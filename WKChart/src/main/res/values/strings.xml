@@ -1,0 +1,15 @@
+<resources>
+  <string name="wk_k_chart">K&#160;Chart</string>
+  <string name="wk_depth_chart">Depth&#160;Chart</string>
+  <string name="wk_price">Price</string>
+  <string name="wk_total_amount">Total&#160;amount</string>
+  <string name="wk_total_cost">Total&#160;cost</string>
+  <string name="wk_high">High</string>
+  <string name="wk_open">Open</string>
+  <string name="wk_low">Low</string>
+  <string name="wk_close">Close</string>
+  <string name="wk_time_value">Date</string>
+  <string name="wk_change_amount">Change</string>
+  <string name="wk_change_proportion">Change</string>
+  <string name="wk_volume">Executed</string>
+</resources>

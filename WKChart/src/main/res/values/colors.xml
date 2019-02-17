@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="colorPrimary">#3F51B5</color>
+  <color name="colorPrimaryDark">#303F9F</color>
+  <color name="colorAccent">#FF4081</color>
+
+  <color name="bg_kChartDataTypeChecked">#cc394551</color>
+  <color name="bg_kChartDataTypeUnChecked">@android:color/transparent</color>
+  <color name="text_kChartDataTypeChecked">#ffffff</color>
+  <color name="text_kChartDataTypeUnChecked">#707d8a</color>
+
+
+  <color name="chart_red">#ff6262</color>
+  <color name="chart_green">#2cc597</color>
+
+  <color name="volume_red">#66ff6262</color>
+  <color name="volume_green">#662cc597</color>
+
+  <color name="chart_ma5">#9561fa</color>
+  <color name="chart_ma10">#ffcb62</color>
+  <color name="chart_ma20">#34a9ff</color>
+  <color name="chart_white">#fff</color>
+
+  <color name="chart_background">#202a33</color>
+  <color name="chart_grid_line">#1AFFFFFF</color>
+  <color name="chart_divider_line">#707d8a</color>
+  <color name="chart_text">#a3ffffff</color>
+  <color name="chart_selector">#cc394551</color>
+  <color name="chart_selector_line">#3dd8d8d8</color>
+  <color name="chart_tab_background">#30343C</color>
+  <color name="chart_tab_indicator">#FF6601</color>
+  <color name="selector_label">#8c99a6</color>
+  <color name="selector_value">#ffffff</color>
+  <color name="selector_border">#F2394551</color>
+  <color name="selector_background">#E6182027</color>
+</resources>

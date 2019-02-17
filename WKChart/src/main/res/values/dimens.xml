@@ -1,0 +1,9 @@
+<resources>
+  <dimen name="chart_tab_width_size">35sp</dimen>
+  <dimen name="chart_tab_height_size">20sp</dimen>
+  <!--深度图-->
+  <dimen name="activity_horizontal_margin">16dp</dimen>
+  <dimen name="activity_vertical_margin">16dp</dimen>
+  <dimen name="depth_label_size">8sp</dimen>
+  <dimen name="depth_selector_label_size">9sp</dimen>
+</resources>

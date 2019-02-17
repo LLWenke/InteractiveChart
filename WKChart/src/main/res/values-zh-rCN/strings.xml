@@ -1,0 +1,15 @@
+<resources>
+  <string name="wk_k_chart">K线图</string>
+  <string name="wk_depth_chart">深度图</string>
+  <string name="wk_price">价格</string>
+  <string name="wk_total_amount">总量</string>
+  <string name="wk_total_cost">总成本</string>
+  <string name="wk_high">高</string>
+  <string name="wk_open">开</string>
+  <string name="wk_low">低</string>
+  <string name="wk_close">收</string>
+  <string name="wk_time_value">时间</string>
+  <string name="wk_change_amount">涨跌额</string>
+  <string name="wk_change_proportion">涨跌幅</string>
+  <string name="wk_volume">成交量</string>
+</resources>
