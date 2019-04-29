@@ -4,7 +4,7 @@
   <string name="wk_macd">MACD</string>
   <string name="wk_rsi">RSI</string>
   <string name="wk_kdj">KDJ</string>
-  <string name="wk_bull">BULL</string>
+  <string name="wk_bull">BOLL</string>
 
   <string name="wk_time_line">line</string>
   <string name="wk_1m">1m</string>
@@ -13,5 +13,10 @@
   <string name="wk_1h">1h</string>
   <string name="wk_6h">6h</string>
   <string name="wk_1d">1d</string>
+
+
+  <string name="wk_historical_data">HISTORICAL DATA SHOW</string>
+  <string name="wk_real_time_data">REAL TIME DATA SHOW</string>
+  <string name="wk_loading_tips">DATA LOADING ...</string>
 
 </resources>

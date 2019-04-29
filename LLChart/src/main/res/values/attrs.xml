@@ -1,0 +1,287 @@
+<resources>
+
+  <declare-styleable name="ChartAttr">
+    <!-- 各个视图模块的配置信息有关属性 -->
+    <!-- K线模块高度 -->
+    <attr format="dimension" name="candleViewHeight"/>
+    <!-- 交易量模块高度 -->
+    <attr format="dimension" name="volumeViewHeight"/>
+    <!-- 副图模块高度 -->
+    <attr format="dimension" name="otherViewHeight"/>
+    <!-- 分时图模块高度 -->
+    <attr format="dimension" name="timeLineViewHeight"/>
+    <!-- 深度图模块高度 -->
+    <attr format="dimension" name="depthViewHeight"/>
+    <!-- 各个视图模块间的间隔 -->
+    <attr format="dimension" name="viewInterval"/>
+    <!-- 视图边框线条宽度 -->
+    <attr format="dimension" name="borderWidth"/>
+    <!-- 视图边框线条颜色 -->
+    <attr format="color" name="borderColor"/>
+    <!-- X 轴方向的最小滚动值固定偏移量（左边） -->
+    <attr format="dimension" name="leftScrollOffset"/>
+    <!-- X 轴方向的最大滚动值固定偏移量（右边） -->
+    <attr format="dimension" name="rightScrollOffset"/>
+    <!-- 渲染model类别 -->
+    <attr name="renderModel">
+      <enum name="candle" value="0"/>
+      <enum name="depth" value="1"/>
+    </attr>
+
+    <!-- 共用的有关属性 -->
+    <!-- 标签字符大小 -->
+    <attr format="dimension" name="labelSize"/>
+    <!-- 标签字符颜色 -->
+    <attr format="color" name="labelColor"/>
+    <!-- 线条宽度 -->
+    <attr format="dimension" name="lineWidth"/>
+    <!-- 线条颜色 -->
+    <attr format="color" name="lineColor"/>
+
+    <!-- 与 grid 标尺刻度有关属性 -->
+    <!-- grid 标签上边距 -->
+    <attr format="dimension" name="gridLabelMarginTop"/>
+    <!-- grid 标签下边距 -->
+    <attr format="dimension" name="gridLabelMarginBottom"/>
+    <!-- grid 行数 -->
+    <attr format="integer" name="gridCount"/>
+    <!-- grid 线条是否显示-->
+    <attr format="boolean" name="gridIsHide"/>
+
+    <!-- 与 axis 标尺刻度有关属性 -->
+    <!-- axis 列数 -->
+    <attr format="integer" name="axisCount"/>
+    <!-- axis 标签左右Margin -->
+    <attr format="dimension" name="axisLabelLRMargin"/>
+    <!-- axis 标签上下Margin -->
+    <attr format="dimension" name="axisLabelTBMargin"/>
+    <!-- axis 标签显示位置 -->
+    <attr name="axisLabelLocation">
+      <enum name="left" value="0"/>
+      <enum name="right" value="1"/>
+      <enum name="all" value="2"/>
+    </attr>
+
+    <!-- 与高亮线有关的属性 -->
+    <!-- X高亮线条是否显示  -->
+    <attr format="boolean" name="xHighlightIsHide"/>
+    <!-- X高亮线条是否启用自动宽度管理(启用后xHighlightWidth将失效，宽度将实时跟随candleWidth)  -->
+    <attr format="boolean" name="xHighlightAutoWidth"/>
+    <!-- X高亮线条颜色 -->
+    <attr format="color" name="xHighlightColor"/>
+    <!-- Y高亮线条是否显示  -->
+    <attr format="boolean" name="yHighlightIsHide"/>
+    <!-- Y高亮线条是否启用自动宽度管理(启用后yHighlightWidth将失效，宽度将实时跟随candleWidth)  -->
+    <attr format="boolean" name="yHighlightAutoWidth"/>
+    <!-- Y高亮线条颜色 -->
+    <attr format="color" name="yHighlightColor"/>
+
+    <!-- 与MarkerView有关的属性 -->
+    <!-- MarkerView 边框宽度 -->
+    <attr format="dimension" name="markerBorderWidth"/>
+    <!-- MarkerView 边框圆角 -->
+    <attr format="dimension" name="markerBorderRadius"/>
+    <!-- MarkerView 上下padding -->
+    <attr format="dimension" name="markerBorderTBPadding"/>
+    <!-- MarkerView 左右padding -->
+    <attr format="dimension" name="markerBorderLRPadding"/>
+    <!-- MarkerView 边框颜色 -->
+    <attr format="color" name="markerBorderColor"/>
+    <!-- MarkerView 字符大小 -->
+    <attr format="dimension" name="markerTextSize"/>
+    <!-- MarkerView 字符颜色 -->
+    <attr format="color" name="markerTextColor"/>
+    <!-- X 轴 MarkerView 对齐方向 -->
+    <attr name="xMarkerAlign">
+      <enum name="top" value="0"/>
+      <enum name="bottom" value="1"/>
+      <enum name="auto" value="2"/>
+    </attr>
+    <!-- Y 轴 MarkerView 对齐方向 -->
+    <attr name="yMarkerAlign">
+      <enum name="left" value="0"/>
+      <enum name="right" value="1"/>
+      <enum name="auto" value="2"/>
+    </attr>
+    <!-- MarkerView填充样式。默认实心 -->
+    <attr name="markerStyle">
+      <!-- 空心，仅描边 -->
+      <enum name="stroke" value="1"/>
+      <!-- 实心并描边 -->
+      <enum name="fill_and_stroke" value="2"/>
+    </attr>
+
+    <!-- 与选择器有关的属性 -->
+    <!-- 信息选择框的padding -->
+    <attr format="dimension" name="selectorPadding"/>
+    <!-- 信息选择框的左右margin -->
+    <attr format="dimension" name="selectorMarginX"/>
+    <!-- 信息选择框的上下margin -->
+    <attr format="dimension" name="selectorMarginY"/>
+    <!-- 信息选择框的item上下间隔 -->
+    <attr format="dimension" name="selectorIntervalY"/>
+    <!-- 信息选择框的item左右间隔 -->
+    <attr format="dimension" name="selectorIntervalX"/>
+    <!-- 信息选择框的圆角度数 -->
+    <attr format="dimension" name="selectorRadius"/>
+    <!-- 选择器边框线宽度 -->
+    <attr format="dimension" name="selectorBorderWidth"/>
+    <!-- 选择器边框线颜色 -->
+    <attr format="color" name="selectorBorderColor"/>
+    <!-- 选择器背景颜色 -->
+    <attr format="color" name="selectorBackgroundColor"/>
+    <!-- 选择器label颜色 -->
+    <attr format="color" name="selectorLabelColor"/>
+    <!-- 选择器value颜色 -->
+    <attr format="color" name="selectorValueColor"/>
+    <!-- 选择器label文字大小 -->
+    <attr format="dimension" name="selectorLabelSize"/>
+    <!-- 选择器value文字大小 -->
+    <attr format="dimension" name="selectorValueSize"/>
+
+    <!-- 与指标文字有关的属性 -->
+    <!-- 指标文字大小 -->
+    <attr format="dimension" name="indicatorsTextSize"/>
+    <!-- 指标文字左右margin -->
+    <attr format="dimension" name="indicatorsTextMarginX"/>
+    <!-- 指标文字上下margin -->
+    <attr format="dimension" name="indicatorsTextMarginY"/>
+    <!-- 指标文字的间隔 -->
+    <attr format="dimension" name="indicatorsTextInterval"/>
+
+    <!-- 与游标指示器有关的属性 -->
+    <!-- 游标文字容器边框宽度 -->
+    <attr format="dimension" name="cursorBorderWidth"/>
+    <!-- 游标文字容器背景颜色 -->
+    <attr format="color" name="cursorBackgroundColor"/>
+    <!-- 游标文字容器圆角 -->
+    <attr format="dimension" name="cursorRadius"/>
+
+    <!-- 与极值有关的属性 -->
+    <!-- 极值字符大小 -->
+    <attr format="dimension" name="candleExtremumLabelSize"/>
+    <!-- 极值字符颜色 -->
+    <attr format="color" name="candleExtremumLableColor"/>
+
+    <!-- 与涨跌有关的属性 -->
+    <!-- 上涨颜色 -->
+    <attr format="color" name="increasingColor"/>
+    <!-- 下跌颜色 -->
+    <attr format="color" name="decreasingColor"/>
+    <!-- 上涨蜡烛图填充样式。默认实心 -->
+    <attr name="increasingStyle">
+      <!-- 实心并描边 -->
+      <enum name="fill" value="0"/>
+      <!-- 空心，仅描边 -->
+      <enum name="stroke" value="1"/>
+    </attr>
+    <!-- 下跌蜡烛图填充样式，默认实心 -->
+    <attr name="decreasingStyle">
+      <!-- 实心并描边 -->
+      <enum name="fill" value="0"/>
+      <!-- 空心，仅描边 -->
+      <enum name="stroke" value="1"/>
+    </attr>
+
+    <!-- 与缩放有关的属性 -->
+    <!-- 竖屏状态下的默认缩放倍数下显示多少个蜡烛图。注：横屏时会自动根据视图宽高变化比例计算，不需要手工设置 -->
+    <attr format="float" name="visibleCount"/>
+    <!-- 最多放大倍数 -->
+    <attr format="float" name="maxScale"/>
+    <!-- 最多缩小倍数 -->
+    <attr format="float" name="minScale"/>
+    <!-- 当前X轴缩放倍数 -->
+    <attr format="float" name="currentScale"/>
+
+    <!-- 与股票指标有关的属性 -->
+    <!-- 视图中心线宽度 -->
+    <attr format="dimension" name="centerLineWidth"/>
+    <!-- 视图中心线颜色 -->
+    <attr format="color" name="centerLineColor"/>
+    <!-- 指标线宽度 -->
+    <attr format="dimension" name="normLineWidth"/>
+
+    <!--  MA5 平均线颜色 -->
+    <attr format="color" name="ma5Color"/>
+    <!-- MA10 平均线颜色 -->
+    <attr format="color" name="ma10Color"/>
+    <!-- MA20 平均线颜色 -->
+    <attr format="color" name="ma20Color"/>
+
+    <!-- BOLL MID 线条颜色 -->
+    <attr format="color" name="bollMidLineColor"/>
+    <!-- BOLL UPPER 线条颜色 -->
+    <attr format="color" name="bollUpperLineColor"/>
+    <!-- BOLL LOWER 线条颜色 -->
+    <attr format="color" name="bollLowerLineColor"/>
+
+    <!-- KDJ K 线条颜色 -->
+    <attr format="color" name="kdjKLineColor"/>
+    <!-- KDJ D 线条颜色 -->
+    <attr format="color" name="kdjDLineColor"/>
+    <!-- KDJ J 线条颜色-->
+    <attr format="color" name="kdjJLineColor"/>
+
+    <!-- DEA 线条颜色 -->
+    <attr format="color" name="deaLineColor"/>
+    <!--  DIFF 线条颜色 -->
+    <attr format="color" name="diffLineColor"/>
+
+    <!-- RSI 第一条线颜色 -->
+    <attr format="color" name="rsi1LineColor"/>
+    <!-- RSI 第二条线颜色 -->
+    <attr format="color" name="rsi2LineColor"/>
+    <!-- RSI 第三条线颜色 -->
+    <attr format="color" name="rsi3LineColor"/>
+
+    <!-- 与loading和error有关的属性 -->
+    <!--  加载字符大小 -->
+    <attr format="dimension" name="loadingTextSize"/>
+    <!-- 加载字符颜色 -->
+    <attr format="color" name="loadingTextColor"/>
+    <!--  加载字符 -->
+    <attr format="string" name="loadingText"/>
+
+    <!--  错误字符大小 -->
+    <attr format="dimension" name="errorTextSize"/>
+    <!--  错误字符颜色 -->
+    <attr format="color" name="errorTextColor"/>
+    <!--  错误字符 -->
+    <attr format="string" name="errorText"/>
+
+    <!-- 蜡烛图相关属性 -->
+    <!-- 蜡烛图矩形边框大小 -->
+    <attr format="dimension" name="candleBorderWidth"/>
+    <!-- 蜡烛图矩形初始宽度 -->
+    <attr format="dimension" name="candleWidth"/>
+    <!-- 蜡烛图矩形间隔 -->
+    <attr format="dimension" name="candleSpace"/>
+
+    <!-- 分时图相关属性 -->
+    <!-- 分时线宽度 -->
+    <attr format="dimension" name="timeLineWidth"/>
+    <!-- 分时线颜色 -->
+    <attr format="color" name="timeLineColor"/>
+    <!-- 分时线颜色渐变起始色值 -->
+    <attr format="color" name="timeLineShaderColorBegin"/>
+    <!-- 分时线颜色渐变结束色值 -->
+    <attr format="color" name="timeLineShaderColorEnd"/>
+
+    <!-- 深度图相关属性 -->
+    <!-- 折线宽度 -->
+    <attr format="dimension" name="depthLineWidth"/>
+    <!-- 买单折线颜色 -->
+    <attr format="color" name="depthBidLineColor"/>
+    <!-- 卖单折线颜色 -->
+    <attr format="color" name="depthAskLineColor"/>
+    <!-- 买单阴影颜色 -->
+    <attr format="color" name="depthBidShaderColor"/>
+    <!-- 卖单阴影颜色 -->
+    <attr format="color" name="depthAskShaderColor"/>
+    <!-- 买单高亮线颜色 -->
+    <attr format="color" name="depthBidHighlightColor"/>
+    <!-- 卖单高亮线颜色 -->
+    <attr format="color" name="depthAskHighlightColor"/>
+
+  </declare-styleable>
+</resources>
