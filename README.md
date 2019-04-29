@@ -7,4 +7,4 @@
 
 
   
- ![输入图片说明](https://image/481556520287_.pic_gaitubao_306x634.jpg)。![输入图片说明](https://image/471556520286_.pic_gaitubao_306x634.jpg)
+ ![输入图片说明](image/481556520287_.pic_gaitubao_306x634.jpg)。![输入图片说明](image/471556520286_.pic_gaitubao_306x634.jpg)
