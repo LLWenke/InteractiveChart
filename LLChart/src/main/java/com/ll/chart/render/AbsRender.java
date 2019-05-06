@@ -25,7 +25,6 @@ import java.util.List;
 
 public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
   private static final String TAG = "AbsRender";
-  private final RectF viewRect; // 整个的视图区域
   private final MeasureUtils measureUtils;//计算工具类
   private final FloatChartModule floatChartModule;//跨视图组件
   private final List<AbsChartModule<? super AbsEntry>> chartModules = new ArrayList<>(); //图表指标列表
@@ -39,6 +38,7 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
   private final float[] extremum = new float[4];//[x0, y0, x1, y1]
   private final float[] highlightPoint = new float[2];//长按位置
 
+  protected final RectF viewRect; // 整个的视图区域
   protected T adapter; // 数据适配器
   protected A attribute; // 配置信息
   private @NonNull MainChartModule mainChartModule;//主图
@@ -46,6 +46,7 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
 
   private boolean highlight = false;//长按事件状态
   private boolean firstLoad = true;//首次加载
+  private float indicatorsLabelHeight = 0;//指示器标签高度
   private float borderCorrection;//边框修正数值
   private float minScrollOffset = 0; // 最小滚动量
   private float maxScrollOffset = 0; // 最大滚动量
@@ -61,12 +62,24 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
     this.measureUtils = new MeasureUtils(attribute);
     this.borderCorrection = attribute.borderWidth / 2;
     this.floatChartModule = new FloatChartModule(viewRect);
+    init();
+  }
+
+  void init() {
+    switch (attribute.indicatorsLabelLocation) {
+      case LEFT_TOP://左上
+      case LEFT_BOTTOM://左下
+      case RIGHT_TOP://右上
+      case RIGHT_BOTTOM://右下
+        indicatorsLabelHeight = attribute.indicatorsTextMarginY * 2f + attribute.indicatorsTextSize;
+        break;
+    }
   }
 
   /**
-   * 初始化
+   * 初始化图标
    */
-  public void init() {
+  public void resetChart() {
     firstLoad = true;
     setOverScrollOffset(0);
     setCurrentTransX(0);
@@ -281,7 +294,7 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
     float left = viewRect.left + attribute.borderWidth;
     float top = viewRect.top + attribute.borderWidth;
     float right = viewRect.right - attribute.borderWidth;
-    float bottom;
+    float bottom, offsetY = 0;
     for (AbsChartModule<? super AbsEntry> module : modules) {
       if (!module.isEnable()) {
         continue;
@@ -290,6 +303,16 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
       if (module instanceof MainChartModule) {
         this.mainChartModule = (MainChartModule) module;
       }
+      switch (attribute.indicatorsLabelLocation) {
+        case LEFT_TOP://左上
+        case RIGHT_TOP://右上
+          top += module.isHasOffsetY() ? indicatorsLabelHeight : 0;
+          break;
+        case LEFT_BOTTOM://左下
+        case RIGHT_BOTTOM://右下
+          offsetY = module.isHasOffsetY() ? indicatorsLabelHeight : 0;
+          break;
+      }
       //分配图表大小和位置
       bottom = top + module.getViewHeight();
       module.setRect(
@@ -297,7 +320,7 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
           top + module.getPaddingTop(),
           right - module.getPaddingRight(),
           bottom - module.getPaddingBottom());
-      top = bottom + attribute.viewInterval + attribute.borderWidth * 2f;
+      top = bottom + attribute.viewInterval + offsetY + attribute.borderWidth * 2f;
     }
   }
 
@@ -306,7 +329,7 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
    */
   void resetMatrix() {
     initMatrixValue(mainChartModule.getRect());
-    postMatrixOffset(mainChartModule.getRect().left, mainChartModule.getRect().top);
+    postMatrixOffset(mainChartModule.getRect().left, viewRect.top);
     postMatrixTouch(mainChartModule.getRect().width(), attribute.visibleCount);
   }
 
@@ -509,7 +532,7 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
     matrixValue.mapPoints(pts);
     matrixTouch.mapPoints(pts);
     matrixOffset.mapPoints(pts);
-    calibrationMapPoints(pts, xOffset, -(yOffset + attribute.borderWidth));
+    calibrationMapPoints(pts, xOffset, -yOffset);
   }
 
   /**
@@ -521,7 +544,6 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
     matrixValue.mapPoints(pts);
     matrixTouch.mapPoints(pts);
     matrixOffset.mapPoints(pts);
-    calibrationMapPoints(pts, 0, -attribute.borderWidth);
   }
 
   /**
@@ -538,7 +560,6 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
     }
     matrixTouch.mapPoints(pts);
     matrixOffset.mapPoints(pts);
-    calibrationMapPoints(pts, 0, -attribute.borderWidth);
   }
 
   /**
@@ -712,7 +733,7 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
    * 布局高度计算
    */
   public int measureHeight(int height) {
-    return Math.round(measureUtils.childViewHeightMeasure(height));
+    return Math.round(measureUtils.childViewHeightMeasure(height, indicatorsLabelHeight));
   }
 
   /**

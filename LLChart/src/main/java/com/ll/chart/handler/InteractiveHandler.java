@@ -15,10 +15,12 @@ public abstract class InteractiveHandler {
 
   public abstract void onRightRefresh(AbsEntry lastData);
 
-  public void onSingleTap(MotionEvent e, float x, float y) {
+  public boolean onSingleTap(MotionEvent e, float x, float y) {
+    return false;
   }
 
-  public void onDoubleTap(MotionEvent e, float x, float y) {
+  public boolean onDoubleTap(MotionEvent e, float x, float y) {
+    return false;
   }
 
   public void onHighlight(AbsEntry entry, int entryIndex, float x, float y) {

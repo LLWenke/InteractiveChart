@@ -44,8 +44,7 @@ public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
   protected void resetMatrix() {
     RectF rectF = getMainChartModule().getRect();
     initMatrixValue(rectF);
-    postMatrixOffset(rectF.left + getMainChartModule().getxOffset() * 2f,
-        rectF.top - getMainChartModule().getyOffset());
+    postMatrixOffset(rectF.left + getMainChartModule().getxOffset() * 2f, viewRect.top);
     postMatrixTouch(rectF.width() - getMainChartModule().getxCorrectedValue(),
         getAdapter().getCount());
   }

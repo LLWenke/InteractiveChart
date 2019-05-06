@@ -4,6 +4,7 @@ package com.ll.chart.module.base;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import com.ll.chart.drawing.AbsDrawing;
+import com.ll.chart.drawing.IndicatorsLabelDrawing;
 import com.ll.chart.entry.AbsEntry;
 import com.ll.chart.entry.ValueEntry;
 import com.ll.chart.enumeration.ModuleType;
@@ -40,6 +41,8 @@ public abstract class AbsChartModule<T extends AbsEntry> {
   private float viewHeight;//高度
 
   private boolean enable = true;
+
+  private boolean hasOffsetY = false;
 
   private ModuleType moduleType;//图表类型
 
@@ -97,9 +100,13 @@ public abstract class AbsChartModule<T extends AbsEntry> {
 
   public void addDrawing(AbsDrawing<? extends AbsRender> drawing) {
     drawingList.add(drawing);
+    hasOffsetY = hasOffsetY || drawing instanceof IndicatorsLabelDrawing;
   }
 
   public void removeDrawing(Class<? extends AbsDrawing> drawing) {
+    if (drawing.isInstance(IndicatorsLabelDrawing.class)) {
+      hasOffsetY = false;
+    }
     for (AbsDrawing item : drawingList) {
       if (item.getClass().isInstance(drawing)) {
         drawingList.remove(item);
@@ -251,5 +258,9 @@ public abstract class AbsChartModule<T extends AbsEntry> {
 
   public float getyOffset() {
     return yOffset;
+  }
+
+  public boolean isHasOffsetY() {
+    return hasOffsetY;
   }
 }

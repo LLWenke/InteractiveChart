@@ -80,6 +80,6 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender> {
 
   @Override public void onViewChange() {
     regionWidth = viewRect.width() / (attribute.gridCount - 1);
-    gridLabelY = viewRect.bottom + rect.height() + attribute.gridLabelMarginTop;
+    gridLabelY = viewRect.bottom + rect.height() + attribute.gridLabelMarginTop+attribute.borderWidth;
   }
 }

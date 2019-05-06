@@ -40,7 +40,7 @@ public class MeasureUtils {
   /**
    * 计算子View高度，并返回真实高度
    */
-  public float childViewHeightMeasure(float height) {
+  public float childViewHeightMeasure(float height, float indicatorsLabelHeight) {
     float viewBorderWidthCount = attribute.borderWidth * 2;
     float viewIntervalCount = attribute.gridLabelMarginTop
         + rect.height()
@@ -59,7 +59,12 @@ public class MeasureUtils {
       AbsChartModule item = chartModules.get(i);
       if (item.isEnable()) {
         enableViewCount++;
-        viewIntervalCount += attribute.viewInterval + viewBorderWidthCount;
+        if (item.isHasOffsetY()) {
+          viewIntervalCount +=
+              (attribute.viewInterval + indicatorsLabelHeight + viewBorderWidthCount);
+        } else {
+          viewIntervalCount += (attribute.viewInterval + viewBorderWidthCount);
+        }
       }
     }
     //减去最后一个view的viewInterval+ borderWidth（也就是最后一个view没有间隔）

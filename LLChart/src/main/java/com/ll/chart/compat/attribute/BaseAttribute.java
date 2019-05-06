@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import com.ll.chart.enumeration.AxisLabelLocation;
 import com.ll.chart.enumeration.GridMarkerAlign;
 import com.ll.chart.enumeration.AxisMarkerAlign;
+import com.ll.chart.enumeration.IndicatorsLabelLocation;
 
 /**
  * <p>视图属性配置基类</p>
@@ -40,6 +41,7 @@ public class BaseAttribute {
   public int lineColor = 0x1Affffff; // 线条颜色
   public float labelSize = 26; // 标签字符大小
   public int labelColor = 0xff8c99a6; //标签字符颜色
+  public boolean onSingleClickSelected = true;//是否可以单击选中
 
   /**
    * 与 grid 标尺刻度有关属性
@@ -109,6 +111,7 @@ public class BaseAttribute {
   public float indicatorsTextMarginX = 16;//指标文字左右margin
   public float indicatorsTextMarginY = 8;//指标文字上下margin
   public float indicatorsTextInterval = 16;//指标文字的间隔
+  public IndicatorsLabelLocation indicatorsLabelLocation = IndicatorsLabelLocation.LEFT_TOP; //指标文字的位置
 
   /**
    * 与游标指示器有关的属性

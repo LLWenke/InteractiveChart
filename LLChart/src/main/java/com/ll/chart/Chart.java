@@ -183,15 +183,23 @@ public class Chart extends View {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
+          boolean consumed = false;
           if (handler != null) {
-            handler.onSingleTap(e, e.getX(), e.getY());
+            consumed = handler.onSingleTap(e, e.getX(), e.getY());
           }
-          if (getRender().onDrawingClick(e.getX(), e.getY()) instanceof CursorDrawing) {
+          if (getRender().onDrawingClick(e.getX(), e.getY()) instanceof CursorDrawing
+              && !consumed) {
             scroller.startScroll(0, 0,
                 (int) (render.getCurrentTransX() - render.getMaxScrollOffset()), 0, 1000);
             postInvalidateOnAnimation();
+            consumed = true;
           }
-          return true;
+          if (attribute.onSingleClickSelected && !consumed) {
+            onLongPress = true;
+            highlight(e.getX(), e.getY());
+            consumed = true;
+          }
+          return consumed;
         }
 
         @Override
@@ -578,7 +586,7 @@ public class Chart extends View {
   private void initChartState() {
     chartState = IDLE;
     lastFlingX = 0;
-    render.init();
+    render.resetChart();
   }
 
   /**
