@@ -201,38 +201,16 @@
     <!-- 指标线宽度 -->
     <attr format="dimension" name="normLineWidth"/>
 
-    <!--  MA5 平均线颜色 -->
-    <attr format="color" name="ma5Color"/>
-    <!-- MA10 平均线颜色 -->
-    <attr format="color" name="ma10Color"/>
-    <!-- MA20 平均线颜色 -->
-    <attr format="color" name="ma20Color"/>
-
-    <!-- BOLL MID 线条颜色 -->
-    <attr format="color" name="bollMidLineColor"/>
-    <!-- BOLL UPPER 线条颜色 -->
-    <attr format="color" name="bollUpperLineColor"/>
-    <!-- BOLL LOWER 线条颜色 -->
-    <attr format="color" name="bollLowerLineColor"/>
-
-    <!-- KDJ K 线条颜色 -->
-    <attr format="color" name="kdjKLineColor"/>
-    <!-- KDJ D 线条颜色 -->
-    <attr format="color" name="kdjDLineColor"/>
-    <!-- KDJ J 线条颜色-->
-    <attr format="color" name="kdjJLineColor"/>
-
-    <!-- DEA 线条颜色 -->
-    <attr format="color" name="deaLineColor"/>
-    <!--  DIFF 线条颜色 -->
-    <attr format="color" name="diffLineColor"/>
-
-    <!-- RSI 第一条线颜色 -->
-    <attr format="color" name="rsi1LineColor"/>
-    <!-- RSI 第二条线颜色 -->
-    <attr format="color" name="rsi2LineColor"/>
-    <!-- RSI 第三条线颜色 -->
-    <attr format="color" name="rsi3LineColor"/>
+    <!-- 线条1颜色 -->
+    <attr format="color" name="line1Color"/>
+    <!-- 线条2颜色 -->
+    <attr format="color" name="line2Color"/>
+    <!-- 线条3颜色 -->
+    <attr format="color" name="line3Color"/>
+    <!-- 线条4颜色 -->
+    <attr format="color" name="line4Color"/>
+    <!-- 线条5颜色 -->
+    <attr format="color" name="line5Color"/>
 
     <!-- 与loading和error有关的属性 -->
     <!--  加载字符大小 -->

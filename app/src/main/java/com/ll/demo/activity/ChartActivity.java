@@ -391,7 +391,7 @@ public class ChartActivity extends AppCompatActivity
         case sixHour://六小时
           button = rbSixHour;
           break;
-        case oneDay://一天
+        case day://一天
           button = rbOneDay;
           break;
       }
@@ -409,7 +409,7 @@ public class ChartActivity extends AppCompatActivity
   }
 
   private void loadData() {
-    candleAdapter.resetData(DisplayType.oneDay,
+    candleAdapter.resetData(DisplayType.day,
         dataShowType == DataDisplayType.REAL_TIME.ordinal() ?
             getNewestData(500) : getInit());
     depthAdapter.resetData(depthEntries);

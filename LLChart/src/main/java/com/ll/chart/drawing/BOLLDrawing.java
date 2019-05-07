@@ -46,15 +46,15 @@ public class BOLLDrawing extends AbsDrawing<CandleRender> {
     borderPaint.setStrokeWidth(attribute.borderWidth);
     borderPaint.setColor(attribute.borderColor);
 
-    r1Paint.setColor(attribute.bollMidLineColor);
+    r1Paint.setColor(attribute.line1Color);
     r1Paint.setStrokeWidth(attribute.lineWidth);
     r1Paint.setStyle(Paint.Style.STROKE);
 
-    r2Paint.setColor(attribute.bollUpperLineColor);
+    r2Paint.setColor(attribute.line2Color);
     r2Paint.setStrokeWidth(attribute.lineWidth);
     r2Paint.setStyle(Paint.Style.STROKE);
 
-    r3Paint.setColor(attribute.bollLowerLineColor);
+    r3Paint.setColor(attribute.line3Color);
     r3Paint.setStrokeWidth(attribute.lineWidth);
     r3Paint.setStyle(Paint.Style.STROKE);
   }

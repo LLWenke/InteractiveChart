@@ -6,7 +6,7 @@ package com.ll.chart.enumeration;
  */
 
 public enum DisplayType {
-  oneMinute("MM-dd HH:mm", 1, 60000),//一分钟
+  oneMinute("yy-MM-dd HH:mm", 1, 60000),//一分钟
 
   fiveMinute(oneMinute.pattern, 5, oneMinute.msec),//五分钟
 
@@ -16,11 +16,21 @@ public enum DisplayType {
 
   oneHour(oneMinute.pattern, 1, oneMinute.msec * 60),//一小时
 
+  twoHour(oneMinute.pattern, 2, oneHour.msec),//二小时
+
   threeHour(oneMinute.pattern, 3, oneHour.msec),//三小时
+
+  fourHour(oneMinute.pattern, 4, oneHour.msec),//四小时
 
   sixHour(oneMinute.pattern, 6, oneHour.msec),//六小时
 
-  oneDay("MM-dd", 1, oneHour.msec * 24);//一天
+  eightHour(oneMinute.pattern, 8, oneHour.msec),//八小时
+
+  day("yy-MM-dd", 1, oneHour.msec * 24),//天
+
+  week("yy-MM-dd", 7, day.msec),//周
+
+  month("yy-MM-dd", 1, 0);//月
 
   DisplayType(String pattern, int value, long msec) {
     this.pattern = pattern;

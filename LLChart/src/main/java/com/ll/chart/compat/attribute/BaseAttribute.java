@@ -28,7 +28,7 @@ public class BaseAttribute {
   public float otherViewHeight = 0; // 副图模块高度
   public float timeLineViewHeight = 0; // 分时图模块高度
   public float depthViewHeight = 0; // 深度图图模块高度
-  public float viewInterval = 30; // 各个视图模块间的间隔
+  public float viewInterval = 0; // 各个视图模块间的间隔
   public float borderWidth = 3f; // 边框线条宽度
   public int borderColor = 0x1Affffff; // 边框线条颜色
   public float leftScrollOffset = 0;//X 轴方向的最小滚动值固定偏移量（左边）
@@ -55,7 +55,7 @@ public class BaseAttribute {
   /**
    * 与 axis 标尺刻度有关属性
    */
-  public int axisCount = 5; // axis数量
+  public int axisCount = 3; // axis数量
   public float axisLabelLRMargin = 16f;//axis标签左右Margin
   public float axisLabelTBMargin = 8f;//axis标签上下Margin
   public AxisLabelLocation axisLabelLocation = AxisLabelLocation.LEFT; // axis标签显示位置
@@ -108,10 +108,11 @@ public class BaseAttribute {
    * 与指标文字有关的属性
    */
   public float indicatorsTextSize = 26;//指标文字大小
-  public float indicatorsTextMarginX = 16;//指标文字左右margin
+  public float indicatorsTextMarginX = 0;//指标文字左右margin
   public float indicatorsTextMarginY = 8;//指标文字上下margin
   public float indicatorsTextInterval = 16;//指标文字的间隔
-  public IndicatorsLabelLocation indicatorsLabelLocation = IndicatorsLabelLocation.LEFT_TOP; //指标文字的位置
+  public IndicatorsLabelLocation indicatorsLabelLocation = IndicatorsLabelLocation.LEFT_TOP;
+  //指标文字的位置
 
   /**
    * 与游标指示器有关的属性
@@ -123,8 +124,11 @@ public class BaseAttribute {
   /**
    * 涨跌有关的属性
    */
-  public int increasingColor = 0xffb5fc00; // 上涨颜色
-  public int decreasingColor = 0xfffe0d5e; // 下跌颜色
+  public int increasingColor = 0xffB5FC00; // 上涨颜色
+  public int decreasingColor = 0xffFE0D5E; // 下跌颜色
+  public int increasingDarkColor = 0x33B5FC00; // 上涨颜色
+  public int decreasingDarkColor = 0x33FE0D5E; // 下跌颜色
+
   public Paint.Style increasingStyle = Paint.Style.FILL; // 上涨蜡烛图填充样式。默认实心
   public Paint.Style decreasingStyle = Paint.Style.STROKE; // 下跌蜡烛图填充样式，默认空心
 
@@ -148,24 +152,11 @@ public class BaseAttribute {
    */
   public int centerLineColor = 0xffffffff; // 视图中心线颜色
 
-  public int ma5Color = 0xff9561fa; // MA5 平均线颜色
-  public int ma10Color = 0xffffcb62; // MA10 平均线颜色
-  public int ma20Color = 0xff34a9ff; // MA20 平均线颜色
-
-  public int bollMidLineColor = 0xff82b1ff; // BOLL MID 线条颜色
-  public int bollUpperLineColor = 0xffffab40; // BOLL UPPER 线条颜色
-  public int bollLowerLineColor = 0xfff06292; // BOLL LOWER 线条颜色
-
-  public int kdjKLineColor = 0xff82b1ff; // KDJ K 线条颜色
-  public int kdjDLineColor = 0xffffab40; // KDJ D 线条颜色
-  public int kdjJLineColor = 0xfff06292; // KDJ J 线条颜色
-
-  public int deaLineColor = 0xff82b1ff; // DEA 线条颜色
-  public int diffLineColor = 0xffffab40; // DIFF 线条颜色
-
-  public int rsi1LineColor = 0xff82b1ff; // RSI 第一条线颜色
-  public int rsi2LineColor = 0xffffab40; // RSI 第二条线颜色
-  public int rsi3LineColor = 0xfff06292; // RSI 第三条线颜色
+  public int line1Color = 0xff9660c4; // 线条1颜色
+  public int line2Color = 0xff84aad5; // 线条2颜色
+  public int line3Color = 0xff55b263; // 线条3颜色
+  public int line4Color = 0xff7F9976; // 线条4颜色
+  public int line5Color = 0xff34a9ff; // 线条5颜色
 
   /**
    * 与loading和error有关的属性

@@ -272,47 +272,20 @@ public class AttributeRead {
     attribute.centerLineColor = a.getColor(R.styleable.ChartAttr_centerLineColor,
         attribute.centerLineColor);// 视图中心线颜色
 
-    attribute.ma5Color = a.getColor(R.styleable.ChartAttr_ma5Color,
-        attribute.ma5Color);// MA5 平均线颜色
+    attribute.line1Color = a.getColor(R.styleable.ChartAttr_line1Color,
+        attribute.line1Color);// 线条1颜色
 
-    attribute.ma10Color = a.getColor(R.styleable.ChartAttr_ma10Color,
-        attribute.ma10Color);// MA10 平均线颜色
+    attribute.line2Color = a.getColor(R.styleable.ChartAttr_line2Color,
+        attribute.line2Color);// 线条2颜色
 
-    attribute.ma20Color = a.getColor(R.styleable.ChartAttr_ma20Color,
-        attribute.ma20Color);// MA20 平均线颜色
+    attribute.line3Color = a.getColor(R.styleable.ChartAttr_line3Color,
+        attribute.line3Color);// 线条3颜色
 
-    attribute.bollMidLineColor = a.getColor(R.styleable.ChartAttr_bollMidLineColor,
-        attribute.bollMidLineColor);// BOLL MID 线条颜色
+    attribute.line4Color = a.getColor(R.styleable.ChartAttr_line4Color,
+        attribute.line4Color);// 线条4颜色
 
-    attribute.bollUpperLineColor = a.getColor(R.styleable.ChartAttr_bollUpperLineColor,
-        attribute.bollUpperLineColor); // BOLL UPPER 线条颜色
-
-    attribute.bollLowerLineColor = a.getColor(R.styleable.ChartAttr_bollLowerLineColor,
-        attribute.bollLowerLineColor);// BOLL LOWER 线条颜色
-
-    attribute.kdjKLineColor = a.getColor(R.styleable.ChartAttr_kdjKLineColor,
-        attribute.kdjKLineColor);// KDJ K 线条颜色
-
-    attribute.kdjDLineColor = a.getColor(R.styleable.ChartAttr_kdjDLineColor,
-        attribute.kdjDLineColor);// KDJ D 线条颜色
-
-    attribute.kdjJLineColor = a.getColor(R.styleable.ChartAttr_kdjJLineColor,
-        attribute.kdjJLineColor); // KDJ J 线条颜色
-
-    attribute.deaLineColor = a.getColor(R.styleable.ChartAttr_deaLineColor,
-        attribute.deaLineColor);// DEA 线条颜色
-
-    attribute.diffLineColor = a.getColor(R.styleable.ChartAttr_diffLineColor,
-        attribute.diffLineColor);// DIFF 线条颜色
-
-    attribute.rsi1LineColor = a.getColor(R.styleable.ChartAttr_rsi1LineColor,
-        attribute.rsi1LineColor);// RSI 线条宽度
-
-    attribute.rsi2LineColor = a.getColor(R.styleable.ChartAttr_rsi2LineColor,
-        attribute.rsi2LineColor);// RSI 第二条线颜色
-
-    attribute.rsi3LineColor = a.getColor(R.styleable.ChartAttr_rsi3LineColor,
-        attribute.rsi3LineColor);// RSI 第三条线颜色
+    attribute.line5Color = a.getColor(R.styleable.ChartAttr_line5Color,
+        attribute.line5Color);// 线条5颜色
 
     /**
      *  与loading和error有关的属性

@@ -37,7 +37,7 @@ public class GridDrawing extends AbsDrawing<CandleRender> {
 
     gridPaint.setStyle(Paint.Style.STROKE);
     gridPaint.setStrokeWidth(attribute.lineWidth);
-    gridPaint.setColor(attribute.labelColor);
+    gridPaint.setColor(attribute.lineColor);
   }
 
   @Override

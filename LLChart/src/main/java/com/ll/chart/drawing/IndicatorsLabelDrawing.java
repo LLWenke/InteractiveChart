@@ -36,13 +36,13 @@ public class IndicatorsLabelDrawing extends AbsDrawing<CandleRender> {
         TextPaint ma20Paint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 
         ma5Paint.setTextSize(attribute.indicatorsTextSize);
-        ma5Paint.setColor(attribute.ma5Color);
+        ma5Paint.setColor(attribute.line1Color);
 
         ma10Paint.setTextSize(attribute.indicatorsTextSize);
-        ma10Paint.setColor(attribute.ma10Color);
+        ma10Paint.setColor(attribute.line2Color);
 
         ma20Paint.setTextSize(attribute.indicatorsTextSize);
-        ma20Paint.setColor(attribute.ma20Color);
+        ma20Paint.setColor(attribute.line3Color);
 
         labelPaint[0] = ma5Paint;
         labelPaint[1] = ma10Paint;
@@ -56,10 +56,10 @@ public class IndicatorsLabelDrawing extends AbsDrawing<CandleRender> {
         TextPaint volumeMa10Paint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 
         volumeMa5Paint.setTextSize(attribute.indicatorsTextSize);
-        volumeMa5Paint.setColor(attribute.ma5Color);
+        volumeMa5Paint.setColor(attribute.line1Color);
 
         volumeMa10Paint.setTextSize(attribute.indicatorsTextSize);
-        volumeMa10Paint.setColor(attribute.ma10Color);
+        volumeMa10Paint.setColor(attribute.line2Color);
 
         labelPaint[0] = volumeMa5Paint;
         labelPaint[1] = volumeMa10Paint;

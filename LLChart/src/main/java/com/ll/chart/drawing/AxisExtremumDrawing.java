@@ -65,23 +65,24 @@ public class AxisExtremumDrawing extends AbsDrawing<AbsRender> {
         paint = linePaint;
         textPaint = labelPaint;
         canvas.drawText(
-            absChartModule.getMaxY().text,
-            labelX,
+            absChartModule.getMaxY().text, labelX,
             viewRect.top - rect.top + attribute.axisLabelTBMargin,
+            textPaint);
+        canvas.drawText(
+            absChartModule.getMinY().text, labelX,
+            viewRect.bottom - rect.bottom - attribute.axisLabelTBMargin,
             textPaint);
         break;
       default:
         paint = linePaint;
         textPaint = labelPaint;
         canvas.drawText(
-            ValueUtils.format(extremum[3], render.getAdapter().getScale()),
-            labelX,
+            ValueUtils.format(extremum[3], render.getAdapter().getScale()), labelX,
             viewRect.top - rect.top + attribute.axisLabelTBMargin,
             textPaint);
 
         canvas.drawText(
-            ValueUtils.format(extremum[1], render.getAdapter().getScale()),
-            labelX,
+            ValueUtils.format(extremum[1], render.getAdapter().getScale()), labelX,
             viewRect.bottom - rect.bottom - attribute.axisLabelTBMargin,
             textPaint);
         break;

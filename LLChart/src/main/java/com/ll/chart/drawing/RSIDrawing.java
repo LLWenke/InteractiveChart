@@ -48,15 +48,15 @@ public class RSIDrawing extends AbsDrawing<CandleRender> {
 
     r1Paint.setStyle(Paint.Style.STROKE);
     r1Paint.setStrokeWidth(attribute.lineWidth);
-    r1Paint.setColor(attribute.rsi1LineColor);
+    r1Paint.setColor(attribute.line1Color);
 
     r2Paint.setStyle(Paint.Style.STROKE);
     r2Paint.setStrokeWidth(attribute.lineWidth);
-    r2Paint.setColor(attribute.rsi2LineColor);
+    r2Paint.setColor(attribute.line2Color);
 
     r3Paint.setStyle(Paint.Style.STROKE);
     r3Paint.setStrokeWidth(attribute.lineWidth);
-    r3Paint.setColor(attribute.rsi3LineColor);
+    r3Paint.setColor(attribute.line3Color);
   }
 
   @Override

@@ -170,6 +170,9 @@
           android:textColor="@drawable/chart_data_type_text_selected"
           android:textSize="12sp"
           android:textStyle="bold"
+          app:indicatorsTextSize="12sp"
+          app:selectorLabelSize="12sp"
+          app:selectorValueSize="12sp"
           />
     </LinearLayout>
 
@@ -199,10 +202,14 @@
         app:borderWidth="1dp"
         app:decreasingStyle="fill"
         app:gridCount="4"
-        app:gridIsHide="true"
+        app:candleSpace="3dp"
+        app:candleWidth="8dp"
         app:gridLabelMarginBottom="8dp"
         app:gridLabelMarginTop="8dp"
+        app:candleExtremumLabelSize="12sp"
         app:increasingStyle="fill"
+        app:indicatorsTextSize="12sp"
+        app:labelSize="12sp"
         app:layout_constraintBottom_toTopOf="@+id/depth_chart"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -215,8 +222,9 @@
         app:markerStyle="fill_and_stroke"
         app:markerTextSize="7sp"
         app:renderModel="candle"
+        app:selectorLabelSize="12sp"
         app:selectorMarginY="19dp"
-        app:viewInterval="10dp"
+        app:selectorValueSize="12sp"
         app:xHighlightAutoWidth="true"
         />
     <ProgressBar
@@ -240,6 +248,7 @@
         app:gridIsHide="true"
         app:gridLabelMarginBottom="8dp"
         app:gridLabelMarginTop="8dp"
+        app:labelSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -251,8 +260,8 @@
         app:markerStyle="fill_and_stroke"
         app:markerTextSize="7sp"
         app:renderModel="depth"
+        app:selectorLabelSize="12sp"
         app:selectorMarginY="19dp"
-        app:viewInterval="0dp"
         />
     <ProgressBar
         android:id="@+id/depth_loading_bar"

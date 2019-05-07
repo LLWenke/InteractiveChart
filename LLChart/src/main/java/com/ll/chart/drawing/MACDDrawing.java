@@ -61,25 +61,25 @@ public class MACDDrawing extends AbsDrawing<CandleRender> {
 
     deaPaint.setStyle(Paint.Style.STROKE);
     deaPaint.setStrokeWidth(attribute.lineWidth);
-    deaPaint.setColor(attribute.deaLineColor);
+    deaPaint.setColor(attribute.line1Color);
 
     diffPaint.setStyle(Paint.Style.STROKE);
     diffPaint.setStrokeWidth(attribute.lineWidth);
-    diffPaint.setColor(attribute.diffLineColor);
+    diffPaint.setColor(attribute.line2Color);
 
     increasingCandlePaint.setStyle(attribute.increasingStyle);
     increasingCandlePaint.setStrokeWidth(attribute.candleBorderWidth);
-    increasingCandlePaint.setColor(attribute.increasingColor);
+    increasingCandlePaint.setColor(attribute.increasingDarkColor);
 
     increasingCandleFillPaint.setStyle(Paint.Style.FILL);
-    increasingCandleFillPaint.setColor(attribute.increasingColor);
+    increasingCandleFillPaint.setColor(attribute.increasingDarkColor);
 
     decreasingCandlePaint.setStyle(attribute.decreasingStyle);
     decreasingCandlePaint.setStrokeWidth(attribute.candleBorderWidth);
-    decreasingCandlePaint.setColor(attribute.decreasingColor);
+    decreasingCandlePaint.setColor(attribute.decreasingDarkColor);
 
     decreasingCandleFillPaint.setStyle(Paint.Style.FILL);
-    decreasingCandleFillPaint.setColor(attribute.decreasingColor);
+    decreasingCandleFillPaint.setColor(attribute.decreasingDarkColor);
 
     space = (attribute.candleSpace / attribute.candleWidth) / 2;
     borderOffset = attribute.candleBorderWidth / 2;

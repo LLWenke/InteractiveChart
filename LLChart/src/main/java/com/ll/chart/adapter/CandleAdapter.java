@@ -139,8 +139,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry> {
    * 判断数据是更新还是追加
    */
   private PushType getPushType(Date endDate) {
-    long diff = DateUtil.getDiffBetween(getItem(getLastPosition()).getTime(),
-        endDate, displayType.msec());
+    long diff = getDateDiff(getItem(getLastPosition()).getTime(), endDate);
     //Log.e("lastTime:", DisplayTypeUtils.selectorFormat(getItem(getLastPosition()).getTime(),
     //    getDisplayType()));
     //Log.e("endDate:", DisplayTypeUtils.selectorFormat(endDate,
@@ -153,6 +152,18 @@ public class CandleAdapter extends AbsAdapter<CandleEntry> {
       return PushType.ADD;//添加
     } else {
       return PushType.INTERMITTENT;//间断
+    }
+  }
+
+  /**
+   * 获取时间间隔
+   */
+  private long getDateDiff(Date startDate, Date endDate) {
+    switch (displayType) {
+      case month://月
+        return DateUtil.getMonthDiff(startDate, endDate);
+      default:
+        return DateUtil.getDateDiff(startDate, endDate, displayType.msec());
     }
   }
 

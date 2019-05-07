@@ -48,15 +48,15 @@ public class KDJDrawing extends AbsDrawing<CandleRender> {
 
     kPaint.setStyle(Paint.Style.STROKE);
     kPaint.setStrokeWidth(attribute.lineWidth);
-    kPaint.setColor(attribute.kdjKLineColor);
+    kPaint.setColor(attribute.line1Color);
 
     dPaint.setStyle(Paint.Style.STROKE);
     dPaint.setStrokeWidth(attribute.lineWidth);
-    dPaint.setColor(attribute.kdjDLineColor);
+    dPaint.setColor(attribute.line2Color);
 
     jPaint.setStyle(Paint.Style.STROKE);
     jPaint.setStrokeWidth(attribute.lineWidth);
-    jPaint.setColor(attribute.kdjJLineColor);
+    jPaint.setColor(attribute.line3Color);
   }
 
   @Override
