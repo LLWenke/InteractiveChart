@@ -1,5 +1,15 @@
-
 package com.wk.chart.entry;
+
+import android.graphics.Rect;
+import android.util.ArrayMap;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.wk.chart.adapter.AbsAdapter;
+import com.wk.chart.compat.Utils;
+import com.wk.chart.enumeration.IndicatorType;
+import com.wk.chart.enumeration.MarkerPointType;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -7,266 +17,158 @@ import java.util.Date;
 /**
  * <p>CandleEntry</p>
  */
-
 public class CandleEntry extends AbsEntry {
+    // 初始需全部赋值的属性
+    private final ValueEntry open; // 开盘价
+    private final ValueEntry high; // 最高价
+    private final ValueEntry low; // 最低价
+    private final ValueEntry close; // 收盘价
+    private final ValueEntry volume; // 量
+    private final ValueEntry changeAmount; // 涨跌额
+    private final ValueEntry changeProportion; // 涨跌幅
+    private final ArrayMap<Integer, ValueEntry[]> indicators; // 指标
+    private final Rect markerPointRect;//标记点位置区域矩形
+    private @MarkerPointType
+    int markerPointType = MarkerPointType.NORMAL; // 标记点类型
 
-  // 初始需全部赋值的属性
-  private final ValueEntry open; // 开盘价
-  private final ValueEntry high; // 最高价
-  private final ValueEntry low; // 最低价
-  private final ValueEntry close; // 收盘价
-  private final ValueEntry volume; // 量
-  private final ValueEntry changeAmount; // 涨跌额
-  private final ValueEntry changeProportion; // 涨跌幅
+    /**
+     * 自定义 K 线图用的数据
+     *
+     * @param scale  精度实例
+     * @param open   开盘价
+     * @param high   最高价
+     * @param low    最低价
+     * @param close  收盘价
+     * @param volume 量
+     * @param time   时间
+     */
+    public CandleEntry(@NonNull AbsAdapter.ScaleEntry scale, double open, double high, double low, double close,
+                       double volume, Date time) {
+        super(scale, time);
+        this.markerPointRect = new Rect();
+        this.open = buildValue(open, scale.getQuoteScale());
+        this.high = buildValue(high, scale.getQuoteScale());
+        this.low = buildValue(low, scale.getQuoteScale());
+        this.close = buildValue(close, scale.getQuoteScale());
+        this.volume = buildValue(volume, scale.getBaseScale());
+        this.changeAmount = recoveryValue(getClose().result - getOpen().result, scale.getQuoteScale());
+        this.changeProportion = recoveryValue(getChangeAmount().result * 10000 / Utils.divisorCorrect(getOpen().result), scale.getBaseScale());
+        this.indicators = new ArrayMap<>();
+        addAnimatorEntry(this.close, this.high, this.low, this.volume);
+    }
 
-  // MA 指标的三个属性
-  private ValueEntry ma5;
-  private ValueEntry ma10;
-  private ValueEntry ma20;
+    /**
+     * 自定义 K 线图用的数据
+     *
+     * @param scale  精度实例
+     * @param open   开盘价
+     * @param high   最高价
+     * @param low    最低价
+     * @param close  收盘价
+     * @param volume 量
+     * @param time   时间
+     */
+    public CandleEntry(@NonNull AbsAdapter.ScaleEntry scale, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close,
+                       BigDecimal volume, Date time) {
+        super(scale, time);
+        this.markerPointRect = new Rect();
+        this.open = buildValue(open, scale.getQuoteScale());
+        this.high = buildValue(high, scale.getQuoteScale());
+        this.low = buildValue(low, scale.getQuoteScale());
+        this.close = buildValue(close, scale.getQuoteScale());
+        this.volume = buildValue(volume, scale.getBaseScale());
+        this.changeAmount = recoveryValue(getClose().result - getOpen().result, scale.getQuoteScale());
+        this.changeProportion = recoveryValue(getChangeAmount().result * 10000 / Utils.divisorCorrect(getOpen().result), scale.getBaseScale());
+        this.indicators = new ArrayMap<>();
+        addAnimatorEntry(this.close, this.high, this.low, this.volume);
+    }
 
-  // 量的5日平均和10日平均
-  private ValueEntry volumeMa5;
-  private ValueEntry volumeMa10;
+    public ValueEntry getOpen() {
+        return open;
+    }
 
-  // MACD 指标的三个属性
-  private ValueEntry dea;
-  private ValueEntry diff;
-  private ValueEntry macd;
+    public ValueEntry getHigh() {
+        return high;
+    }
 
-  // KDJ 指标的三个属性
-  private ValueEntry k;
-  private ValueEntry d;
-  private ValueEntry j;
+    public ValueEntry getLow() {
+        return low;
+    }
 
-  // RSI 指标的三个属性
-  private ValueEntry rsi1;
-  private ValueEntry rsi2;
-  private ValueEntry rsi3;
+    public ValueEntry getClose() {
+        return close;
+    }
 
-  // BOLL 指标的三个属性
-  private ValueEntry up; // 上轨线
-  private ValueEntry mb; // 中轨线
-  private ValueEntry dn; // 下轨线
+    public ValueEntry getVolume() {
+        return volume;
+    }
 
-  /**
-   * 自定义 K 线图用的数据
-   *
-   * @param scale 精度
-   * @param open 开盘价
-   * @param high 最高价
-   * @param low 最低价
-   * @param close 收盘价
-   * @param volume 量
-   * @param time 时间
-   */
-  public CandleEntry(int scale, double open, double high, double low, double close,
-      double volume, Date time) {
-    super(time, scale);
-    this.open = buildValue(open);
-    this.high = buildValue(high);
-    this.low = buildValue(low);
-    this.close = buildValue(close);
-    this.volume = buildValue(volume);
-    this.changeAmount = recoveryValue(getClose().result - getOpen().result);
-    this.changeProportion = recoveryValue(getChangeAmount().result * 10000 / getOpen().result, 2);
-  }
+    public ValueEntry getChangeAmount() {
+        return changeAmount;
+    }
 
-  /**
-   * 自定义 K 线图用的数据
-   *
-   * @param scale 精度
-   * @param open 开盘价
-   * @param high 最高价
-   * @param low 最低价
-   * @param close 收盘价
-   * @param volume 量
-   * @param time 时间
-   */
-  public CandleEntry(int scale, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close,
-      BigDecimal volume, Date time) {
-    super(time, scale);
-    this.open = buildValue(open);
-    this.high = buildValue(high);
-    this.low = buildValue(low);
-    this.close = buildValue(close);
-    this.volume = buildValue(volume);
-    this.changeAmount = recoveryValue(getClose().result - getOpen().result);
-    this.changeProportion = recoveryValue(getChangeAmount().result * 10000 / getOpen().result, 2);
-  }
+    public ValueEntry getChangeProportion() {
+        return changeProportion;
+    }
 
-  //set 方法
-  public void setMa5(long ma5) {
-    this.ma5 = recoveryValue(ma5);
-  }
+    /**
+     * 复原QuoteScale精度的value
+     *
+     * @param value 值
+     * @return 复原后的ValueEntry
+     */
+    public ValueEntry recoveryQuoteScaleValue(long value) {
+        return recoveryValue(value, getScale().getQuoteScale());
+    }
 
-  public void setMa10(long ma10) {
-    this.ma10 = recoveryValue(ma10);
-  }
+    /**
+     * 复原BaseScale精度的value
+     *
+     * @param value 值
+     * @return 复原后的ValueEntry
+     */
+    public ValueEntry recoveryBaseScaleValue(long value) {
+        return recoveryValue(value, getScale().getBaseScale());
+    }
 
-  public void setMa20(long ma20) {
-    this.ma20 = recoveryValue(ma20);
-  }
+    public void putIndicator(@IndicatorType int indicatorType, ValueEntry... values) {
+        this.indicators.put(indicatorType, values);
+    }
 
-  public void setVolumeMa5(long volumeMa5) {
-    this.volumeMa5 = recoveryValue(volumeMa5);
-  }
+    public @Nullable
+    ValueEntry[] getIndicator(@IndicatorType int indicatorType) {
+        return indicators.get(indicatorType);
+    }
 
-  public void setVolumeMa10(long volumeMa10) {
-    this.volumeMa10 = recoveryValue(volumeMa10);
-  }
+    public @MarkerPointType
+    int getMarkerPointType() {
+        return markerPointType;
+    }
 
-  public void setDea(long dea) {
-    this.dea = recoveryValue(dea);
-  }
+    public void setMarkerPointType(@MarkerPointType int markerPointType) {
+        this.markerPointType = markerPointType;
+    }
 
-  public void setDiff(long diff) {
-    this.diff = recoveryValue(diff);
-  }
+    /**
+     * 重置标记点位置区域坐标
+     */
+    public void updateMarkerRect(float left, float top, float right, float bottom) {
+        this.markerPointRect.set((int) left, (int) top, (int) right, (int) bottom);
+    }
 
-  public void setMacd(long macd) {
-    this.macd = recoveryValue(macd);
-  }
+    public Rect getMarkerPointRect() {
+        return markerPointRect;
+    }
 
-  public void setK(long k) {
-    this.k = recoveryValue(k);
-  }
-
-  public void setD(long d) {
-    this.d = recoveryValue(d);
-  }
-
-  public void setJ(long j) {
-    this.j = recoveryValue(j);
-  }
-
-  public void setRsi1(long rsi1) {
-    this.rsi1 = recoveryValue(rsi1);
-  }
-
-  public void setRsi2(long rsi2) {
-    this.rsi2 = recoveryValue(rsi2);
-  }
-
-  public void setRsi3(long rsi3) {
-    this.rsi3 = recoveryValue(rsi3);
-  }
-
-  public void setUp(long up) {
-    this.up = recoveryValue(up);
-  }
-
-  public void setMb(long mb) {
-    this.mb = recoveryValue(mb);
-  }
-
-  public void setDn(long dn) {
-    this.dn = recoveryValue(dn);
-  }
-
-  public ValueEntry getOpen() {
-    return open;
-  }
-
-  public ValueEntry getHigh() {
-    return high;
-  }
-
-  public ValueEntry getLow() {
-    return low;
-  }
-
-  public ValueEntry getClose() {
-    return close;
-  }
-
-  public ValueEntry getVolume() {
-    return volume;
-  }
-
-  public ValueEntry getChangeAmount() {
-    return changeAmount;
-  }
-
-  public ValueEntry getChangeProportion() {
-    return changeProportion;
-  }
-
-  public ValueEntry getMa5() {
-    return ma5;
-  }
-
-  public ValueEntry getMa10() {
-    return ma10;
-  }
-
-  public ValueEntry getMa20() {
-    return ma20;
-  }
-
-  public ValueEntry getVolumeMa5() {
-    return volumeMa5;
-  }
-
-  public ValueEntry getVolumeMa10() {
-    return volumeMa10;
-  }
-
-  public ValueEntry getDea() {
-    return dea;
-  }
-
-  public ValueEntry getDiff() {
-    return diff;
-  }
-
-  public ValueEntry getMacd() {
-    return macd;
-  }
-
-  public ValueEntry getK() {
-    return k;
-  }
-
-  public ValueEntry getD() {
-    return d;
-  }
-
-  public ValueEntry getJ() {
-    return j;
-  }
-
-  public ValueEntry getRsi1() {
-    return rsi1;
-  }
-
-  public ValueEntry getRsi2() {
-    return rsi2;
-  }
-
-  public ValueEntry getRsi3() {
-    return rsi3;
-  }
-
-  public ValueEntry getUp() {
-    return up;
-  }
-
-  public ValueEntry getMb() {
-    return mb;
-  }
-
-  public ValueEntry getDn() {
-    return dn;
-  }
-
-  @Override
-  public String toString() {
-    return "CandleEntry{" +
-        "open=" + getOpen().text.toString() +
-        ", high=" + getHigh().text.toString() +
-        ", low=" + getLow().text.toString() +
-        ", close=" + getClose().text.toString() +
-        ", time=" + getTime() +
-        '}';
-  }
+    @Override
+    public String toString() {
+        return "\nCandleEntry{" +
+                "open=" + getOpen().text +
+                ", high=" + getHigh().text +
+                ", low=" + getLow().text +
+                ", close=" + getClose().text +
+                ", volume=" + getVolume().text +
+                ", time=" + getTime() +
+                '}';
+    }
 }

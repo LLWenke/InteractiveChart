@@ -1,9 +1,9 @@
 package com.wk.demo.view;
 
 import android.content.Context;
-import android.support.v7.widget.AppCompatRadioButton;
+import androidx.appcompat.widget.AppCompatRadioButton;
 import android.util.AttributeSet;
-import com.wk.chart.compat.FontConfig;
+import com.wk.chart.compat.FontStyle;
 
 /**
  * 自定义字体库的RadioButton
@@ -27,9 +27,9 @@ public class FontRadioButton extends AppCompatRadioButton {
 
   public void initFont() {
     if (null != getTypeface() && getTypeface().isBold()) {
-      this.setTypeface(FontConfig.boldTypeFace);
+      this.setTypeface(FontStyle.boldTypeFace);
     } else {
-      this.setTypeface(FontConfig.typeFace);
+      this.setTypeface(FontStyle.typeFace);
     }
     this.postInvalidate();
   }

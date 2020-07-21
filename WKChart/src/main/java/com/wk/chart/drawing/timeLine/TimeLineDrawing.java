@@ -1,112 +1,138 @@
 
 package com.wk.chart.drawing.timeLine;
 
+
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.RectF;
 import android.graphics.Shader;
+
+import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
-import com.wk.chart.drawing.AbsDrawing;
+import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.CandleEntry;
+import com.wk.chart.module.TimeLineChartModule;
 import com.wk.chart.render.CandleRender;
-import com.wk.chart.stock.base.AbsChartModule;
 
 /**
  * <p>TimeLineDrawing</p>
  */
 
-public class TimeLineDrawing extends AbsDrawing<CandleRender> {
-  private static final String TAG = "TimeLineDrawing";
-  private CandleAttribute attribute;//配置文件
-  // 边框线画笔
-  private Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  // 分时折线画笔(绘制path 尽量不开抗锯齿)
-  private Paint timelinePaint = new Paint();
-  // 分时阴影画笔(绘制path 尽量不开抗锯齿)
-  private Paint timeShaderPaint = new Paint();
-  // 分时折线绘制路径
-  private Path timelinePath = new Path();
-  // 分时阴影绘制路径
-  private Path timeShaderPath = new Path();
-  // 折线路径位置信息
-  private final float[] pathPts = new float[4];
-  //间隔
-  private float space = 0;
-  // 计算 1 个矩形坐标用的
-  private float[] candleRectBuffer = new float[4];
+public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineChartModule> {
+    private static final String TAG = "TimeLineDrawing";
+    private CandleAttribute attribute;//配置文件
+    // 边框线画笔
+    private Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    // 分时折线画笔(绘制path 尽量不开抗锯齿)
+    private Paint timelinePaint = new Paint();
+    // 分时阴影画笔(绘制path 尽量不开抗锯齿)
+    private Paint timeShaderPaint = new Paint();
+    // 分时折线绘制路径
+    private Path timelinePath = new Path();
+    // 分时阴影绘制路径
+    private Path timeShaderPath = new Path();
+    // 折线路径位置信息
+    private final float[] pathPts = new float[2];
+    // 计算 1 个矩形坐标用的
+    private float[] candleRectBuffer = new float[8];
+    // 高亮状态
+    private boolean highlightState;
+    // 蜡烛图绘制的实际收首尾X轴坐标点（从首尾两根蜡烛图的中心点算起）
+    private float beginX, endX = 0;
+    // 分时线宽度的一半
+    private int lineHalfWidth;
 
-  @Override public void onInit(RectF viewRect, CandleRender render, AbsChartModule chartModule) {
-    super.onInit(viewRect, render, chartModule);
-    attribute = render.getAttribute();
+    @Override
+    public void onInit(CandleRender render, TimeLineChartModule chartModule) {
+        super.onInit(render, chartModule);
+        attribute = render.getAttribute();
 
-    borderPaint.setStyle(Paint.Style.STROKE);
-    borderPaint.setStrokeWidth(attribute.borderWidth);
-    borderPaint.setColor(attribute.borderColor);
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setStrokeWidth(attribute.borderWidth);
+        borderPaint.setColor(attribute.borderColor);
 
-    timelinePaint.setStrokeWidth(attribute.timeLineWidth);
-    timelinePaint.setColor(attribute.timeLineColor);
-    timelinePaint.setStyle(Paint.Style.STROKE);
+        timelinePaint.setStrokeWidth(attribute.timeLineWidth);
+        timelinePaint.setColor(attribute.timeLineColor);
+        timelinePaint.setStyle(Paint.Style.STROKE);
 
-    timeShaderPaint.setShader(
-        new LinearGradient(0, viewRect.top, 0, viewRect.bottom,
-            new int[] { attribute.timeLineShaderColorBegin, attribute.timeLineShaderColorEnd },
-            null, Shader.TileMode.REPEAT));
-
-    space = (attribute.candleSpace / attribute.candleWidth) / 2;
-  }
-
-  @Override
-  public void computePoint(int begin, int end, int current) {
-    CandleEntry entry = render.getAdapter().getItem(current);
-    pathPts[0] = current;
-    pathPts[1] = entry.getClose().value;
-    pathPts[2] = current + 0.5f;
-    render.mapPoints(pathPts);
-    if (current == begin) {//开始点
-      timelinePath.moveTo(pathPts[0], pathPts[1]);
-      timeShaderPath.moveTo(pathPts[0], viewRect.bottom);
-      timeShaderPath.lineTo(pathPts[0], pathPts[1]);
-    } else if (current == end - 1) {//结束点
-      float endX = pathPts[2] + (pathPts[2] - pathPts[0]);
-      timelinePath.lineTo(endX, pathPts[1]);
-      timeShaderPath.lineTo(endX, pathPts[1]);
-      timeShaderPath.lineTo(endX, viewRect.bottom);
-    } else {
-      timelinePath.lineTo(pathPts[2], pathPts[1]);
-      timeShaderPath.lineTo(pathPts[2], pathPts[1]);
+        lineHalfWidth = (int) (attribute.timeLineWidth / 2);
     }
-    candleRectBuffer[0] = current + space;
-    candleRectBuffer[2] = current + 1 - space;
-    render.mapPoints(candleRectBuffer);
-    // 计算高亮坐标
-    if (render.isHighlight()) {
-      final float[] highlightPoint = render.getHighlightPoint();
-      if (candleRectBuffer[0] <= highlightPoint[0] && highlightPoint[0] <= candleRectBuffer[2]) {
-        highlightPoint[0] = pathPts[2];
-        render.getAdapter().setHighlightIndex(current);
-      }
+
+    @Override
+    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
+        highlightState = true;
+        beginX = render.getPointX(begin + 0.5f, null);
+        endX = render.getPointX(end - 0.5f, null);
     }
-  }
 
-  @Override
-  public void onComputeOver(Canvas canvas, int begin, int end, float[] extremum) {
-    canvas.save();
-    canvas.clipRect(viewRect);
-    canvas.drawPath(timelinePath, timelinePaint);
-    canvas.drawPath(timeShaderPath, timeShaderPaint);
-    timelinePath.reset();
-    timeShaderPath.reset();
-    canvas.restore();
-  }
+    @Override
+    public void onComputation(int begin, int end, int current, float[] extremum) {
+        CandleEntry entry = render.getAdapter().getItem(current);
+        pathPts[0] = current + 0.5f;
+        pathPts[1] = entry.getClose().value;
+        render.mapPoints(pathPts);
+        if (current == begin) {//开始点
+            float beginX = begin == 0 ? pathPts[0] : viewRect.left;
+            timelinePath.moveTo(beginX, pathPts[1]);
+            timeShaderPath.moveTo(beginX, viewRect.bottom);
+            timeShaderPath.lineTo(beginX, pathPts[1]);
+        }
+        if (current == end - 1) {//结束点
+            float endX = end == render.getAdapter().getCount() ? pathPts[0] : viewRect.right;
+            timelinePath.lineTo(endX, pathPts[1]);
+            timeShaderPath.lineTo(endX, pathPts[1]);
+            timeShaderPath.lineTo(endX, viewRect.bottom);
+        } else {
+            timelinePath.lineTo(pathPts[0], pathPts[1]);
+            timeShaderPath.lineTo(pathPts[0], pathPts[1]);
+        }
+        candleRectBuffer[0] = current + render.pointsSpace;
+        candleRectBuffer[2] = current + 1 - render.pointsSpace;
+        candleRectBuffer[4] = current;
+        candleRectBuffer[6] = current + 1;
+        render.mapPoints(candleRectBuffer);
+        // 计算高亮坐标
+        if (render.isHighlight() && highlightState) {
+            final float[] highlightPoint = render.getHighlightPoint();
+            if (candleRectBuffer[4] <= highlightPoint[0] && highlightPoint[0] <= candleRectBuffer[6]) {
+                highlightPoint[0] = pathPts[0];
+                render.getAdapter().setHighlightIndex(current);
+                highlightState = false;
+            } else if (highlightPoint[0] <= beginX) {
+                highlightPoint[0] = beginX;
+                render.getAdapter().setHighlightIndex(begin);
+                highlightState = false;
+            } else if (highlightPoint[0] >= endX) {
+                highlightPoint[0] = endX;
+                render.getAdapter().setHighlightIndex(end);
+                highlightState = false;
+            }
+        }
+    }
 
-  @Override
-  public void onDrawOver(Canvas canvas) {
+    @Override
+    public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
+        canvas.save();
+        canvas.clipRect(viewRect);
+        canvas.drawPath(timelinePath, timelinePaint);
+        canvas.drawPath(timeShaderPath, timeShaderPaint);
+        timelinePath.reset();
+        timeShaderPath.reset();
+        canvas.restore();
+    }
 
-  }
+    @Override
+    public void drawOver(Canvas canvas) {
 
-  @Override public void onViewChange() {
+    }
 
-  }
+    @Override
+    public void onViewChange() {
+        timeShaderPaint.setShader(
+                new LinearGradient(0, viewRect.top, 0, viewRect.bottom,
+                        new int[]{Utils.getColorWithAlpha(attribute.timeLineColor, attribute.shaderBeginColorAlpha)
+                                , Utils.getColorWithAlpha(attribute.timeLineColor, attribute.shaderEndColorAlpha)},
+                        null, Shader.TileMode.REPEAT));
+    }
 }

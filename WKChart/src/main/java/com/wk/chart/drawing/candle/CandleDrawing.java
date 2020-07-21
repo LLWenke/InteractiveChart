@@ -3,209 +3,154 @@ package com.wk.chart.drawing.candle;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.text.TextPaint;
-import com.wk.chart.compat.FontConfig;
+import android.graphics.Path;
+import android.util.Log;
+
 import com.wk.chart.compat.attribute.CandleAttribute;
-import com.wk.chart.drawing.AbsDrawing;
+import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.CandleEntry;
+import com.wk.chart.module.CandleChartModule;
 import com.wk.chart.render.CandleRender;
-import com.wk.chart.stock.base.AbsChartModule;
+
 
 /**
  * <p>CandleDrawing</p>
  */
 
-public class CandleDrawing extends AbsDrawing<CandleRender> {
-  private static final String TAG = "CandleDrawing";
-  private CandleAttribute attribute;//配置文件
+public class CandleDrawing extends AbsDrawing<CandleRender, CandleChartModule> {
+    private static final String TAG = "CandleDrawing";
+    private CandleAttribute attribute;//配置文件
+    // 蜡烛图边框线画笔
+    private Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    // 上涨画笔
+    private Paint increasingPaint = new Paint();
+    // 下跌画笔
+    private Paint decreasingPaint = new Paint();
+    // 上涨路径
+    private Path increasingPath = new Path();
+    // 下跌路径
+    private Path decreasingPath = new Path();
+    //边框线坐标点[x0, y0, x1, y1]
+    private float[] borderPts;
+    private float borderOffset;//边框偏移量
+    private boolean highlightState = true;//高亮状态
+    // 蜡烛图绘制的实际收首尾X轴坐标点（从首尾两根蜡烛图的中心点算起）
+    private float beginX, endX = 0;
 
-  // 上涨蜡烛图画笔
-  private Paint increasingCandlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  // 下跌蜡烛图画笔
-  private Paint decreasingCandlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  // 上涨蜡烛图画笔(用于高度或宽度小于边框宽高度时使用)
-  private Paint increasingCandleFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  // 上涨蜡烛图画笔(用于高度或宽度小于边框宽高度时使用)
-  private Paint decreasingCandleFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  // k线图边框线画笔
-  private Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  // 当前可见区域内的极值画笔
-  private TextPaint extremumPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-  private final Rect extremumRect = new Rect(); // 用于计算极值文字位置
+    @Override
+    public void onInit(CandleRender render, CandleChartModule chartModule) {
+        super.onInit(render, chartModule);
+        attribute = render.getAttribute();
 
-  private float[] candleLineBuffer = new float[8]; // 计算 2 根线坐标用的
-  private float[] candleRectBuffer = new float[4]; // 计算 1 个矩形坐标用的
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setStrokeWidth(attribute.borderWidth);
+        borderPaint.setColor(attribute.borderColor);
 
-  private float extremumToRight;
-  private float space = 0;//间隔
-  private float borderOffset;//边框偏移量
-  private float minSize;//最小宽度或高度
+        increasingPaint.setStyle(attribute.increasingStyle);
+        increasingPaint.setStrokeWidth(attribute.pointBorderWidth);
+        increasingPaint.setColor(attribute.increasingColor);
 
-  @Override public void onInit(RectF viewRect, CandleRender render, AbsChartModule chartModule) {
-    super.onInit(viewRect, render, chartModule);
-    attribute = render.getAttribute();
+        decreasingPaint.setStyle(attribute.decreasingStyle);
+        decreasingPaint.setStrokeWidth(attribute.pointBorderWidth);
+        decreasingPaint.setColor(attribute.decreasingColor);
 
-    borderPaint.setStyle(Paint.Style.STROKE);
-    borderPaint.setStrokeWidth(attribute.borderWidth);
-    borderPaint.setColor(attribute.borderColor);
-
-    increasingCandlePaint.setStyle(attribute.increasingStyle);
-    increasingCandlePaint.setStrokeWidth(attribute.candleBorderWidth);
-    increasingCandlePaint.setColor(attribute.increasingColor);
-
-    increasingCandleFillPaint.setStyle(Paint.Style.FILL);
-    increasingCandleFillPaint.setColor(attribute.increasingColor);
-
-    decreasingCandlePaint.setStyle(attribute.decreasingStyle);
-    decreasingCandlePaint.setStrokeWidth(attribute.candleBorderWidth);
-    decreasingCandlePaint.setColor(attribute.decreasingColor);
-
-    decreasingCandleFillPaint.setStyle(Paint.Style.FILL);
-    decreasingCandleFillPaint.setColor(attribute.decreasingColor);
-
-    extremumPaint.setStyle(Paint.Style.FILL);
-    extremumPaint.setTypeface(FontConfig.typeFace);
-    extremumPaint.setTextSize(attribute.candleExtremumLabelSize);
-    extremumPaint.setColor(attribute.candleExtremumLableColor);
-
-    space = (attribute.candleSpace / attribute.candleWidth) / 2;
-    borderOffset = attribute.candleBorderWidth / 2;
-    minSize = attribute.candleBorderWidth * 2;
-    extremumToRight = viewRect.right - 150;
-  }
-
-  @Override
-  public void computePoint(int begin, int end, int current) {
-
-  }
-
-  @Override
-  public void onComputeOver(Canvas canvas, int begin, int end, float[] extremum) {
-    canvas.save();
-    canvas.clipRect(viewRect);
-
-    Paint candlePaint;
-    Paint candleFillPaint;
-
-    for (int i = begin; i < end; i++) {
-      // 设置画笔颜色
-      CandleEntry entry = render.getAdapter().getItem(i);
-      if (entry.getClose().value < entry.getOpen().value) {
-        candlePaint = decreasingCandlePaint;//下跌
-        candleFillPaint = decreasingCandleFillPaint;//下跌fill
-      } else {
-        candlePaint = increasingCandlePaint;//上涨或者不涨不跌
-        candleFillPaint = increasingCandleFillPaint;//上涨或者不涨不跌fill
-      }
-      // 绘制 影线
-      float offset = i + 0.5f;
-      candleLineBuffer[0] = offset;
-      candleLineBuffer[2] = offset;
-      candleLineBuffer[4] = offset;
-      candleLineBuffer[6] = offset;
-      if (entry.getOpen().value > entry.getClose().value) {
-        candleLineBuffer[1] = entry.getHigh().value;
-        candleLineBuffer[3] = entry.getOpen().value;
-        candleLineBuffer[5] = entry.getClose().value;
-        candleLineBuffer[7] = entry.getLow().value;
-      } else {
-        candleLineBuffer[1] = entry.getHigh().value;
-        candleLineBuffer[3] = entry.getClose().value;
-        candleLineBuffer[5] = entry.getOpen().value;
-        candleLineBuffer[7] = entry.getLow().value;
-      }
-      render.mapPoints(candleLineBuffer);
-      canvas.drawLines(candleLineBuffer, candlePaint);
-
-      // 绘制 当前显示区域的"最小"与"最大"两个值
-      String text;
-      if (i == render.getAdapter().getMinYIndex()) {
-        if (candleLineBuffer[6] > extremumToRight) {
-          extremumPaint.setTextAlign(Paint.Align.RIGHT);
-          text = entry.getLow().text.concat(" →");
-        } else {
-          extremumPaint.setTextAlign(Paint.Align.LEFT);
-          text = "← ".concat(entry.getLow().text);
-        }
-        extremumPaint.getTextBounds(text, 0, text.length(), extremumRect);
-        canvas.drawText(text, candleLineBuffer[6],
-            candleLineBuffer[7] + extremumRect.height(), extremumPaint);
-      }
-      if (i == render.getAdapter().getMaxYIndex()) {
-        if (candleLineBuffer[0] > extremumToRight) {
-          extremumPaint.setTextAlign(Paint.Align.RIGHT);
-          text = entry.getHigh().text.concat(" →");
-        } else {
-          extremumPaint.setTextAlign(Paint.Align.LEFT);
-          text = "← ".concat(entry.getHigh().text);
-        }
-        canvas.drawText(text, candleLineBuffer[0], candleLineBuffer[1], extremumPaint);
-      }
-      // 绘制 蜡烛图的矩形
-      candleRectBuffer[0] = i + space;
-      candleRectBuffer[2] = i + 1 - space;
-      if (entry.getOpen().value > entry.getClose().value) {
-        candleRectBuffer[1] = entry.getOpen().value;
-        candleRectBuffer[3] = entry.getClose().value;
-      } else {
-        candleRectBuffer[1] = entry.getClose().value;
-        candleRectBuffer[3] = entry.getOpen().value;
-      }
-      render.mapPoints(candleRectBuffer);
-      //Log.e(TAG, "left " + candleRectBuffer[0]
-      //    + "right " + candleRectBuffer[2]
-      //    + "top " + candleRectBuffer[1]
-      //    + "bottom " + candleRectBuffer[3]
-      //    + "candleRectHeight " + (candleRectBuffer[1] - candleRectBuffer[3]));
-
-      float width = candleRectBuffer[2] - candleRectBuffer[0];
-      float height = candleRectBuffer[3] - candleRectBuffer[1];
-
-      //边框偏移量修正
-      if (candlePaint.getStyle() == Paint.Style.STROKE) {
-        if (width > minSize && height > minSize) {
-          candleRectBuffer[0] += borderOffset;
-          candleRectBuffer[2] -= borderOffset;
-          candleRectBuffer[1] += borderOffset;
-          candleRectBuffer[3] -= borderOffset;
-        } else {
-          candlePaint = candleFillPaint;
-        }
-      }
-      if (height < 2) {// 涨停、跌停、或不涨不跌的一字板
-        candleRectBuffer[1] -= 1;
-        candleRectBuffer[3] += 1;
-      }
-      canvas.drawRect(candleRectBuffer[0], candleRectBuffer[1], candleRectBuffer[2],
-          candleRectBuffer[3], candlePaint);
-      // 计算高亮坐标
-      if (render.isHighlight()) {
-        final float[] highlightPoint = render.getHighlightPoint();
-        if (candleRectBuffer[0] <= highlightPoint[0] && highlightPoint[0] <= candleRectBuffer[2]) {
-          highlightPoint[0] = candleLineBuffer[0];
-          render.getAdapter().setHighlightIndex(i);
-        }
-      }
+        borderOffset = attribute.pointBorderWidth / 2f;
     }
 
-    canvas.restore();
-  }
-
-  @Override
-  public void onDrawOver(Canvas canvas) {
-    // 绘制外层边框线
-    if (attribute.borderWidth > 0) {
-      canvas.drawRect(viewRect.left - render.getBorderCorrection(),
-          viewRect.top - render.getBorderCorrection(),
-          viewRect.right + render.getBorderCorrection(),
-          viewRect.bottom + render.getBorderCorrection(),
-          borderPaint);
+    @Override
+    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
+        //获取蜡烛图绘制的实际收首尾X轴坐标点（从首尾两根蜡烛图的中心点算起）
+        this.beginX = render.getPointX(begin + 0.5f, null);
+        this.endX = render.getPointX(end - 0.5f, null);
+        this.highlightState = true;
     }
-  }
 
-  @Override public void onViewChange() {
+    @Override
+    public void onComputation(int begin, int end, int current, float[] extremum) {
+        CandleEntry entry = render.getAdapter().getItem(current);
+        boolean isStroke;
+        Path path;
+        // 设置涨跌路径
+        if (entry.getClose().value < entry.getOpen().value) {
+            path = decreasingPath;//下跌路径
+            isStroke = attribute.decreasingStyle == Paint.Style.STROKE;
+        } else {
+            path = increasingPath;//上涨或者不涨不跌路径
+            isStroke = attribute.increasingStyle == Paint.Style.STROKE;
+        }
+        float[] rectBuffer = absChartModule.getPointRect(render, entry, current);
+        //边框偏移量修正
+        if (isStroke) {
+            rectBuffer[0] += borderOffset;
+            rectBuffer[2] -= borderOffset;
+            rectBuffer[5] += borderOffset;
+            rectBuffer[7] -= borderOffset;
+        }
+        // 涨停、跌停、或不涨不跌的一字板
+        if (rectBuffer[7] - rectBuffer[5] < 2) {
+            rectBuffer[5] -= 1;
+            rectBuffer[7] += 1;
+        }
+        //计算中心线
+        float centerLine = rectBuffer[0] + (rectBuffer[2] - rectBuffer[0]) / 2f;
+        //添加影线路径
+        if (isStroke) {
+            //上影线路径
+            path.moveTo(centerLine, rectBuffer[1]);
+            path.lineTo(centerLine, rectBuffer[5]);
+            //下影线路径
+            path.moveTo(centerLine, rectBuffer[7]);
+            path.lineTo(centerLine, rectBuffer[3]);
+        } else {
+            float lineLeft = centerLine - borderOffset;
+            float lineRight = centerLine + borderOffset;
+            //上影线路径
+            path.addRect(lineLeft, rectBuffer[1], lineRight, rectBuffer[5], Path.Direction.CW);
+            //下影线路径
+            path.addRect(lineLeft, rectBuffer[7], lineRight, rectBuffer[3], Path.Direction.CW);
+        }
+        //添加矩形路径
+        path.addRect(rectBuffer[0], rectBuffer[5], rectBuffer[2], rectBuffer[7], Path.Direction.CW);
+        // 计算高亮坐标
+        if (render.isHighlight() && highlightState) {
+            final float[] highlightPoint = render.getHighlightPoint();
+            if (rectBuffer[4] <= highlightPoint[0] && highlightPoint[0] <= rectBuffer[6]) {
+                highlightPoint[0] = centerLine;
+                render.getAdapter().setHighlightIndex(current);
+                highlightState = false;
+            } else if (highlightPoint[0] <= beginX) {
+                highlightPoint[0] = beginX;
+                render.getAdapter().setHighlightIndex(begin);
+                highlightState = false;
+            } else if (highlightPoint[0] >= endX) {
+                highlightPoint[0] = endX;
+                render.getAdapter().setHighlightIndex(end);
+                highlightState = false;
+            }
+        }
+    }
 
-  }
+    @Override
+    public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
+        canvas.save();
+        canvas.clipRect(viewRect);
+        canvas.drawPath(decreasingPath, decreasingPaint);
+        canvas.drawPath(increasingPath, increasingPaint);
+        decreasingPath.reset();
+        increasingPath.reset();
+        canvas.restore();
+    }
+
+    @Override
+    public void drawOver(Canvas canvas) {
+        // 绘制外层边框线
+        if (attribute.borderWidth > 0) {
+            canvas.drawRect(borderPts[0], borderPts[1], borderPts[2], borderPts[3], borderPaint);
+        }
+    }
+
+    @Override
+    public void onViewChange() {
+        borderPts = render.getBorderPoints(viewRect);
+    }
 }

@@ -5,11 +5,15 @@ package com.wk.chart.enumeration;
  */
 
 public enum GridMarkerAlign {
-  LEFT(0),//靠左
+  TOP(0),
 
-  RIGHT(1),//靠右
+  BOTTOM(1),
 
-  AUTO(2);//自动
+  TOP_INSIDE(2),//上（内部）
+
+  BOTTOM_INSIDE(3),//下（内部）
+
+  AUTO(4);
 
   GridMarkerAlign(int nativeInt) {
     this.nativeInt = nativeInt;

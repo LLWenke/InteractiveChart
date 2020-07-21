@@ -1,139 +1,122 @@
 package com.wk.chart.drawing;
 
+
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.RectF;
+import android.graphics.Path;
+
+import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
+import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.CandleEntry;
+import com.wk.chart.module.VolumeChartModule;
 import com.wk.chart.render.CandleRender;
-import com.wk.chart.stock.base.AbsChartModule;
 
 /**
  * <p>VolumeDrawing K线成交量的绘制</p>
  */
 
-public class VolumeDrawing extends AbsDrawing<CandleRender> {
-  private static final String TAG = "VolumeDrawing";
-  private CandleAttribute attribute;//配置文件
-  // X 轴和 Y 轴的画笔
-  private Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  // 上涨蜡烛图画笔
-  private Paint increasingCandlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  // 下跌蜡烛图画笔
-  private Paint decreasingCandlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  // 上涨蜡烛图画笔(用于高度或宽度小于边框宽高度时使用)
-  private Paint increasingCandleFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  // 上涨蜡烛图画笔(用于高度或宽度小于边框宽高度时使用)
-  private Paint decreasingCandleFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeChartModule> {
+    private static final String TAG = "VolumeDrawing";
+    private CandleAttribute attribute;//配置文件
+    // 蜡烛图边框线画笔
+    private Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    // 上涨画笔
+    private Paint increasingPaint = new Paint();
+    // 下跌画笔
+    private Paint decreasingPaint = new Paint();
+    // 上涨路径
+    private Path increasingPath = new Path();
+    // 下跌路径
+    private Path decreasingPath = new Path();
 
-  private float[] xRectBuffer = new float[4];
-  private float[] candleBuffer = new float[4];
+    private float[] rectBuffer = new float[4];
 
-  private float space = 0;//间隔
-  private float borderOffset;//边框偏移量
-  private float minSize;//最小宽度或高度
+    private float borderOffset;//边框偏移量
 
-  @Override public void onInit(RectF viewRect, CandleRender render, AbsChartModule chartModule) {
-    super.onInit(viewRect, render, chartModule);
-    attribute = render.getAttribute();
+    @Override
+    public void onInit(CandleRender render, VolumeChartModule chartModule) {
+        super.onInit(render, chartModule);
+        attribute = render.getAttribute();
 
-    borderPaint.setStyle(Paint.Style.STROKE);
-    borderPaint.setStrokeWidth(attribute.borderWidth);
-    borderPaint.setColor(attribute.borderColor);
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setStrokeWidth(attribute.borderWidth);
+        borderPaint.setColor(attribute.borderColor);
 
-    increasingCandlePaint.setStyle(attribute.increasingStyle);
-    increasingCandlePaint.setStrokeWidth(attribute.candleBorderWidth);
-    increasingCandlePaint.setColor(attribute.increasingDiffColor);
+        increasingPaint.setStyle(attribute.increasingStyle);
+        increasingPaint.setStrokeWidth(attribute.pointBorderWidth);
+        increasingPaint.setColor(Utils.getColorWithAlpha(attribute.increasingColor
+                , attribute.darkColorAlpha));
 
-    increasingCandleFillPaint.setStyle(Paint.Style.FILL);
-    increasingCandleFillPaint.setColor(attribute.increasingDiffColor);
+        decreasingPaint.setStyle(attribute.decreasingStyle);
+        decreasingPaint.setStrokeWidth(attribute.pointBorderWidth);
+        decreasingPaint.setColor(Utils.getColorWithAlpha(attribute.decreasingColor
+                , attribute.darkColorAlpha));
 
-    decreasingCandlePaint.setStyle(attribute.decreasingStyle);
-    decreasingCandlePaint.setStrokeWidth(attribute.candleBorderWidth);
-    decreasingCandlePaint.setColor(attribute.decreasingDiffColor);
+        borderOffset = attribute.pointBorderWidth / 2;
+    }
 
-    decreasingCandleFillPaint.setStyle(Paint.Style.FILL);
-    decreasingCandleFillPaint.setColor(attribute.decreasingDiffColor);
+    @Override
+    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
 
-    space = (attribute.candleSpace / attribute.candleWidth) / 2;
-    borderOffset = attribute.candleBorderWidth / 2;
-    minSize = attribute.candleBorderWidth * 2;
-  }
+    }
 
-  @Override
-  public void computePoint(int begin, int end, int current) {
-  }
-
-  @Override
-  public void onComputeOver(Canvas canvas, int begin, int end, float[] extremum) {
-    canvas.save();
-    canvas.clipRect(viewRect);
-
-    Paint candlePaint;
-    Paint candleFillPaint;
-    for (int i = begin; i < end; i++) {
-      // 设置画笔颜色
-      CandleEntry entry = render.getAdapter().getItem(i);
-
-      if (entry.getClose().value < entry.getOpen().value) {
-        candlePaint = decreasingCandlePaint;//下跌
-        candleFillPaint = decreasingCandleFillPaint;//下跌fill
-      } else {
-        candlePaint = increasingCandlePaint;//上涨或者不涨不跌
-        candleFillPaint = increasingCandleFillPaint;//上涨或者不涨不跌fill
-      }
-
-      // 计算 成交量的矩形卓坐标
-      // 绘制 蜡烛图的矩形
-      xRectBuffer[0] = i + space;
-      xRectBuffer[1] = 0;
-      xRectBuffer[2] = i + 1 - space;
-      xRectBuffer[3] = 0;
-      render.mapPoints(xRectBuffer);
-
-      candleBuffer[0] = 0;
-      candleBuffer[1] = entry.getVolume().value;
-      candleBuffer[2] = 0;
-      candleBuffer[3] = extremum[1];
-
-      render.mapPoints(candleBuffer);
-
-      float width = xRectBuffer[2] - xRectBuffer[0];
-      float height = candleBuffer[3] - candleBuffer[1];
-
-      //边框偏移量修正
-      if (candlePaint.getStyle() == Paint.Style.STROKE) {
-        if (width > minSize && height > minSize) {
-          xRectBuffer[0] += borderOffset;
-          xRectBuffer[2] -= borderOffset;
-          candleBuffer[1] += borderOffset;
-          candleBuffer[3] -= borderOffset;
+    @Override
+    public void onComputation(int begin, int end, int current, float[] extremum) {
+        // 设置画笔颜色
+        CandleEntry entry = render.getAdapter().getItem(current);
+        boolean isStroke;
+        Path path;
+        // 设置涨跌路径
+        if (entry.getClose().value < entry.getOpen().value) {
+            path = decreasingPath;//下跌路径
+            isStroke = attribute.decreasingStyle == Paint.Style.STROKE;
         } else {
-          candlePaint = candleFillPaint;
+            path = increasingPath;//上涨或者不涨不跌路径
+            isStroke = attribute.increasingStyle == Paint.Style.STROKE;
         }
-      }
-      if (height < 2) {// 涨停、跌停、或不涨不跌的一字板
-        candleBuffer[1] -= 2;
-      }
-      canvas.drawRect(xRectBuffer[0], candleBuffer[1], xRectBuffer[2],
-          candleBuffer[3], candlePaint);
+
+        // 计算 成交量的矩形坐标
+        rectBuffer[0] = current + render.pointsSpace;
+        rectBuffer[1] = entry.getVolume().value;
+        rectBuffer[2] = current + 1 - render.pointsSpace;
+        rectBuffer[3] = extremum[1];
+        render.mapPoints(rectBuffer);
+        //边框偏移量修正
+        if (isStroke) {
+            rectBuffer[0] += borderOffset;
+            rectBuffer[2] -= borderOffset;
+            rectBuffer[1] += borderOffset;
+            rectBuffer[3] -= borderOffset;
+        }
+        //无成交量的一字板
+        if (rectBuffer[3] - rectBuffer[1] < 2) {
+            rectBuffer[1] -= 2;
+        }
+        path.addRect(rectBuffer[0], rectBuffer[1], rectBuffer[2], rectBuffer[3], Path.Direction.CW);
     }
-    canvas.restore();
-  }
 
-  @Override
-  public void onDrawOver(Canvas canvas) {
-    //绘制外层边框线
-    if (attribute.borderWidth > 0) {
-      canvas.drawRect(viewRect.left - render.getBorderCorrection(),
-          viewRect.top - render.getBorderCorrection(),
-          viewRect.right + render.getBorderCorrection(),
-          viewRect.bottom + render.getBorderCorrection(),
-          borderPaint);
+    @Override
+    public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
+        canvas.save();
+        canvas.clipRect(viewRect);
+        canvas.drawPath(decreasingPath, decreasingPaint);
+        canvas.drawPath(increasingPath, increasingPaint);
+        decreasingPath.reset();
+        increasingPath.reset();
+        canvas.restore();
     }
-  }
 
-  @Override public void onViewChange() {
+    @Override
+    public void drawOver(Canvas canvas) {
+        //绘制外层边框线
+        if (attribute.borderWidth > 0) {
+            canvas.drawRect(borderPts[0], borderPts[1], borderPts[2], borderPts[3], borderPaint);
+        }
+    }
 
-  }
+    @Override
+    public void onViewChange() {
+        super.onViewChange();
+    }
 }

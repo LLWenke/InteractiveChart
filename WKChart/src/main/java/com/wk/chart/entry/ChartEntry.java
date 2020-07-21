@@ -1,20 +1,20 @@
 package com.wk.chart.entry;
 
-import com.wk.chart.Chart;
+import com.wk.chart.ChartView;
 import com.wk.chart.handler.InteractiveHandler;
 
 public class ChartEntry {
-  private Chart chart;
+  private ChartView chart;
   private InteractiveHandler handler;
 
   public ChartEntry() {
   }
 
-  public void setChart(Chart chart) {
+  public void setChart(ChartView chart) {
     this.chart = chart;
   }
 
-  public Chart getChart() {
+  public ChartView getChart() {
     return chart;
   }
 

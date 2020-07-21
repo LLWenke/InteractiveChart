@@ -1,7 +1,7 @@
 package com.wk.chart.compat;
 
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 
 public class ChartConstraintSet extends ConstraintSet {
 

@@ -1,6 +1,8 @@
 package com.wk.chart.compat;
 
+
 import com.wk.chart.enumeration.DisplayType;
+
 import java.util.Date;
 
 /**
@@ -14,7 +16,7 @@ public class DisplayTypeUtils {
   }
 
   public static String selectorFormat(Date date, DisplayType displayType) {
-    return DateUtil.formatDateToString(date, displayType == DisplayType.oneDay
+    return DateUtil.formatDateToString(date, displayType == DisplayType.day
         ? DateUtil.DATE_FORMAT_YMD : DateUtil.DATE_FORMAT_YMDHM);
   }
 }

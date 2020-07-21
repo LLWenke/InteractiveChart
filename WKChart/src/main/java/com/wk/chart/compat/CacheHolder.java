@@ -1,13 +1,13 @@
 package com.wk.chart.compat;
 
-import com.wk.chart.Chart;
+import com.wk.chart.ChartView;
 import com.wk.chart.entry.ChartEntry;
 
 /**
  * 缓存
  */
 public class CacheHolder {
-  private static Chart cacheChart = null;
+  private static ChartView cacheChart = null;
 
   /**
    * 缓存图表
@@ -19,7 +19,7 @@ public class CacheHolder {
   /**
    * 获取缓存的图表
    */
-  public static Chart getCacheChart() {
+  public static ChartView getCacheChart() {
     return cacheChart;
   }
 

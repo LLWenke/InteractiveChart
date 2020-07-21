@@ -1,5 +1,7 @@
-
 package com.wk.chart.entry;
+
+import com.wk.chart.adapter.AbsAdapter;
+import com.wk.chart.compat.Utils;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -9,92 +11,92 @@ import java.util.Date;
  */
 
 public class DepthEntry extends AbsEntry {
-  // 初始需全部赋值的属性
-  private final ValueEntry price;
-  private final ValueEntry amount;
-  private final ValueEntry totalAmount;
-  private ValueEntry totalPrice;
-  private int type;
+    // 初始需全部赋值的属性
+    private final ValueEntry price;
+    private final ValueEntry amount;
+    private final ValueEntry totalAmount;
+    private ValueEntry totalPrice;
+    private int type;
 
-  /**
-   * @param time 时间
-   * @param scale 精度
-   * @param quoteScale quote精度
-   * @param price 价格
-   * @param amount 交易量
-   * @param totalAmount 总交易量
-   * @param type 类型
-   */
-  public DepthEntry(Date time, int scale, int quoteScale, double price, double amount,
-      double totalAmount, int type) {
-    super(time, scale);
-    this.price = buildValue(price, quoteScale);
-    this.amount = buildValue(amount, quoteScale);
-    this.totalAmount = buildValue(totalAmount);
-    this.type = type;
-    resetTotalPrice(quoteScale);
-  }
+    /**
+     * @param scale       精度实例
+     * @param price       价格
+     * @param amount      交易量
+     * @param totalAmount 总交易量
+     * @param type        类型
+     * @param time        时间
+     */
+    public DepthEntry(AbsAdapter.ScaleEntry scale, double price, double amount,
+                      double totalAmount, int type, Date time) {
+        super(scale, time);
+        this.price = buildValue(price, scale.getQuoteScale());
+        this.amount = buildValue(amount, scale.getBaseScale());
+        this.totalAmount = buildValue(totalAmount, scale.getBaseScale());
+        this.type = type;
+        resetTotalPrice();
+        addAnimatorEntry(this.price, this.totalAmount);
+    }
 
-  /**
-   * @param time 时间
-   * @param scale 精度
-   * @param quoteScale quote精度
-   * @param price 价格
-   * @param amount 交易量
-   * @param totalAmount 总交易量
-   * @param type 类型
-   */
-  public DepthEntry(Date time, int scale, int quoteScale, BigDecimal price, BigDecimal amount,
-      BigDecimal totalAmount, int type) {
-    super(time, scale);
-    this.price = buildValue(price, quoteScale);
-    this.amount = buildValue(amount, quoteScale);
-    this.totalAmount = buildValue(totalAmount);
-    this.type = type;
-    resetTotalPrice(quoteScale);
-  }
+    /**
+     * @param scale       精度实例
+     * @param price       价格
+     * @param amount      交易量
+     * @param totalAmount 总交易量
+     * @param type        类型
+     * @param time        时间
+     */
+    public DepthEntry(AbsAdapter.ScaleEntry scale, BigDecimal price, BigDecimal amount,
+                      BigDecimal totalAmount, int type, Date time) {
+        super(scale, time);
+        this.price = buildValue(price, scale.getQuoteScale());
+        this.amount = buildValue(amount, scale.getBaseScale());
+        this.totalAmount = buildValue(totalAmount, scale.getBaseScale());
+        this.type = type;
+        resetTotalPrice();
+        addAnimatorEntry(this.price, this.totalAmount);
+    }
 
-  /**
-   * @param time 时间
-   * @param scale 精度
-   * @param quoteScale quote精度
-   * @param price 价格
-   * @param amount 交易量
-   * @param totalAmount 总交易量
-   * @param type 类型
-   */
-  public DepthEntry(Date time, int scale, int quoteScale, long price, long amount,
-      long totalAmount, int type) {
-    super(time, scale);
-    this.price = recoveryValue(price, quoteScale);
-    this.amount = recoveryValue(amount, quoteScale);
-    this.totalAmount = recoveryValue(totalAmount);
-    this.type = type;
-    resetTotalPrice(quoteScale);
-  }
+    /**
+     * @param scale       精度实例
+     * @param price       价格
+     * @param amount      交易量
+     * @param totalAmount 总交易量
+     * @param type        类型
+     * @param time        时间
+     */
+    public DepthEntry(AbsAdapter.ScaleEntry scale, long price, long amount,
+                      long totalAmount, int type, Date time) {
+        super(scale, time);
+        this.price = recoveryValue(price, scale.getQuoteScale());
+        this.amount = recoveryValue(amount, scale.getBaseScale());
+        this.totalAmount = recoveryValue(totalAmount, scale.getBaseScale());
+        this.type = type;
+        resetTotalPrice();
+    }
 
-  public ValueEntry getPrice() {
-    return price;
-  }
+    public ValueEntry getPrice() {
+        return price;
+    }
 
-  public ValueEntry getAmount() {
-    return amount;
-  }
+    public ValueEntry getAmount() {
+        return amount;
+    }
 
-  public ValueEntry getTotalAmount() {
-    return totalAmount;
-  }
+    public ValueEntry getTotalAmount() {
+        return totalAmount;
+    }
 
-  public ValueEntry getTotalPrice() {
-    return totalPrice;
-  }
+    public ValueEntry getTotalPrice() {
+        return totalPrice;
+    }
 
-  public int getType() {
-    return type;
-  }
+    public int getType() {
+        return type;
+    }
 
-  private void resetTotalPrice(int quoteScale) {
-    this.totalPrice = recoveryValue(getTotalAmount().result * getPrice().result
-        / (long) Math.pow(10, getScale()),quoteScale);
-  }
+    private void resetTotalPrice() {
+        this.totalPrice = recoveryValue(getTotalAmount().result
+                / Utils.divisorCorrect((long) Math.pow(10, getScale().getBaseScale()))
+                * getPrice().result, getScale().getQuoteScale());
+    }
 }

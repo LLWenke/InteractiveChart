@@ -1,205 +1,183 @@
 
 package com.wk.chart.drawing;
 
+
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.RectF;
+import android.graphics.Path;
+
+import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
-import com.wk.chart.entry.CandleEntry;
+import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.entry.ValueEntry;
+import com.wk.chart.module.MACDChartModule;
 import com.wk.chart.render.CandleRender;
-import com.wk.chart.stock.base.AbsChartModule;
 
 /**
  * <p>MACDDrawing</p>
  */
 
-public class MACDDrawing extends AbsDrawing<CandleRender> {
-  private static final String TAG = "MACDDrawing";
-  private CandleAttribute attribute;//配置文件
+public class MACDDrawing extends AbsDrawing<CandleRender, MACDChartModule> {
+    private static final String TAG = "MACDDrawing";
+    private CandleAttribute attribute;//配置文件
 
-  private Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG); //边框画笔
-  private Paint centerLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG); //中心线画笔
+    private Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG); //边框画笔
+    private Paint centerLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG); //中心线画笔
 
-  private Paint deaPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  private Paint difPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  // 上涨蜡烛图画笔
-  private Paint increasingCandlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  // 下跌蜡烛图画笔
-  private Paint decreasingCandlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  // 上涨蜡烛图画笔(用于高度或宽度小于边框宽高度时使用)
-  private Paint increasingCandleFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  // 上涨蜡烛图画笔(用于高度或宽度小于边框宽高度时使用)
-  private Paint decreasingCandleFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint deaPaint = new Paint();
+    private Paint diffPaint = new Paint();
+    // 上涨蜡烛图画笔
+    private Paint increasingPaint = new Paint();
+    // 下跌蜡烛图画笔
+    private Paint decreasingPaint = new Paint();
+    // 上涨路径
+    private Path increasingPath = new Path();
+    // 下跌路径
+    private Path decreasingPath = new Path();
+    // dea绘制路径
+    private Path deaPath = new Path();
+    // diff绘制路径
+    private Path diffPath = new Path();
+    // 折线路径位置信息
+    private final float[] pathPts = new float[4];
 
-  private float[] deaBuffer = new float[4];
-  private float[] diffBuffer = new float[4];
+    private float[] gridBuffer = new float[2];
 
-  private float[] gridBuffer = new float[2];
+    private float[] rectBuffer = new float[4];
 
-  private float[] xRectBuffer = new float[4];
-  private float[] macdBuffer = new float[4];
+    private float borderOffset;//边框偏移量
 
-  private float space = 0;//间隔
-  private float borderOffset;//边框偏移量
-  private float minSize;//最小宽度或高度
+    @Override
+    public void onInit(CandleRender render, MACDChartModule chartModule) {
+        super.onInit(render, chartModule);
+        attribute = render.getAttribute();
 
-  @Override public void onInit(RectF viewRect, CandleRender render, AbsChartModule chartModule) {
-    super.onInit(viewRect, render, chartModule);
-    attribute = render.getAttribute();
+        centerLinePaint.setColor(attribute.centerLineColor);
+        centerLinePaint.setStrokeWidth(attribute.lineWidth);
+        centerLinePaint.setStyle(Paint.Style.FILL);
 
-    centerLinePaint.setColor(attribute.centerLineColor);
-    centerLinePaint.setStrokeWidth(attribute.centerLineWidth);
-    centerLinePaint.setStyle(Paint.Style.FILL);
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setStrokeWidth(attribute.borderWidth);
+        borderPaint.setColor(attribute.borderColor);
 
-    borderPaint.setStyle(Paint.Style.STROKE);
-    borderPaint.setStrokeWidth(attribute.borderWidth);
-    borderPaint.setColor(attribute.borderColor);
+        diffPaint.setStyle(Paint.Style.STROKE);
+        diffPaint.setStrokeWidth(attribute.lineWidth);
+        diffPaint.setColor(attribute.line1Color);
 
-    deaPaint.setStyle(Paint.Style.STROKE);
-    deaPaint.setStrokeWidth(attribute.normLineWidth);
-    deaPaint.setColor(attribute.deaLineColor);
+        deaPaint.setStyle(Paint.Style.STROKE);
+        deaPaint.setStrokeWidth(attribute.lineWidth);
+        deaPaint.setColor(attribute.line2Color);
 
-    difPaint.setStyle(Paint.Style.STROKE);
-    difPaint.setStrokeWidth(attribute.normLineWidth);
-    difPaint.setColor(attribute.diffLineColor);
+        increasingPaint.setStyle(attribute.increasingStyle);
+        increasingPaint.setStrokeWidth(attribute.pointBorderWidth);
+        increasingPaint.setColor(Utils.getColorWithAlpha(attribute.increasingColor
+                , attribute.darkColorAlpha));
 
-    increasingCandlePaint.setStyle(attribute.increasingStyle);
-    increasingCandlePaint.setStrokeWidth(attribute.candleBorderWidth);
-    increasingCandlePaint.setColor(attribute.increasingColor);
+        decreasingPaint.setStyle(attribute.decreasingStyle);
+        decreasingPaint.setStrokeWidth(attribute.pointBorderWidth);
+        decreasingPaint.setColor(Utils.getColorWithAlpha(attribute.decreasingColor
+                , attribute.darkColorAlpha));
 
-    increasingCandleFillPaint.setStyle(Paint.Style.FILL);
-    increasingCandleFillPaint.setColor(attribute.increasingColor);
-
-    decreasingCandlePaint.setStyle(attribute.decreasingStyle);
-    decreasingCandlePaint.setStrokeWidth(attribute.candleBorderWidth);
-    decreasingCandlePaint.setColor(attribute.decreasingColor);
-
-    decreasingCandleFillPaint.setStyle(Paint.Style.FILL);
-    decreasingCandleFillPaint.setColor(attribute.decreasingColor);
-
-    space = (attribute.candleSpace / attribute.candleWidth) / 2;
-    borderOffset = attribute.candleBorderWidth / 2;
-    minSize = attribute.candleBorderWidth * 2;
-  }
-
-  @Override
-  public void computePoint(int begin, int end, int current) {
-    final int count = (end - begin) * 4;
-    final int next = current + 1;
-    final int i = current - begin;
-    final int left = i * 4;
-    final int top = i * 4 + 1;
-    final int right = i * 4 + 2;
-    final int bottom = i * 4 + 3;
-    final CandleEntry entry = render.getAdapter().getItem(current);
-
-    if (deaBuffer.length < count) {
-      deaBuffer = new float[count];
-      diffBuffer = new float[count];
+        borderOffset = attribute.pointBorderWidth / 2;
     }
 
-    if (current < end - 1) {
-      deaBuffer[left] = current + 0.5f;
-      deaBuffer[top] = entry.getDea().value;
-      deaBuffer[right] = current + 1.5f;
-      deaBuffer[bottom] = render.getAdapter().getItem(next).getDea().value;
+    @Override
+    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
 
-      diffBuffer[left] = deaBuffer[left];
-      diffBuffer[top] = entry.getDiff().value;
-      diffBuffer[right] = deaBuffer[right];
-      diffBuffer[bottom] = render.getAdapter().getItem(next).getDiff().value;
     }
-  }
 
-  @Override
-  public void onComputeOver(Canvas canvas, int begin, int end, float[] extremum) {
-    canvas.save();
-    canvas.clipRect(viewRect);
-
-    Paint candlePaint;
-    Paint candleFillPaint;
-    gridBuffer[0] = 0;
-    gridBuffer[1] = 0;
-    render.mapPoints(gridBuffer);
-
-    canvas.drawLine(viewRect.left, gridBuffer[1], viewRect.right, gridBuffer[1], centerLinePaint);
-
-    for (int i = begin; i < end; i++) {
-      CandleEntry entry = render.getAdapter().getItem(i);
-
-      xRectBuffer[0] = i + space;
-      xRectBuffer[1] = 0;
-      xRectBuffer[2] = i + 1 - space;
-      xRectBuffer[3] = 0;
-      render.mapPoints(xRectBuffer);
-
-      macdBuffer[0] = 0;
-      macdBuffer[2] = 0;
-
-      if (entry.getMacd().value >= 0) {
-        macdBuffer[1] = entry.getMacd().value;
-        macdBuffer[3] = 0;
-      } else {
-        macdBuffer[1] = 0;
-        macdBuffer[3] = entry.getMacd().value;
-      }
-      render.mapPoints(macdBuffer);
-
-      if (macdBuffer[3] <= gridBuffer[1]) {
-        candlePaint = decreasingCandlePaint;//下跌
-        candleFillPaint = decreasingCandleFillPaint;//下跌fill
-      } else {
-        candlePaint = increasingCandlePaint;//上涨或者不涨不跌
-        candleFillPaint = increasingCandleFillPaint;//上涨或者不涨不跌fill
-      }
-
-      float width = xRectBuffer[2] - xRectBuffer[0];
-      float height = macdBuffer[3] - macdBuffer[1];
-
-      //边框偏移量修正
-      if (candlePaint.getStyle() == Paint.Style.STROKE) {
-        if (width > minSize && height > minSize) {
-          xRectBuffer[0] += borderOffset;
-          xRectBuffer[2] -= borderOffset;
-          macdBuffer[1] += borderOffset;
-          macdBuffer[3] -= borderOffset;
-        } else {
-          candlePaint = candleFillPaint;
+    @Override
+    public void onComputation(int begin, int end, int current, float[] extremum) {
+        ValueEntry[] values = render.getAdapter().getItem(current).getIndicator(absChartModule.getIndicatorType());
+        if (null == values || values.length < 3) {
+            return;
         }
-      }
-      if (height < 2) {// 涨停、跌停、或不涨不跌的一字板
-        macdBuffer[1] -= 2;
-      }
-      canvas.drawRect(xRectBuffer[0], macdBuffer[1], xRectBuffer[2],
-          macdBuffer[3], candlePaint);
+        Path path;
+        boolean isStroke, isComputationDiffPath = null != values[0], isComputationDeaPath = null != values[1];
+        pathPts[0] = pathPts[2] = current + 0.5f;
+        if (isComputationDiffPath) {
+            pathPts[3] = values[0].value;
+        }
+        if (isComputationDeaPath) {
+            pathPts[1] = values[1].value;
+        }
+        render.mapPoints(pathPts);
+        if (isComputationDiffPath) {
+            if (diffPath.isEmpty()) diffPath.moveTo(pathPts[2], pathPts[3]);
+            else diffPath.lineTo(pathPts[2], pathPts[3]);
+        }
+        if (isComputationDeaPath) {
+            if (deaPath.isEmpty()) deaPath.moveTo(pathPts[0], pathPts[1]);
+            else deaPath.lineTo(pathPts[0], pathPts[1]);
+        }
+        //计算MACD矩形路径
+        ValueEntry macd = values[2];
+        if (null == macd) {
+            return;
+        }
+        if (macd.value >= 0) {
+            path = increasingPath;//上涨或者不涨不跌路径
+            isStroke = attribute.increasingStyle == Paint.Style.STROKE;
+            rectBuffer[1] = macd.value;
+            rectBuffer[3] = 0;
+        } else {
+            path = decreasingPath;//下跌路径
+            isStroke = attribute.decreasingStyle == Paint.Style.STROKE;
+            rectBuffer[1] = 0;
+            rectBuffer[3] = macd.value;
+        }
+        rectBuffer[0] = current + render.pointsSpace;
+        rectBuffer[2] = current + 1 - render.pointsSpace;
+        render.mapPoints(rectBuffer);
+        //边框偏移量修正
+        if (isStroke) {
+            rectBuffer[0] += borderOffset;
+            rectBuffer[2] -= borderOffset;
+            rectBuffer[1] += borderOffset;
+            rectBuffer[3] -= borderOffset;
+        }
+        // 涨停、跌停、或不涨不跌的一字板
+        if (rectBuffer[3] - rectBuffer[1] < 2) {
+            if (macd.value >= 0) {
+                rectBuffer[1] -= 2;
+            } else {
+                rectBuffer[3] += 2;
+            }
+        }
+        path.addRect(rectBuffer[0], rectBuffer[1], rectBuffer[2], rectBuffer[3], Path.Direction.CW);
     }
-    canvas.restore();
 
-    canvas.save();
-    canvas.clipRect(viewRect);
-
-    render.mapPoints(deaBuffer);
-    render.mapPoints(diffBuffer);
-
-    final int count = (end - begin) * 4;
-    canvas.drawLines(deaBuffer, 0, count, deaPaint);
-    canvas.drawLines(diffBuffer, 0, count, difPaint);
-
-    canvas.restore();
-  }
-
-  @Override
-  public void onDrawOver(Canvas canvas) {
-    if (attribute.borderWidth > 0) {
-      canvas.drawRect(viewRect.left - render.getBorderCorrection(),
-          viewRect.top - render.getBorderCorrection(),
-          viewRect.right + render.getBorderCorrection(),
-          viewRect.bottom + render.getBorderCorrection(),
-          borderPaint);
+    @Override
+    public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
+        canvas.save();
+        canvas.clipRect(viewRect);
+        //绘制中线
+        gridBuffer[0] = 0;
+        gridBuffer[1] = 0;
+        render.mapPoints(gridBuffer);
+        canvas.drawLine(viewRect.left, gridBuffer[1], viewRect.right, gridBuffer[1], centerLinePaint);
+        //绘制MACD矩形
+        canvas.drawPath(decreasingPath, decreasingPaint);
+        canvas.drawPath(increasingPath, increasingPaint);
+        decreasingPath.reset();
+        increasingPath.reset();
+        //绘制MACD指标线
+        canvas.drawPath(deaPath, deaPaint);
+        canvas.drawPath(diffPath, diffPaint);
+        deaPath.reset();
+        diffPath.reset();
+        canvas.restore();
     }
-  }
 
-  @Override public void onViewChange() {
+    @Override
+    public void drawOver(Canvas canvas) {
+        if (attribute.borderWidth > 0) {
+            canvas.drawRect(borderPts[0], borderPts[1], borderPts[2], borderPts[3], borderPaint);
+        }
+    }
 
-  }
+    @Override
+    public void onViewChange() {
+        super.onViewChange();
+    }
 }

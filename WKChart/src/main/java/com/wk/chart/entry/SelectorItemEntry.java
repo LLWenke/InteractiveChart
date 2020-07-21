@@ -1,21 +1,21 @@
-package com.wk.chart.entry;
+package com.wkchart.entry;
 
 import android.text.TextPaint;
 
 public class SelectorItemEntry {
-  private String lable;
-  private TextPaint lablePaint;
+  private String label;
+  private TextPaint labelPaint;
   private String value;
   private TextPaint valuePaint;
   private String unit;
   private TextPaint unitPaint;
 
-  public String getLable() {
-    return lable;
+  public String getLabel() {
+    return label;
   }
 
-  public TextPaint getLablePaint() {
-    return lablePaint;
+  public TextPaint getLabelPaint() {
+    return labelPaint;
   }
 
   public String getValue() {
@@ -34,13 +34,13 @@ public class SelectorItemEntry {
     return unitPaint;
   }
 
-  public SelectorItemEntry setLable(String lable) {
-    this.lable = lable;
+  public SelectorItemEntry setLabel(String label) {
+    this.label = label;
     return this;
   }
 
-  public SelectorItemEntry setLablePaint(TextPaint lablePaint) {
-    this.lablePaint = lablePaint;
+  public SelectorItemEntry setLabelPaint(TextPaint labelPaint) {
+    this.labelPaint = labelPaint;
     return this;
   }
 

@@ -2,8 +2,9 @@
 
 package com.wk.chart.handler;
 
-import android.view.MotionEvent;
+import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
+import com.wk.chart.module.base.AbsChartModule;
 
 /**
  * <p>InteractiveHandler</p>
@@ -11,19 +12,27 @@ import com.wk.chart.entry.AbsEntry;
 
 public abstract class InteractiveHandler {
 
-  public abstract void onLeftRefresh(AbsEntry firstData);
+    public void onLeftRefresh(AbsEntry firstData) {
+    }
 
-  public abstract void onRightRefresh(AbsEntry lastData);
+    public void onRightRefresh(AbsEntry lastData) {
+    }
 
-  public void onSingleTap(MotionEvent e, float x, float y) {
-  }
+    public boolean onSingleTap(AbsChartModule focusChartModule, float x, float y) {
+        return false;
+    }
 
-  public void onDoubleTap(MotionEvent e, float x, float y) {
-  }
+    public boolean onSingleTap(AbsDrawing drawing, float x, float y) {
+        return false;
+    }
 
-  public void onHighlight(AbsEntry entry, int entryIndex, float x, float y) {
-  }
+    public boolean onDoubleTap(AbsChartModule focusChartModule, float x, float y) {
+        return false;
+    }
 
-  public void onCancelHighlight() {
-  }
+    public void onHighlight(AbsEntry entry, int entryIndex, float x, float y) {
+    }
+
+    public void onCancelHighlight() {
+    }
 }
