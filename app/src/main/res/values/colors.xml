@@ -2,4 +2,6 @@
 <resources>
     <color name="colorPrimary">#202a33</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="btn_enable_color">#5f99da</color>
+    <color name="btn_unEnable_color">#394551</color>
 </resources>

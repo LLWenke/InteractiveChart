@@ -99,7 +99,7 @@ public class IndicatorLineDrawing extends AbsDrawing<CandleRender, AbsChartModul
         //绘制指标线
         for (int i = 0; i < paints.length; i++) {
             canvas.drawPath(paths[i], paints[i]);
-            paths[i].reset();
+            paths[i].rewind();
         }
         canvas.restore();
     }

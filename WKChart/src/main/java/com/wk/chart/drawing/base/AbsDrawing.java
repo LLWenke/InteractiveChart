@@ -106,6 +106,15 @@ public abstract class AbsDrawing<T extends AbsRender, A extends AbsChartModule> 
     }
 
     /**
+     * 获取绘制区域
+     *
+     * @return 绘制区域
+     */
+    public RectF getViewRect() {
+        return viewRect;
+    }
+
+    /**
      * 设置边距
      */
     public void setMargin(float left, float top, float right, float bottom) {

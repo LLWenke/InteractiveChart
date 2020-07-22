@@ -105,7 +105,7 @@ public class ChartLayout extends ConstraintLayout {
         candleModule.addDrawing(new CandleDrawing());//蜡烛图组件
         candleModule.addDrawing(new IndicatorLineDrawing());//平均线组件
         candleModule.addDrawing(new AxisDrawing());//x轴组件
-        candleModule.addDrawing(new GridDrawing());//Y轴组件
+//        candleModule.addDrawing(new GridDrawing());//Y轴组件
         candleModule.addDrawing(new IndicatorLabelDrawing());//指标文字标签组件
         candleModule.addDrawing(new MarkerPointDrawing());//标记点绘制组件
         candleModule.addDrawing(new ExtremumTagDrawing());//极值标签组件

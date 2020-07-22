@@ -115,7 +115,7 @@ public class MACDDrawing extends AbsDrawing<CandleRender, MACDChartModule> {
         if (null == macd) {
             return;
         }
-        if (macd.value >= 0) {
+        if (macd.value >= 0f) {
             path = increasingPath;//上涨或者不涨不跌路径
             isStroke = attribute.increasingStyle == Paint.Style.STROKE;
             rectBuffer[1] = macd.value;
@@ -137,13 +137,16 @@ public class MACDDrawing extends AbsDrawing<CandleRender, MACDChartModule> {
             rectBuffer[3] -= borderOffset;
         }
         // 涨停、跌停、或不涨不跌的一字板
-        if (rectBuffer[3] - rectBuffer[1] < 2) {
-            if (macd.value >= 0) {
-                rectBuffer[1] -= 2;
+        if (rectBuffer[3] - rectBuffer[1] < attribute.pointBorderWidth) {
+            if (macd.value >= 0f) {
+                rectBuffer[1] = rectBuffer[3];
+                rectBuffer[1] -= attribute.pointBorderWidth;
             } else {
-                rectBuffer[3] += 2;
+                rectBuffer[3] = rectBuffer[1];
+                rectBuffer[3] += attribute.pointBorderWidth;
             }
         }
+        path.moveTo(rectBuffer[0], rectBuffer[1]);
         path.addRect(rectBuffer[0], rectBuffer[1], rectBuffer[2], rectBuffer[3], Path.Direction.CW);
     }
 
@@ -157,15 +160,17 @@ public class MACDDrawing extends AbsDrawing<CandleRender, MACDChartModule> {
         render.mapPoints(gridBuffer);
         canvas.drawLine(viewRect.left, gridBuffer[1], viewRect.right, gridBuffer[1], centerLinePaint);
         //绘制MACD矩形
+        decreasingPath.close();
+        increasingPath.close();
         canvas.drawPath(decreasingPath, decreasingPaint);
         canvas.drawPath(increasingPath, increasingPaint);
-        decreasingPath.reset();
-        increasingPath.reset();
+        decreasingPath.rewind();
+        increasingPath.rewind();
         //绘制MACD指标线
         canvas.drawPath(deaPath, deaPaint);
         canvas.drawPath(diffPath, diffPaint);
-        deaPath.reset();
-        diffPath.reset();
+        deaPath.rewind();
+        diffPath.rewind();
         canvas.restore();
     }
 

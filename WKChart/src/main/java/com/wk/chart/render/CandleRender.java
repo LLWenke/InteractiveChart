@@ -52,7 +52,6 @@ public class CandleRender extends AbsRender<CandleAdapter, CandleAttribute> {
                             * chartModule.getyScale();
                 }
                 break;
-
             default://默认Y轴最大值和最小值全部进行比例缩放
                 if (deltaYScale > 0) {
                     extremum[1] = chartModule.getMinY().value - deltaYScale;

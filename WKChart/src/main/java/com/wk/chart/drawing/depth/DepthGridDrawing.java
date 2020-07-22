@@ -141,7 +141,7 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsChartModule> {
             dividingLinePath.lineTo(borderPts[2], borderPts[1]);
 //          borderPath.close();
             canvas.drawPath(dividingLinePath, gridDividingLinePaint);
-            dividingLinePath.reset();
+            dividingLinePath.rewind();
         }
     }
 

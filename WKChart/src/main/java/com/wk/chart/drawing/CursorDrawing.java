@@ -134,7 +134,7 @@ public class CursorDrawing extends AbsDrawing<CandleRender, CandleChartModule> {
             //绘制游标值
             canvas.drawText(last.getClose().text, textX, textY, cursorTextPaint);
             //绘制游标icon
-            cursorIconPath.reset();
+            cursorIconPath.rewind();
             float iconX = cursorRect.right - attribute.axisLabelLRMargin - iconWidth;
             cursorIconPath.moveTo(iconX, textY - iconHeight);
             cursorIconPath.lineTo(iconX + iconWidth, textY - iconHeight / 2f);
@@ -147,7 +147,7 @@ public class CursorDrawing extends AbsDrawing<CandleRender, CandleChartModule> {
             path.lineTo(viewRect.right, cursorPoint[1]);
             canvas.drawPath(path, cursorLinePaint);
         }
-        path.reset();
+        path.rewind();
     }
 
     @Override

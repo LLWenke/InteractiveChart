@@ -36,7 +36,7 @@ public class BaseAttribute {
     public float depthViewHeight = 0; // 深度图图模块高度
     public float viewInterval = 0; // 各个视图模块间的间隔
     public float borderWidth = 3f; // 边框线条宽度
-    public int borderColor = 0xff132a38; // 边框线条颜色
+    public int borderColor = 0x1Affffff; // 边框线条颜色
     public float leftScrollOffset = 0;//X 轴方向的最小滚动值固定偏移量（左边）
     public float rightScrollOffset = 0;//X 轴方向的最大滚动值固定偏移量（右边）
 
@@ -54,8 +54,8 @@ public class BaseAttribute {
      */
     public int gridCount = 4; // grid数量
     public float gridDividingLineWidth = 0; // grid 分割线宽度
-    public float gridLabelMarginTop = 0; // grid标签上边距
-    public float gridLabelMarginBottom = 0; // grid标签下边距
+    public float gridLabelMarginTop = 6; // grid标签上边距
+    public float gridLabelMarginBottom = 6; // grid标签下边距
     public boolean gridLineState = true;//grid 线条是否显示
 
     /**
@@ -73,13 +73,13 @@ public class BaseAttribute {
     public boolean xHighlightIsHide = false; // X高亮线条是否显示
     // X高亮线条是否启用自动宽度管理(启用后xHighlightWidth将失效，宽度将实时跟随candleWidth)
     public boolean xHighlightAutoWidth = false;
-    public int xHighlightColor = 0xff4d6370; // X高亮线条颜色 0xff1c232e
+    public int xHighlightColor = 0x33ffffff; // X高亮线条颜色 0x33ffffff
 
     public boolean yHighlightIsHide = false; // Y高亮线条是否显示
     // Y高亮线条是否启用自动宽度管理(启用后yHighlightWidth将失效，宽度将实时跟随candleWidth)
     public boolean yHighlightAutoWidth = false;
-    public int yHighlightColor = 0xff4d6370; // Y高亮线条颜色 0xff1c232e
-    public HighLightStyle highLightStyle = HighLightStyle.DOTTED; // 高亮线条样式(实线/虚线)
+    public int yHighlightColor = 0x33ffffff; // Y高亮线条颜色 0x33ffffff
+    public HighLightStyle highLightStyle = HighLightStyle.SOLID; // 高亮线条样式(实线/虚线)
 
     /**
      * 与MarkerView 有关的属性
@@ -127,12 +127,11 @@ public class BaseAttribute {
      * 与游标指示器有关的属性
      */
     public float cursorBorderWidth = 3;//游标文字容器边框宽度
-    public int cursorBackgroundColor = 0xFF061520;//游标文字容器背景颜色
+    public int cursorBackgroundColor = 0xFF202a33;//游标文字容器背景颜色
     public float cursorRadius = 5;//游标文字容器圆角
     public int cursorLineColor = 0xff00efff;//游标线颜色
     public int cursorTextColor = 0xff00efff;//游标值颜色
     public int cursorBorderColor = 0xff00efff;//游标值容器边框颜色
-
 
     /**
      * 涨跌有关的属性
@@ -207,7 +206,7 @@ public class BaseAttribute {
     public float markerPointLineDefaultLength = 20;//标记点连接线默认长度
     public float markerPointJointRadius = 8;//标记点接点半径（小圆点和小三角）
     public float markerPointJointMargin = 6;//标记点接点边距（小圆点距离K线柱的距离）
-    public float markerPointTextSize = 20;//标记点文字大小
+    public float markerPointTextSize = 26;//标记点文字大小
     public int markerPointTextColor = 0xFFFFFFFF;//标记点文字颜色
     public int markerPointColorB = 0xFFFF8100;//B标记点颜色
     public int markerPointColorS = 0xFF00ABFF;//S标记点颜色

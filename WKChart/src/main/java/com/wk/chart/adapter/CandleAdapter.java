@@ -141,7 +141,6 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndicatorBuildConfig>
                 addFooterData(data);
                 break;
         }
-        Log.e("dataPush-->" + pushType, data.toString());
         return pushType;
     }
 

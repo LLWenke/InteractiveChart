@@ -178,14 +178,14 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatChartModule>
             highlightPath.lineTo(highlightPts[i - 1], highlightPts[i]);
         }
         canvas.drawPath(highlightPath, xHighlightPaint);
-        highlightPath.reset();
+        highlightPath.rewind();
 
         yHighlightPaint.setStrokeWidth(attribute.yHighlightAutoWidth ? pointWidth : attribute.lineWidth);
 
         highlightPath.moveTo(left, highlightPoint[1]);
         highlightPath.lineTo(right, highlightPoint[1]);
         canvas.drawPath(highlightPath, yHighlightPaint);
-        highlightPath.reset();
+        highlightPath.rewind();
 
         for (AbsMarker markerView : markerViewList) {
             markerView.onMarkerViewDraw(canvas, markerText);

@@ -26,13 +26,9 @@ public class CandleChartModule extends MainChartModule<CandleEntry> implements I
     @Override
     public void computeMinMax(CandleEntry entry) {
         //计算最小值
-        if (entry.getLow().value < getMinY().value) {
-            setMinY(entry.getLow());
-        }
+        setMinY(entry.getLow());
         //计算最大值
-        if (entry.getHigh().value > getMaxY().value) {
-            setMaxY(entry.getHigh());
-        }
+        setMaxY(entry.getHigh());
         ValueEntry[] values = entry.getIndicator(getIndicatorType());
         if (null == values) {
             return;
@@ -42,13 +38,9 @@ public class CandleChartModule extends MainChartModule<CandleEntry> implements I
                 continue;
             }
             //计算最小值
-            if (item.value < getMinY().value) {
-                setMinY(item);
-            }
+            setMinY(item);
             //计算最大值
-            if (item.value > getMaxY().value) {
-                setMaxY(item);
-            }
+            setMaxY(item);
         }
         //计算标签数量
         if (entry.getMarkerPointType() != MarkerPointType.NORMAL) {

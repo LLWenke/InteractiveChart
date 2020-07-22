@@ -149,13 +149,13 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsChartModule>
             canvas.drawText(texts[i], textPointBuffer[index], textPointBuffer[index + 1], markerPointsTextPaint);
         }
 
-        markerPointsPathB.reset();
-        markerPointsPathS.reset();
-        markerPointsPathT.reset();
+        markerPointsPathB.rewind();
+        markerPointsPathS.rewind();
+        markerPointsPathT.rewind();
 
-        markerPointsLinePathB.reset();
-        markerPointsLinePathS.reset();
-        markerPointsLinePathT.reset();
+        markerPointsLinePathB.rewind();
+        markerPointsLinePathS.rewind();
+        markerPointsLinePathT.rewind();
 
         canvas.restore();
     }

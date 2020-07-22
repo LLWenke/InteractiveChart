@@ -147,7 +147,7 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsChartModul
             highlightPath.lineTo(highlightPts[i - 1], highlightPts[i]);
         }
         canvas.drawPath(highlightPath, highlightPaint);
-        highlightPath.reset();
+        highlightPath.rewind();
         canvas.drawCircle(highlightPoint[0], highlightPoint[1], attribute.circleSize / 2,
                 circlePant);
 

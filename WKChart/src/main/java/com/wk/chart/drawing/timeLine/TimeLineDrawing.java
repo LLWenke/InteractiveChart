@@ -117,8 +117,8 @@ public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineChartModul
         canvas.clipRect(viewRect);
         canvas.drawPath(timelinePath, timelinePaint);
         canvas.drawPath(timeShaderPath, timeShaderPaint);
-        timelinePath.reset();
-        timeShaderPath.reset();
+        timelinePath.rewind();
+        timeShaderPath.rewind();
         canvas.restore();
     }
 

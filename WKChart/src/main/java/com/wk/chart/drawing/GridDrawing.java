@@ -123,7 +123,7 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsChartModule> {
 
     private void computationGridDividingLine() {
         if (attribute.gridDividingLineWidth > 0) {
-            dividingLinePath.reset();
+            dividingLinePath.rewind();
             dividingLinePath.moveTo(borderPts[0], borderPts[1]);
             dividingLinePath.lineTo(borderPts[2], borderPts[1]);
             dividingLinePath.moveTo(borderPts[0], borderPts[3]);

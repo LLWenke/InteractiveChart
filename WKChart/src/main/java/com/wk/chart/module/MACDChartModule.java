@@ -18,6 +18,15 @@ public class MACDChartModule extends AuxiliaryChartModule<CandleEntry> {
         setIndicatorType(IndicatorType.MACD);
     }
 
+    /**
+     * MACD指标的minY不能大于0，否则会出现超出绘制区域的现象
+     */
+    @Override
+    public ValueEntry getMinY() {
+        ValueEntry min = super.getMinY();
+        return min.result > 0f ? zeroEntry : min;
+    }
+
     @Override
     public void computeMinMax(CandleEntry entry) {
         ValueEntry[] values = entry.getIndicator(getIndicatorType());
@@ -29,13 +38,9 @@ public class MACDChartModule extends AuxiliaryChartModule<CandleEntry> {
                 continue;
             }
             //计算最小值
-            if (item.value < getMinY().value) {
-                setMinY(item);
-            }
+            setMinY(item);
             //计算最大值
-            if (item.value > getMaxY().value) {
-                setMaxY(item);
-            }
+            setMaxY(item);
         }
     }
 }

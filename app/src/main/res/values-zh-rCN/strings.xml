@@ -5,6 +5,7 @@
   <string name="wk_rsi">RSI</string>
   <string name="wk_kdj">KDJ</string>
   <string name="wk_bull">BULL</string>
+  <string name="wk_wr">WR</string>
 
   <string name="wk_time_line">分时</string>
   <string name="wk_1m">1m</string>
@@ -13,4 +14,8 @@
   <string name="wk_1h">1h</string>
   <string name="wk_6h">6h</string>
   <string name="wk_1d">1d</string>
+
+  <string name="wk_historical_data">历史数据展示</string>
+  <string name="wk_real_time_data">实时数据展示</string>
+  <string name="wk_loading_tips">数据加载中 。。。</string>
 </resources>

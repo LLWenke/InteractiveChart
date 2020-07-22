@@ -87,9 +87,9 @@ public class CandleDrawing extends AbsDrawing<CandleRender, CandleChartModule> {
             rectBuffer[7] -= borderOffset;
         }
         // 涨停、跌停、或不涨不跌的一字板
-        if (rectBuffer[7] - rectBuffer[5] < 2) {
-            rectBuffer[5] -= 1;
-            rectBuffer[7] += 1;
+        if (rectBuffer[7] - rectBuffer[5] < attribute.pointBorderWidth) {
+            rectBuffer[5] -= borderOffset;
+            rectBuffer[7] += borderOffset;
         }
         //计算中心线
         float centerLine = rectBuffer[0] + (rectBuffer[2] - rectBuffer[0]) / 2f;
@@ -134,10 +134,12 @@ public class CandleDrawing extends AbsDrawing<CandleRender, CandleChartModule> {
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
         canvas.save();
         canvas.clipRect(viewRect);
+        decreasingPath.close();
+        increasingPath.close();
         canvas.drawPath(decreasingPath, decreasingPaint);
         canvas.drawPath(increasingPath, increasingPaint);
-        decreasingPath.reset();
-        increasingPath.reset();
+        decreasingPath.rewind();
+        increasingPath.rewind();
         canvas.restore();
     }
 

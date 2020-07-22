@@ -1,15 +1,17 @@
 
 package com.wk.demo.util;
 
-import android.content.Context;
+import android.annotation.SuppressLint;
+import android.os.AsyncTask;
 
 import com.google.gson.Gson;
 import com.wk.chart.adapter.AbsAdapter;
+import com.wk.chart.adapter.CandleAdapter;
 import com.wk.chart.adapter.DepthAdapter;
-import com.wk.chart.compat.DateUtil;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.DepthEntry;
+import com.wk.demo.MyApp;
 import com.wk.demo.model.DepthWrapper;
 
 import java.io.InputStream;
@@ -25,11 +27,36 @@ import java.util.List;
 
 public class DataUtils {
 
-    public static List<CandleEntry> getCandelData(Context context, AbsAdapter.ScaleEntry scale) {
+    private static AsyncTask<Void, Void, Void> task;
+    public static List<CandleEntry> candleEntries;
+    public static List<DepthEntry> depthEntries;
+
+    @SuppressLint("StaticFieldLeak")
+    public static void loadData(AbsAdapter.ScaleEntry scaleEntry, LoadingListener listener) {
+        task = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (Utils.listIsEmpty(candleEntries)) {
+                    candleEntries = DataUtils.getCandelData(scaleEntry);
+                }
+                if (Utils.listIsEmpty(depthEntries)) {
+                    depthEntries = DataUtils.getDepthData(scaleEntry);
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                listener.loadComplete();
+            }
+        }.execute();
+    }
+
+    private static List<CandleEntry> getCandelData(AbsAdapter.ScaleEntry scaleEntry) {
         String kLineData;
         List<CandleEntry> dataList = new ArrayList<>();
         try {
-            InputStream in = context.getResources().getAssets().open("kline1.txt");
+            InputStream in = MyApp.context.getResources().getAssets().open("kline1.txt");
             int length = in.available();
             byte[] buffer = new byte[length];
             in.read(buffer);
@@ -46,7 +73,7 @@ public class DataUtils {
                 double volume = Double.parseDouble(v[4]);
 
                 dataList.add(
-                        new CandleEntry(scale, open, high, low, close, volume, new Date(Date.parse(v[5]))));
+                        new CandleEntry(scaleEntry, open, high, low, close, volume, new Date(Date.parse(v[5]))));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,9 +84,9 @@ public class DataUtils {
         return dataList;
     }
 
-    public static List<DepthEntry> getDepthData(Context context, AbsAdapter.ScaleEntry scale) {
+    private static List<DepthEntry> getDepthData(AbsAdapter.ScaleEntry scaleEntry) {
         try {
-            InputStream in = context.getResources().getAssets().open("depth_data.json");
+            InputStream in = MyApp.context.getResources().getAssets().open("depth_data.json");
             int length = in.available();
             byte[] buffer = new byte[length];
             in.read(buffer);
@@ -78,18 +105,32 @@ public class DataUtils {
             for (int i = 0; i < data.getBids().size(); i++) {
                 DepthWrapper.Depth item = data.getBids().get(i);
                 totalAmount = totalAmount.add(item.getAmount());
-                depthData.add(new DepthEntry(scale, item.getPrice(), item.getAmount(), totalAmount, DepthAdapter.BID, null));
+                depthData.add(new DepthEntry(scaleEntry,
+                        item.getPrice(), item.getAmount(), totalAmount, DepthAdapter.BID, null));
             }
             totalAmount = BigDecimal.ZERO;
             for (int i = 0; i < data.getAsks().size(); i++) {
                 DepthWrapper.Depth item = data.getAsks().get(i);
                 totalAmount = totalAmount.add(item.getAmount());
-                depthData.add(new DepthEntry(scale, item.getPrice(), item.getAmount(), totalAmount, DepthAdapter.ASK, null));
+                depthData.add(new DepthEntry(scaleEntry,
+                        item.getPrice(), item.getAmount(), totalAmount, DepthAdapter.ASK, null));
             }
             return depthData;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void destroy() {
+        if (null != task) {
+            task.cancel(true);
+        }
+        if (null != candleEntries) {
+            candleEntries.clear();
+        }
+        if (null != depthEntries) {
+            depthEntries.clear();
+        }
     }
 }

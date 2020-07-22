@@ -17,18 +17,10 @@ public class DepthChartModule extends MainChartModule<DepthEntry> {
     @Override
     public void computeMinMax(DepthEntry entry) {
         //计算最小值
-        if (entry.getTotalAmount().value < getMinY().value) {
-            setMinY(entry.getTotalAmount());
-        }
-        if (entry.getPrice().value < getMinX().value) {
-            setMinX(entry.getPrice());
-        }
+        setMinY(entry.getTotalAmount());
+        setMinX(entry.getPrice());
         //计算最大值
-        if (entry.getTotalAmount().value > getMaxY().value) {
-            setMaxY(entry.getTotalAmount());
-        }
-        if (entry.getPrice().value > getMaxX().value) {
-            setMaxX(entry.getPrice());
-        }
+        setMaxY(entry.getTotalAmount());
+        setMaxX(entry.getPrice());
     }
 }

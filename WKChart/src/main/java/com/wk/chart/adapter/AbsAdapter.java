@@ -16,6 +16,7 @@ import com.wk.chart.enumeration.ObserverArg;
 import com.wk.chart.module.base.AbsChartModule;
 import com.wk.chart.thread.WorkThread;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -234,7 +235,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
             notifyDataSetChanged(ObserverArg.INIT);
         } else {
             setWorking(true);
-            onAsyTask(buildConfig,data, ObserverArg.INIT);
+            onAsyTask(buildConfig, data, ObserverArg.INIT);
         }
     }
 
@@ -247,7 +248,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             setWorking(true);
             data.addAll(chartData);
-            onAsyTask(buildConfig,data, ObserverArg.ADD);
+            onAsyTask(buildConfig, data, ObserverArg.ADD);
         }
     }
 
@@ -260,7 +261,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             setWorking(true);
             data.addAll(0, chartData);
-            onAsyTask(buildConfig,data, ObserverArg.ADD);
+            onAsyTask(buildConfig, data, ObserverArg.ADD);
         }
     }
 
@@ -272,7 +273,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
             stopAnimator();
             this.chartData.add(data);
             this.dataSize = chartData.size();
-            buildData(buildConfig,chartData);
+            buildData(buildConfig, chartData);
             notifyDataSetChanged(ObserverArg.PUSH);
         }
     }
@@ -292,7 +293,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     public void onAnimation(int position, T updateData, boolean buildState) {
         if (buildState) {
             this.chartData.set(position, updateData);
-            buildData(buildConfig,chartData);
+            buildData(buildConfig, chartData);
             notifyDataSetChanged(ObserverArg.PUSH);
         } else {
             notifyDataSetChanged(ObserverArg.REFRESH);
@@ -422,17 +423,24 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         return null == animator ? 1f : animator.getAnimatedFraction();
     }
 
-    public class ScaleEntry {
+    public static class ScaleEntry implements Serializable {
         private int baseScale;// base 精度
         private int quoteScale;// quote 精度
         private String baseUnit;// base 单位
         private String quoteUnit;// quote 单位
 
-        ScaleEntry(int baseScale, int quoteScale, String baseUnit, String quoteUnit) {
+        public ScaleEntry(int baseScale, int quoteScale, String baseUnit, String quoteUnit) {
             this.baseScale = baseScale;
             this.quoteScale = quoteScale;
             this.baseUnit = baseUnit;
             this.quoteUnit = quoteUnit;
+        }
+
+        public ScaleEntry(int baseScale, int quoteScale) {
+            this.baseScale = baseScale;
+            this.quoteScale = quoteScale;
+            this.baseUnit = "";
+            this.quoteUnit = "";
         }
 
         void reset(int baseScale, int quoteScale) {

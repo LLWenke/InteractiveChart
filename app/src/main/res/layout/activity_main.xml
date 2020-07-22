@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    >
+  <LinearLayout
+      android:id="@+id/loading_tips"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="50dp"
+      android:gravity="center"
+      android:orientation="horizontal"
+      >
+    <ProgressBar
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:gravity="center"
+        android:text="@string/wk_loading_tips"
+        android:textColor="@color/chart_white"
+        android:textSize="18sp"
+        />
+  </LinearLayout>
+
+
+  <Button
+      android:id="@+id/btn_real_time_data"
+      android:layout_width="300dp"
+      android:layout_height="50dp"
+      android:background="@drawable/selector_button"
+      android:gravity="center"
+      android:includeFontPadding="false"
+      android:text="@string/wk_real_time_data"
+      android:textColor="@color/chart_white"
+      android:textSize="18sp"
+      />
+
+  <Button
+      android:id="@+id/btn_historical_data"
+      android:layout_width="300dp"
+      android:layout_height="50dp"
+      android:layout_marginTop="30dp"
+      android:background="@drawable/selector_button"
+      android:gravity="center"
+      android:includeFontPadding="false"
+      android:text="@string/wk_historical_data"
+      android:textColor="@color/chart_white"
+      android:textSize="18sp"
+      />
+</LinearLayout>

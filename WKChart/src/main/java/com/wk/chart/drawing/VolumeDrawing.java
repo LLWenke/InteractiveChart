@@ -1,9 +1,9 @@
 package com.wk.chart.drawing;
 
-
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.util.Log;
 
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
@@ -75,7 +75,6 @@ public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeChartModule> {
             path = increasingPath;//上涨或者不涨不跌路径
             isStroke = attribute.increasingStyle == Paint.Style.STROKE;
         }
-
         // 计算 成交量的矩形坐标
         rectBuffer[0] = current + render.pointsSpace;
         rectBuffer[1] = entry.getVolume().value;
@@ -90,8 +89,9 @@ public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeChartModule> {
             rectBuffer[3] -= borderOffset;
         }
         //无成交量的一字板
-        if (rectBuffer[3] - rectBuffer[1] < 2) {
-            rectBuffer[1] -= 2;
+        if (rectBuffer[3] - rectBuffer[1] < attribute.pointBorderWidth) {
+            rectBuffer[1] = rectBuffer[3];
+            rectBuffer[1] -= attribute.pointBorderWidth;
         }
         path.addRect(rectBuffer[0], rectBuffer[1], rectBuffer[2], rectBuffer[3], Path.Direction.CW);
     }
@@ -100,10 +100,12 @@ public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeChartModule> {
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
         canvas.save();
         canvas.clipRect(viewRect);
+        decreasingPath.close();
+        increasingPath.close();
         canvas.drawPath(decreasingPath, decreasingPaint);
         canvas.drawPath(increasingPath, increasingPaint);
-        decreasingPath.reset();
-        increasingPath.reset();
+        decreasingPath.rewind();
+        increasingPath.rewind();
         canvas.restore();
     }
 
@@ -113,10 +115,5 @@ public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeChartModule> {
         if (attribute.borderWidth > 0) {
             canvas.drawRect(borderPts[0], borderPts[1], borderPts[2], borderPts[3], borderPaint);
         }
-    }
-
-    @Override
-    public void onViewChange() {
-        super.onViewChange();
     }
 }

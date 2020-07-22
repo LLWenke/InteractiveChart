@@ -23,9 +23,11 @@ public abstract class AbsChartModule<T extends AbsEntry> {
 
     private final ArrayList<AbsDrawing> drawingList = new ArrayList<>();
 
-    private final ValueEntry maxEntry; //最大值
+    protected final ValueEntry maxEntry; //最大值
 
-    private final ValueEntry minEntry; //最小值
+    protected final ValueEntry minEntry; //最小值
+
+    protected final ValueEntry zeroEntry; //0
 
     private RectF rect = new RectF();
 
@@ -70,8 +72,9 @@ public abstract class AbsChartModule<T extends AbsEntry> {
         this.moduleType = moduleType;
         this.maxEntry = new ValueEntry(0);
         this.minEntry = new ValueEntry(0);
-        this.maxEntry.value = -Float.MAX_VALUE;
-        this.minEntry.value = Float.MAX_VALUE;
+        this.zeroEntry = new ValueEntry(0);
+        this.maxEntry.result = -Long.MAX_VALUE;
+        this.minEntry.result = Long.MAX_VALUE;
         this.margin = new float[4];
         this.rectBuffer = new float[8];
     }
@@ -207,35 +210,43 @@ public abstract class AbsChartModule<T extends AbsEntry> {
     }
 
     public ValueEntry getMaxY() {
-        return maxY;
+        return maxY == maxEntry ? zeroEntry : maxY;
     }
 
     protected void setMaxY(ValueEntry maxY) {
-        this.maxY = maxY;
+        if (maxY.result > this.maxY.result) {
+            this.maxY = maxY;
+        }
     }
 
     public ValueEntry getMinY() {
-        return minY;
+        return minY == minEntry ? zeroEntry : minY;
     }
 
     protected void setMinY(ValueEntry minY) {
-        this.minY = minY;
+        if (minY.result < this.minY.result) {
+            this.minY = minY;
+        }
     }
 
     public ValueEntry getMaxX() {
-        return maxX;
+        return maxX == maxEntry ? zeroEntry : maxX;
     }
 
     protected void setMaxX(ValueEntry maxX) {
-        this.maxX = maxX;
+        if (maxX.result > this.maxX.result) {
+            this.maxX = maxX;
+        }
     }
 
     public ValueEntry getMinX() {
-        return minX;
+        return minX == minEntry ? zeroEntry : minX;
     }
 
     protected void setMinX(ValueEntry minX) {
-        this.minX = minX;
+        if (minX.result < this.minX.result) {
+            this.minX = minX;
+        }
     }
 
     public float getyScale() {

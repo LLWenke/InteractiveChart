@@ -29,13 +29,9 @@ public class WRChartModule extends AuxiliaryChartModule<CandleEntry> {
                 continue;
             }
             //计算最小值
-            if (item.value < getMinY().value) {
-                setMinY(item);
-            }
+            setMinY(item);
             //计算最大值
-            if (item.value > getMaxY().value) {
-                setMaxY(item);
-            }
+            setMaxY(item);
         }
     }
 }

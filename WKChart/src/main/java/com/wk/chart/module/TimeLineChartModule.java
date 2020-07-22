@@ -23,13 +23,9 @@ public class TimeLineChartModule extends MainChartModule<CandleEntry> implements
     @Override
     public void computeMinMax(CandleEntry entry) {
         //计算最小值
-        if (entry.getClose().value < getMinY().value) {
-            setMinY(entry.getClose());
-        }
+        setMinY(entry.getClose());
         //计算最大值
-        if (entry.getClose().value > getMaxY().value) {
-            setMaxY(entry.getClose());
-        }
+        setMaxY(entry.getClose());
         //计算标签数量
         if (entry.getMarkerPointType() != MarkerPointType.NORMAL) {
             this.markerPointCount++;

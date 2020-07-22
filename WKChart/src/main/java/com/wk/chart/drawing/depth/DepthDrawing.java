@@ -131,8 +131,8 @@ public class DepthDrawing extends AbsDrawing<DepthRender, DepthChartModule> {
         canvas.drawPath(askPath, askShaderPaint);
         canvas.drawPath(bidPath, bidPolylinePaint);
         canvas.drawPath(askPath, askPolylinePaint);
-        bidPath.reset();
-        askPath.reset();
+        bidPath.rewind();
+        askPath.rewind();
         canvas.restore();
     }
 
@@ -146,7 +146,7 @@ public class DepthDrawing extends AbsDrawing<DepthRender, DepthChartModule> {
             borderPath.lineTo(borderPts[2], borderPts[1]);
 //          borderPath.close();
             canvas.drawPath(borderPath, borderPaint);
-            borderPath.reset();
+            borderPath.rewind();
         }
     }
 

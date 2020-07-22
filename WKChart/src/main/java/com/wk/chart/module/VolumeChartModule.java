@@ -1,4 +1,5 @@
 package com.wk.chart.module;
+
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.ValueEntry;
 import com.wk.chart.enumeration.IndicatorType;
@@ -19,13 +20,9 @@ public class VolumeChartModule extends AuxiliaryChartModule<CandleEntry> {
     @Override
     public void computeMinMax(CandleEntry entry) {
         //计算最小值
-        if (entry.getVolume().value < getMinY().value) {
-            setMinY(entry.getVolume());
-        }
+        setMinY(entry.getVolume());
         //计算最大值
-        if (entry.getVolume().value > getMaxY().value) {
-            setMaxY(entry.getVolume());
-        }
+        setMaxY(entry.getVolume());
         ValueEntry[] values = entry.getIndicator(getIndicatorType());
         if (null == values) {
             return;
@@ -35,13 +32,9 @@ public class VolumeChartModule extends AuxiliaryChartModule<CandleEntry> {
                 continue;
             }
             //计算最小值
-            if (item.value < getMinY().value) {
-                setMinY(item);
-            }
+            setMinY(item);
             //计算最大值
-            if (item.value > getMaxY().value) {
-                setMaxY(item);
-            }
+            setMaxY(item);
         }
     }
 }
