@@ -13,7 +13,7 @@ import com.wk.chart.compat.FontStyle;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.CandleEntry;
-import com.wk.chart.module.CandleChartModule;
+import com.wk.chart.module.base.MainChartModule;
 import com.wk.chart.render.CandleRender;
 
 
@@ -22,7 +22,7 @@ import com.wk.chart.render.CandleRender;
  * 游标指示器组件
  */
 
-public class CursorDrawing extends AbsDrawing<CandleRender, CandleChartModule> {
+public class CursorDrawing extends AbsDrawing<CandleRender, MainChartModule> {
     private CandleAttribute attribute;//配置文件
     private Paint cursorLinePaint = new Paint();//游标线画笔
     private TextPaint cursorTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//游标值画笔
@@ -39,7 +39,7 @@ public class CursorDrawing extends AbsDrawing<CandleRender, CandleChartModule> {
     private float iconWidth, iconHeight = 0;//游标的图标的宽高（这里以游标中"一个字符"的宽高来定义）
 
     @Override
-    public void onInit(CandleRender render, CandleChartModule chartModule) {
+    public void onInit(CandleRender render, MainChartModule chartModule) {
         super.onInit(render, chartModule);
         this.attribute = render.getAttribute();
         DashPathEffect dashPathEffect = new DashPathEffect(new float[]{10f, 5f}, 0);
