@@ -2,6 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/InteractiveChart.iml" filepath="$PROJECT_DIR$/.idea/modules/InteractiveChart.iml" group="InteractiveChart" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/WKChart/InteractiveChart-WKChart.iml" filepath="$PROJECT_DIR$/.idea/modules/WKChart/InteractiveChart-WKChart.iml" group="InteractiveChart/WKChart" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/InteractiveChart-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/InteractiveChart-app.iml" group="InteractiveChart/app" />
       <module fileurl="file://$PROJECT_DIR$/WKChart/WKChart.iml" filepath="$PROJECT_DIR$/WKChart/WKChart.iml" group="WK_Chart/WKChart" />
       <module fileurl="file://$PROJECT_DIR$/WK_Chart.iml" filepath="$PROJECT_DIR$/WK_Chart.iml" group="WK_Chart" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="WK_Chart/app" />

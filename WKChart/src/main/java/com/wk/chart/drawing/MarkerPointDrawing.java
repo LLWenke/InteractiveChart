@@ -232,82 +232,90 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsChartModule>
         availableAreas[9] = availableAreas[13] = pointBuffer[3] + attribute.markerPointJointMargin + jointSize;
         availableAreas[11] = availableAreas[15] = viewRect.bottom;
         boolean doLeft = true, doRight = true;
-        int index = 0;
+        int position = 1;
         while (doLeft || doRight) {
-            index++;
-            int rightIndex = current + index;
-            int leftIndex = current - index;
-            //向左修正（方向：上）
-            leftCheck:
             if (doLeft) {
-                if (leftIndex < begin) {
-                    doLeft = false;
-                    break leftCheck;
-                }
-                CandleEntry left = render.getAdapter().getItem(leftIndex);
-                Rect leftRect = left.getMarkerPointRect();
-                float[] buffer = absChartModule.getPointRect(render, left, leftIndex);
-                float right = Math.max(buffer[2], leftRect.right);
-                if (availableAreas[0] >= right) {
-                    doLeft = false;
-                    break leftCheck;
-                }
-                if (buffer[1] < availableAreas[1]) {
-                    availableAreas[1] = buffer[1];
-                }
-                if (buffer[3] > availableAreas[9]) {
-                    availableAreas[9] = buffer[3];
-                }
-                if (leftRect.bottom <= buffer[1]) {
-                    float minTop = leftRect.top < availableAreas[1] ? leftRect.top : availableAreas[1];
-                    if (minTop - availableAreas[3] >= totalRectHeight) {
-                        availableAreas[1] = minTop;
-                    } else if (leftRect.bottom > availableAreas[3]) {
-                        availableAreas[3] = leftRect.bottom;
-                    }
-                    if (leftRect.top < availableAreas[5]) {
-                        availableAreas[5] = leftRect.top;
-                    }
-                }
-                if (leftRect.top >= buffer[3]) {
-                    float maxTop = leftRect.bottom > availableAreas[9] ? leftRect.bottom : availableAreas[9];
-                    if (availableAreas[11] - maxTop >= totalRectHeight) {
-                        availableAreas[9] = maxTop;
-                    } else if (leftRect.top < availableAreas[11]) {
-                        availableAreas[11] = leftRect.top;
-                    }
-                    if (leftRect.bottom > availableAreas[13]) {
-                        availableAreas[13] = leftRect.bottom;
-                    }
-                }
+                doLeft = reviseLeftAvailableAreas(begin, current, position);
             }
-            //向右修正（方向：上）
-            rightCheck:
             if (doRight) {
-                if (rightIndex >= end) {
-                    doRight = false;
-                    break rightCheck;
-                }
-                CandleEntry right = render.getAdapter().getItem(rightIndex);
-                float[] buffer = absChartModule.getPointRect(render, right, rightIndex);
-                if (availableAreas[2] <= buffer[0]) {
-                    doRight = false;
-                    break rightCheck;
-                }
-                if (buffer[1] < availableAreas[1]) {
-                    availableAreas[1] = buffer[1];
-                }
-                if (buffer[1] < availableAreas[5]) {
-                    availableAreas[5] = buffer[1];
-                }
-                if (buffer[3] > availableAreas[9]) {
-                    availableAreas[9] = buffer[3];
-                }
-                if (buffer[3] > availableAreas[13]) {
-                    availableAreas[13] = buffer[3];
-                }
+                doRight = reviseRightAvailableAreas(end, current, position);
+            }
+            position++;
+        }
+    }
+
+    /**
+     * 修正左边可用区域
+     */
+    private boolean reviseLeftAvailableAreas(int begin, int current, int position) {
+        int leftIndex = current - position;
+        if (leftIndex < begin) {
+            return false;
+        }
+        CandleEntry left = render.getAdapter().getItem(leftIndex);
+        Rect leftRect = left.getMarkerPointRect();
+        float[] buffer = absChartModule.getPointRect(render, left, leftIndex);
+        float right = Math.max(buffer[2], leftRect.right);
+        if (availableAreas[0] >= right) {
+            return false;
+        }
+        if (buffer[1] < availableAreas[1]) {
+            availableAreas[1] = buffer[1];
+        }
+        if (buffer[3] > availableAreas[9]) {
+            availableAreas[9] = buffer[3];
+        }
+        if (leftRect.bottom <= buffer[1]) {
+            float minTop = leftRect.top < availableAreas[1] ? leftRect.top : availableAreas[1];
+            if (minTop - availableAreas[3] >= totalRectHeight) {
+                availableAreas[1] = minTop;
+            } else if (leftRect.bottom > availableAreas[3]) {
+                availableAreas[3] = leftRect.bottom;
+            }
+            if (leftRect.top < availableAreas[5]) {
+                availableAreas[5] = leftRect.top;
             }
         }
+        if (leftRect.top >= buffer[3]) {
+            float maxTop = leftRect.bottom > availableAreas[9] ? leftRect.bottom : availableAreas[9];
+            if (availableAreas[11] - maxTop >= totalRectHeight) {
+                availableAreas[9] = maxTop;
+            } else if (leftRect.top < availableAreas[11]) {
+                availableAreas[11] = leftRect.top;
+            }
+            if (leftRect.bottom > availableAreas[13]) {
+                availableAreas[13] = leftRect.bottom;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 修正右边可用区域
+     */
+    private boolean reviseRightAvailableAreas(int end, int current, int position) {
+        int rightIndex = current + position;
+        if (rightIndex >= end) {
+            return false;
+        }
+        CandleEntry right = render.getAdapter().getItem(rightIndex);
+        float[] buffer = absChartModule.getPointRect(render, right, rightIndex);
+        if (availableAreas[2] <= buffer[0]) {
+            return false;
+        }
+        if (buffer[1] < availableAreas[1]) {
+            availableAreas[1] = buffer[1];
+        }
+        if (buffer[1] < availableAreas[5]) {
+            availableAreas[5] = buffer[1];
+        }
+        if (buffer[3] > availableAreas[9]) {
+            availableAreas[9] = buffer[3];
+        }
+        if (buffer[3] > availableAreas[13]) {
+            availableAreas[13] = buffer[3];
+        }
+        return true;
     }
 
     /**
