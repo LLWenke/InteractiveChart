@@ -34,18 +34,19 @@ public class ChartAnimator<T extends AbsEntry> extends ValueAnimator
         this.position = position;
         this.buildState = buildState;
         if (Utils.listIsEmpty(beginDate.getAnimatorEntry())
-                || Utils.listIsEmpty(endData.getAnimatorEntry())) {
+                || Utils.listIsEmpty(endData.getAnimatorEntry())
+                || getDuration() == 0L) {
             this.animationListener.onAnimation(position, endData, buildState);
+            return;
         }
 //        Log.e("新动画", "-------------------------------");
         if (isRunning()) {
             cancel();
             this.beginDate = this.endData;
-            this.endData = endData;
         } else {
             this.beginDate = beginDate;
-            this.endData = endData;
         }
+        this.endData = endData;
         this.endValues.clear();
         start();
     }

@@ -19,18 +19,18 @@ import com.wk.chart.render.AbsRender;
  * <p>AxisTextMarker</p>
  */
 
-public class GridTextMarker extends AbsMarker<AbsRender> {
+public class GridTextMarker extends AbsMarker<AbsRender<?, ?>> {
     private static final String TAG = "GridTextMarker";
 
-    private TextPaint markerTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-    private Paint markerBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final TextPaint markerTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint markerBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private final RectF markerInsets = new RectF(0, 0, 0, 0);
-    private Rect textRect = new Rect();
+    private final Rect textRect = new Rect();
     private float width, height, inset = 0;
 
     @Override
-    public void onInit(AbsRender render) {
+    public void onInit(AbsRender<?, ?> render) {
         super.onInit(render);
         markerTextPaint.setTextAlign(Paint.Align.CENTER);
         markerTextPaint.setColor(attribute.markerTextColor);
@@ -43,8 +43,8 @@ public class GridTextMarker extends AbsMarker<AbsRender> {
         Utils.measureTextArea(markerTextPaint, textRect);
 
         inset = attribute.markerBorderWidth / 2;
-        width = (attribute.markerBorderLRPadding + attribute.markerBorderWidth) * 2f;
-        height = textRect.height() + (attribute.markerBorderTBPadding + attribute.markerBorderWidth) * 2f;
+        width = (attribute.markerLRPadding + attribute.markerBorderWidth) * 2f;
+        height = textRect.height() + (attribute.markerTBPadding + attribute.markerBorderWidth) * 2f;
 
         switch (attribute.gridMarkerAlign) {
             case TOP://上
@@ -77,13 +77,13 @@ public class GridTextMarker extends AbsMarker<AbsRender> {
         markerInsets.left = highlightPointX;
 
         if (attribute.gridMarkerAlign == GridMarkerAlign.TOP_INSIDE) {
-            markerInsets.top = render.getMainChartModule().getRect().top + inset;
+            markerInsets.top = render.getTopModule().getRect().top + inset;
         } else if (attribute.gridMarkerAlign == GridMarkerAlign.TOP) {
-            markerInsets.top = render.getMainChartModule().getRect().top - height - attribute.borderWidth;
+            markerInsets.top = render.getTopModule().getRect().top - height - attribute.borderWidth;
         } else if (attribute.gridMarkerAlign == GridMarkerAlign.BOTTOM_INSIDE) {
-            markerInsets.top = render.getBottomChartModule().getRect().bottom - height - inset;
+            markerInsets.top = render.getBottomModule().getRect().bottom - height - inset;
         } else if (attribute.gridMarkerAlign == GridMarkerAlign.BOTTOM) {
-            markerInsets.top = render.getBottomChartModule().getRect().bottom + attribute.borderWidth;
+            markerInsets.top = render.getBottomModule().getRect().bottom + attribute.borderWidth;
         } else if (highlightPointY < viewRect.top + viewRect.height() / 2) {
             markerInsets.top = viewRect.bottom - height - inset;
         } else {
@@ -99,7 +99,7 @@ public class GridTextMarker extends AbsMarker<AbsRender> {
 
     @Override
     public void onMarkerViewDraw(Canvas canvas, String[] markerText) {
-        canvas.drawRoundRect(markerInsets, attribute.markerBorderRadius, attribute.markerBorderRadius,
+        canvas.drawRoundRect(markerInsets, attribute.markerRadius, attribute.markerRadius,
                 markerBorderPaint);
 
         canvas.drawText(markerText[0],

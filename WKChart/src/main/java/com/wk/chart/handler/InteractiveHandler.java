@@ -4,7 +4,7 @@ package com.wk.chart.handler;
 
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
-import com.wk.chart.module.base.AbsChartModule;
+import com.wk.chart.module.base.AbsModule;
 
 /**
  * <p>InteractiveHandler</p>
@@ -18,15 +18,15 @@ public abstract class InteractiveHandler {
     public void onRightRefresh(AbsEntry lastData) {
     }
 
-    public boolean onSingleTap(AbsChartModule focusChartModule, float x, float y) {
+    public boolean onSingleTap(AbsModule<AbsEntry> focusChartModule, float x, float y) {
         return false;
     }
 
-    public boolean onSingleTap(AbsDrawing drawing, float x, float y) {
+    public boolean onSingleTap(AbsDrawing<?, ?> drawing, float x, float y) {
         return false;
     }
 
-    public boolean onDoubleTap(AbsChartModule focusChartModule, float x, float y) {
+    public boolean onDoubleTap(AbsModule<AbsEntry> focusChartModule, float x, float y) {
         return false;
     }
 

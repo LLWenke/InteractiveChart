@@ -12,26 +12,26 @@ import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.CandleEntry;
-import com.wk.chart.module.TimeLineChartModule;
+import com.wk.chart.module.TimeLineModule;
 import com.wk.chart.render.CandleRender;
 
 /**
  * <p>BreathingLampDrawing</p>
  * 呼吸灯组件
  */
-public class BreathingLampDrawing extends AbsDrawing<CandleRender, TimeLineChartModule> implements Runnable {
+public class BreathingLampDrawing extends AbsDrawing<CandleRender, TimeLineModule> implements Runnable {
     private CandleAttribute attribute;//配置文件
-    private Paint lampPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private int[] lampShaderColor = new int[4];
-    private float[] lampShaderColorBuffer = new float[4];
-    private float[] points = new float[2];
+    private final Paint lampPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final int[] lampShaderColor = new int[4];
+    private final float[] lampShaderColorBuffer = new float[4];
+    private final float[] points = new float[2];
     private float animationCentre, shaderSize, breathingLampSize;
     private long time = 0;
-    private Handler handler = new Handler();
+    private final Handler handler = new Handler();
     private float progress, oldFraction;
 
     @Override
-    public void onInit(CandleRender render, TimeLineChartModule chartModule) {
+    public void onInit(CandleRender render, TimeLineModule chartModule) {
         super.onInit(render, chartModule);
         this.attribute = render.getAttribute();
         lampPaint.setStyle(Paint.Style.FILL);
@@ -104,6 +104,11 @@ public class BreathingLampDrawing extends AbsDrawing<CandleRender, TimeLineChart
 
     @Override
     public void drawOver(Canvas canvas) {
+    }
+
+    @Override
+    public void onViewChange() {
+
     }
 
     /**

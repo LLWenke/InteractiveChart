@@ -29,7 +29,6 @@ public class GestureMoveActionCompat {
      * 是否响应点击事件
      *
      * 因为有手指抖动的影响，有时候会产生少量的 ACTION_MOVE 事件，造成程序识别错误。
-     * 如果需要减少识别错误的几率，使用 {@link GestureMoveDetectorCompat} 这个类。
      */
     private boolean mEnableClick = true;
 
@@ -76,7 +75,7 @@ public class GestureMoveActionCompat {
                 float deltaY = Math.abs(y - lastMotionY);
                 float deltaX = Math.abs(x - lastMotionX);
 
-                /**
+                /*
                  * 如果之前是垂直滑动，即使现在是横向滑动，仍然认为它是垂直滑动的
                  * 如果之前是横向滑动，即使现在是垂直滑动，仍然认为它是横向滑动的
                  * 防止在一个方向上来回滑动时，发生垂直滑动和横向滑动的频繁切换，造成识别错误

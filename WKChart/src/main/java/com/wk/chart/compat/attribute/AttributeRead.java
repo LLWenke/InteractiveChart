@@ -8,7 +8,10 @@ import android.text.TextUtils;
 import com.wk.chart.R;
 import com.wk.chart.enumeration.AxisLabelLocation;
 import com.wk.chart.enumeration.AxisMarkerAlign;
+import com.wk.chart.enumeration.AxisTagLocation;
+import com.wk.chart.enumeration.GridLineStyle;
 import com.wk.chart.enumeration.GridMarkerAlign;
+import com.wk.chart.enumeration.IndexLabelLocation;
 
 /**
  * <p>AttributeRead</p>
@@ -20,32 +23,11 @@ public class AttributeRead {
      * 初始化 BaseAttribute
      */
     public void initAttribute(TypedArray a, BaseAttribute attribute) {
-        /**
+        /*
          * 各个视图模块的配置信息有关属性
          */
-        attribute.candleViewHeight = a.getDimension(R.styleable.ChartAttr_candleViewHeight,
-                attribute.candleViewHeight);// K线模块高度
-
-        attribute.volumeViewHeight = a.getDimension(R.styleable.ChartAttr_volumeViewHeight,
-                attribute.volumeViewHeight);// 交易量模块高度
-
-        attribute.otherViewHeight = a.getDimension(R.styleable.ChartAttr_otherViewHeight,
-                attribute.otherViewHeight);// 副图模块高度
-
-        attribute.timeLineViewHeight = a.getDimension(R.styleable.ChartAttr_timeLineViewHeight,
-                attribute.timeLineViewHeight);// 分时图模块高度
-
-        attribute.depthViewHeight = a.getDimension(R.styleable.ChartAttr_depthViewHeight,
-                attribute.depthViewHeight);// 深度图模块高度
-
         attribute.viewInterval = a.getDimension(R.styleable.ChartAttr_viewInterval,
                 attribute.viewInterval);// 各个视图模块间的间隔
-
-        attribute.borderWidth = a.getDimension(R.styleable.ChartAttr_borderWidth,
-                attribute.borderWidth);//边框线条宽度
-
-        attribute.borderColor = a.getColor(R.styleable.ChartAttr_borderColor,
-                attribute.borderColor);//边框线条颜色
 
         attribute.leftScrollOffset = a.getDimension(R.styleable.ChartAttr_leftScrollOffset,
                 attribute.leftScrollOffset);//X 轴方向的最小滚动值固定偏移量（左边）
@@ -53,7 +35,7 @@ public class AttributeRead {
         attribute.rightScrollOffset = a.getDimension(R.styleable.ChartAttr_rightScrollOffset,
                 attribute.rightScrollOffset);//X 轴方向的最大滚动值固定偏移量（右边）
 
-        /**
+        /*
          * 共用的有关属性
          */
         attribute.lineWidth = a.getDimension(R.styleable.ChartAttr_lineWidth,
@@ -68,14 +50,19 @@ public class AttributeRead {
         attribute.labelColor = a.getColor(R.styleable.ChartAttr_labelColor,
                 attribute.labelColor);//标签字符颜色
 
-        /**
+        /*
+         * 边框线有关属性
+         */
+        attribute.borderWidth = a.getDimension(R.styleable.ChartAttr_borderWidth,
+                attribute.borderWidth);//边框线条宽度
+
+        attribute.borderColor = a.getColor(R.styleable.ChartAttr_borderColor,
+                attribute.borderColor);//边框线条颜色
+        /*
          * 与 grid 标尺刻度有关属性
          */
         attribute.gridCount = a.getInteger(R.styleable.ChartAttr_gridCount,
                 attribute.gridCount);//grid数量
-
-        attribute.gridDividingLineWidth = a.getDimension(R.styleable.ChartAttr_gridDividingLineWidth,
-                attribute.gridDividingLineWidth);//grid 分割线宽度
 
         attribute.gridLabelMarginTop = a.getDimension(R.styleable.ChartAttr_gridLabelMarginTop,
                 attribute.gridLabelMarginTop);//grid标签上边距
@@ -83,29 +70,46 @@ public class AttributeRead {
         attribute.gridLabelMarginBottom = a.getDimension(R.styleable.ChartAttr_gridLabelMarginBottom,
                 attribute.gridLabelMarginBottom);//grid标签下边距
 
-        attribute.gridLineState = a.getBoolean(R.styleable.ChartAttr_gridLineState,
-                attribute.gridLineState);//grid线条是否显示
+        attribute.gridLineLength = a.getDimension(R.styleable.ChartAttr_gridLineLength,
+                attribute.gridLineLength);//grid线条长度
 
-        /**
+        int style = a.getInteger(R.styleable.ChartAttr_gridLineStyle, attribute.gridLineStyle.ordinal());
+        attribute.gridLineStyle = GridLineStyle.values()[style];//grid 线条样式
+
+        /*
          * 与 axis 标尺刻度有关属性
          */
-        attribute.axisCount = a.getInteger(R.styleable.ChartAttr_axisCount,
-                attribute.axisCount);//axis数量
-
         attribute.axisLabelLRMargin = a.getDimension(R.styleable.ChartAttr_axisLabelLRMargin,
                 attribute.axisLabelLRMargin);//axis标签左右Margin
 
         attribute.axisLabelTBMargin = a.getDimension(R.styleable.ChartAttr_axisLabelTBMargin,
                 attribute.axisLabelTBMargin);//axis标签上下Margin
 
-        int align =
-                a.getInteger(R.styleable.ChartAttr_axisLabelLocation, attribute.axisLabelLocation.ordinal());
-        attribute.axisLabelLocation = AxisLabelLocation.values()[align];//axis标签显示位置
-
         attribute.axisLineState = a.getBoolean(R.styleable.ChartAttr_axisLineState,
                 attribute.axisLineState);//axis线条是否显示
 
-        /**
+        attribute.showFirstAxis = a.getBoolean(R.styleable.ChartAttr_showFirstAxis,
+                attribute.showFirstAxis);//axis 是否显示第一条
+
+        attribute.showLastAxis = a.getBoolean(R.styleable.ChartAttr_showLastAxis,
+                attribute.showLastAxis);//axis 是否显示最后一条
+
+        int align = a.getInteger(R.styleable.ChartAttr_axisLabelLocation, attribute.axisLabelLocation.ordinal());
+        attribute.axisLabelLocation = AxisLabelLocation.values()[align];//axis 标签显示位置
+
+        /*
+         * 与 axis 标签有关属性
+         */
+        attribute.axisTagMarginX = a.getDimension(R.styleable.ChartAttr_axisTagMarginX,
+                attribute.axisTagMarginX);//tag文字左右margin
+
+        attribute.axisTagMarginY = a.getDimension(R.styleable.ChartAttr_axisTagMarginY,
+                attribute.axisTagMarginY);//tag文字上下margin
+
+        align = a.getInteger(R.styleable.ChartAttr_axisTagLocation, attribute.axisTagLocation.ordinal());
+        attribute.axisTagLocation = AxisTagLocation.values()[align];//axis tag显示位置
+
+        /*
          * 与高亮线有关的属性
          */
         attribute.xHighlightAutoWidth = a.getBoolean(R.styleable.ChartAttr_xHighlightAutoWidth,
@@ -120,26 +124,29 @@ public class AttributeRead {
         attribute.yHighlightAutoWidth = a.getBoolean(R.styleable.ChartAttr_yHighlightAutoWidth,
                 attribute.yHighlightAutoWidth);// Y高亮线条是否启用自动宽度管理(启用后yHighlightWidth将失效，宽度将实时跟随candleWidth)
 
+        attribute.yHighlightAutoDivision = a.getBoolean(R.styleable.ChartAttr_yHighlightAutoDivision,
+                attribute.yHighlightAutoDivision);// Y高亮线条是否启用自动分割
+
         attribute.yHighlightColor = a.getColor(R.styleable.ChartAttr_yHighlightColor,
                 attribute.yHighlightColor);// Y高亮线条颜色
 
         attribute.yHighlightIsHide = a.getBoolean(R.styleable.ChartAttr_yHighlightIsHide,
                 attribute.yHighlightIsHide);// Y高亮线条是否显示
 
-        /**
+        /*
          * 与MarkerView 有关的属性
          */
+        attribute.markerRadius = a.getDimension(R.styleable.ChartAttr_markerRadius,
+                attribute.markerRadius);// MarkerView 边框圆角
+
+        attribute.markerTBPadding = a.getDimension(R.styleable.ChartAttr_markerTBPadding,
+                attribute.markerTBPadding);// MarkerView 上下padding
+
+        attribute.markerLRPadding = a.getDimension(R.styleable.ChartAttr_markerLRPadding,
+                attribute.markerLRPadding);// MarkerView 左右padding
+
         attribute.markerBorderWidth = a.getDimension(R.styleable.ChartAttr_markerBorderWidth,
                 attribute.markerBorderWidth); // MarkerView 边框宽度
-
-        attribute.markerBorderRadius = a.getDimension(R.styleable.ChartAttr_markerBorderRadius,
-                attribute.markerBorderRadius);// MarkerView 边框圆角
-
-        attribute.markerBorderTBPadding = a.getDimension(R.styleable.ChartAttr_markerBorderTBPadding,
-                attribute.markerBorderTBPadding);// MarkerView 上下padding
-
-        attribute.markerBorderLRPadding = a.getDimension(R.styleable.ChartAttr_markerBorderLRPadding,
-                attribute.markerBorderLRPadding);// MarkerView 左右padding
 
         attribute.markerBorderColor = a.getColor(R.styleable.ChartAttr_markerBorderColor,
                 attribute.markerBorderColor);// MarkerView 边框颜色
@@ -150,18 +157,16 @@ public class AttributeRead {
         attribute.markerTextColor = a.getColor(R.styleable.ChartAttr_markerTextColor,
                 attribute.markerTextColor);// MarkerView 字符颜色
 
-        align =
-                a.getInteger(R.styleable.ChartAttr_gridMarkerAlign, attribute.gridMarkerAlign.ordinal());
+        align = a.getInteger(R.styleable.ChartAttr_gridMarkerAlign, attribute.gridMarkerAlign.ordinal());
         attribute.gridMarkerAlign = GridMarkerAlign.values()[align];// X 轴 MarkerView 对齐方向
 
-        align =
-                a.getInteger(R.styleable.ChartAttr_axisMarkerAlign, attribute.axisMarkerAlign.ordinal());
+        align = a.getInteger(R.styleable.ChartAttr_axisMarkerAlign, attribute.axisMarkerAlign.ordinal());
         attribute.axisMarkerAlign = AxisMarkerAlign.values()[align];// Y 轴 MarkerView 对齐方向
 
-        int style = a.getInteger(R.styleable.ChartAttr_markerStyle, attribute.markerStyle.ordinal());
+        style = a.getInteger(R.styleable.ChartAttr_markerStyle, attribute.markerStyle.ordinal());
         attribute.markerStyle = Paint.Style.values()[style];//  MarkerView 的style（边框/边框和填充）
 
-        /**
+        /*
          * 与选择器有关的属性
          */
         attribute.selectorPadding = a.getDimension(R.styleable.ChartAttr_selectorPadding,
@@ -206,60 +211,76 @@ public class AttributeRead {
         attribute.selectorValueSize = a.getDimension(R.styleable.ChartAttr_selectorValueSize,
                 attribute.selectorValueSize);//选择器value文字大小
 
-        /**
+        /*
          * 与指标文字有关的属性
          */
-        attribute.indicatorsTextSize = a.getDimension(R.styleable.ChartAttr_indicatorsTextSize,
-                attribute.indicatorsTextSize); // 指标文字大小
+        attribute.indexTextSize = a.getDimension(R.styleable.ChartAttr_indexTextSize,
+                attribute.indexTextSize); // 指标文字大小
 
-        attribute.indicatorsTextMarginX = a.getDimension(R.styleable.ChartAttr_indicatorsTextMarginX,
-                attribute.indicatorsTextMarginX); // 指标文字左右margin
+        attribute.indexTextMarginX = a.getDimension(R.styleable.ChartAttr_indexTextMarginX,
+                attribute.indexTextMarginX); // 指标文字左右margin
 
-        attribute.indicatorsTextMarginY = a.getDimension(R.styleable.ChartAttr_indicatorsTextMarginY,
-                attribute.indicatorsTextMarginY); // 指标文字上下margin
+        attribute.indexTextMarginY = a.getDimension(R.styleable.ChartAttr_indexTextMarginY,
+                attribute.indexTextMarginY); // 指标文字上下margin
 
-        attribute.indicatorsTextInterval = a.getDimension(R.styleable.ChartAttr_indicatorsTextInterval,
-                attribute.indicatorsTextInterval); // 指标文字的间隔
+        attribute.indexTextInterval = a.getDimension(R.styleable.ChartAttr_indexTextInterval,
+                attribute.indexTextInterval); // 指标文字的间隔
 
-        /**
+        attribute.indexDefaultShowLastItemInfo = a.getBoolean(R.styleable.ChartAttr_defaultShowLastItem,
+                attribute.indexDefaultShowLastItemInfo);// 指标默认显示最后一条的数据
+
+        align = a.getInteger(R.styleable.ChartAttr_indexLabelLocation, attribute.indexLabelLocation.ordinal());
+        attribute.indexLabelLocation = IndexLabelLocation.values()[align];// 指标文字的位置
+
+        /*
          * 与游标指示器有关的属性
          */
-        attribute.cursorBorderWidth = a.getDimension(R.styleable.ChartAttr_cursorBorderWidth,
-                attribute.cursorBorderWidth); // 游标文字容器边框宽度
-
         attribute.cursorBackgroundColor = a.getColor(R.styleable.ChartAttr_cursorBackgroundColor,
                 attribute.cursorBackgroundColor);// 游标文字容器背景颜色
 
-        attribute.cursorRadius = a.getDimension(R.styleable.ChartAttr_cursorRadius,
-                attribute.cursorRadius); // 游标文字容器圆角
+        attribute.foldedCursorLineColor = a.getColor(R.styleable.ChartAttr_foldedCursorLineColor,
+                attribute.foldedCursorLineColor);// （折叠时）游标线颜色
 
-        attribute.cursorLineColor = a.getColor(R.styleable.ChartAttr_cursorLineColor,
-                attribute.cursorLineColor);// 游标线颜色
+        attribute.foldedCursorTextColor = a.getColor(R.styleable.ChartAttr_foldedCursorTextColor,
+                attribute.foldedCursorTextColor);// （折叠时）游标值颜色
 
-        attribute.cursorTextColor = a.getColor(R.styleable.ChartAttr_cursorTextColor,
-                attribute.cursorTextColor);// 游标值颜色
+        attribute.spreadCursorLineColor = a.getColor(R.styleable.ChartAttr_spreadCursorLineColor,
+                attribute.spreadCursorLineColor);// （展开时）游标线颜色
 
-        attribute.cursorBorderColor = a.getColor(R.styleable.ChartAttr_cursorBorderColor,
-                attribute.cursorBorderColor);// 游标值容器边框颜色
+        attribute.spreadCursorTextColor = a.getColor(R.styleable.ChartAttr_spreadCursorTextColor,
+                attribute.spreadCursorTextColor);// （展开时）游标值颜色
 
-        attribute.defaultShowLastItem = a.getBoolean(R.styleable.ChartAttr_defaultShowLastItem,
-                attribute.defaultShowLastItem);// 默认显示最后一条数据
+        attribute.spreadCursorBorderColor = a.getColor(R.styleable.ChartAttr_spreadCursorBorderColor,
+                attribute.spreadCursorBorderColor);// （展开时）游标值容器边框颜色
 
-        /**
+        attribute.spreadCursorBorderWidth = a.getDimension(R.styleable.ChartAttr_spreadCursorBorderWidth,
+                attribute.spreadCursorBorderWidth); //（展开时） 游标文字容器边框宽度
+
+        attribute.spreadCursorRadius = a.getDimension(R.styleable.ChartAttr_spreadCursorRadius,
+                attribute.spreadCursorRadius); //（展开时） 游标文字容器圆角
+
+        attribute.spreadCursorTextLRMargin = a.getDimension(R.styleable.ChartAttr_spreadCursorTextLRMargin,
+                attribute.spreadCursorTextLRMargin); //（展开时） 游标文字左右Margin
+
+        attribute.spreadCursorTextTBMargin = a.getDimension(R.styleable.ChartAttr_spreadCursorTextTBMargin,
+                attribute.spreadCursorTextTBMargin); //（展开时） 游标文字上下Margin
+
+        attribute.spreadTriangleWidth = a.getDimension(R.styleable.ChartAttr_spreadTriangleWidth,
+                attribute.spreadTriangleWidth); //（展开时） 游标三角宽度
+
+        attribute.spreadTriangleHeight = a.getDimension(R.styleable.ChartAttr_spreadTriangleHeight,
+                attribute.spreadTriangleHeight); //（展开时） 游标三角高度
+
+        /*
          * 极值有关属性
          */
-        attribute.candleExtremumLabelSize =
-                a.getDimension(R.styleable.ChartAttr_candleExtremumLabelSize,
-                        attribute.candleExtremumLabelSize); // 极值字符大小
+        attribute.candleExtremumLabelSize = a.getDimension(R.styleable.ChartAttr_candleExtremumLabelSize,
+                attribute.candleExtremumLabelSize); // 极值字符大小
 
         attribute.candleExtremumLableColor = a.getColor(R.styleable.ChartAttr_candleExtremumLableColor,
                 attribute.candleExtremumLableColor);// 极值字符颜色
 
-        attribute.extremumLineState = a.getBoolean(R.styleable.ChartAttr_extremumLineState,
-                attribute.extremumLineState);// 极值横线是否显示
-
-        //最极值标签Drawable
-        attribute.extremumTagDrawable = a.getDrawable(R.styleable.ChartAttr_extremumTagDrawable);
+        attribute.extremumTagDrawable = a.getDrawable(R.styleable.ChartAttr_extremumTagDrawable); //最极值标签Drawable
 
         attribute.extremumTagDrawableWidth = a.getDimension(R.styleable.ChartAttr_extremumTagDrawableWidth,
                 attribute.extremumTagDrawableWidth);//极值标签Drawable宽度
@@ -273,7 +294,7 @@ public class AttributeRead {
         attribute.extremumTagDrawableLocation = a.getInt(R.styleable.ChartAttr_extremumTagDrawableLocation,
                 attribute.extremumTagDrawableLocation);//极值标签的Drawable显示位置
 
-        /**
+        /*
          * 涨跌有关的属性
          */
         attribute.increasingColor = a.getColor(R.styleable.ChartAttr_increasingColor,
@@ -290,15 +311,14 @@ public class AttributeRead {
 
         attribute.darkColorAlpha = getAlpha(a.getFloat(R.styleable.ChartAttr_darkColorAlpha,
                 attribute.darkColorAlpha));//（暗色）透明度（基于涨跌色配合透明度来实现暗色）
-        style =
-                a.getInteger(R.styleable.ChartAttr_increasingStyle, attribute.increasingStyle.ordinal());
+
+        style = a.getInteger(R.styleable.ChartAttr_increasingStyle, attribute.increasingStyle.ordinal());
         attribute.increasingStyle = Paint.Style.values()[style];// 上涨蜡烛图填充样式。默认实心
 
-        style =
-                a.getInteger(R.styleable.ChartAttr_decreasingStyle, attribute.decreasingStyle.ordinal());
+        style = a.getInteger(R.styleable.ChartAttr_decreasingStyle, attribute.decreasingStyle.ordinal());
         attribute.decreasingStyle = Paint.Style.values()[style];// 下跌蜡烛图填充样式，默认空心
 
-        /**
+        /*
          * 缩放有关的属性
          */
         attribute.pointBorderWidth = a.getDimension(R.styleable.ChartAttr_pointBorderWidth,
@@ -315,35 +335,22 @@ public class AttributeRead {
 
         attribute.maxScale = a.getFloat(R.styleable.ChartAttr_maxScale, attribute.maxScale);// 最多放大倍数
 
-        float minScale =
-                1f - a.getFloat(R.styleable.ChartAttr_minScale, attribute.minScale) / 10f;// 最多缩小倍数
+        float minScale = 1f - a.getFloat(R.styleable.ChartAttr_minScale, attribute.minScale) / 10f;// 最多缩小倍数
         attribute.minScale = minScale > 0 ? minScale : 0.1f;
 
         attribute.currentScale =
                 a.getFloat(R.styleable.ChartAttr_currentScale, attribute.currentScale);// 当前X轴缩放倍数
 
-        /**
+        /*
          * 与股票指标有关的属性
          */
         attribute.centerLineColor = a.getColor(R.styleable.ChartAttr_centerLineColor,
                 attribute.centerLineColor);// 视图中心线颜色
 
-        attribute.line1Color = a.getColor(R.styleable.ChartAttr_line1Color,
-                attribute.line1Color);// 线条1颜色
+        attribute.indexTagColor = a.getColor(R.styleable.ChartAttr_indexTagColor,
+                attribute.indexTagColor);// 指标Tag颜色
 
-        attribute.line2Color = a.getColor(R.styleable.ChartAttr_line2Color,
-                attribute.line2Color);// 线条2颜色
-
-        attribute.line3Color = a.getColor(R.styleable.ChartAttr_line3Color,
-                attribute.line3Color);// 线条3颜色
-
-        attribute.line4Color = a.getColor(R.styleable.ChartAttr_line4Color,
-                attribute.line4Color);// 线条4颜色
-
-        attribute.line5Color = a.getColor(R.styleable.ChartAttr_line5Color,
-                attribute.line5Color);// 线条5颜色
-
-        /**
+        /*
          * 与水印有关的属性
          */
         attribute.waterMarkingWidth = a.getDimension(R.styleable.ChartAttr_waterMarkingWidth,
@@ -364,7 +371,7 @@ public class AttributeRead {
         attribute.waterMarkingAlign = a.getInt(R.styleable.ChartAttr_waterMarkingAlign,
                 attribute.waterMarkingAlign);//水印对其齐方向
 
-        /**
+        /*
          * 与呼吸灯有关的属性
          */
         attribute.breathingLampRadius = a.getDimension(R.styleable.ChartAttr_breathingLampRadius,
@@ -377,7 +384,7 @@ public class AttributeRead {
                 attribute.breathingLampAutoTwinkleInterval);//呼吸灯自动闪烁时间（0为不自动闪烁）
 
 
-        /**
+        /*
          * 与标记点有关的属性
          */
         attribute.markerPointMinMargin = a.getDimension(R.styleable.ChartAttr_markerPointMinMargin,
@@ -417,7 +424,7 @@ public class AttributeRead {
                 attribute.markerPointColorT);//T标记点颜色
 
 
-        /**
+        /*
          *  与loading和error有关的属性
          */
         attribute.loadingTextSize = a.getDimension(R.styleable.ChartAttr_loadingTextSize,
@@ -442,7 +449,7 @@ public class AttributeRead {
             attribute.errorText = errorText;
         }
 
-        /**
+        /*
          * 与蜡烛图有关的属性
          */
         if (attribute instanceof CandleAttribute) {
@@ -455,7 +462,7 @@ public class AttributeRead {
                     candleAttribute.timeLineColor);//分时图线条颜色
         }
 
-        /**
+        /*
          * 与深度图有关的属性
          */
         if (attribute instanceof DepthAttribute) {

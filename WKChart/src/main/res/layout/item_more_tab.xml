@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.wk.view.FontRadioButton xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/radio_button"
+    android:layout_width="match_parent"
+    android:layout_height="35dp"
+    android:button="@null"
+    android:gravity="center"
+    android:includeFontPadding="false"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp"
+    android:textColor="@color/color_tab_text"
+    android:textSize="12sp"
+    android:textStyle="bold"
+    tools:text="@string/wk_15m" />

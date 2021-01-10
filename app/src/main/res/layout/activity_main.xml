@@ -24,7 +24,7 @@
         android:layout_marginStart="10dp"
         android:gravity="center"
         android:text="@string/wk_loading_tips"
-        android:textColor="@color/chart_white"
+        android:textColor="#ffffff"
         android:textSize="18sp"
         />
   </LinearLayout>
@@ -38,7 +38,7 @@
       android:gravity="center"
       android:includeFontPadding="false"
       android:text="@string/wk_real_time_data"
-      android:textColor="@color/chart_white"
+      android:textColor="#ffffff"
       android:textSize="18sp"
       />
 
@@ -51,7 +51,7 @@
       android:gravity="center"
       android:includeFontPadding="false"
       android:text="@string/wk_historical_data"
-      android:textColor="@color/chart_white"
+      android:textColor="#ffffff"
       android:textSize="18sp"
       />
 </LinearLayout>

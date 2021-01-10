@@ -3,7 +3,6 @@ package com.wk.chart.drawing;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Rect;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -13,7 +12,9 @@ import com.wk.chart.compat.FontStyle;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
-import com.wk.chart.module.base.AbsChartModule;
+import com.wk.chart.entry.AbsEntry;
+import com.wk.chart.enumeration.GridLineStyle;
+import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
 
 /**
@@ -21,29 +22,23 @@ import com.wk.chart.render.CandleRender;
  * <p>GridDrawing</p>
  */
 
-public class GridDrawing extends AbsDrawing<CandleRender, AbsChartModule> {
+public class GridDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
     private static final String TAG = "GridDrawing";
     private BaseAttribute attribute;//配置文件
-    private Paint gridDividingLinePaint = new Paint();  //分割线画笔
-    private TextPaint gridLabelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG); // Grid 轴标签的画笔
-    private Paint gridPaint = new Paint(Paint.ANTI_ALIAS_FLAG); // Grid 轴网格线画笔
+    private final TextPaint gridLabelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG); // Grid 轴标签的画笔
+    private final Paint gridPaint = new Paint(Paint.ANTI_ALIAS_FLAG); // Grid 轴网格线画笔
     private float[] point;
     private String[] label;
-    private Path dividingLinePath = new Path();// 分割线绘制路径
-    private Rect rect = new Rect(); //用于测量文字的实际占用区域
+    private final Rect rect = new Rect(); //用于测量文字的实际占用区域
 
     private float gridLabelY;//gridLabel的Y轴坐标
 
     private int position;//label下标
 
     @Override
-    public void onInit(CandleRender render, AbsChartModule chartModule) {
+    public void onInit(CandleRender render, AbsModule<AbsEntry> chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
-
-        gridDividingLinePaint.setStyle(Paint.Style.STROKE);
-        gridDividingLinePaint.setStrokeWidth(attribute.gridDividingLineWidth);
-        gridDividingLinePaint.setColor(attribute.borderColor);
 
         gridLabelPaint.setTypeface(FontStyle.typeFace);
         gridLabelPaint.setTextSize(attribute.labelSize);
@@ -59,11 +54,16 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsChartModule> {
         label = new String[size];
 
         Utils.measureTextArea(gridLabelPaint, rect);
-        setMargin(0, 0, 0,
-                attribute.gridLabelMarginTop
-                        + attribute.gridLabelMarginBottom
-                        + rect.height()
-                        + attribute.gridDividingLineWidth);
+    }
+
+    @Override
+    public float[] onInitMargin() {
+        margin[3] = attribute.gridLabelMarginTop
+                + attribute.gridLabelMarginBottom
+                + rect.height()
+                + attribute.borderWidth
+                + (attribute.gridLineStyle == GridLineStyle.GRADUATION ? attribute.gridLineLength : 0);
+        return margin;
     }
 
     @Override
@@ -79,13 +79,13 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsChartModule> {
         }
         point[position * 2] = current + 0.5f;
         label[position] = DisplayTypeUtils.format(render.getAdapter().getItem(current).getTime(),
-                render.getAdapter().getDisplayType());
+                render.getAdapter().getTimeType());
         position++;
     }
 
     @Override
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
-        render.mapPoints(render.getMainChartModule().getMatrix(), point);
+        render.mapPoints(render.getMainModule().getMatrix(), point);
         for (int i = 0; i < label.length; i++) {
             if (TextUtils.isEmpty(label[i])) {
                 continue;
@@ -93,42 +93,27 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsChartModule> {
             int xIndex = i * 2;
             canvas.drawText(label[i], point[xIndex], gridLabelY, gridLabelPaint);
             // 跳过超出显示区域的线
-            if (!attribute.gridLineState || point[xIndex] < viewRect.left || point[xIndex] > viewRect.right) {
+            if (attribute.gridLineStyle == GridLineStyle.NONE || point[xIndex] < viewRect.left || point[xIndex] > viewRect.right) {
                 continue;
             }
-            canvas.drawLines(render.getMeasureUtils().buildViewLRCoordinates
-                    (point[xIndex], point[xIndex]), gridPaint);
+            float x = point[xIndex];
+            float y = render.getBottomModule().getRect().bottom;
+            if (attribute.gridLineStyle == GridLineStyle.LINE) {
+                canvas.drawLines(render.buildViewLRCoordinates(x, x), gridPaint);
+            } else if (attribute.gridLineStyle == GridLineStyle.GRADUATION_INSIDE) {
+                canvas.drawLine(x, y, x, y - attribute.gridLineLength, gridPaint);
+            } else if (attribute.gridLineStyle == GridLineStyle.GRADUATION) {
+                canvas.drawLine(x, y, x, y + attribute.gridLineLength + attribute.borderWidth, gridPaint);
+            }
         }
     }
 
     @Override
     public void drawOver(Canvas canvas) {
-        // 绘制外层边框线
-        if (attribute.gridDividingLineWidth > 0) {
-            canvas.drawPath(dividingLinePath, gridDividingLinePaint);
-        }
     }
 
     @Override
     public void onViewChange() {
-        float labelAreaHeight = rect.height() + attribute.gridLabelMarginTop + attribute.gridLabelMarginBottom;
-        float bottom = viewRect.bottom + attribute.borderWidth;
-        borderPts = render.getBorderPoints(viewRect.left,
-                bottom,
-                viewRect.right,
-                bottom + labelAreaHeight);
-        gridLabelY = bottom + rect.height() + attribute.gridLabelMarginTop;
-        computationGridDividingLine();
+        gridLabelY = viewRect.bottom - attribute.borderWidth - attribute.gridLabelMarginBottom;
     }
-
-    private void computationGridDividingLine() {
-        if (attribute.gridDividingLineWidth > 0) {
-            dividingLinePath.rewind();
-            dividingLinePath.moveTo(borderPts[0], borderPts[1]);
-            dividingLinePath.lineTo(borderPts[2], borderPts[1]);
-            dividingLinePath.moveTo(borderPts[0], borderPts[3]);
-            dividingLinePath.lineTo(borderPts[2], borderPts[3]);
-        }
-    }
-
 }

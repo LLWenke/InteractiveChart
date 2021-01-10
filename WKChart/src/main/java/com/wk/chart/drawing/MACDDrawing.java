@@ -9,46 +9,46 @@ import android.graphics.Path;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.entry.IndexConfigEntry;
 import com.wk.chart.entry.ValueEntry;
-import com.wk.chart.module.MACDChartModule;
+import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
 
 /**
  * <p>MACDDrawing</p>
  */
 
-public class MACDDrawing extends AbsDrawing<CandleRender, MACDChartModule> {
+public class MACDDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
     private static final String TAG = "MACDDrawing";
     private CandleAttribute attribute;//配置文件
 
-    private Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG); //边框画笔
-    private Paint centerLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG); //中心线画笔
+    private final Paint centerLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG); //中心线画笔
 
-    private Paint deaPaint = new Paint();
-    private Paint diffPaint = new Paint();
+    private final Paint deaPaint = new Paint();
+    private final Paint diffPaint = new Paint();
     // 上涨蜡烛图画笔
-    private Paint increasingPaint = new Paint();
+    private final Paint increasingPaint = new Paint();
     // 下跌蜡烛图画笔
-    private Paint decreasingPaint = new Paint();
+    private final Paint decreasingPaint = new Paint();
     // 上涨路径
-    private Path increasingPath = new Path();
+    private final Path increasingPath = new Path();
     // 下跌路径
-    private Path decreasingPath = new Path();
+    private final Path decreasingPath = new Path();
     // dea绘制路径
-    private Path deaPath = new Path();
+    private final Path deaPath = new Path();
     // diff绘制路径
-    private Path diffPath = new Path();
+    private final Path diffPath = new Path();
     // 折线路径位置信息
     private final float[] pathPts = new float[4];
 
-    private float[] gridBuffer = new float[2];
+    private final float[] gridBuffer = new float[2];
 
-    private float[] rectBuffer = new float[4];
+    private final float[] rectBuffer = new float[4];
 
     private float borderOffset;//边框偏移量
 
     @Override
-    public void onInit(CandleRender render, MACDChartModule chartModule) {
+    public void onInit(CandleRender render, AbsModule<?> chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
 
@@ -56,17 +56,11 @@ public class MACDDrawing extends AbsDrawing<CandleRender, MACDChartModule> {
         centerLinePaint.setStrokeWidth(attribute.lineWidth);
         centerLinePaint.setStyle(Paint.Style.FILL);
 
-        borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setStrokeWidth(attribute.borderWidth);
-        borderPaint.setColor(attribute.borderColor);
-
         diffPaint.setStyle(Paint.Style.STROKE);
         diffPaint.setStrokeWidth(attribute.lineWidth);
-        diffPaint.setColor(attribute.line1Color);
 
         deaPaint.setStyle(Paint.Style.STROKE);
         deaPaint.setStrokeWidth(attribute.lineWidth);
-        deaPaint.setColor(attribute.line2Color);
 
         increasingPaint.setStyle(attribute.increasingStyle);
         increasingPaint.setStrokeWidth(attribute.pointBorderWidth);
@@ -88,7 +82,7 @@ public class MACDDrawing extends AbsDrawing<CandleRender, MACDChartModule> {
 
     @Override
     public void onComputation(int begin, int end, int current, float[] extremum) {
-        ValueEntry[] values = render.getAdapter().getItem(current).getIndicator(absChartModule.getIndicatorType());
+        ValueEntry[] values = render.getAdapter().getItem(current).getIndex(absChartModule.getAttachIndexType());
         if (null == values || values.length < 3) {
             return;
         }
@@ -176,13 +170,15 @@ public class MACDDrawing extends AbsDrawing<CandleRender, MACDChartModule> {
 
     @Override
     public void drawOver(Canvas canvas) {
-        if (attribute.borderWidth > 0) {
-            canvas.drawRect(borderPts[0], borderPts[1], borderPts[2], borderPts[3], borderPaint);
-        }
     }
 
     @Override
     public void onViewChange() {
-        super.onViewChange();
+        IndexConfigEntry indexTag = render.getAdapter().getBuildConfig().getIndexTags(absChartModule.getAttachIndexType());
+        if (null == indexTag || indexTag.getFlagEntries().length < 3) {
+            return;
+        }
+        diffPaint.setColor(indexTag.getFlagEntries()[0].getColor());
+        deaPaint.setColor(indexTag.getFlagEntries()[1].getColor());
     }
 }

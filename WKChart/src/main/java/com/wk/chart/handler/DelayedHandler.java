@@ -2,7 +2,8 @@ package com.wk.chart.handler;
 
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * 用于延时任务的handler(注意，将执行在main(UI)线程中)
@@ -51,7 +52,7 @@ public class DelayedHandler extends Handler {
     }
 
     @Override
-    public void handleMessage(Message msg) {
+    public void handleMessage(@NotNull Message msg) {
         if (null != listener) {
             this.listener.onDelayedWork(msg.what);
         }

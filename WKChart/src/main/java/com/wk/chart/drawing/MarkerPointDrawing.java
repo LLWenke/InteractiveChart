@@ -13,10 +13,11 @@ import android.text.TextPaint;
 
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.enumeration.MarkerPointType;
 import com.wk.chart.interfaces.IMarkerPoint;
-import com.wk.chart.module.base.AbsChartModule;
+import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
 
 /**
@@ -24,40 +25,40 @@ import com.wk.chart.render.CandleRender;
  * 标记点绘制组件
  */
 
-public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsChartModule> {
+public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
     private static final String TAG = "MarkerPointDrawing";
     //配置文件
     private CandleAttribute attribute;
     //标记点绘制组件接口
     private IMarkerPoint iMarkerPoint;
     // 标记点画笔
-    private Paint markerPointsPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint markerPointsPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     // 标记点连接线画笔
-    private Paint markerPointsLinePaint = new Paint();
+    private final Paint markerPointsLinePaint = new Paint();
     // 标记点文字画笔
-    private TextPaint markerPointsTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+    private final TextPaint markerPointsTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     // B标记点绘制路径
-    private Path markerPointsPathB = new Path();
+    private final Path markerPointsPathB = new Path();
     // S标记点绘制路径
-    private Path markerPointsPathS = new Path();
+    private final Path markerPointsPathS = new Path();
     // T标记点绘制路径
-    private Path markerPointsPathT = new Path();
+    private final Path markerPointsPathT = new Path();
     // B标记点连接线绘制路径
-    private Path markerPointsLinePathB = new Path();
+    private final Path markerPointsLinePathB = new Path();
     // S标记点连接线绘制路径
-    private Path markerPointsLinePathS = new Path();
+    private final Path markerPointsLinePathS = new Path();
     // T标记点连接线绘制路径
-    private Path markerPointsLinePathT = new Path();
+    private final Path markerPointsLinePathT = new Path();
     // 用于计算标记点绘制路径的起始位置
-    private float[] pointBuffer = new float[4];
+    private final float[] pointBuffer = new float[4];
     //可用区域，上下都分为标签上，标签下两个可用区域，共4个可用区域
-    private float[] availableAreas = new float[16];
+    private final float[] availableAreas = new float[16];
     // 标记点绘制区域宽度的一半/高度/总高度（包含三角形高度）/连接点大小/文字Y轴坐标/三角形高度
     private float pointRectHalfWidth, pointRectHeight, totalRectHeight, jointSize, textY, triangleHeight;
     // 当前标记点区域范围矩形
-    private Rect markerRect = new Rect();
+    private final Rect markerRect = new Rect();
     // 当前标记点文字范围矩形
-    private Rect textRect = new Rect();
+    private final Rect textRect = new Rect();
     // 标记点下标
     private int position = 0;
     // 标记点文字数组
@@ -66,7 +67,7 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsChartModule>
     private float[] textPointBuffer;
 
     @Override
-    public void onInit(CandleRender render, AbsChartModule chartModule) {
+    public void onInit(CandleRender render, AbsModule<AbsEntry> chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
         iMarkerPoint = (IMarkerPoint) chartModule;
@@ -164,6 +165,11 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsChartModule>
     public void drawOver(Canvas canvas) {
     }
 
+    @Override
+    public void onViewChange() {
+
+    }
+
     /**
      * 计算标记点位置
      */
@@ -232,90 +238,82 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsChartModule>
         availableAreas[9] = availableAreas[13] = pointBuffer[3] + attribute.markerPointJointMargin + jointSize;
         availableAreas[11] = availableAreas[15] = viewRect.bottom;
         boolean doLeft = true, doRight = true;
-        int position = 1;
+        int index = 0;
         while (doLeft || doRight) {
+            index++;
+            int rightIndex = current + index;
+            int leftIndex = current - index;
+            //向左修正（方向：上）
+            leftCheck:
             if (doLeft) {
-                doLeft = reviseLeftAvailableAreas(begin, current, position);
+                if (leftIndex < begin) {
+                    doLeft = false;
+                    break leftCheck;
+                }
+                CandleEntry left = render.getAdapter().getItem(leftIndex);
+                Rect leftRect = left.getMarkerPointRect();
+                float[] buffer = absChartModule.getPointRect(render, left, leftIndex);
+                float right = Math.max(buffer[2], leftRect.right);
+                if (availableAreas[0] >= right) {
+                    doLeft = false;
+                    break leftCheck;
+                }
+                if (buffer[1] < availableAreas[1]) {
+                    availableAreas[1] = buffer[1];
+                }
+                if (buffer[3] > availableAreas[9]) {
+                    availableAreas[9] = buffer[3];
+                }
+                if (leftRect.bottom <= buffer[1]) {
+                    float minTop = leftRect.top < availableAreas[1] ? leftRect.top : availableAreas[1];
+                    if (minTop - availableAreas[3] >= totalRectHeight) {
+                        availableAreas[1] = minTop;
+                    } else if (leftRect.bottom > availableAreas[3]) {
+                        availableAreas[3] = leftRect.bottom;
+                    }
+                    if (leftRect.top < availableAreas[5]) {
+                        availableAreas[5] = leftRect.top;
+                    }
+                }
+                if (leftRect.top >= buffer[3]) {
+                    float maxTop = leftRect.bottom > availableAreas[9] ? leftRect.bottom : availableAreas[9];
+                    if (availableAreas[11] - maxTop >= totalRectHeight) {
+                        availableAreas[9] = maxTop;
+                    } else if (leftRect.top < availableAreas[11]) {
+                        availableAreas[11] = leftRect.top;
+                    }
+                    if (leftRect.bottom > availableAreas[13]) {
+                        availableAreas[13] = leftRect.bottom;
+                    }
+                }
             }
+            //向右修正（方向：上）
+            rightCheck:
             if (doRight) {
-                doRight = reviseRightAvailableAreas(end, current, position);
-            }
-            position++;
-        }
-    }
-
-    /**
-     * 修正左边可用区域
-     */
-    private boolean reviseLeftAvailableAreas(int begin, int current, int position) {
-        int leftIndex = current - position;
-        if (leftIndex < begin) {
-            return false;
-        }
-        CandleEntry left = render.getAdapter().getItem(leftIndex);
-        Rect leftRect = left.getMarkerPointRect();
-        float[] buffer = absChartModule.getPointRect(render, left, leftIndex);
-        float right = Math.max(buffer[2], leftRect.right);
-        if (availableAreas[0] >= right) {
-            return false;
-        }
-        if (buffer[1] < availableAreas[1]) {
-            availableAreas[1] = buffer[1];
-        }
-        if (buffer[3] > availableAreas[9]) {
-            availableAreas[9] = buffer[3];
-        }
-        if (leftRect.bottom <= buffer[1]) {
-            float minTop = leftRect.top < availableAreas[1] ? leftRect.top : availableAreas[1];
-            if (minTop - availableAreas[3] >= totalRectHeight) {
-                availableAreas[1] = minTop;
-            } else if (leftRect.bottom > availableAreas[3]) {
-                availableAreas[3] = leftRect.bottom;
-            }
-            if (leftRect.top < availableAreas[5]) {
-                availableAreas[5] = leftRect.top;
+                if (rightIndex >= end) {
+                    doRight = false;
+                    break rightCheck;
+                }
+                CandleEntry right = render.getAdapter().getItem(rightIndex);
+                float[] buffer = absChartModule.getPointRect(render, right, rightIndex);
+                if (availableAreas[2] <= buffer[0]) {
+                    doRight = false;
+                    break rightCheck;
+                }
+                if (buffer[1] < availableAreas[1]) {
+                    availableAreas[1] = buffer[1];
+                }
+                if (buffer[1] < availableAreas[5]) {
+                    availableAreas[5] = buffer[1];
+                }
+                if (buffer[3] > availableAreas[9]) {
+                    availableAreas[9] = buffer[3];
+                }
+                if (buffer[3] > availableAreas[13]) {
+                    availableAreas[13] = buffer[3];
+                }
             }
         }
-        if (leftRect.top >= buffer[3]) {
-            float maxTop = leftRect.bottom > availableAreas[9] ? leftRect.bottom : availableAreas[9];
-            if (availableAreas[11] - maxTop >= totalRectHeight) {
-                availableAreas[9] = maxTop;
-            } else if (leftRect.top < availableAreas[11]) {
-                availableAreas[11] = leftRect.top;
-            }
-            if (leftRect.bottom > availableAreas[13]) {
-                availableAreas[13] = leftRect.bottom;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * 修正右边可用区域
-     */
-    private boolean reviseRightAvailableAreas(int end, int current, int position) {
-        int rightIndex = current + position;
-        if (rightIndex >= end) {
-            return false;
-        }
-        CandleEntry right = render.getAdapter().getItem(rightIndex);
-        float[] buffer = absChartModule.getPointRect(render, right, rightIndex);
-        if (availableAreas[2] <= buffer[0]) {
-            return false;
-        }
-        if (buffer[1] < availableAreas[1]) {
-            availableAreas[1] = buffer[1];
-        }
-        if (buffer[1] < availableAreas[5]) {
-            availableAreas[5] = buffer[1];
-        }
-        if (buffer[3] > availableAreas[9]) {
-            availableAreas[9] = buffer[3];
-        }
-        if (buffer[3] > availableAreas[13]) {
-            availableAreas[13] = buffer[3];
-        }
-        return true;
     }
 
     /**

@@ -13,36 +13,37 @@ import com.wk.chart.compat.FontStyle;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.DepthAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.DepthEntry;
-import com.wk.chart.module.DepthChartModule;
-import com.wk.chart.module.base.AbsChartModule;
+import com.wk.chart.entry.SelectorItemEntry;
+import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.DepthRender;
 
 /**
  * <p>DepthSelectorDrawing</p>
  */
 
-public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsChartModule> {
+public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry>> {
     private static final String TAG = "DepthSelectorDrawing";
     private DepthAttribute attribute;//配置文件
 
-    private Paint selectorBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);//选择器边框画笔
-    private Paint selectorBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);//选择器背景画笔
-    private TextPaint labelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//label画笔
-    private TextPaint valuePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//value画笔
-    private TextPaint unitPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//unit画笔
+    private final Paint selectorBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);//选择器边框画笔
+    private final Paint selectorBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);//选择器背景画笔
+    private final TextPaint labelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//label画笔
+    private final TextPaint valuePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//value画笔
+    private final TextPaint unitPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//unit画笔
 
     private Paint.FontMetrics metrics;
-    private float[] viewRectBuffer = new float[4]; // 计算选择器矩形坐标用的
+    private final float[] viewRectBuffer = new float[4]; // 计算选择器矩形坐标用的
 
     private float selectedWidth;//信息选择框的宽度
     private float selectedHeight;//信息选择框的高度
-    private com.wkchart.entry.SelectorItemEntry[] selectorInfo;//选择器信息集合
-    private float borderOffset;//边框偏移量
+    private SelectorItemEntry[] selectorInfo;//选择器信息集合
+    private float selectorBorderOffset;//选择器边框偏移量
     private int itemCount = 3;//选择器中的条目数
 
     @Override
-    public void onInit(DepthRender render, AbsChartModule chartModule) {
+    public void onInit(DepthRender render, AbsModule<AbsEntry> chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
 
@@ -68,10 +69,10 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsChartModule
         metrics = attribute.selectorLabelSize > attribute.selectorValueSize ?
                 labelPaint.getFontMetrics() : valuePaint.getFontMetrics();
 
-        borderOffset = attribute.selectorBorderWidth / 2;
-        selectorInfo = new com.wkchart.entry.SelectorItemEntry[itemCount];
+        selectorBorderOffset = attribute.selectorBorderWidth / 2;
+        selectorInfo = new SelectorItemEntry[itemCount];
         for (int i = 0; i < itemCount; i++) {
-            selectorInfo[i] = new com.wkchart.entry.SelectorItemEntry();
+            selectorInfo[i] = new SelectorItemEntry();
         }
     }
 
@@ -104,7 +105,7 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsChartModule
 
         //动态计算选择器宽度和高度
         float width = 0;
-        for (com.wkchart.entry.SelectorItemEntry item : selectorInfo) {
+        for (SelectorItemEntry item : selectorInfo) {
             float textWidth = item.getLabelPaint().measureText(item.getLabel())
                     + item.getValuePaint().measureText(item.getValue())
                     + item.getUnitPaint().measureText(item.getUnit());
@@ -130,13 +131,13 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsChartModule
                 selectorBorderPaint);
 
         //绘制选择器填充背景
-        canvas.drawRoundRect(viewRectBuffer[0] + borderOffset, viewRectBuffer[1] + borderOffset,
-                viewRectBuffer[2] - borderOffset, viewRectBuffer[3] - borderOffset,
+        canvas.drawRoundRect(viewRectBuffer[0] + selectorBorderOffset, viewRectBuffer[1] + selectorBorderOffset,
+                viewRectBuffer[2] - selectorBorderOffset, viewRectBuffer[3] - selectorBorderOffset,
                 attribute.selectorRadius, attribute.selectorRadius, selectorBackgroundPaint);
 
         //绘制选择器内容信息
         float y = top + attribute.selectorIntervalY + (textHeight - metrics.bottom - metrics.top) / 2;
-        for (com.wkchart.entry.SelectorItemEntry item : selectorInfo) {
+        for (SelectorItemEntry item : selectorInfo) {
             //绘制label
             float x = viewRectBuffer[0] + attribute.selectorPadding;
             canvas.drawText(item.getLabel(), x, y, item.getLabelPaint());
@@ -154,7 +155,6 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsChartModule
 
     @Override
     public void onViewChange() {
-
     }
 
     /**

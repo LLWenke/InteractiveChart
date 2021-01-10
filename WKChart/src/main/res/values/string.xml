@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wk_price">价格</string>
+    <string name="wk_total_amount">总量</string>
+    <string name="wk_total_cost">总成本</string>
+    <string name="wk_high">高</string>
+    <string name="wk_open">开</string>
+    <string name="wk_low">低</string>
+    <string name="wk_close">收</string>
+    <string name="wk_time_value">时间</string>
+    <string name="wk_change_amount">涨跌额</string>
+    <string name="wk_change_proportion">涨跌幅</string>
+    <string name="wk_volume">成交量</string>
+
+    <string name="app_name">WKChart</string>
+    <string name="wk_indicators">指标</string>
+    <string name="wk_macd">MACD</string>
+    <string name="wk_rsi">RSI</string>
+    <string name="wk_kdj">KDJ</string>
+    <string name="wk_wr">WR</string>
+    <string name="wk_boll">BOLL</string>
+    <string name="wk_ma">MA</string>
+
+    <string name="wk_time_line">分时</string>
+    <string name="wk_1m">1分</string>
+    <string name="wk_5m">5分</string>
+    <string name="wk_15m">15分</string>
+    <string name="wk_30m">30分</string>
+    <string name="wk_1h">1小时</string>
+    <string name="wk_2h">2小时</string>
+    <string name="wk_4h">4小时</string>
+    <string name="wk_6h">6小时</string>
+    <string name="wk_8h">8小时</string>
+    <string name="wk_12h">12小时</string>
+    <string name="wk_day">日线</string>
+    <string name="wk_week">周线</string>
+    <string name="wk_month">月线</string>
+
+    <string name="wk_main">主图</string>
+    <string name="wk_secondary">副图</string>
+
+    <string name="wk_more">更多</string>
+    <string name="wk_index">指标</string>
+    <string name="wk_main_index">主图指标</string>
+    <string name="wk_index_setting">指标设置</string>
+    <string name="wk_auxiliary_index">副图指标</string>
+    <string name="wk_tips_label">简介</string>
+    <string name="wk_ma_tips">移动平均线简称MA，也叫均线，MA指标由一段时间内的收盘价之和算数平均数后的连线，可抚平短期波动描述币价走势，反映出长期趋势或周期。</string>
+    <string name="wk_boll_tips">BOLL指标又叫布林带，其基本的形态是由三条轨道线组成的带状通道（上轨、下轨和中轨），中轨为价格的平均时间成本，上轨和下轨可分别视为一个价格的压力线和支撑线）。</string>
+    <string name="wk_macd_tips">MACD指标由一组曲线与圆形组成，通过收盘时价格或指数的快变及慢变的指数移动平均值（EMA）之间的差计算出来。“S”指更短时间段的EMA,而“L“则指较长时段的EMA,最常用的是12及26日EMA.</string>
+    <string name="wk_kdj_tips">KDJ指标通过一个特定的周期（常为9日、9周等）内出现过的最高价、最低价及最后一个计算周期的收盘价及这三者之间的比例关系，来计算最后一个计算周期的未成熟随机值，然后根据平滑移动平均线的方法来计算K值、D值与J值，并绘成曲线来判断价格走势。</string>
+    <string name="wk_rsi_tips">RSI指标是比较价格升降运动以表达价格强度的技术分析工具，是根据一定时期内上涨和下跌幅度之和的比率制作出的一种技术曲线。</string>
+    <string name="wk_wr_tips">WR指标是一个震荡指标，是以价格的摆动点来度量是否处于超买或超卖现象，分析多空双方力量的对比，从而提出有效的信号来判断市场中短期行为的走势。</string>
+    <string name="wk_reset">重置</string>
+</resources>

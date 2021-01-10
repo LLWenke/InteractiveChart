@@ -1,5 +1,8 @@
+
+
 package com.wk.chart;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -20,6 +23,7 @@ import com.wk.chart.compat.attribute.AttributeRead;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.compat.attribute.DepthAttribute;
+import com.wk.chart.compat.config.AbsBuildConfig;
 import com.wk.chart.drawing.CursorDrawing;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
@@ -27,12 +31,10 @@ import com.wk.chart.enumeration.ObserverArg;
 import com.wk.chart.enumeration.RenderModel;
 import com.wk.chart.handler.DelayedHandler;
 import com.wk.chart.handler.InteractiveHandler;
-import com.wk.chart.module.base.AbsChartModule;
 import com.wk.chart.render.AbsRender;
 import com.wk.chart.render.CandleRender;
 import com.wk.chart.render.DepthRender;
 
-import java.util.List;
 import java.util.Observer;
 
 /**
@@ -53,7 +55,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private BaseAttribute attribute = null;
     private final RectF viewRect = new RectF();
     // 渲染相关的属性
-    private AbsRender render;
+    private AbsRender<? extends AbsAdapter<?, ?>, ? extends BaseAttribute> render;
     private InteractiveHandler interactiveHandler;
     private OverScroller scroller;
     private RenderModel renderModel;
@@ -73,17 +75,20 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private int chartState = IDLE;//图表状态
     private int lastHighlightIndex = -1; // 上一次高亮的 entry 索引，用于减少回调
     private int orientation;//屏幕方向
-    private int enableModuleCount = 0;//启用的模型数量
 
     //数据监视器
-    private Observer dataSetObserver = (o, arg) -> {
+    private final Observer dataSetObserver = (o, arg) -> {
         switch ((ObserverArg) arg) {
             case NORMAL:
                 loadingComplete();
                 lockRefresh = true;
                 break;
-            case INIT:
-                initChartState();
+            case INIT_AND_RESET:
+                onViewInit();
+            case RESET:
+                onDataReset();
+            case CLEAR:
+                resetChartState();
                 lockRefresh = false;
             case ADD:
                 loadingComplete();
@@ -91,8 +96,12 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
             case REFRESH:
                 onDataChange();
                 break;
-            case CONFIG_CHANGE:
-                onViewChanged();
+            case INIT:
+                onViewInit();
+                onDataReset();
+                break;
+            case RESET_RATE:
+                onDataReset();
                 break;
         }
     };
@@ -154,13 +163,12 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     /**
      * 设置数据适配器
      */
-    public<T extends AbsAdapter> void setAdapter(@NonNull T adapter) {
+    public void setAdapter(@NonNull AbsAdapter<? extends AbsEntry, ? extends AbsBuildConfig> adapter) {
         adapter.registerDataSetObserver(dataSetObserver);
-        render.setAdapter(adapter);
-        onViewChanged();
+        ((AbsRender<AbsAdapter<?, ?>, BaseAttribute>) render).setAdapter(adapter);
     }
 
-    public AbsRender getRender() {
+    public AbsRender<? extends AbsAdapter<?, ?>, ? extends BaseAttribute> getRender() {
         return render;
     }
 
@@ -185,7 +193,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 @Override
                 public boolean onDoubleTap(MotionEvent e) {
                     if (interactiveHandler != null) {
-                        interactiveHandler.onDoubleTap(render.getChartModuleInFocusArea(), e.getX(), e.getY());
+                        interactiveHandler.onDoubleTap(render.getModuleInFocusArea(), e.getX(), e.getY());
                     }
                     return true;
                 }
@@ -195,18 +203,15 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                     boolean consumed = false;
                     if (interactiveHandler != null) {
                         render.resetChartModuleInFocusArea(e.getX(), e.getY());
-                        consumed = interactiveHandler.onSingleTap(render.getChartModuleInFocusArea(), e.getX(), e.getY());
+                        consumed = interactiveHandler.onSingleTap(render.getModuleInFocusArea(), e.getX(), e.getY());
                     }
-                    AbsDrawing absDrawing = getRender().onDrawingClick(e.getX(), e.getY());
+                    AbsDrawing<?, ?> absDrawing = getRender().onDrawingClick(e.getX(), e.getY());
+                    if (absDrawing instanceof CursorDrawing && !consumed) {
+                        scrollToEnd();
+                        consumed = true;
+                    }
                     if (null != absDrawing && !consumed) {
                         consumed = interactiveHandler.onSingleTap(absDrawing, e.getX(), e.getY());
-                    }
-                    if (absDrawing instanceof CursorDrawing
-                            && !consumed) {
-                        scroller.startScroll(0, 0,
-                                (int) (render.getCurrentTransX() - render.getMaxScrollOffset()), 0, 1000);
-                        postInvalidateOnAnimation();
-                        consumed = true;
                     }
                     if (attribute.onSingleClickSelected && !consumed) {
                         highlight(e.getX(), e.getY());
@@ -279,7 +284,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 }
             });
 
-    private GestureMoveActionCompat gestureCompat = new GestureMoveActionCompat(null);
+    private final GestureMoveActionCompat gestureCompat = new GestureMoveActionCompat(null);
 
     /**
      * 高亮处理逻辑（选中了某个item）
@@ -312,6 +317,16 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     }
 
     /**
+     * 滚动到最后
+     */
+    public void scrollToEnd() {
+        lastFlingX = 0;
+        float scrollX = Math.abs(render.getMaxScrollOffset()) - Math.abs(render.getCurrentTransX());
+        scroller.startScroll(0, 0, (int) scrollX, 0, 2000);
+        postInvalidateOnAnimation();
+    }
+
+    /**
      * 滚动，这里只会进行水平滚动，到达边界时将不能继续滑动
      *
      * @param dx 变化 量
@@ -333,11 +348,12 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         float value = overScrollOffset < restriction ? 1 - overScrollOffset / restriction : 0;
         //Log.e(TAG, "     value:" + value);
         dx *= value;
-        if (render.getMaxScrollOffset() < 0 || dx < 0) {
-            render.updateCurrentTransX(dx);
-            render.updateOverScrollOffset(dx);
-            postInvalidateOnAnimation();
+        if (dx == 0) {
+            return;
         }
+        render.updateCurrentTransX(dx);
+        render.updateOverScrollOffset(dx);
+        postInvalidateOnAnimation();
     }
 
     /**
@@ -352,16 +368,6 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        //计算View高度，并返回真实高度（注意，此方法在此处必须调用，否则有可能发生视图错位）
-        int height = MeasureSpec.getSize(heightMeasureSpec) - getPaddingTop() - getPaddingBottom();
-        if (height > 0) {
-            height = render.measureHeight(height);
-        }
-        setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), height);
-    }
-
-    @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         this.viewRect.set(getPaddingLeft(), getPaddingTop(), w - getPaddingRight(), h);
     }
@@ -369,7 +375,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         if ((changed || viewChangeState)) {
-            onViewChanged();
+            onViewInit();
             this.viewChangeState = false;
         }
     }
@@ -413,16 +419,16 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 postInvalidateOnAnimation();
             } else if (chartState == RELEASE_BACK && loadingComplete) {
                 chartState = LOADING;
-                if (interactiveHandler != null) {
-                    if (lastScrollDx > 0) {
-                        loadingComplete = false;
-                        interactiveHandler.onLeftRefresh(render.getAdapter().getItem(0));
-                    } else if (lastScrollDx < 0) {
-                        loadingComplete = false;
-                        interactiveHandler.onRightRefresh(render.getAdapter().getItem(render.getAdapter().getLastPosition()));
-                    }
-                } else {
+                if (interactiveHandler == null) {
                     loadingComplete();
+                    return;
+                }
+                if (lastScrollDx > 0) {
+                    loadingComplete = false;
+                    interactiveHandler.onLeftRefresh(render.getAdapter().getItem(0));
+                } else if (lastScrollDx < 0) {
+                    loadingComplete = false;
+                    interactiveHandler.onRightRefresh(render.getAdapter().getItem(render.getAdapter().getLastPosition()));
                 }
             } else {
                 chartState = IDLE;
@@ -488,6 +494,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         return false;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         final int action = e.getAction();
@@ -559,29 +566,14 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
 
 
     /**
-     * 视图更新
+     * 视图初始化
      */
-    public void onViewChanged() {
+    public void onViewInit() {
         if (null == render.getAdapter()) {
             return;
         }
-        int enableCount = 0;
-        List<AbsChartModule> chartModules = render.getChartModules();
-        for (AbsChartModule module : chartModules) {
-            enableCount += module.isEnable() ? 1 : 0;
-        }
-        if (enableCount != enableModuleCount) {
-            this.enableModuleCount = enableCount;
-            this.viewChangeState = true;
-            this.requestLayout();
-//            Log.e(TAG, "requestLayout");
-        } else {
-            if (render.onViewRectChange() > 0) {
-                render.measureHeight((int) viewRect.height());
-                render.onViewRectChange();
-            }
-            postInvalidateOnAnimation();
-        }
+        render.onViewInit();
+        postInvalidateOnAnimation();
     }
 
     /**
@@ -593,6 +585,16 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     }
 
     /**
+     * 数据重置回调
+     */
+    public void onDataReset() {
+        if (render.onDataReset() > 0) {
+            render.onViewInit();
+            postInvalidateOnAnimation();
+        }
+    }
+
+    /**
      * 数据更新回调
      */
     public void onDataChange() {
@@ -601,9 +603,9 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     }
 
     /**
-     * 初始化图表状态
+     * 重置图表状态
      */
-    private void initChartState() {
+    private void resetChartState() {
         scroller.forceFinished(true);
         chartState = IDLE;
         lastFlingX = 0;
@@ -614,7 +616,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      * 检查图表准备状态
      */
     private boolean checkReadyState() {
-        return null != render.getAdapter() && null != render.getMainChartModule()
+        return null != render.getAdapter() && null != render.getMainModule()
                 && render.getAdapter().getCount() > 0;
     }
 
