@@ -1,221 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingStart="10dp">
-
-    <com.wk.demo.view.XRadioGroup
-        android:id="@+id/tab_layout"
-        android:layout_width="60dp"
-        android:layout_height="match_parent"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="end"
-        android:layout_marginBottom="22dp"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:paddingTop="8dp">
-
-        <ImageView
-            android:id="@+id/btn_direction"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:src="@drawable/icon_full_screen" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <com.wk.demo.view.FontRadioButton
-                android:id="@+id/rb_time_line"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/chart_tab_height_size"
-                android:background="@drawable/chart_data_type_bg_selected"
-                android:button="@null"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:minWidth="@dimen/chart_tab_width_size"
-                android:text="@string/wk_time_line"
-                android:textColor="@drawable/chart_data_type_text_selected"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <com.wk.demo.view.FontRadioButton
-                android:id="@+id/rb_one_minute"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/chart_tab_height_size"
-                android:background="@drawable/chart_data_type_bg_selected"
-                android:button="@null"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:minWidth="@dimen/chart_tab_width_size"
-                android:text="@string/wk_1m"
-                android:textColor="@drawable/chart_data_type_text_selected"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <com.wk.demo.view.FontRadioButton
-                android:id="@+id/rb_fifteen_minute"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/chart_tab_height_size"
-                android:background="@drawable/chart_data_type_bg_selected"
-                android:button="@null"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:minWidth="@dimen/chart_tab_width_size"
-                android:text="@string/wk_15m"
-                android:textColor="@drawable/chart_data_type_text_selected"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <com.wk.demo.view.FontRadioButton
-                android:id="@+id/rb_one_hour"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/chart_tab_height_size"
-                android:background="@drawable/chart_data_type_bg_selected"
-                android:button="@null"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:minWidth="@dimen/chart_tab_width_size"
-                android:text="@string/wk_1h"
-                android:textColor="@drawable/chart_data_type_text_selected"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <com.wk.demo.view.FontRadioButton
-                android:id="@+id/rb_six_hour"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/chart_tab_height_size"
-                android:background="@drawable/chart_data_type_bg_selected"
-                android:button="@null"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:minWidth="@dimen/chart_tab_width_size"
-                android:text="@string/wk_6h"
-                android:textColor="@drawable/chart_data_type_text_selected"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <com.wk.demo.view.FontRadioButton
-                android:id="@+id/rb_one_day"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/chart_tab_height_size"
-                android:background="@drawable/chart_data_type_bg_selected"
-                android:button="@null"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:minWidth="@dimen/chart_tab_width_size"
-                android:text="@string/wk_1d"
-                android:textColor="@drawable/chart_data_type_text_selected"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <com.wk.demo.view.FontCheckBox
-                android:id="@+id/folding_menu_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/chart_tab_height_size"
-                android:background="@drawable/chart_data_type_bg_selected"
-                android:button="@null"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:minWidth="@dimen/chart_tab_width_size"
-                android:text="@string/wk_indicators"
-                android:textColor="@drawable/chart_data_type_text_selected"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-    </com.wk.demo.view.XRadioGroup>
-
-    <View
-        android:id="@+id/space_line"
-        android:layout_width="1dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:layout_toStartOf="@+id/tab_layout"
-        android:background="@android:color/black" />
+    android:layout_height="match_parent">
 
     <com.wk.chart.ChartLayout
         android:id="@+id/chart_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toStartOf="@+id/space_line"
-        android:background="@android:color/black">
+        android:layout_marginEnd="65.5dp"
+        android:layout_marginBottom="40dp">
 
         <com.wk.chart.ChartView
             android:id="@+id/candle_chart"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="#202a33"
+            android:layout_height="230dp"
             app:axisLabelLocation="right"
-            app:borderWidth="1dp"
+            app:axisLabelTBMargin="0dp"
+            app:axisLineState="false"
+            app:axisTagMarginY="3dp"
+            app:borderWidth="0.5dp"
+            app:breathingLampRadius="3dp"
+            app:candleExtremumLabelSize="10sp"
             app:decreasingStyle="fill"
-            app:gridCount="4"
-            app:gridLabelMarginBottom="8dp"
-            app:gridLabelMarginTop="8dp"
-            app:gridLineState="true"
+            app:gridCount="5"
+            app:gridLabelMarginBottom="3dp"
+            app:gridLineLength="3dp"
+            app:gridLineStyle="graduation"
             app:increasingStyle="fill"
-            app:layout_constraintBottom_toTopOf="@+id/depth_chart"
+            app:indexTextMarginX="10dp"
+            app:indexTextMarginY="3dp"
+            app:indexTextSize="10sp"
+            app:labelSize="10sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_weight="2"
             app:lineWidth="1dp"
-            app:markerBorderLRPadding="10dp"
-            app:markerBorderRadius="2dp"
-            app:markerBorderTBPadding="3dp"
+            app:markerLRPadding="5dp"
+            app:markerPointJointMargin="1dp"
+            app:markerPointJointRadius="2dp"
+            app:markerPointLineDefaultLength="4dp"
+            app:markerPointLineWidth="0.5dp"
+            app:markerPointMinMargin="1dp"
+            app:markerPointTextMarginX="4dp"
+            app:markerPointTextMarginY="3dp"
+            app:markerPointTextSize="9sp"
+            app:markerRadius="2dp"
             app:markerStyle="fill_and_stroke"
-            app:markerTextSize="7sp"
+            app:markerTBPadding="2dp"
+            app:markerTextSize="11sp"
+            app:pointBorderWidth="1.5dp"
+            app:pointSpace="2dp"
+            app:pointWidth="5dp"
             app:renderModel="candle"
-            app:selectorMarginY="19dp"
-            app:viewInterval="10dp"
-            app:xHighlightAutoWidth="true" />
+            app:rightScrollOffset="70dp"
+            app:selectorBorderWidth="0.5dp"
+            app:selectorLabelSize="8sp"
+            app:selectorMarginY="30dp"
+            app:selectorValueSize="8sp"
+            app:spreadCursorBorderWidth="0.7dp"
+            app:spreadCursorTextLRMargin="4dp"
+            app:spreadCursorTextTBMargin="2dp"
+            app:spreadTriangleHeight="3dp"
+            app:spreadTriangleWidth="3dp"
+            app:timeLineWidth="1dp"
+            app:waterMarkingMarginX="24dp"
+            app:waterMarkingMarginY="10dp" />
 
         <ProgressBar
             android:id="@+id/candle_loading_bar"
@@ -229,22 +79,17 @@
             android:id="@+id/depth_chart"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="0.5dp"
-            android:background="#202a33"
+            android:layout_marginTop="10dp"
             app:axisLabelLocation="all"
             app:borderWidth="0dp"
-            app:decreasingStyle="fill"
             app:gridLabelMarginBottom="8dp"
             app:gridLabelMarginTop="8dp"
-            app:gridLineState="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/candle_chart"
             app:layout_constraintVertical_weight="1"
             app:lineWidth="1dp"
-            app:markerBorderLRPadding="10dp"
-            app:markerBorderTBPadding="3dp"
             app:markerStyle="fill_and_stroke"
             app:markerTextSize="7sp"
             app:renderModel="depth"
@@ -260,124 +105,34 @@
             app:layout_constraintTop_toTopOf="@+id/depth_chart" />
     </com.wk.chart.ChartLayout>
 
-    <com.wk.demo.view.XRadioGroup
-        android:id="@+id/folding_menu"
-        android:layout_width="wrap_content"
+    <View
+        android:layout_width="0.5dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:layout_marginBottom="22dp"
-        android:layout_toStartOf="@+id/tab_layout"
-        android:background="@color/chart_background"
-        android:orientation="vertical"
+        android:layout_marginEnd="65dp"
+        android:background="#132a38" />
+
+    <com.wk.view.tab.ChartIndexTabLayout
+        android:id="@+id/chart_index_tab_view"
+        android:layout_width="65dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="#061D2C" />
+
+    <com.wk.view.tab.ChartTabLayout
+        android:id="@+id/chart_tab_view"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_gravity="bottom"
+        android:layout_marginEnd="65dp"
+        android:background="#061D2C"
         android:paddingStart="10dp"
-        android:paddingTop="8dp"
         android:paddingEnd="10dp"
-        android:paddingBottom="8dp"
-        android:visibility="invisible">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:orientation="horizontal"
+        app:tabAlign="top"
+        app:tabType="spot" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <com.wk.demo.view.FontRadioButton
-                android:id="@+id/macd_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/chart_tab_height_size"
-                android:background="@drawable/chart_data_type_bg_selected"
-                android:button="@null"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:minWidth="@dimen/chart_tab_width_size"
-                android:text="@string/wk_macd"
-                android:textColor="@drawable/chart_data_type_text_selected"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <com.wk.demo.view.FontRadioButton
-                android:id="@+id/rsi_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/chart_tab_height_size"
-                android:background="@drawable/chart_data_type_bg_selected"
-                android:button="@null"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:minWidth="@dimen/chart_tab_width_size"
-                android:text="@string/wk_rsi"
-                android:textColor="@drawable/chart_data_type_text_selected"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <com.wk.demo.view.FontRadioButton
-                android:id="@+id/kdj_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/chart_tab_height_size"
-                android:background="@drawable/chart_data_type_bg_selected"
-                android:button="@null"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:minWidth="@dimen/chart_tab_width_size"
-                android:text="@string/wk_kdj"
-                android:textColor="@drawable/chart_data_type_text_selected"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <com.wk.demo.view.FontRadioButton
-                android:id="@+id/boll_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/chart_tab_height_size"
-                android:background="@drawable/chart_data_type_bg_selected"
-                android:button="@null"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:minWidth="@dimen/chart_tab_width_size"
-                android:text="@string/wk_bull"
-                android:textColor="@drawable/chart_data_type_text_selected"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <com.wk.demo.view.FontRadioButton
-                android:id="@+id/wr_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/chart_tab_height_size"
-                android:background="@drawable/chart_data_type_bg_selected"
-                android:button="@null"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:minWidth="@dimen/chart_tab_width_size"
-                android:text="@string/wk_wr"
-                android:textColor="@drawable/chart_data_type_text_selected"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-    </com.wk.demo.view.XRadioGroup>
-</RelativeLayout>
+</FrameLayout>

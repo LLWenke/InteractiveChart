@@ -6,16 +6,15 @@ import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 
-
 import com.wk.chart.adapter.DepthAdapter;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.DepthAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.DepthEntry;
 import com.wk.chart.enumeration.HighLightStyle;
 import com.wk.chart.marker.AbsMarker;
-import com.wk.chart.module.DepthChartModule;
-import com.wk.chart.module.base.AbsChartModule;
+import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.DepthRender;
 
 import java.util.ArrayList;
@@ -25,24 +24,24 @@ import java.util.List;
  * <p>DepthHighlightDrawing</p>
  */
 
-public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsChartModule> {
+public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry>> {
     private static final String TAG = "DepthHighlightDrawing";
     private DepthAttribute attribute;//配置文件
 
-    private Paint bidHighlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG); // 买单高亮线条画笔
-    private Paint askHighlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG); // 卖单高亮线条画笔
-    private Paint bidCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);//买单圆点画笔
-    private Paint askCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);//卖单圆点画笔
-    private Path highlightPath = new Path();
+    private final Paint bidHighlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG); // 买单高亮线条画笔
+    private final Paint askHighlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG); // 卖单高亮线条画笔
+    private final Paint bidCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);//买单圆点画笔
+    private final Paint askCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);//卖单圆点画笔
+    private final Path highlightPath = new Path();
 
-    private float[] highlightPoint = new float[2];//高亮线条x，y
-    private float[] markerViewInfo = new float[4];//markerView的left,top,right,bottom信息
-    private String[] markerText = new String[2];//marker中显示的值
+    private final float[] highlightPoint = new float[2];//高亮线条x，y
+    private final float[] markerViewInfo = new float[4];//markerView的left,top,right,bottom信息
+    private final String[] markerText = new String[2];//marker中显示的值
 
-    private List<AbsMarker> markerViewList = new ArrayList<>();
+    private final List<AbsMarker> markerViewList = new ArrayList<>();
 
     @Override
-    public void onInit(DepthRender render, AbsChartModule chartModule) {
+    public void onInit(DepthRender render, AbsModule<AbsEntry> chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
 
@@ -70,15 +69,20 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsChartModul
             askHighlightPaint.setPathEffect(dashPathEffect);
         }
 
-        if (markerViewList.size() > 0) {
-            for (AbsMarker markerView : markerViewList) {
-                markerView.onInit(render);
-                setMargin(Math.max(getMargin()[0], markerView.getMargin()[0]),
-                        Math.max(getMargin()[1], markerView.getMargin()[1]),
-                        Math.max(getMargin()[2], markerView.getMargin()[2]),
-                        Math.max(getMargin()[3], markerView.getMargin()[3]));
-            }
+        for (AbsMarker markerView : markerViewList) {
+            markerView.onInit(render);
         }
+    }
+
+    @Override
+    public float[] onInitMargin() {
+        for (AbsMarker markerView : markerViewList) {
+            margin[0] = Math.max(margin[0], markerView.getMargin()[0]);
+            margin[1] = Math.max(margin[1], markerView.getMargin()[1]);
+            margin[2] = Math.max(margin[2], markerView.getMargin()[2]);
+            margin[3] = Math.max(margin[3], markerView.getMargin()[3]);
+        }
+        return margin;
     }
 
     @Override
@@ -105,7 +109,7 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsChartModul
         Paint highlightPaint;//高亮线画笔
         DepthEntry entry = render.getAdapter().getItem(render.getAdapter().getHighlightIndex());
         //获取当前焦点区域内的chartModule
-        AbsChartModule chartModule = render.getChartModuleInFocusArea();
+        AbsModule chartModule = render.getModuleInFocusArea();
         if (null == chartModule) {
             return;
         }
@@ -139,7 +143,7 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsChartModul
             top = chartModule.getRect().top;
             bottom = markerViewInfo[1] > 0 ? markerViewInfo[1] : chartModule.getRect().bottom;
         }
-        float[] highlightPts = render.getMeasureUtils().buildViewLRCoordinates(highlightPoint[0],
+        float[] highlightPts = render.buildViewLRCoordinates(highlightPoint[0],
                 highlightPoint[0], top, bottom, chartModule.getRect());
 
         for (int i = 3; i < highlightPts.length; i += 4) {
@@ -158,7 +162,6 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsChartModul
 
     @Override
     public void onViewChange() {
-
     }
 
     public void addMarkerView(AbsMarker markerView) {

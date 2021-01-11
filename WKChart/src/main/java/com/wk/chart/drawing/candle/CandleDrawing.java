@@ -4,47 +4,37 @@ package com.wk.chart.drawing.candle;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.util.Log;
 
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.CandleEntry;
-import com.wk.chart.module.CandleChartModule;
+import com.wk.chart.module.CandleModule;
 import com.wk.chart.render.CandleRender;
 
 
 /**
  * <p>CandleDrawing</p>
  */
-
-public class CandleDrawing extends AbsDrawing<CandleRender, CandleChartModule> {
+public class CandleDrawing extends AbsDrawing<CandleRender, CandleModule> {
     private static final String TAG = "CandleDrawing";
     private CandleAttribute attribute;//配置文件
-    // 蜡烛图边框线画笔
-    private Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     // 上涨画笔
-    private Paint increasingPaint = new Paint();
+    private final Paint increasingPaint = new Paint();
     // 下跌画笔
-    private Paint decreasingPaint = new Paint();
+    private final Paint decreasingPaint = new Paint();
     // 上涨路径
-    private Path increasingPath = new Path();
+    private final Path increasingPath = new Path();
     // 下跌路径
-    private Path decreasingPath = new Path();
-    //边框线坐标点[x0, y0, x1, y1]
-    private float[] borderPts;
-    private float borderOffset;//边框偏移量
+    private final Path decreasingPath = new Path();
+    private float pointBorderOffset;//边框偏移量
     private boolean highlightState = true;//高亮状态
     // 蜡烛图绘制的实际收首尾X轴坐标点（从首尾两根蜡烛图的中心点算起）
     private float beginX, endX = 0;
 
     @Override
-    public void onInit(CandleRender render, CandleChartModule chartModule) {
+    public void onInit(CandleRender render, CandleModule chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
-
-        borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setStrokeWidth(attribute.borderWidth);
-        borderPaint.setColor(attribute.borderColor);
 
         increasingPaint.setStyle(attribute.increasingStyle);
         increasingPaint.setStrokeWidth(attribute.pointBorderWidth);
@@ -54,7 +44,7 @@ public class CandleDrawing extends AbsDrawing<CandleRender, CandleChartModule> {
         decreasingPaint.setStrokeWidth(attribute.pointBorderWidth);
         decreasingPaint.setColor(attribute.decreasingColor);
 
-        borderOffset = attribute.pointBorderWidth / 2f;
+        pointBorderOffset = attribute.pointBorderWidth / 2f;
     }
 
     @Override
@@ -81,15 +71,15 @@ public class CandleDrawing extends AbsDrawing<CandleRender, CandleChartModule> {
         float[] rectBuffer = absChartModule.getPointRect(render, entry, current);
         //边框偏移量修正
         if (isStroke) {
-            rectBuffer[0] += borderOffset;
-            rectBuffer[2] -= borderOffset;
-            rectBuffer[5] += borderOffset;
-            rectBuffer[7] -= borderOffset;
+            rectBuffer[0] += pointBorderOffset;
+            rectBuffer[2] -= pointBorderOffset;
+            rectBuffer[5] += pointBorderOffset;
+            rectBuffer[7] -= pointBorderOffset;
         }
         // 涨停、跌停、或不涨不跌的一字板
         if (rectBuffer[7] - rectBuffer[5] < attribute.pointBorderWidth) {
-            rectBuffer[5] -= borderOffset;
-            rectBuffer[7] += borderOffset;
+            rectBuffer[5] -= pointBorderOffset;
+            rectBuffer[7] += pointBorderOffset;
         }
         //计算中心线
         float centerLine = rectBuffer[0] + (rectBuffer[2] - rectBuffer[0]) / 2f;
@@ -99,15 +89,15 @@ public class CandleDrawing extends AbsDrawing<CandleRender, CandleChartModule> {
             path.moveTo(centerLine, rectBuffer[1]);
             path.lineTo(centerLine, rectBuffer[5]);
             //下影线路径
-            path.moveTo(centerLine, rectBuffer[7]);
-            path.lineTo(centerLine, rectBuffer[3]);
+            path.moveTo(centerLine, rectBuffer[3]);
+            path.lineTo(centerLine, rectBuffer[7]);
         } else {
-            float lineLeft = centerLine - borderOffset;
-            float lineRight = centerLine + borderOffset;
+            float lineLeft = centerLine - pointBorderOffset;
+            float lineRight = centerLine + pointBorderOffset;
             //上影线路径
-            path.addRect(lineLeft, rectBuffer[1], lineRight, rectBuffer[5], Path.Direction.CW);
+            path.addRect(lineLeft, rectBuffer[5], lineRight, rectBuffer[1], Path.Direction.CW);
             //下影线路径
-            path.addRect(lineLeft, rectBuffer[7], lineRight, rectBuffer[3], Path.Direction.CW);
+            path.addRect(lineLeft, rectBuffer[3], lineRight, rectBuffer[7], Path.Direction.CW);
         }
         //添加矩形路径
         path.addRect(rectBuffer[0], rectBuffer[5], rectBuffer[2], rectBuffer[7], Path.Direction.CW);
@@ -145,14 +135,9 @@ public class CandleDrawing extends AbsDrawing<CandleRender, CandleChartModule> {
 
     @Override
     public void drawOver(Canvas canvas) {
-        // 绘制外层边框线
-        if (attribute.borderWidth > 0) {
-            canvas.drawRect(borderPts[0], borderPts[1], borderPts[2], borderPts[3], borderPaint);
-        }
     }
 
     @Override
     public void onViewChange() {
-        borderPts = render.getBorderPoints(viewRect);
     }
 }

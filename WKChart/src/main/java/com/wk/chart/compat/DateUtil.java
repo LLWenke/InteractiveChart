@@ -1,5 +1,7 @@
 package com.wk.chart.compat;
 
+import android.annotation.SuppressLint;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -11,6 +13,7 @@ public class DateUtil {
   /**
    * 常用变量
    */
+  @SuppressLint("SimpleDateFormat")
   private static final SimpleDateFormat format = new SimpleDateFormat();
   public static final String DATE_FORMAT_YMD = "yyyy-MM-dd";
   public static final String DATE_FORMAT_YMDHM = "yyyy-MM-dd HH:mm";

@@ -7,17 +7,19 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.wk.chart.adapter.AbsAdapter;
+import com.wk.chart.adapter.CandleAdapter;
 import com.wk.chart.compat.ChartConstraintSet;
 import com.wk.chart.drawing.AxisDrawing;
-import com.wk.chart.drawing.AxisExtremumDrawing;
+import com.wk.chart.drawing.AxisTagDrawing;
+import com.wk.chart.drawing.BorderDrawing;
 import com.wk.chart.drawing.BreathingLampDrawing;
 import com.wk.chart.drawing.CursorDrawing;
-import com.wk.chart.drawing.EmptyDataDrawing;
 import com.wk.chart.drawing.ExtremumTagDrawing;
 import com.wk.chart.drawing.GridDrawing;
 import com.wk.chart.drawing.HighlightDrawing;
-import com.wk.chart.drawing.IndicatorLabelDrawing;
-import com.wk.chart.drawing.IndicatorLineDrawing;
+import com.wk.chart.drawing.IndexLabelDrawing;
+import com.wk.chart.drawing.IndexLineDrawing;
 import com.wk.chart.drawing.MACDDrawing;
 import com.wk.chart.drawing.MarkerPointDrawing;
 import com.wk.chart.drawing.VolumeDrawing;
@@ -30,41 +32,36 @@ import com.wk.chart.drawing.depth.DepthHighlightDrawing;
 import com.wk.chart.drawing.depth.DepthSelectorDrawing;
 import com.wk.chart.drawing.timeLine.TimeLineDrawing;
 import com.wk.chart.entry.AbsEntry;
-import com.wk.chart.entry.ChartEntry;
+import com.wk.chart.entry.ChartCache;
+import com.wk.chart.enumeration.BorderStyle;
 import com.wk.chart.enumeration.DataType;
+import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.enumeration.ModuleGroupType;
 import com.wk.chart.enumeration.ModuleType;
 import com.wk.chart.enumeration.RenderModel;
+import com.wk.chart.interfaces.ICacheLoadListener;
 import com.wk.chart.marker.AxisTextMarker;
 import com.wk.chart.marker.GridTextMarker;
-import com.wk.chart.module.BOLLChartModule;
-import com.wk.chart.module.CandleChartModule;
-import com.wk.chart.module.DepthChartModule;
-import com.wk.chart.module.KDJChartModule;
-import com.wk.chart.module.MACDChartModule;
-import com.wk.chart.module.RSIChartModule;
-import com.wk.chart.module.TimeLineChartModule;
-import com.wk.chart.module.VolumeChartModule;
-import com.wk.chart.module.WRChartModule;
-import com.wk.chart.module.base.AbsChartModule;
-import com.wk.chart.module.base.AuxiliaryChartModule;
-import com.wk.chart.module.base.MainChartModule;
+import com.wk.chart.module.CandleIndexModule;
+import com.wk.chart.module.CandleModule;
+import com.wk.chart.module.DepthModule;
+import com.wk.chart.module.FloatModule;
+import com.wk.chart.module.TimeLineModule;
+import com.wk.chart.module.VolumeModule;
+import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 import java.util.Map;
 
 public class ChartLayout extends ConstraintLayout {
     private static final String TAG = "ChartLayout";
-    private ChartEntry chartEntry;
-
-    private LinkedHashMap<ModuleType, AbsChartModule<? extends AbsEntry>> ChartModules;
-
-    private List<ModuleType> enableModuleTypes;
-
     private DataType dataDisplayType;
+    private AbsRender<?, ?> candleRender;
+    private ChartView candleChartView;
+    private ICacheLoadListener iCacheLoadListener;
 
     public ChartLayout(Context context) {
         this(context, null);
@@ -81,86 +78,62 @@ public class ChartLayout extends ConstraintLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        init();
-        initChartModules();
         initChart();
-    }
-
-    /**
-     * 初始化
-     */
-    private void init() {
-        this.chartEntry = new ChartEntry();
-        this.ChartModules = new LinkedHashMap<>();
-        this.enableModuleTypes = new ArrayList<>();
     }
 
     /**
      * 构建图表组件
      */
-    private void initChartModules() {
-        this.ChartModules.clear();
-        CandleChartModule candleModule = new CandleChartModule();
+    private void initChartModules(AbsRender render) {
+        render.resetChartModules();
+        CandleModule candleModule = new CandleModule(IndexType.CANDLE_MA);
         candleModule.addDrawing(new WaterMarkingDrawing());//水印组件
         candleModule.addDrawing(new CandleDrawing());//蜡烛图组件
-        candleModule.addDrawing(new IndicatorLineDrawing());//平均线组件
-        candleModule.addDrawing(new AxisDrawing());//x轴组件
-//        candleModule.addDrawing(new GridDrawing());//Y轴组件
-        candleModule.addDrawing(new IndicatorLabelDrawing());//指标文字标签组件
+        candleModule.addDrawing(new IndexLineDrawing());//平均线组件
+        candleModule.addDrawing(new AxisDrawing(5));//x轴组件
+        candleModule.addDrawing(new IndexLabelDrawing());//指标文字标签组件
         candleModule.addDrawing(new MarkerPointDrawing());//标记点绘制组件
         candleModule.addDrawing(new ExtremumTagDrawing());//极值标签组件
-        candleModule.addDrawing(new AxisExtremumDrawing());//x轴极值组件
-//        candleModule.addDrawing(new EmptyDataDrawing());//空页面组件
-        this.ChartModules.put(candleModule.getModuleType(), candleModule);
+        candleModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
+        candleModule.setEnable(true);
+        render.addModule(candleModule);
 
-        TimeLineChartModule timeLineModule = new TimeLineChartModule();
+        TimeLineModule timeLineModule = new TimeLineModule();
         timeLineModule.addDrawing(new WaterMarkingDrawing());//水印组件
-        timeLineModule.addDrawing(new AxisDrawing());//x轴组件
-        timeLineModule.addDrawing(new GridDrawing());//Y轴组件
+        timeLineModule.addDrawing(new AxisDrawing(5));//x轴组件
         timeLineModule.addDrawing(new TimeLineDrawing());//分时图组件
         timeLineModule.addDrawing(new MarkerPointDrawing());//标记点绘制组件
-        timeLineModule.addDrawing(new AxisExtremumDrawing());//x轴极值组件
-        timeLineModule.addDrawing(new IndicatorLabelDrawing());//指标文字标签组件
+        timeLineModule.addDrawing(new IndexLabelDrawing());//指标文字标签组件
         timeLineModule.addDrawing(new BreathingLampDrawing());//呼吸灯组件
-        this.ChartModules.put(timeLineModule.getModuleType(), timeLineModule);
+        timeLineModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
+        render.addModule(timeLineModule);
 
-        VolumeChartModule volumeModule = new VolumeChartModule();
+        VolumeModule volumeModule = new VolumeModule();
         volumeModule.addDrawing(new VolumeDrawing());
-        volumeModule.addDrawing(new IndicatorLineDrawing());
-        volumeModule.addDrawing(new IndicatorLabelDrawing());
-        volumeModule.addDrawing(new AxisExtremumDrawing());
-        volumeModule.setSeparateState(true);
-        this.ChartModules.put(volumeModule.getModuleType(), volumeModule);
+        volumeModule.addDrawing(new IndexLineDrawing());
+        volumeModule.addDrawing(new IndexLabelDrawing());
+        volumeModule.addDrawing(new AxisTagDrawing());
+        volumeModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
+        volumeModule.setEnable(true);
+        render.addModule(volumeModule);
 
-        MACDChartModule macdModule = new MACDChartModule();
-        macdModule.addDrawing(new MACDDrawing());
-        macdModule.addDrawing(new AxisExtremumDrawing());
-        macdModule.addDrawing(new IndicatorLabelDrawing());//指标文字标签组件
-        this.ChartModules.put(macdModule.getModuleType(), macdModule);
+        CandleIndexModule indexModule = new CandleIndexModule(IndexType.NONE);
+        indexModule.addDrawing(new MACDDrawing());//macd指标组件
+        indexModule.addDrawing(new IndexLineDrawing());//指标线组件
+        indexModule.addDrawing(new IndexLabelDrawing());//指标文字标签组件
+        indexModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
+        indexModule.setEnable(true);
+        render.addModule(indexModule);
 
-        RSIChartModule rsiModule = new RSIChartModule();
-        rsiModule.addDrawing(new IndicatorLineDrawing());
-        rsiModule.addDrawing(new AxisExtremumDrawing());
-        rsiModule.addDrawing(new IndicatorLabelDrawing());//指标文字标签组件
-        this.ChartModules.put(rsiModule.getModuleType(), rsiModule);
-
-        KDJChartModule kdjModule = new KDJChartModule();
-        kdjModule.addDrawing(new IndicatorLineDrawing());
-        kdjModule.addDrawing(new AxisExtremumDrawing());
-        kdjModule.addDrawing(new IndicatorLabelDrawing());//指标文字标签组件
-        this.ChartModules.put(kdjModule.getModuleType(), kdjModule);
-
-        BOLLChartModule bollModule = new BOLLChartModule();
-        bollModule.addDrawing(new IndicatorLineDrawing());
-        bollModule.addDrawing(new AxisExtremumDrawing());
-        bollModule.addDrawing(new IndicatorLabelDrawing());//指标文字标签组件
-        this.ChartModules.put(bollModule.getModuleType(), bollModule);
-
-        WRChartModule wrModule = new WRChartModule();
-        wrModule.addDrawing(new IndicatorLineDrawing());
-        wrModule.addDrawing(new AxisExtremumDrawing());
-        wrModule.addDrawing(new IndicatorLabelDrawing());//指标文字标签组件
-        this.ChartModules.put(wrModule.getModuleType(), wrModule);
+        FloatModule floatModule = new FloatModule();
+        HighlightDrawing candleHighlight = new HighlightDrawing();
+        candleHighlight.addMarkerView(new AxisTextMarker());
+        candleHighlight.addMarkerView(new GridTextMarker());
+        floatModule.addDrawing(new GridDrawing());//Y轴组件
+        floatModule.addDrawing(candleHighlight);
+        floatModule.addDrawing(new CandleSelectorDrawing());
+        floatModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
+        render.addModule(floatModule);
     }
 
     /**
@@ -172,102 +145,163 @@ public class ChartLayout extends ConstraintLayout {
             if (!(view instanceof ChartView)) {
                 continue;
             }
-            ChartView chart = (ChartView) view;
-            AbsRender reader = chart.getRender();
-            switch (chart.getRenderModel()) {
+            ChartView chartView = (ChartView) view;
+            AbsRender<?, ?> render = chartView.getRender();
+            switch (chartView.getRenderModel()) {
                 case CANDLE://蜡烛图
-                    HighlightDrawing candleHighlight = new HighlightDrawing();
-                    candleHighlight.addMarkerView(new AxisTextMarker());
-                    candleHighlight.addMarkerView(new GridTextMarker());
-                    reader.addFloatDrawing(candleHighlight);
-                    reader.addFloatDrawing(new GridDrawing());
-                    reader.addFloatDrawing(new CandleSelectorDrawing());
-                    for (Map.Entry<ModuleType, AbsChartModule<? extends AbsEntry>> item : ChartModules.entrySet()) {
-                        reader.addChartModule(item.getValue());
-                    }
+                    this.candleChartView = chartView;
+                    this.candleRender = render;
+                    initChartModules(render);
                     break;
                 case DEPTH://深度图
-                    DepthChartModule depthChartModule = new DepthChartModule();
-                    depthChartModule.addDrawing(new AxisDrawing());//x轴组件
-                    depthChartModule.addDrawing(new DepthGridDrawing());//Y轴组件
-                    depthChartModule.addDrawing(new DepthDrawing());//深度图组件
+                    DepthModule depthModule = new DepthModule();
+                    depthModule.addDrawing(new AxisDrawing(4));//x轴组件
+                    depthModule.addDrawing(new DepthGridDrawing());//Y轴组件
+                    depthModule.addDrawing(new DepthDrawing());//深度图组件
+                    FloatModule floatModule = new FloatModule();
                     DepthHighlightDrawing depthHighlight = new DepthHighlightDrawing();
                     depthHighlight.addMarkerView(new AxisTextMarker());
                     depthHighlight.addMarkerView(new GridTextMarker());
-                    reader.addChartModule(depthChartModule);
-                    reader.addFloatDrawing(depthHighlight);
-                    reader.addFloatDrawing(new DepthSelectorDrawing());
-                    chart.setEnableRightRefresh(false);
-                    chart.setEnableLeftRefresh(false);
-                    depthChartModule.setEnable(true);
+                    floatModule.addDrawing(depthHighlight);
+                    floatModule.addDrawing(new DepthSelectorDrawing());
+                    render.addModule(depthModule);
+                    render.addModule(floatModule);
+                    chartView.setEnableRightRefresh(false);
+                    chartView.setEnableLeftRefresh(false);
                     break;
             }
-            this.chartEntry.setChart(chart);
         }
     }
 
     /**
-     * 切换图表组件显示状态
+     * 切换图表组件
      *
-     * @param moduleTypes 类型
+     * @param moduleType      模型类型
+     * @param moduleGroupType 模型分组
      */
-    public int switchModuleType(ModuleType... moduleTypes) {
-        int changeCount = 0;
-        for (ModuleType moduleType : moduleTypes) {
-            if (!ChartModules.containsKey(moduleType)) {
-                continue;
-            }
-            AbsChartModule chartModule = ChartModules.get(moduleType);
-            if (null == chartModule || chartModule.isEnable()) {
-                continue;
-            }
-            this.enableModuleTypes.clear();
-            chartModule.setEnable(true);
-            Class classType = chartModule instanceof MainChartModule ?
-                    MainChartModule.class : AuxiliaryChartModule.class;
-            for (Map.Entry<ModuleType, AbsChartModule<? extends AbsEntry>> item : ChartModules.entrySet()) {
-                if (item.getValue() instanceof AuxiliaryChartModule && ((AuxiliaryChartModule) item.getValue()).isSeparateState()) {
-                    continue;
+    public boolean switchModuleType(@ModuleType int moduleType, @ModuleGroupType int moduleGroupType) {
+        if (null == candleRender) {
+            return false;
+        }
+        List<AbsModule<AbsEntry>> modules = candleRender.getModules().get(moduleGroupType);
+        if (null == modules || modules.isEmpty()) {
+            return false;
+        }
+        boolean state = false;
+        for (AbsModule<AbsEntry> item : modules) {
+            if (moduleType == item.getModuleType()) {
+                if (item.isEnable()) {
+                    state = false;
+                } else {
+                    item.setEnable(true);
+                    state = true;
                 }
-                if (item.getValue().isEnable() && classType.isInstance(item.getValue()) && item.getKey() != moduleType) {
-                    item.getValue().setEnable(false);
-                    changeCount++;
-                } else if (item.getValue().isEnable()) {
-                    //记录当前启用的图表组件
-                    this.enableModuleTypes.add(item.getKey());
-                    changeCount++;
-                }
+            } else {
+                item.setEnable(false);
             }
         }
-        return changeCount;
+        return state;
     }
 
     /**
-     * 获取当前启用的图表组件
+     * 切换图表指标
      *
-     * @return List<ModuleType> 当前启用的图表组件类型集合
+     * @param indexType       指标类型
+     * @param moduleGroupType 模型分组
      */
-    public List<ModuleType> getEnableModuleTypes() {
-        return enableModuleTypes;
+    public boolean switchIndexType(@IndexType int indexType, @ModuleGroupType int moduleGroupType) {
+        if (null == candleRender) {
+            return false;
+        }
+        List<AbsModule<AbsEntry>> modules = candleRender.getModules().get(moduleGroupType);
+        if (null == modules || modules.isEmpty()) {
+            return false;
+        }
+        for (AbsModule<AbsEntry> item : modules) {
+            if (item.isEnable()) {
+                if (item.getAttachIndexType() == indexType) {
+                    return false;
+                }
+                item.setAttachIndexType(indexType);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public @IndexType
+    int getNowIndexType(@ModuleGroupType int moduleGroupType) {
+        List<AbsModule<AbsEntry>> modules = candleRender.getModules().get(moduleGroupType);
+        if (null == modules || modules.isEmpty()) {
+            return IndexType.NONE;
+        }
+        for (AbsModule<AbsEntry> item : modules) {
+            if (item.isEnable()) {
+                return item.getAttachIndexType();
+            }
+        }
+        return IndexType.NONE;
     }
 
     /**
-     * 根据RenderModel获取对应图表中的ModuleType
+     * 缓存图表信息
      *
-     * @return ModuleType
+     * @return 缓存信息
      */
     public @Nullable
-    ModuleType getMainModuleType(RenderModel renderModel) {
-        for (int i = 0, z = getChildCount(); i < z; i++) {
-            View view = getChildAt(i);
-            if (view instanceof ChartView) {
-                ChartView chart = (ChartView) view;
-                if (chart.getRenderModel() == renderModel) {
-                    return chart.getRender().getMainChartModule().getModuleType();
+    ChartCache chartCache() {
+        if (null == candleRender) {
+            return null;
+        }
+        ChartCache chartCache = new ChartCache();
+        chartCache.scale = candleRender.getAttribute().currentScale;
+        chartCache.beginPosition = candleRender.getBegin();
+        AbsAdapter adapter = candleRender.getAdapter();
+        if (adapter instanceof CandleAdapter) {
+            chartCache.timeType = ((CandleAdapter) adapter).getTimeType();
+        }
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : candleRender.getModules().entrySet()) {
+            for (AbsModule<AbsEntry> module : item.getValue()) {
+                if (module.isEnable()) {
+                    chartCache.types.add(new ChartCache.TypeEntry(module.getModuleType(),
+                            module.getModuleGroup(), module.getAttachIndexType()));
+                    break;
                 }
             }
         }
-        return null;
+        return chartCache;
+    }
+
+    /**
+     * 加载图表缓存信息
+     */
+    public void loadChartCache(@NotNull final ChartCache chartCache) {
+        if (null == candleRender || null == candleChartView) {
+            return;
+        }
+        boolean isLoadData = false, isViewChanged = false;
+        candleRender.getAttribute().currentScale = chartCache.scale;
+        AbsAdapter adapter = candleRender.getAdapter();
+        if (adapter instanceof CandleAdapter) {
+            CandleAdapter candleAdapter = (CandleAdapter) adapter;
+            isLoadData = candleAdapter.resetTimeType(chartCache.timeType);
+        }
+        for (ChartCache.TypeEntry entry : chartCache.types) {
+            if (switchModuleType(entry.getModuleType(), entry.getModuleGroupType()) ||
+                    switchIndexType(entry.getIndexType(), entry.getModuleGroupType())) {
+                isViewChanged = true;
+            }
+        }
+        if (isViewChanged) {
+            this.candleChartView.onViewInit();
+        }
+        this.candleChartView.post(() -> {
+            candleChartView.onDataReset();
+            candleRender.toTransX(chartCache.beginPosition);
+        });
+        if (null != iCacheLoadListener) {
+            this.iCacheLoadListener.onLoadCacheTypes(chartCache.timeType, isLoadData, chartCache.types);
+        }
     }
 
     /**
@@ -283,20 +317,20 @@ public class ChartLayout extends ConstraintLayout {
             if (view instanceof ChartView) {
                 ChartView chart = (ChartView) view;
                 if (chart.getRenderModel() == RenderModel.CANDLE) {
-                    AbsRender reader = chart.getRender();
+                    AbsRender<?, ?> reader = chart.getRender();
                     if (type == DataType.REAL_TIME) {
                         chart.setEnableRightRefresh(false);//禁用右滑
                         //添加右固定偏移量
                         if (reader.getAttribute().rightScrollOffset == 0) {
                             reader.getAttribute().rightScrollOffset = 250;
                         }
-                        chart.getRender().getChartModule(ModuleType.CANDLE).addDrawing(new CursorDrawing());
-                        chart.getRender().getChartModule(ModuleType.TIME).addDrawing(new CursorDrawing());
+                        chart.getRender().getModule(ModuleType.CANDLE, ModuleGroupType.MAIN).addDrawing(new CursorDrawing());
+                        chart.getRender().getModule(ModuleType.TIME, ModuleGroupType.MAIN).addDrawing(new CursorDrawing());
                     } else {
                         chart.setEnableRightRefresh(true);//启用右滑
                         reader.getAttribute().rightScrollOffset = 0;  //消除右固定偏移量
-                        chart.getRender().getChartModule(ModuleType.CANDLE).removeDrawing(CursorDrawing.class);
-                        chart.getRender().getChartModule(ModuleType.TIME).removeDrawing(CursorDrawing.class);
+                        chart.getRender().getModule(ModuleType.CANDLE, ModuleGroupType.MAIN).removeDrawing(CursorDrawing.class);
+                        chart.getRender().getModule(ModuleType.TIME, ModuleGroupType.MAIN).removeDrawing(CursorDrawing.class);
                     }
                     break;
                 }
@@ -304,36 +338,11 @@ public class ChartLayout extends ConstraintLayout {
         }
     }
 
-    /**
-     * 根据参数中的Module 获取列表中下一个同级别的Module
-     *
-     * @param absChartModule 当前Module
-     * @return 下一个同级别的Module
-     */
-    public @Nullable
-    AbsChartModule getNextChartModule(AbsChartModule absChartModule) {
-        Class classType = absChartModule instanceof MainChartModule ?
-                MainChartModule.class : AuxiliaryChartModule.class;
-        Iterator<Map.Entry<ModuleType, AbsChartModule<? extends AbsEntry>>> iterator = ChartModules.entrySet().iterator();
-        AbsChartModule first = null;
-        boolean isFindNext = false;
-        while (iterator.hasNext()) {
-            Map.Entry<ModuleType, AbsChartModule<? extends AbsEntry>> item = iterator.next();
-            if (null == first && classType.isInstance(item.getValue())) {
-                first = item.getValue();
-            }
-            if (item.getValue().getModuleType() == absChartModule.getModuleType()) {
-                isFindNext = true;
-                continue;
-            }
-            if (isFindNext && classType.isInstance(item.getValue())) {
-                return item.getValue();
-            }
-        }
-        return first;
-    }
-
     public void setConstraintSet(ChartConstraintSet set) {
         set.applyTo(this);
+    }
+
+    public void setICacheLoadListener(ICacheLoadListener iCacheLoadListener) {
+        this.iCacheLoadListener = iCacheLoadListener;
     }
 }

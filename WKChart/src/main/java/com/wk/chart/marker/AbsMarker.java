@@ -5,6 +5,7 @@ package com.wk.chart.marker;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.RectF;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Size;
 
@@ -16,7 +17,7 @@ import com.wk.chart.render.AbsRender;
  * <p>AbsMarker</p>
  */
 
-public abstract class AbsMarker<T extends AbsRender> {
+public abstract class AbsMarker<T extends AbsRender<?, ?>> {
     public boolean isInit = false;
     protected BaseAttribute attribute;
     protected T render;

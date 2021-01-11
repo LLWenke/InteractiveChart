@@ -1,10 +1,10 @@
 package com.wk.chart.adapter;
 
+import androidx.annotation.NonNull;
+
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.config.NormalBuildConfig;
-import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.DepthEntry;
-import com.wk.chart.module.base.AbsChartModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,8 @@ public class DepthAdapter extends AbsAdapter<DepthEntry, NormalBuildConfig> {
     }
 
     @Override
-    void buildData(NormalBuildConfig buildConfig, List<DepthEntry> data) {
+    void buildData(@NonNull NormalBuildConfig buildConfig, @NonNull List<DepthEntry> data) {
+        buildConfig.setInit(true);
         calculationData(data);
     }
 
@@ -27,21 +28,7 @@ public class DepthAdapter extends AbsAdapter<DepthEntry, NormalBuildConfig> {
      * 在给定的范围内，计算最大值和最小值
      */
     @Override
-    public void computeMinAndMax(int start, int end,
-                                 List<AbsChartModule<? extends AbsEntry>> chartModules) {
-        for (AbsChartModule item : chartModules) {
-            if (item.isEnable()) {
-                item.resetMinMax();
-            }
-        }
-        for (int i = start; i < end; i++) {
-            DepthEntry entry = getItem(i);
-            for (AbsChartModule item : chartModules) {
-                if (item.isEnable()) {
-                    item.computeMinMax(entry);
-                }
-            }
-        }
+    public void computeMinAndMax(int start, int end) {
     }
 
     /**

@@ -10,7 +10,7 @@ import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.enumeration.DrawingAlign;
-import com.wk.chart.module.base.AbsChartModule;
+import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
 
 /**
@@ -18,16 +18,15 @@ import com.wk.chart.render.AbsRender;
  * <p>WaterMarkingDrawing</p>
  */
 
-public class WaterMarkingDrawing extends AbsDrawing<AbsRender, AbsChartModule> {
+public class WaterMarkingDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
     private BaseAttribute attribute;//配置文件
 
-    private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);//水印画笔
-    private Matrix matrix = new Matrix();//水印矩阵
+    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);//水印画笔
+    private final Matrix matrix = new Matrix();//水印矩阵
     private Bitmap bitmap;//水印图
 
-
     @Override
-    public void onInit(AbsRender render, AbsChartModule chartModule) {
+    public void onInit(AbsRender<?, ?> render, AbsModule<?> chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
         bitmap = Utils.drawableToBitmap(attribute.waterMarkingDrawable);

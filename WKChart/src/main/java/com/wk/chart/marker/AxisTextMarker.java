@@ -18,18 +18,18 @@ import com.wk.chart.render.AbsRender;
  * <p>AxisTextMarker</p>
  */
 
-public class AxisTextMarker extends AbsMarker<AbsRender> {
+public class AxisTextMarker extends AbsMarker<AbsRender<?, ?>> {
     private static final String TAG = "AxisTextMarker";
 
-    private TextPaint markerTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-    private Paint markerBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final TextPaint markerTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint markerBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private final RectF markerInsets = new RectF(0, 0, 0, 0);
     private final Rect textRect = new Rect();
     private float width, height, inset, charsWidth = 0;
 
     @Override
-    public void onInit(AbsRender render) {
+    public void onInit(AbsRender<?, ?> render) {
         super.onInit(render);
         markerTextPaint.setTextAlign(Paint.Align.CENTER);
         markerTextPaint.setColor(attribute.markerTextColor);
@@ -44,8 +44,8 @@ public class AxisTextMarker extends AbsMarker<AbsRender> {
         //用于计算的文字宽度
         charsWidth = markerTextPaint.measureText(chars);
         inset = attribute.markerBorderWidth / 2;
-        width = (attribute.markerBorderLRPadding + attribute.markerBorderWidth) * 2f;
-        height = textRect.height() + (attribute.markerBorderTBPadding + attribute.markerBorderWidth) * 2f;
+        width = (attribute.markerLRPadding + attribute.markerBorderWidth) * 2f;
+        height = textRect.height() + (attribute.markerTBPadding + attribute.markerBorderWidth) * 2f;
     }
 
     @Override
@@ -87,7 +87,7 @@ public class AxisTextMarker extends AbsMarker<AbsRender> {
 
     @Override
     public void onMarkerViewDraw(Canvas canvas, String[] markerText) {
-        canvas.drawRoundRect(markerInsets, attribute.markerBorderRadius, attribute.markerBorderRadius,
+        canvas.drawRoundRect(markerInsets, attribute.markerRadius, attribute.markerRadius,
                 markerBorderPaint);
 
         canvas.drawText(markerText[1],

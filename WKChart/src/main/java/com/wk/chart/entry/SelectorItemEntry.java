@@ -1,4 +1,4 @@
-package com.wkchart.entry;
+package com.wk.chart.entry;
 
 import android.text.TextPaint;
 

@@ -2,6 +2,7 @@
 
 package com.wk.chart.render;
 
+import android.annotation.SuppressLint;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.RectF;
@@ -9,31 +10,34 @@ import android.graphics.RectF;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-
 import com.wk.chart.adapter.AbsAdapter;
 import com.wk.chart.compat.MeasureUtils;
 import com.wk.chart.compat.ValueUtils;
 import com.wk.chart.compat.attribute.BaseAttribute;
+import com.wk.chart.compat.config.AbsBuildConfig;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
+import com.wk.chart.enumeration.ModuleGroupType;
 import com.wk.chart.enumeration.ModuleType;
-import com.wk.chart.module.FloatChartModule;
-import com.wk.chart.module.base.AbsChartModule;
-import com.wk.chart.module.base.MainChartModule;
+import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.module.base.MainModule;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>AbsRender</p>
  */
 
-public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
+public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? extends AbsBuildConfig>, A extends BaseAttribute> {
     private static final String TAG = "AbsRender";
     private final MeasureUtils measureUtils;//计算工具类
-    private final FloatChartModule floatChartModule;//跨视图组件
-    private final List<AbsChartModule<? extends AbsEntry>> chartModules = new ArrayList<>(); //图表指标列表
+    private final LinkedHashMap<Integer, List<AbsModule<AbsEntry>>> chartModules; //图表指标列表
     private final Matrix matrixValue = new Matrix(); // 把值映射到屏幕像素的矩阵
     private final Matrix matrixTouch = new Matrix(); // 缩放和平移矩阵
     private final Matrix matrixOffset = new Matrix(); // 偏移矩阵
@@ -43,14 +47,15 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
     private final float[] touchValues = new float[9]; // 存储缩放和平移信息
     private final float[] extremum = new float[4];//极值[x0, y0, x1, y1]
     private final float[] highlightPoint = new float[2];//长按位置
-
+    private float[] oldViewTBCoordinates;//用来储存每个已经启用的View的坐标[x0 y0 x1 y1 x2 y2 ...](old)
+    private float[] newViewTBCoordinates;//用来储存每个已经启用的View的坐标[x0 y0 x1 y1 x2 y2 ...](new)
     protected final RectF viewRect; // 整个的视图区域
     protected final A attribute; // 配置信息
     protected T adapter; // 数据适配器
-    private MainChartModule mainChartModule;//主图
-    private AbsChartModule bottomChartModule;//最底部的图表模型
-    private AbsChartModule focusAreaChartModule = null;//焦点区域的ChartModule
-
+    private MainModule<AbsEntry> mainModule;//主图
+    private AbsModule<AbsEntry> topModule;//最顶部的图表模型
+    private AbsModule<AbsEntry> bottomModule;//最底部的图表模型
+    private AbsModule<AbsEntry> focusAreaModule = null;//焦点区域的ChartModule
     private boolean highlight = false;//长按事件状态
     private boolean firstLoad = true;//首次加载
     private float borderCorrection;//边框修正数值
@@ -67,7 +72,8 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
         this.attribute = attribute;
         this.viewRect = viewRect;
         this.measureUtils = new MeasureUtils(this);
-        this.floatChartModule = new FloatChartModule(viewRect);
+        this.chartModules = new LinkedHashMap<>();
+        resetChartModules();
         init();
     }
 
@@ -99,7 +105,7 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
                 attribute.currentScale = minScale;
                 attribute.minScale = minScale;
             }
-            attribute.visibleCount = getMainChartModule().getRect().width() / pointsWidth;
+            attribute.visibleCount = getMainModule().getRect().width() / pointsWidth;
         } else {
             pointsMinWidth = pointsWidth = pointsSpace = 0;
         }
@@ -153,21 +159,6 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
     }
 
     /**
-     * 获取计算工具类
-     */
-    public MeasureUtils getMeasureUtils() {
-        return measureUtils;
-    }
-
-    /**
-     * 获取校准后边框坐标点
-     */
-    public @NonNull
-    float[] getBorderPoints(RectF viewRect) {
-        return getBorderPoints(viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
-    }
-
-    /**
      * 获取校准后边框坐标点
      */
     public @NonNull
@@ -181,36 +172,20 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
     }
 
     /**
-     * 设置跨子视图显示的浮动组件
-     */
-    public void addFloatDrawing(AbsDrawing floatDrawing) {
-        this.floatChartModule.addDrawing(floatDrawing);
-    }
-
-    /**
-     * 获取浮动模型
-     *
-     * @return 浮动模型
-     */
-    public FloatChartModule getFloatChartModule() {
-        return floatChartModule;
-    }
-
-    /**
      * 根据位置获取长按区域内的信息
      */
     public void onHighlight(float x, float y) {
         highlight = false;
-        focusAreaChartModule = null;
+        focusAreaModule = null;
         if (adapter.getCount() == 0) {
             return;
         }
         resetChartModuleInFocusArea(x, y);
         //如果存在结果，则对x轴坐标进行修正，使之不超过焦点区域内的ChartModule的left和right
-        if (x < focusAreaChartModule.getRect().left) {
-            x = focusAreaChartModule.getRect().left;
-        } else if (x > focusAreaChartModule.getRect().right) {
-            x = focusAreaChartModule.getRect().right;
+        if (x < focusAreaModule.getRect().left) {
+            x = focusAreaModule.getRect().left;
+        } else if (x > focusAreaModule.getRect().right) {
+            x = focusAreaModule.getRect().right;
         }
         highlightPoint[0] = x;
         highlightPoint[1] = y;
@@ -221,13 +196,15 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
      * 重置当前焦点区域内的chartModule
      */
     public void resetChartModuleInFocusArea(float x, float y) {
-        for (AbsChartModule item : getChartModules()) {
-            if (item.isEnable() && item.getRect().contains(x, y)) {
-                focusAreaChartModule = item;
-                return;
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
+            for (AbsModule<AbsEntry> module : item.getValue()) {
+                if (module.isAttach() && module.getRect().contains(x, y)) {
+                    focusAreaModule = module;
+                    return;
+                }
             }
         }
-        focusAreaChartModule = floatChartModule;
+        focusAreaModule = mainModule;
     }
 
     /**
@@ -303,6 +280,7 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
      * 获取当前滚动量
      */
     public float getCurrentTransX() {
+        matrixTouch.getValues(touchValues);
         return touchValues[Matrix.MTRANS_X];
     }
 
@@ -326,66 +304,74 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
     /**
      * 当ViewRect发生改变时，修改viewRectChange状态，用于重新定位和更新所需参数
      */
-    public int onViewRectChange() {
-        int initCount = 0;
-        initViewRect(viewRect, chartModules);
-        if (isReady()) {
-            measureUtils.initViewCoordinates();
-            resetPointsWidth();
-            correctVisibleCount();
-            resetInterval();
-            resetMatrix();
-            //初始化浮动绘制组件
-            initCount = floatChartModule.initDrawing(this);
-            //初始化绘制组件
-            for (AbsChartModule<? extends AbsEntry> module : chartModules) {
-                if (module.isEnable()) {
-                    initCount += module.initDrawing(this);
-                }
-            }
+    public void onViewInit() {
+        measureModuleSize();
+        layoutModule();
+        initViewCoordinates();
+        if (!isReady()) {
+            return;
         }
-        return initCount;
+        resetPointsWidth();
+        correctVisibleCount();
+        resetInterval();
+        resetMatrix();
+        initDrawing();
     }
 
     /**
-     * 初始化各个组件的绘制区域
+     * 布局组件
      */
-    void initViewRect(RectF viewRect, List<AbsChartModule<? extends AbsEntry>> modules) {
+    void layoutModule() {
         float left = viewRect.left + attribute.borderWidth;
         float top = viewRect.top + attribute.borderWidth;
         float right = viewRect.right - attribute.borderWidth;
-        float bottom = 0;
-        for (AbsChartModule module : modules) {
-            if (!module.isEnable()) {
-                continue;
+        float bottom = viewRect.bottom - attribute.borderWidth;
+        float marginTop = 0;
+        final List<AbsModule<AbsEntry>> floatModules = chartModules.get(ModuleGroupType.FLOAT);
+        if (null != floatModules) {
+            for (AbsModule<AbsEntry> module : floatModules) {
+                module.setRect(left, top, right, bottom);
+                marginTop = Math.max(marginTop, module.getMargin()[1]);
             }
-            //更新最底部的图表模型
-            this.bottomChartModule = module;
-            //更新主图模型
-            if (module instanceof MainChartModule) {
-                this.mainChartModule = (MainChartModule) module;
-            }
-//            Log.e(TAG, "getViewHeight" + module.getIndicatorType() + "   " + module.getViewHeight());
-            //分配图表大小和位置
-            top += module.getMargin()[1];
-            bottom = top + module.getViewHeight();
-            module.setRect(
-                    left + module.getPaddingLeft(),
-                    top + module.getPaddingTop(),
-                    right - module.getPaddingRight(),
-                    bottom - module.getPaddingBottom());
-            top = bottom + attribute.viewInterval + module.getMargin()[3] + attribute.borderWidth * 2f;
         }
-        this.floatChartModule.setRect(left, viewRect.top + attribute.borderWidth, right, bottom);
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
+            for (AbsModule<AbsEntry> module : item.getValue()) {
+                if (!module.isAttach() || module.getModuleGroup() == ModuleGroupType.FLOAT) {
+                    continue;
+                }
+                //更新主图模型
+                if (module.getModuleGroup() == ModuleGroupType.MAIN) {
+                    this.mainModule = (MainModule<AbsEntry>) module;
+                }
+                //更新最顶部的图表模型
+                if (null == topModule) {
+                    this.topModule = module;
+                }
+                //更新最底部的图表模型
+                this.bottomModule = module;
+//            Log.e(TAG, "getViewHeight" + module.getIndicatorType() + "   " + module.getViewHeight());
+                //分配图表大小和位置
+                marginTop = Math.max(module.getMargin()[1], marginTop);
+                top += marginTop;
+                bottom = top + module.getHeight();
+                module.setRect(
+                        left + module.getPaddingLeft(),
+                        top + module.getPaddingTop(),
+                        right - module.getPaddingRight(),
+                        bottom - module.getPaddingBottom());
+                top = bottom + attribute.viewInterval + module.getMargin()[3] + attribute.borderWidth * 2f;
+                marginTop = 0;
+            }
+        }
     }
 
     /**
      * 刷新Matrix
      */
     void resetMatrix() {
-        initMatrixValue(mainChartModule.getRect());
-        postMatrixOffset(mainChartModule.getRect().left, viewRect.top);
-        postMatrixTouch(mainChartModule.getRect().width(), attribute.visibleCount);
+        initMatrixValue(mainModule.getRect());
+        postMatrixOffset(mainModule.getRect().left, viewRect.top);
+        postMatrixTouch(mainModule.getRect().width(), attribute.visibleCount);
     }
 
     /**
@@ -419,7 +405,7 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
         if (attribute.rightScrollOffset > 0) {
             setCurrentTransX(-maxScrollOffset + attribute.rightScrollOffset);
         }
-        setCurrentTransX(getTransX(getMainChartModule().getRect(),
+        setCurrentTransX(getTransX(getMainModule().getRect(),
                 attribute.visibleCount, entryIndex) - 1f);
     }
 
@@ -658,7 +644,7 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
     /**
      * 值矩阵运算
      */
-    protected void postMatrixValue(AbsChartModule chartModule) {
+    protected void postMatrixValue(AbsModule<AbsEntry> chartModule) {
         RectF rect = chartModule.getRect();//视图 rect
         //计算 X,Y 轴的极值
         computeExtremumValue(extremum, chartModule);
@@ -667,9 +653,9 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
         if (Float.isInfinite(deltaY) || Float.isInfinite(deltaX)) {
             return;
         }
-        final float scaleX = (rect.width() - chartModule.getxCorrectedValue())
+        final float scaleX = (rect.width() - chartModule.getXCorrectedValue())
                 / (deltaX == 0 ? adapter.getCount() : deltaX);
-        final float scaleY = (rect.height() - chartModule.getyCorrectedValue()) / deltaY;
+        final float scaleY = (rect.height() - chartModule.getYCorrectedValue()) / deltaY;
         final float translateX = extremum[0] * scaleX;
         final float translateY = rect.top + extremum[3] / deltaY * rect.height();
         matrixValue.reset();
@@ -706,16 +692,12 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
             matrixTouch.postTranslate(
                     touchValues[Matrix.MTRANS_X] - (maxScrollOffset - lastMaxScrollOffset), 0);
         } else if (touchValues[Matrix.MTRANS_X] < 0) {
-            if ((int) overScrollOffset != 0) {
-                // 右滑加载完成之后定位到之前滚动的位置
-                matrixTouch.postTranslate(touchValues[Matrix.MTRANS_X], 0);
-            } else {
+            if ((int) overScrollOffset == 0) {
                 // 转动屏幕方向导致矩形变化，定位到之前相同比例的滚动位置
                 touchValues[Matrix.MTRANS_X] =
                         touchValues[Matrix.MTRANS_X] / lastMaxScrollOffset * maxScrollOffset;
-
-                matrixTouch.postTranslate(touchValues[Matrix.MTRANS_X], 0);
             }
+            matrixTouch.postTranslate(touchValues[Matrix.MTRANS_X], 0);
 //            Log.e(TAG, "##d postMatrixTouch: currentOffset = " + touchValues[Matrix.MTRANS_X]
 //                    + ", rightScrollOffset = " + attribute.rightScrollOffset);
         } else if (firstLoad) {
@@ -743,7 +725,7 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
     /**
      * 计算显示区域内 X,Y 轴的范围
      */
-    protected void computeExtremumValue(float[] extremum, AbsChartModule chartModule) {
+    protected void computeExtremumValue(float[] extremum, AbsModule<AbsEntry> chartModule) {
         //X轴
         extremum[0] = chartModule.getMinX().value;
         extremum[2] = chartModule.getMaxX().value;
@@ -753,89 +735,75 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
     }
 
     /**
-     * 渲染LeapingViewDrawing(renderDrawing之前调用)
+     * 初始化Drawing
      */
-    private void renderDrawingBefore(Canvas canvas) {
-        for (AbsDrawing drawing : floatChartModule.getDrawingList()) {
-            drawing.readyComputation(canvas, begin, end, extremum);
-        }
-        for (int i = begin; i < end; i++) {
-            for (AbsDrawing drawing : floatChartModule.getDrawingList()) {
-                drawing.onComputation(begin, end, i, extremum);
+    private void initDrawing() {
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
+            for (AbsModule<AbsEntry> module : item.getValue()) {
+                if (module.isAttach()) {
+                    module.initDrawing(this);
+                }
             }
-        }
-        for (AbsDrawing drawing : floatChartModule.getDrawingList()) {
-            drawing.onDraw(canvas, begin, end, extremum);
         }
     }
 
     /**
      * 渲染Drawing
      */
-    private void renderDrawing(Canvas canvas, ArrayList<AbsDrawing> drawingList) {
-        for (AbsDrawing drawing : drawingList) {
+    private void renderDrawing(Canvas canvas, ArrayList<AbsDrawing<AbsRender<?, ?>,
+            AbsModule<?>>> drawingList) {
+        for (AbsDrawing<?, ?> drawing : drawingList) {
             drawing.readyComputation(canvas, begin, end, extremum);
         }
-        for (int i = begin; i < end; i++) {
-            for (AbsDrawing drawing : drawingList) {
+        for (AbsDrawing<?, ?> drawing : drawingList) {
+            for (int i = begin; i < end; i++) {
                 drawing.onComputation(begin, end, i, extremum);
             }
         }
-        for (AbsDrawing drawing : drawingList) {
+        for (AbsDrawing<?, ?> drawing : drawingList) {
             drawing.onDraw(canvas, begin, end, extremum);
         }
 
-        for (AbsDrawing drawing : drawingList) {
+        for (AbsDrawing<?, ?> drawing : drawingList) {
             drawing.drawOver(canvas);
         }
     }
 
     /**
-     * 渲染LeapingViewDrawing(renderDrawing之后调用)
+     * 测量模块大小
      */
-    private void renderDrawingAfter(Canvas canvas) {
-        for (AbsDrawing drawing : floatChartModule.getDrawingList()) {
-            drawing.drawOver(canvas);
-        }
+    public void measureModuleSize() {
+        measureUtils.measureModuleSize(viewRect.width(), viewRect.height());
     }
 
     /**
-     * 布局高度计算
+     * 重置图表组件
      */
-    public int measureHeight(int height) {
-        return Math.round(measureUtils.childViewHeightMeasure(height));
+    public void resetChartModules() {
+        this.chartModules.clear();
+        this.chartModules.put(ModuleGroupType.MAIN, new ArrayList<>());
     }
 
     /**
      * 添加图表组件
      */
-    public void addChartModule(AbsChartModule<? super AbsEntry> chartModule) {
-        if (null == chartModule) {
-            return;
+    @SuppressLint("SwitchIntDef")
+    public void addModule(@NotNull AbsModule module) {
+        List<AbsModule<AbsEntry>> modules = chartModules.get(module.getModuleGroup());
+        if (null == modules) {
+            modules = new ArrayList<>();
+            chartModules.put(module.getModuleGroup(), modules);
         }
-        switch (chartModule.getModuleType()) {
-            case CANDLE:
-                chartModule.setViewHeight(attribute.candleViewHeight);
-                break;
-            case VOLUME:
-                chartModule.setViewHeight(attribute.volumeViewHeight);
-                break;
-            case TIME:
-                chartModule.setViewHeight(attribute.timeLineViewHeight);
-                break;
-            case DEPTH:
-                chartModule.setViewHeight(attribute.depthViewHeight);
-                break;
-            default:
-                chartModule.setViewHeight(attribute.otherViewHeight);
-                break;
-        }
-        if (chartModule instanceof MainChartModule) {
-            chartModules.add(0, chartModule);//主图位居首位
-        } else {
-            chartModules.add(chartModule);
-        }
-        measureUtils.chartModuleNotifyDataSetChanged(chartModules);
+        modules.add(module);
+    }
+
+    /**
+     * 获取绘制区域
+     *
+     * @return 绘制区域
+     */
+    public RectF getViewRect() {
+        return viewRect;
     }
 
     /**
@@ -855,35 +823,58 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
     /**
      * 指标集合
      */
-    public List<AbsChartModule<? extends AbsEntry>> getChartModules() {
+    public LinkedHashMap<Integer, List<AbsModule<AbsEntry>>> getModules() {
         return chartModules;
+    }
+
+    /**
+     * 获取启用的分组数量
+     */
+    public int getModuleGroupCount() {
+        int count = 0;
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
+            if (item.getKey() == ModuleGroupType.FLOAT) {
+                continue;
+            }
+            for (AbsModule<AbsEntry> module : item.getValue()) {
+                if (module.isAttach()) {
+                    count++;
+                    break;
+                }
+            }
+        }
+        return count;
     }
 
     /**
      * 获取当前焦点区域内的chartModule
      */
     public @Nullable
-    AbsChartModule getChartModuleInFocusArea() {
-        return focusAreaChartModule;
+    AbsModule<AbsEntry> getModuleInFocusArea() {
+        return focusAreaModule;
     }
 
     /**
-     * 根据图表moduleType获取对应组件
+     * 根据图表ModuleType获取对应模型
      */
-    public AbsChartModule<? extends AbsEntry> getChartModule(ModuleType moduleType) {
-        for (AbsChartModule<? extends AbsEntry> item : getChartModules()) {
-            if (item.getModuleType() == moduleType) {
-                return item;
+    public AbsModule<AbsEntry> getModule(@ModuleType int moduleType,
+                                         @ModuleGroupType int moduleGroupType) {
+        List<AbsModule<AbsEntry>> modules = chartModules.get(moduleGroupType);
+        if (null != modules) {
+            for (AbsModule<AbsEntry> item : modules) {
+                if (item.getModuleType() == moduleType) {
+                    return item;
+                }
             }
         }
-        return floatChartModule;
+        return mainModule;
     }
 
     /**
      * 根据当前可见的主图组件
      */
-    public AbsChartModule getMainChartModule() {
-        return mainChartModule;
+    public AbsModule<AbsEntry> getMainModule() {
+        return mainModule;
     }
 
     /**
@@ -892,15 +883,17 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
      * @return (返回响应事件的元素)
      */
     public @Nullable
-    AbsDrawing onDrawingClick(float x, float y) {
-        for (AbsChartModule<? extends AbsEntry> item : getChartModules()) {
-            if (item.isEnable() && item.getRect().contains(x, y)) {
-                for (AbsDrawing drawing : item.getDrawingList()) {
-                    if (drawing.onDrawingClick(x, y)) {
-                        return drawing;
+    AbsDrawing<?, ?> onDrawingClick(float x, float y) {
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
+            for (AbsModule<AbsEntry> module : item.getValue()) {
+                if (module.isAttach() && module.getRect().contains(x, y)) {
+                    for (AbsDrawing<?, ?> drawing : module.getDrawingList()) {
+                        if (drawing.onDrawingClick(x, y)) {
+                            return drawing;
+                        }
                     }
+                    return null;
                 }
-                return null;
             }
         }
         return null;
@@ -914,17 +907,33 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
             return;
         }
         computeVisibleIndex();
-        for (AbsChartModule module : getChartModules()) {
-            if (!module.isEnable()) {
-                continue;
+        computeMinMax();
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
+            for (AbsModule<AbsEntry> module : item.getValue()) {
+                if (!module.isAttach()) {
+                    continue;
+                }
+                postMatrixValue(module);
+                renderDrawing(canvas, module.getDrawingList());
             }
-            postMatrixValue(module);
-            if (module instanceof MainChartModule) {
-                renderDrawingBefore(canvas);
-            }
-            renderDrawing(canvas, module.getDrawingList());
         }
-        renderDrawingAfter(canvas);
+    }
+
+    /**
+     * 计算当前显示区域内 entry 在 Y 轴上的最小值和最大值
+     */
+    protected void computeMinMax() {
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
+            for (AbsModule<AbsEntry> module : item.getValue()) {
+                if (module.isAttach()) {
+                    module.resetMinMax();
+                    for (int i = begin; i < end; i++) {
+                        module.computeMinMax(adapter.getItem(i));
+                    }
+                }
+            }
+        }
+        adapter.computeMinAndMax(begin, end);
     }
 
     /**
@@ -933,19 +942,35 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
     protected void computeVisibleIndex() {
         begin = 0;
         end = getAdapter().getCount();
-        // 计算当前显示区域内 entry 在 Y 轴上的最小值和最大值
-        getAdapter().computeMinAndMax(begin, end, getChartModules());
     }
 
     /**
      * 配置文件更改回调
      */
     public void onAttributeChange() {
-        this.floatChartModule.resetDrawing();
-        for (AbsChartModule module : getChartModules()) {
-            module.resetDrawing();
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
+            for (AbsModule<AbsEntry> module : item.getValue()) {
+                module.resetDrawing();
+            }
         }
-        onViewRectChange();
+        onViewInit();
+    }
+
+    /**
+     * 数据重置回调
+     *
+     * @return 修改数量
+     */
+    public int onDataReset() {
+        int updateCount = 0;
+        if (isReady()) {
+            for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
+                for (AbsModule<AbsEntry> module : item.getValue()) {
+                    updateCount += module.initMargin();
+                }
+            }
+        }
+        return updateCount;
     }
 
     /**
@@ -962,14 +987,77 @@ public abstract class AbsRender<T extends AbsAdapter, A extends BaseAttribute> {
      * 是否已经准备好
      */
     public boolean isReady() {
-        return null != mainChartModule && null != adapter;
+        return null != mainModule && null != adapter;
+    }
+
+    /**
+     * 获取当前被启用的最顶部的图表模型
+     */
+    public AbsModule<AbsEntry> getTopModule() {
+        return topModule;
     }
 
     /**
      * 获取当前被启用的最底部的图表模型
      */
-    public AbsChartModule getBottomChartModule() {
-        return bottomChartModule;
+    public AbsModule<AbsEntry> getBottomModule() {
+        return bottomModule;
+    }
+
+    /**
+     * 初始化每个已经启用的View的坐标[x0 y0 x1 y1 x2 y2 ...]
+     * 此方法只更新top和bottom(如：y0 y1)
+     */
+    public void initViewCoordinates() {
+        int coordinatesCount = getModuleGroupCount() * 4;
+        if (null == oldViewTBCoordinates || coordinatesCount != oldViewTBCoordinates.length) {
+            oldViewTBCoordinates = new float[coordinatesCount];
+            newViewTBCoordinates = new float[coordinatesCount];
+        }
+        int point = -1;
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
+            for (int i = 0, z = item.getValue().size(); i < z && i < oldViewTBCoordinates.length; i++) {
+                AbsModule module = item.getValue().get(i);
+                if (module.isAttach() && module.getModuleType() != ModuleType.FLOAT) {
+                    point += 2;
+                    oldViewTBCoordinates[point] = module.getRect().top;
+                    point += 2;
+                    oldViewTBCoordinates[point] = module.getRect().bottom;
+                }
+            }
+        }
+    }
+
+    /**
+     * 构建每个已经启用的View的坐标[x0 y0 x1 y1 x2 y2 ...]
+     * 此方法只更新left和right(如：x0 x1)
+     */
+    public float[] buildViewLRCoordinates(float x0, float x1) {
+        return buildViewLRCoordinates(x0, x1, 0, 0, null);
+    }
+
+    /**
+     * 构建每个已经启用的View的坐标[x0 y0 x1 y1 x2 y2 ...]
+     * 此方法只更新left和right(如：x0 x1)
+     * 如果focusArea不为null的时候，会在focusArea所在的坐标上更新y0 y1 (即top 和 bottom)
+     */
+    public float[] buildViewLRCoordinates(float x0, float x1, float y0, float y1, RectF focusArea) {
+        for (int i = 0; i < newViewTBCoordinates.length; i += 2) {
+            newViewTBCoordinates[i] = x0;
+            i += 2;
+            newViewTBCoordinates[i] = x1;
+            int topPosition = i - 1;
+            int bottomPosition = i + 1;
+            if (null != focusArea && focusArea.top <= oldViewTBCoordinates[topPosition]
+                    && focusArea.bottom >= oldViewTBCoordinates[bottomPosition]) {
+                newViewTBCoordinates[topPosition] = y0;
+                newViewTBCoordinates[bottomPosition] = y1;
+            } else {
+                newViewTBCoordinates[topPosition] = oldViewTBCoordinates[topPosition];
+                newViewTBCoordinates[bottomPosition] = oldViewTBCoordinates[bottomPosition];
+            }
+        }
+        return newViewTBCoordinates;
     }
 
     /**

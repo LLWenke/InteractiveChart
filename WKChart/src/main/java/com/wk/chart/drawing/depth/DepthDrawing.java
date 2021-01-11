@@ -13,32 +13,28 @@ import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.DepthAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.DepthEntry;
-import com.wk.chart.module.DepthChartModule;
+import com.wk.chart.module.DepthModule;
 import com.wk.chart.render.DepthRender;
 
 /**
  * <p>DepthDrawing</p>
  */
 
-public class DepthDrawing extends AbsDrawing<DepthRender, DepthChartModule> {
+public class DepthDrawing extends AbsDrawing<DepthRender, DepthModule> {
     private static final String TAG = "DepthDrawing";
     private DepthAttribute attribute;//配置文件
-    // 边框线画笔
-    private Paint borderPaint = new Paint();
     // 买单折线画笔(绘制path 尽量不开抗锯齿)
-    private Paint bidPolylinePaint = new Paint();
+    private final Paint bidPolylinePaint = new Paint();
     // 卖单折线画笔(绘制path 尽量不开抗锯齿)
-    private Paint askPolylinePaint = new Paint();
+    private final Paint askPolylinePaint = new Paint();
     // 买单阴影画笔(绘制path 尽量不开抗锯齿)
-    private Paint bidShaderPaint = new Paint();
+    private final Paint bidShaderPaint = new Paint();
     // 卖单阴影画笔(绘制path 尽量不开抗锯齿)
-    private Paint askShaderPaint = new Paint();
+    private final Paint askShaderPaint = new Paint();
     // 买单绘制路径
-    private Path bidPath = new Path();
+    private final Path bidPath = new Path();
     // 卖单绘制路径
-    private Path askPath = new Path();
-    // 边框线绘制路径
-    private Path borderPath = new Path();
+    private final Path askPath = new Path();
     // 绘制路径
     private Path path;
     // 路径位置信息
@@ -51,13 +47,9 @@ public class DepthDrawing extends AbsDrawing<DepthRender, DepthChartModule> {
     private float offset;
 
     @Override
-    public void onInit(DepthRender render, DepthChartModule chartModule) {
+    public void onInit(DepthRender render, DepthModule chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
-
-        borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setStrokeWidth(attribute.borderWidth);
-        borderPaint.setColor(attribute.borderColor);
 
         bidPolylinePaint.setStrokeWidth(attribute.polylineWidth);
         bidPolylinePaint.setColor(attribute.increasingColor);
@@ -67,7 +59,7 @@ public class DepthDrawing extends AbsDrawing<DepthRender, DepthChartModule> {
         askPolylinePaint.setColor(attribute.decreasingColor);
         askPolylinePaint.setStyle(Paint.Style.STROKE);
 
-        offset = chartModule.getxOffset();
+        offset = chartModule.getXOffset();
     }
 
     @Override
@@ -138,21 +130,10 @@ public class DepthDrawing extends AbsDrawing<DepthRender, DepthChartModule> {
 
     @Override
     public void drawOver(Canvas canvas) {
-        // 绘制外层边框线
-        if (attribute.borderWidth > 0) {
-            borderPath.moveTo(borderPts[0], borderPts[1]);
-            borderPath.lineTo(borderPts[0], borderPts[3]);
-            borderPath.lineTo(borderPts[2], borderPts[3]);
-            borderPath.lineTo(borderPts[2], borderPts[1]);
-//          borderPath.close();
-            canvas.drawPath(borderPath, borderPaint);
-            borderPath.rewind();
-        }
     }
 
     @Override
     public void onViewChange() {
-        super.onViewChange();
         left = viewRect.left - attribute.polylineWidth;
         right = viewRect.right + attribute.polylineWidth;
 

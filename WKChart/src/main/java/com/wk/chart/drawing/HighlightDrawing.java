@@ -11,11 +11,13 @@ import android.graphics.RectF;
 import com.wk.chart.compat.DisplayTypeUtils;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.enumeration.HighLightStyle;
 import com.wk.chart.marker.AbsMarker;
-import com.wk.chart.module.FloatChartModule;
-import com.wk.chart.module.base.AbsChartModule;
+import com.wk.chart.module.FloatModule;
+import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.render.AbsRender;
 import com.wk.chart.render.CandleRender;
 
 import java.util.ArrayList;
@@ -25,31 +27,30 @@ import java.util.List;
  * <p>HighlightDrawing</p>
  */
 
-public class HighlightDrawing extends AbsDrawing<CandleRender, FloatChartModule> {
+public class HighlightDrawing extends AbsDrawing<CandleRender, FloatModule> {
     private static final String TAG = "HighlightDrawing";
     private CandleAttribute attribute;//配置文件
 
-    private Paint xHighlightPaint = new Paint(); // X高亮线条画笔
-    private Paint yHighlightPaint = new Paint(); // Y高亮线条画笔
-    private Path highlightPath = new Path();
+    private final Paint xHighlightPaint = new Paint(); // X高亮线条画笔
+    private final Paint yHighlightPaint = new Paint(); // Y高亮线条画笔
+    private final Path highlightPath = new Path();
 
-    private float[] markerViewInfo = new float[4];//markerView的left,top,right,bottom信息
-    private float[] highlightPoint = new float[2];//高亮线条x，y
-    private float[] highlightInvertPoint = new float[2];//高亮线条坐标反转后的x，y
-    private String[] markerText = new String[2];//marker中显示的值
+    private final float[] markerViewInfo = new float[4];//markerView的left,top,right,bottom信息
+    private final float[] highlightPoint = new float[2];//高亮线条x，y
+    private final float[] highlightInvertPoint = new float[2];//高亮线条坐标反转后的x，y
+    private final String[] markerText = new String[2];//marker中显示的值
+    private final List<AbsMarker<AbsRender<?, ?>>> markerViewList = new ArrayList<>();
 
-    private List<AbsMarker> markerViewList = new ArrayList<>();
-
-    public void addMarkerView(AbsMarker markerView) {
+    public void addMarkerView(AbsMarker<AbsRender<?, ?>> markerView) {
         markerViewList.add(markerView);
     }
 
-    public List<AbsMarker> getMarkerViewList() {
+    public List<AbsMarker<AbsRender<?, ?>>> getMarkerViewList() {
         return markerViewList;
     }
 
     @Override
-    public void onInit(CandleRender render, FloatChartModule chartModule) {
+    public void onInit(CandleRender render, FloatModule chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
 
@@ -65,15 +66,21 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatChartModule>
             yHighlightPaint.setPathEffect(dashPathEffect);
         }
 
-        if (markerViewList.size() > 0) {
-            for (AbsMarker markerView : markerViewList) {
-                markerView.onInit(render);
-                setMargin(Math.max(getMargin()[0], markerView.getMargin()[0]),
-                        Math.max(getMargin()[1], markerView.getMargin()[1]),
-                        Math.max(getMargin()[2], markerView.getMargin()[2]),
-                        Math.max(getMargin()[3], markerView.getMargin()[3]));
-            }
+        for (AbsMarker<AbsRender<?, ?>> markerView : markerViewList) {
+            markerView.onInit(render);
         }
+    }
+
+    @Override
+    public float[] onInitMargin() {
+        for (AbsMarker<AbsRender<?, ?>> markerView : markerViewList) {
+            markerView.onInit(render);
+            margin[0] = Math.max(margin[0], markerView.getMargin()[0]);
+            margin[1] = Math.max(margin[1], markerView.getMargin()[1]);
+            margin[2] = Math.max(margin[2], markerView.getMargin()[2]);
+            margin[3] = Math.max(margin[3], markerView.getMargin()[3]);
+        }
+        return margin;
     }
 
     @Override
@@ -99,12 +106,12 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatChartModule>
 
         CandleEntry entry = render.getAdapter().getItem(render.getAdapter().getHighlightIndex());
         //获取当前焦点区域内的chartModule
-        AbsChartModule chartModule = render.getChartModuleInFocusArea();
+        AbsModule<? extends AbsEntry> chartModule = render.getModuleInFocusArea();
         if (null == chartModule) {
             return;
         }
         markerText[0] = DisplayTypeUtils.selectorFormat(entry.getTime(),
-                render.getAdapter().getDisplayType());
+                render.getAdapter().getTimeType());
         //switch (chartModule.getInstance()) {
         //  case VOLUME://交易量 指标
         //    chartModule = render.getMainChartModule();
@@ -125,14 +132,14 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatChartModule>
         //    markerText[1] = getInvertPoint(chartModule);
         //    break;
         //}
-        chartModule = render.getMainChartModule();
+        chartModule = render.getMainModule();
         highlightPoint[1] = entry.getClose().value;
         render.mapPoints(chartModule.getMatrix(), highlightPoint);
         highlightPoint[0] = render.getHighlightPoint()[0];
         markerText[1] = render.exchangeRateConversion(entry.getClose().text,
                 render.getAdapter().getScale().getQuoteScale());
 
-        for (AbsMarker markerView : markerViewList) {
+        for (AbsMarker<AbsRender<?, ?>> markerView : markerViewList) {
             markerView.onMarkerViewMeasure(chartModule.getRect(),
                     chartModule.getMatrix(),
                     highlightPoint[0],
@@ -144,11 +151,11 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatChartModule>
         switch (attribute.gridMarkerAlign) {
             case TOP_INSIDE:
             case TOP:
-                focusRect = render.getMainChartModule().getRect();
+                focusRect = render.getTopModule().getRect();
                 break;
             case BOTTOM:
             case BOTTOM_INSIDE:
-                focusRect = render.getBottomChartModule().getRect();
+                focusRect = render.getBottomModule().getRect();
                 break;
             default:
                 focusRect = chartModule.getRect();
@@ -170,12 +177,16 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatChartModule>
         }
         float pointWidth = render.getSubtractSpacePointWidth();
         xHighlightPaint.setStrokeWidth(attribute.xHighlightAutoWidth ? pointWidth : attribute.lineWidth);
-        float[] highlightPts = render.getMeasureUtils().buildViewLRCoordinates(highlightPoint[0],
-                highlightPoint[0], top, bottom, focusRect);
-
-        for (int i = 3; i < highlightPts.length; i += 4) {
-            highlightPath.moveTo(highlightPts[i - 3], highlightPts[i - 2]);
-            highlightPath.lineTo(highlightPts[i - 1], highlightPts[i]);
+        if (attribute.yHighlightAutoDivision) {
+            float[] highlightPts = render.buildViewLRCoordinates(highlightPoint[0],
+                    highlightPoint[0], top, bottom, focusRect);
+            for (int i = 3; i < highlightPts.length; i += 4) {
+                highlightPath.moveTo(highlightPts[i - 3], highlightPts[i - 2]);
+                highlightPath.lineTo(highlightPts[i - 1], highlightPts[i]);
+            }
+        } else {
+            highlightPath.moveTo(highlightPoint[0], render.getTopModule().getRect().top);
+            highlightPath.lineTo(highlightPoint[0], render.getBottomModule().getRect().bottom);
         }
         canvas.drawPath(highlightPath, xHighlightPaint);
         highlightPath.rewind();
@@ -187,7 +198,7 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatChartModule>
         canvas.drawPath(highlightPath, yHighlightPaint);
         highlightPath.rewind();
 
-        for (AbsMarker markerView : markerViewList) {
+        for (AbsMarker<AbsRender<?, ?>> markerView : markerViewList) {
             markerView.onMarkerViewDraw(canvas, markerText);
         }
     }
@@ -199,7 +210,7 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatChartModule>
     /**
      * 获取坐标反转后的值（此处已做精度控制）
      */
-    private String getInvertPoint(AbsChartModule chartModule) {
+    private String getInvertPoint(AbsModule<AbsEntry> chartModule) {
         highlightInvertPoint[1] = highlightPoint[1];
         render.invertMapPoints(chartModule.getMatrix(), highlightInvertPoint);
         return render.exchangeRateConversion(highlightInvertPoint[1],

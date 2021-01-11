@@ -4,20 +4,24 @@ package com.wk.chart.drawing.base;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 
-import com.wk.chart.module.base.AbsChartModule;
+import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
 
 /**
  * <p>AbsDrawing</p>
  */
 
-public abstract class AbsDrawing<T extends AbsRender, A extends AbsChartModule> {
-    private boolean initState = false;
+public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<?>> {
+    protected final float[] margin; //边距[left, top, right, bottom]
+    private boolean initState = false;//是否初始化
     protected RectF viewRect; // 绘制区域
     protected T render;//渲染工厂
     protected A absChartModule;//组件
-    protected float[] borderPts; //边框线坐标点[x0, y0, x1, y1]
-    private float[] margin; //边距[left, top, right, bottom]
+
+
+    public AbsDrawing() {
+        this.margin = new float[4];
+    }
 
     /**
      * 初始化
@@ -30,7 +34,6 @@ public abstract class AbsDrawing<T extends AbsRender, A extends AbsChartModule> 
         this.render = render;
         this.absChartModule = chartModule;
         this.viewRect = chartModule.getRect();
-        this.margin = new float[4];
     }
 
     /**
@@ -71,9 +74,7 @@ public abstract class AbsDrawing<T extends AbsRender, A extends AbsChartModule> 
     /**
      * 当视图改变时调用此方法，用于一些属性的重制和运算
      */
-    public void onViewChange() {
-        this.borderPts = render.getBorderPoints(viewRect);
-    }
+    public abstract void onViewChange();
 
     /**
      * 是否初始化完成
@@ -99,9 +100,9 @@ public abstract class AbsDrawing<T extends AbsRender, A extends AbsChartModule> 
     }
 
     /**
-     * 获取边距
+     * 初始化边距
      */
-    public final float[] getMargin() {
+    public float[] onInitMargin() {
         return margin;
     }
 
@@ -112,15 +113,5 @@ public abstract class AbsDrawing<T extends AbsRender, A extends AbsChartModule> 
      */
     public RectF getViewRect() {
         return viewRect;
-    }
-
-    /**
-     * 设置边距
-     */
-    public void setMargin(float left, float top, float right, float bottom) {
-        this.margin[0] = left;
-        this.margin[1] = top;
-        this.margin[2] = right;
-        this.margin[3] = bottom;
     }
 }

@@ -5,8 +5,6 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import com.wk.chart.compat.attribute.BaseAttribute;
-
 /**
  * <p>蜡烛图属性配置类</p>
  */

@@ -17,36 +17,37 @@ import com.wk.chart.compat.ValueUtils;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.CandleEntry;
-import com.wk.chart.module.FloatChartModule;
+import com.wk.chart.entry.SelectorItemEntry;
+import com.wk.chart.module.FloatModule;
 import com.wk.chart.render.CandleRender;
 
 /**
  * <p>CandleSelectorDrawing</p>
  */
 
-public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatChartModule> {
+public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule> {
     private static final String TAG = "CandleSelectorDrawing";
 
     private CandleAttribute attribute;//配置文件
 
-    private Paint selectorBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);//选择器边框画笔
-    private Paint selectorBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);//选择器背景画笔
-    private TextPaint labelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//label画笔
-    private TextPaint valuePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//value画笔(默认)
-    private TextPaint increasingValuePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//上涨value画笔
-    private TextPaint decreasingValuePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//下跌value画笔
+    private final Paint selectorBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);//选择器边框画笔
+    private final Paint selectorBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);//选择器背景画笔
+    private final TextPaint labelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//label画笔
+    private final TextPaint valuePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//value画笔(默认)
+    private final TextPaint increasingValuePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//上涨value画笔
+    private final TextPaint decreasingValuePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//下跌value画笔
 
     private Paint.FontMetrics metrics;
-    private float[] viewRectBuffer = new float[4]; // 计算选择器矩形坐标用的
+    private final float[] viewRectBuffer = new float[4]; // 计算选择器矩形坐标用的
 
     private float selectedWidth;//信息选择框的宽度
     private float selectedHeight;//信息选择框的高度
-    private com.wkchart.entry.SelectorItemEntry[] selectorInfo;//选择器信息集合
-    private float borderOffset;//边框偏移量
+    private SelectorItemEntry[] selectorInfo;//选择器信息集合
+    private float selectorBorderOffset;//选择器边框偏移量
     private int itemCount = 8;//选择器中的条目数
 
     @Override
-    public void onInit(CandleRender render, FloatChartModule chartModule) {
+    public void onInit(CandleRender render, FloatModule chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
 
@@ -76,10 +77,10 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatChartMo
         metrics = attribute.selectorLabelSize > attribute.selectorValueSize ?
                 labelPaint.getFontMetrics() : valuePaint.getFontMetrics();
 
-        borderOffset = attribute.selectorBorderWidth / 2;
-        selectorInfo = new com.wkchart.entry.SelectorItemEntry[itemCount];
+        selectorBorderOffset = attribute.selectorBorderWidth / 2;
+        selectorInfo = new SelectorItemEntry[itemCount];
         for (int i = 0; i < itemCount; i++) {
-            selectorInfo[i] = new com.wkchart.entry.SelectorItemEntry();
+            selectorInfo[i] = new SelectorItemEntry();
         }
     }
 
@@ -112,7 +113,7 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatChartMo
         loadSelectorInfo();
 
         //动态计算选择器宽度和高度
-        com.wkchart.entry.SelectorItemEntry firstItem = selectorInfo[0];
+        SelectorItemEntry firstItem = selectorInfo[0];
         float width = firstItem.getLabelPaint().measureText(firstItem.getLabel())
                 + firstItem.getValuePaint().measureText(firstItem.getValue())
                 + attribute.selectorPadding * 2
@@ -141,13 +142,13 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatChartMo
                 selectorBorderPaint);
 
         //绘制选择器填充背景
-        canvas.drawRoundRect(viewRectBuffer[0] + borderOffset, viewRectBuffer[1] + borderOffset,
-                viewRectBuffer[2] - borderOffset, viewRectBuffer[3] - borderOffset,
+        canvas.drawRoundRect(viewRectBuffer[0] + selectorBorderOffset, viewRectBuffer[1] + selectorBorderOffset,
+                viewRectBuffer[2] - selectorBorderOffset, viewRectBuffer[3] - selectorBorderOffset,
                 attribute.selectorRadius, attribute.selectorRadius, selectorBackgroundPaint);
 
         //绘制选择器内容信息
         float y = top + attribute.selectorIntervalY + (textHeight - metrics.bottom - metrics.top) / 2;
-        for (com.wkchart.entry.SelectorItemEntry item : selectorInfo) {
+        for (SelectorItemEntry item : selectorInfo) {
             //绘制label
             canvas.drawText(item.getLabel(), viewRectBuffer[0] + attribute.selectorPadding, y,
                     item.getLabelPaint());
@@ -163,7 +164,6 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatChartMo
 
     @Override
     public void onViewChange() {
-
     }
 
     /**
@@ -176,7 +176,7 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatChartMo
                 .setLabel(attribute.context.getString(R.string.wk_time_value))
                 .setLabelPaint(labelPaint)
                 .setValue(DisplayTypeUtils.selectorFormat(point.getTime(),
-                        render.getAdapter().getDisplayType()))
+                        render.getAdapter().getTimeType()))
                 .setValuePaint(valuePaint);
         //开
         selectorInfo[1]

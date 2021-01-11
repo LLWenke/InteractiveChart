@@ -13,7 +13,6 @@ import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.BuildData;
 import com.wk.chart.entry.RateEntry;
 import com.wk.chart.enumeration.ObserverArg;
-import com.wk.chart.module.base.AbsChartModule;
 import com.wk.chart.thread.WorkThread;
 
 import java.io.Serializable;
@@ -23,7 +22,8 @@ import java.util.List;
 import java.util.Observer;
 
 public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
-        implements Handler.Callback, WorkThread.WorkCallBack<BuildData<T, F>>, ChartAnimator.AnimationListener<T> {
+        implements Handler.Callback, WorkThread.WorkCallBack<BuildData<T, F>>,
+        ChartAnimator.AnimationListener<T> {
 
     private final DataSetObservable dataSetObservable;//数据状态监听器
     private F buildConfig; // 构建配置信息
@@ -36,8 +36,8 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     private List<T> chartData;//数据列表
     private final ScaleEntry scale;// 精度
     private RateEntry rate;// 比率
-    private Handler uiHandler; //主线程Handler
-    private ChartAnimator<T> animator;//数据更新动画
+    private final Handler uiHandler; //主线程Handler
+    private final ChartAnimator<T> animator;//数据更新动画
     private boolean isWorking = false;//是否为工作中
     private int dataSize;//数据大小
     private boolean liveState = true;//adapter存活状态
@@ -47,7 +47,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         this.chartData = new ArrayList<>();
         this.uiHandler = new Handler(this);
         this.dataSetObservable = new DataSetObservable();
-        this.animator = new ChartAnimator<>(this, 800);
+        this.animator = new ChartAnimator<>(this, 300);
         this.scale = new ScaleEntry(0, 0, "", "");
         this.rate = new RateEntry(BigDecimal.ONE, scale.getQuoteUnit(), scale.quoteScale);
     }
@@ -158,7 +158,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         this.rate.setRate(rateValue);
         this.rate.setUnit(unit);
         this.rate.setScale(scale);
-        notifyDataSetChanged(ObserverArg.REFRESH);
+        notifyDataSetChanged(ObserverArg.RESET_RATE);
     }
 
     /**
@@ -166,7 +166,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      */
     public void resetRate() {
         this.rate = new RateEntry(BigDecimal.ONE, scale.getQuoteUnit(), scale.quoteScale);
-        notifyDataSetChanged(ObserverArg.REFRESH);
+        notifyDataSetChanged(ObserverArg.RESET_RATE);
     }
 
     /**
@@ -177,20 +177,21 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     }
 
     /**
-     * 获取指标配置信息(深拷贝一份，不会影响源文件)
+     * 获取指标配置信息
      *
      * @return 配置信息类（复制品）
      */
     public F getBuildConfig() {
-        return (F) buildConfig.clone();
+        return buildConfig;
     }
 
     /**
-     * 设置指标配置信息(深拷贝一份进行赋值，不会使用源文件)
+     * 设置指标配置信息
      */
     public void setBuildConfig(F buildConfig) {
+        this.buildConfig = buildConfig;
         setWorking(true);
-        onAsyTask((F) buildConfig.clone(), chartData, ObserverArg.CONFIG_CHANGE);
+        onAsyTask(buildConfig, chartData, ObserverArg.INIT);
     }
 
     /**
@@ -201,7 +202,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     /**
      * 在给定的范围内，计算最大值和最小值
      */
-    public abstract void computeMinAndMax(int start, int end, List<AbsChartModule<? extends AbsEntry>> chartModules);
+    public abstract void computeMinAndMax(int start, int end);
 
     /**
      * 获取数据数量
@@ -226,16 +227,30 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     }
 
     /**
-     * 刷新数据
+     * 重置数据
      */
     public synchronized void resetData(List<T> data) {
         if (Utils.listIsEmpty(data)) {
             this.chartData.clear();
             this.dataSize = chartData.size();
-            notifyDataSetChanged(ObserverArg.INIT);
+            notifyDataSetChanged(ObserverArg.CLEAR);
         } else {
             setWorking(true);
-            onAsyTask(buildConfig, data, ObserverArg.INIT);
+            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.RESET : ObserverArg.INIT_AND_RESET);
+        }
+    }
+
+    /**
+     * 刷新数据
+     */
+    public synchronized void refreshData(List<T> data) {
+        if (Utils.listIsEmpty(data)) {
+            this.chartData.clear();
+            this.dataSize = chartData.size();
+            notifyDataSetChanged(ObserverArg.CLEAR);
+        } else {
+            setWorking(true);
+            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.REFRESH : ObserverArg.INIT_AND_RESET);
         }
     }
 

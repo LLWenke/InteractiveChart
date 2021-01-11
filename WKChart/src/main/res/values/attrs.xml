@@ -1,22 +1,9 @@
 <resources>
+
     <declare-styleable name="ChartAttr">
         <!-- 各个视图模块的配置信息有关属性 -->
-        <!-- K线模块高度 -->
-        <attr name="candleViewHeight" format="dimension" />
-        <!-- 交易量模块高度 -->
-        <attr name="volumeViewHeight" format="dimension" />
-        <!-- 副图模块高度 -->
-        <attr name="otherViewHeight" format="dimension" />
-        <!-- 分时图模块高度 -->
-        <attr name="timeLineViewHeight" format="dimension" />
-        <!-- 深度图模块高度 -->
-        <attr name="depthViewHeight" format="dimension" />
         <!-- 各个视图模块间的间隔 -->
         <attr name="viewInterval" format="dimension" />
-        <!-- 视图边框线条宽度 -->
-        <attr name="borderWidth" format="dimension" />
-        <!-- 视图边框线条颜色 -->
-        <attr name="borderColor" format="color" />
         <!-- X 轴方向的最小滚动值固定偏移量（左边） -->
         <attr name="leftScrollOffset" format="dimension" />
         <!-- X 轴方向的最大滚动值固定偏移量（右边） -->
@@ -37,32 +24,60 @@
         <!-- 线条颜色 -->
         <attr name="lineColor" format="color" />
 
+        <!-- 边框线有关属性 -->
+        <!-- 边框线条宽度 -->
+        <attr name="borderWidth" format="dimension" />
+        <!-- 边框线条颜色 -->
+        <attr name="borderColor" format="color" />
+
         <!-- 与 grid 标尺刻度有关属性 -->
-        <!-- grid 分割线宽度 -->
-        <attr name="gridDividingLineWidth" format="dimension" />
         <!-- grid 标签上边距 -->
         <attr name="gridLabelMarginTop" format="dimension" />
         <!-- grid 标签下边距 -->
         <attr name="gridLabelMarginBottom" format="dimension" />
         <!-- grid 行数 -->
         <attr name="gridCount" format="integer" />
+        <!-- grid 线条长度 -->
+        <attr name="gridLineLength" format="dimension" />
         <!-- grid 线条是否显示-->
-        <attr name="gridLineState" format="boolean" />
+        <attr name="gridLineStyle">
+            <enum name="none" value="0" />
+            <enum name="line" value="1" />
+            <enum name="graduation" value="2" />
+            <enum name="graduation_inside" value="3" />
+        </attr>
 
         <!-- 与 axis 标尺刻度有关属性 -->
-        <!-- axis 列数 -->
-        <attr name="axisCount" format="integer" />
         <!-- axis 标签左右Margin -->
         <attr name="axisLabelLRMargin" format="dimension" />
         <!-- axis 标签上下Margin -->
         <attr name="axisLabelTBMargin" format="dimension" />
         <!-- axis 线条是否显示 -->
         <attr name="axisLineState" format="boolean" />
+        <!-- axis 是否显示第一条 -->
+        <attr name="showFirstAxis" format="boolean" />
+        <!-- axis 是否显示最后一条 -->
+        <attr name="showLastAxis" format="boolean" />
         <!-- axis 标签显示位置 -->
         <attr name="axisLabelLocation">
             <enum name="left" value="0" />
             <enum name="right" value="1" />
             <enum name="all" value="2" />
+        </attr>
+
+        <!-- 与 axis tag有关属性 -->
+        <!-- axis tag文字左右margin -->
+        <attr name="axisTagMarginX" format="dimension" />
+        <!-- axis tag文字上下margin -->
+        <attr name="axisTagMarginY" format="dimension" />
+        <!-- axis tag显示位置 -->
+        <attr name="axisTagLocation">
+            <enum name="left" value="0" />
+            <enum name="left_inside" value="1" />
+            <enum name="right" value="2" />
+            <enum name="right_inside" value="3" />
+            <enum name="all" value="4" />
+            <enum name="all_inside" value="5" />
         </attr>
 
         <!-- 与高亮线有关的属性 -->
@@ -76,18 +91,20 @@
         <attr name="yHighlightIsHide" format="boolean" />
         <!-- Y高亮线条是否启用自动宽度管理(启用后yHighlightWidth将失效，宽度将实时跟随candleWidth)  -->
         <attr name="yHighlightAutoWidth" format="boolean" />
+        <!-- Y高亮线条是否启用自动分割 -->
+        <attr name="yHighlightAutoDivision" format="boolean" />
         <!-- Y高亮线条颜色 -->
         <attr name="yHighlightColor" format="color" />
 
         <!-- 与MarkerView有关的属性 -->
+        <!-- MarkerView 边框圆角 -->
+        <attr name="markerRadius" format="dimension" />
+        <!-- MarkerView 上下padding -->
+        <attr name="markerTBPadding" format="dimension" />
+        <!-- MarkerView 左右padding -->
+        <attr name="markerLRPadding" format="dimension" />
         <!-- MarkerView 边框宽度 -->
         <attr name="markerBorderWidth" format="dimension" />
-        <!-- MarkerView 边框圆角 -->
-        <attr name="markerBorderRadius" format="dimension" />
-        <!-- MarkerView 上下padding -->
-        <attr name="markerBorderTBPadding" format="dimension" />
-        <!-- MarkerView 左右padding -->
-        <attr name="markerBorderLRPadding" format="dimension" />
         <!-- MarkerView 边框颜色 -->
         <attr name="markerBorderColor" format="color" />
         <!-- MarkerView 字符大小 -->
@@ -146,29 +163,52 @@
 
         <!-- 与指标文字有关的属性 -->
         <!-- 指标文字大小 -->
-        <attr name="indicatorsTextSize" format="dimension" />
+        <attr name="indexTextSize" format="dimension" />
         <!-- 指标文字左右margin -->
-        <attr name="indicatorsTextMarginX" format="dimension" />
+        <attr name="indexTextMarginX" format="dimension" />
         <!-- 指标文字上下margin -->
-        <attr name="indicatorsTextMarginY" format="dimension" />
+        <attr name="indexTextMarginY" format="dimension" />
         <!-- 指标文字的间隔 -->
-        <attr name="indicatorsTextInterval" format="dimension" />
+        <attr name="indexTextInterval" format="dimension" />
+        <!-- 指标默认显示最后一条的数据 -->
+        <attr name="defaultShowLastItem" format="color" />
+        <!-- 指标文字的位置 -->
+        <attr name="indexLabelLocation">
+            <enum name="left_top_inside" value="0" />
+            <enum name="right_top_inside" value="1" />
+            <enum name="left_top" value="2" />
+            <enum name="right_top" value="3" />
+            <enum name="left_bottom_inside" value="4" />
+            <enum name="right_bottom_inside" value="5" />
+            <enum name="left_bottom" value="6" />
+            <enum name="right_bottom" value="7" />
+        </attr>
 
         <!-- 与游标指示器有关的属性 -->
-        <!-- 游标文字容器边框宽度 -->
-        <attr name="cursorBorderWidth" format="dimension" />
         <!-- 游标文字容器背景颜色 -->
         <attr name="cursorBackgroundColor" format="color" />
-        <!-- 游标文字容器圆角 -->
-        <attr name="cursorRadius" format="dimension" />
-        <!-- 游标线颜色 -->
-        <attr name="cursorLineColor" format="color" />
-        <!-- 游标值颜色 -->
-        <attr name="cursorTextColor" format="color" />
-        <!-- 游标值容器边框颜色 -->
-        <attr name="cursorBorderColor" format="color" />
-        <!-- 默认显示最后一条数据 -->
-        <attr name="defaultShowLastItem" format="color" />
+        <!-- （折叠时）游标线颜色 -->
+        <attr name="foldedCursorLineColor" format="color" />
+        <!-- （折叠时）游标值颜色 -->
+        <attr name="foldedCursorTextColor" format="color" />
+        <!-- （展开时）游标线颜色 -->
+        <attr name="spreadCursorLineColor" format="color" />
+        <!-- （展开时）游标值颜色 -->
+        <attr name="spreadCursorTextColor" format="color" />
+        <!-- （展开时）游标值容器边框颜色 -->
+        <attr name="spreadCursorBorderColor" format="color" />
+        <!-- （展开时）游标文字容器边框宽度 -->
+        <attr name="spreadCursorBorderWidth" format="dimension" />
+        <!-- （展开时）游标文字容器圆角 -->
+        <attr name="spreadCursorRadius" format="dimension" />
+        <!-- （展开时）游标文字左右Margin -->
+        <attr name="spreadCursorTextLRMargin" format="dimension" />
+        <!-- （展开时）游标文字上下Margin -->
+        <attr name="spreadCursorTextTBMargin" format="dimension" />
+        <!-- （展开时）游标三角宽度 -->
+        <attr name="spreadTriangleWidth" format="dimension" />
+        <!-- （展开时）游标三角高度 -->
+        <attr name="spreadTriangleHeight" format="dimension" />
 
         <!-- 与极值有关的属性 -->
         <!-- 极值字符大小 -->
@@ -238,23 +278,10 @@
         <attr name="currentScale" format="float" />
 
         <!-- 与股票指标有关的属性 -->
-        <!-- 视图中心线宽度 -->
-        <attr name="centerLineWidth" format="dimension" />
         <!-- 视图中心线颜色 -->
         <attr name="centerLineColor" format="color" />
-        <!-- 指标线宽度 -->
-        <attr name="normLineWidth" format="dimension" />
-
-        <!-- 线条1颜色 -->
-        <attr name="line1Color" format="color" />
-        <!-- 线条2颜色 -->
-        <attr name="line2Color" format="color" />
-        <!-- 线条3颜色 -->
-        <attr name="line3Color" format="color" />
-        <!-- 线条4颜色 -->
-        <attr name="line4Color" format="color" />
-        <!-- 线条5颜色 -->
-        <attr name="line5Color" format="color" />
+        <!-- 指标Tag颜色 -->
+        <attr name="indexTagColor" format="color" />
 
         <!--与水印有关的属性-->
         <!-- 水印宽度 -->
@@ -348,6 +375,73 @@
             <enum name="default_style" value="0" />
             <!-- 空心，仅描边 -->
             <enum name="gap_style" value="1" />
+        </attr>
+    </declare-styleable>
+
+
+    <declare-styleable name="SortItemView">
+        <attr name="label" format="string" />
+        <attr name="line_count" format="integer" /><!--行个数-->
+        <attr name="row_count" format="integer" /><!--列个数-->
+        <attr name="show_other_line" format="boolean" /><!--是否显示下拉图标-->
+    </declare-styleable>
+
+    <declare-styleable name="PopsTabView">
+
+        <attr name="tab_textsize" format="dimension" /> <!--tab字体大小-->
+        <attr name="tab_text_color_normal" format="color" /> <!--tab字体正常颜色-->
+        <attr name="tab_text_color_focus" format="color" /><!--tab字体选中颜色-->
+
+        <attr name="tab_background_normal" format="color|reference" /><!--tab正常背景-->
+        <attr name="tab_background_focus" format="color|reference" /><!--tab选中背景-->
+
+        <attr name="tab_pop_anim" format="reference" /><!--popwindow弹出动画-->
+
+        <attr name="tab_max_ems" format="integer" /> <!--tab单行最多字数-->
+        <attr name="tab_max_lines" format="integer" /> <!--tab单行最大行数-->
+
+    </declare-styleable>
+
+    <declare-styleable name="TabAttr">
+        <attr name="textSize" format="dimension" />
+        <attr name="checkedTextColor" format="color" />
+        <attr name="unCheckedTextColor" format="color" />
+        <attr name="indicatorColor" format="color" />
+        <attr name="indicatorHeight" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="weightViewAttr">
+        <attr name="leftColor" format="color" />
+        <attr name="rightColor" format="color" />
+        <attr name="labelTextColor" format="color" />
+        <attr name="valueTextColor" format="color" />
+        <attr name="leftLabel" format="string" />
+        <attr name="rightLabel" format="string" />
+        <attr name="labelTextSize" format="dimension" />
+        <attr name="radius" format="dimension" />
+        <attr name="valueTextSize" format="dimension" />
+        <attr name="weightLineHeight" format="dimension" />
+        <attr name="labelMargin" format="dimension" />
+        <attr name="valueMargin" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="chartTabAttr">
+        <!-- 选项卡类型 -->
+        <attr name="tabType">
+            <!-- 币币 -->
+            <enum name="spot" value="111" />
+            <!-- 合约 -->
+            <enum name="contract" value="112" />
+        </attr>
+        <!-- 选项卡子菜单对齐方向 -->
+        <attr name="tabAlign">
+            <enum name="top" value="101" />
+            <enum name="bottom" value="102" />
+        </attr>
+        <!-- 选项卡方向 -->
+        <attr name="orientation">
+            <enum name="vertical" value="121" />
+            <enum name="horizontal" value="122" />
         </attr>
     </declare-styleable>
 </resources>

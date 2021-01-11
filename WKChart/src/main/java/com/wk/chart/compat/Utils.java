@@ -8,12 +8,11 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
-import com.wk.chart.entry.IndicatorTagEntry;
+import com.wk.chart.entry.IndexConfigEntry;
 
 import java.util.Collection;
 
@@ -22,7 +21,7 @@ public class Utils {
     /**
      * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
      */
-    public static int dpTopx(Context context, float dpValue) {
+    public static int dp2px(Context context, float dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
@@ -30,15 +29,23 @@ public class Utils {
     /**
      * 根据手机的分辨率从 px(像素) 的单位 转成为 dp
      */
-    public static int pxTodp(Context context, float pxValue) {
+    public static int px2dp(Context context, float pxValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5f);
     }
 
     /**
+     * 将sp值转换为px值，保证文字大小不变
+     */
+    public static int sp2px(Context context, float spValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (spValue * fontScale + 0.5f);
+    }
+
+    /**
      * 检查集合是否为null或者Empty
      */
-    public static boolean listIsEmpty(Collection data) {
+    public static boolean listIsEmpty(Collection<?> data) {
         return null == data || data.size() == 0;
     }
 
@@ -84,7 +91,7 @@ public class Utils {
      * @param str         源字符串
      * @param flagEntries flag数组，用于将其中flag替换到对应的占位符上
      */
-    public static String replacePlaceholder(@NonNull String str, IndicatorTagEntry.FlagEntry... flagEntries) {
+    public static String replacePlaceholder(@NonNull String str, IndexConfigEntry.FlagEntry... flagEntries) {
         if (null == flagEntries) {
             return str;
         }
@@ -93,8 +100,8 @@ public class Utils {
         if (!str.contains(placeholder)) {
             return str;
         }
-        for (IndicatorTagEntry.FlagEntry value : flagEntries) {
-            str = str.replaceFirst(placeholder, value.getFlag().toString());
+        for (IndexConfigEntry.FlagEntry value : flagEntries) {
+            str = str.replaceFirst(placeholder, String.valueOf(value.getFlag()));
         }
         return str;
     }

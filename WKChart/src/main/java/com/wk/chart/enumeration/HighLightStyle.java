@@ -1,18 +1,18 @@
 package com.wk.chart.enumeration;
 
 /**
- * <p>DataType</p>
- * 数据展示类型
+ * <p>HighLightStyle</p>
+ * 高亮线样式
  */
 
 public enum HighLightStyle {
-  SOLID(0),//实线
+    SOLID(0),//实线
 
-  DOTTED(1);//虚线
+    DOTTED(1);//虚线
 
-  HighLightStyle(int nativeInt) {
-    this.nativeInt = nativeInt;
-  }
+    HighLightStyle(int nativeInt) {
+        this.nativeInt = nativeInt;
+    }
 
-  final int nativeInt;
+    final int nativeInt;
 }

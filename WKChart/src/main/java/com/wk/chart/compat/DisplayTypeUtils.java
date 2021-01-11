@@ -1,8 +1,6 @@
 package com.wk.chart.compat;
 
-
-import com.wk.chart.enumeration.DisplayType;
-
+import com.wk.chart.enumeration.TimeType;
 import java.util.Date;
 
 /**
@@ -11,12 +9,12 @@ import java.util.Date;
 
 public class DisplayTypeUtils {
 
-  public static String format(Date date, DisplayType displayType) {
+  public static String format(Date date, TimeType displayType) {
     return DateUtil.formatDateToString(date, displayType.pattern());
   }
 
-  public static String selectorFormat(Date date, DisplayType displayType) {
-    return DateUtil.formatDateToString(date, displayType == DisplayType.day
+  public static String selectorFormat(Date date, TimeType displayType) {
+    return DateUtil.formatDateToString(date, displayType == TimeType.day
         ? DateUtil.DATE_FORMAT_YMD : DateUtil.DATE_FORMAT_YMDHM);
   }
 }

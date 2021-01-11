@@ -5,15 +5,15 @@ package com.wk.chart.enumeration;
  */
 
 public enum AxisLabelLocation {
-  LEFT(0),//左边
+    LEFT(0),//左边
 
-  RIGHT(1),//右边
+    RIGHT(1),//右边
 
-  ALL(2);//左右都有
+    ALL(2);//左右都有
 
-  AxisLabelLocation(int nativeInt) {
-    this.nativeInt = nativeInt;
-  }
+    AxisLabelLocation(int nativeInt) {
+        this.nativeInt = nativeInt;
+    }
 
-  final int nativeInt;
+    final int nativeInt;
 }

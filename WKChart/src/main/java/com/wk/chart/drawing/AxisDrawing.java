@@ -12,30 +12,37 @@ import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.enumeration.AxisLabelLocation;
-import com.wk.chart.module.base.AbsChartModule;
+import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
+
+import java.util.Arrays;
 
 /**
  * Axis轴绘制组件
  * <p>AxisDrawing</p>
  */
 
-public class AxisDrawing extends AbsDrawing<AbsRender, AbsChartModule> {
+public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
     private static final String TAG = "AxisDrawing";
     private BaseAttribute attribute;
 
-    private TextPaint axisLabelPaintLeft = new TextPaint(Paint.ANTI_ALIAS_FLAG); // Axis 轴标签文字的画笔(左)
-    private TextPaint axisLabelPaintRight = new TextPaint(Paint.ANTI_ALIAS_FLAG); // Axis 轴标签文字的画笔（右）
-    private Paint axisPaint = new Paint(Paint.ANTI_ALIAS_FLAG); // Axis 轴的画笔
-    private Rect rect = new Rect();//用于测量文字的实际占用区域
+    private final TextPaint axisLabelPaintLeft = new TextPaint(Paint.ANTI_ALIAS_FLAG); // Axis 轴标签文字的画笔(左)
+    private final TextPaint axisLabelPaintRight = new TextPaint(Paint.ANTI_ALIAS_FLAG); // Axis 轴标签文字的画笔（右）
+    private final Paint axisPaint = new Paint(Paint.ANTI_ALIAS_FLAG); // Axis 轴的画笔
+    private final Rect rect = new Rect();//用于测量文字的实际占用区域
 
     private final float[] pointCache = new float[2];
-    private float[] lineBuffer = new float[8];
+    private final float[] lineBuffer = new float[8];
+    private final int axisCount;
+    private int axisStart = 0, axisEnd = 0;
+    private float left, right, textCenter, regionHeight, unilateralTextOffset, lineOffset;
 
-    private float left, right, textCenter, regionHeight;
+    public AxisDrawing(int axisCount) {
+        this.axisCount = axisCount;
+    }
 
     @Override
-    public void onInit(AbsRender render, AbsChartModule chartModule) {
+    public void onInit(AbsRender<?, ?> render, AbsModule<?> chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
 
@@ -47,13 +54,16 @@ public class AxisDrawing extends AbsDrawing<AbsRender, AbsChartModule> {
         axisLabelPaintRight.setTextSize(attribute.labelSize);
         axisLabelPaintRight.setColor(attribute.labelColor);
         axisLabelPaintRight.setTextAlign(Paint.Align.RIGHT);
-
         axisPaint.setStyle(Paint.Style.STROKE);
         axisPaint.setStrokeWidth(attribute.lineWidth);
         axisPaint.setColor(attribute.lineColor);
 
         Utils.measureTextArea(axisLabelPaintLeft, rect);
+        axisStart = attribute.showFirstAxis ? 0 : 1;
+        axisEnd = attribute.showLastAxis ? axisCount : axisCount - 1;
         textCenter = rect.height() / 2f;
+        lineOffset = attribute.lineWidth / 2f;
+        unilateralTextOffset = attribute.axisLineState ? -rect.top + attribute.axisLabelTBMargin + lineOffset : textCenter;
     }
 
     @Override
@@ -68,33 +78,43 @@ public class AxisDrawing extends AbsDrawing<AbsRender, AbsChartModule> {
 
     @Override
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
-        for (int i = 1; i < attribute.axisCount; i++) {
+        for (int i = axisStart; i < axisEnd; i++) {
             pointCache[1] = lineBuffer[1] = lineBuffer[3] = viewRect.top + i * regionHeight;
             render.invertMapPoints(pointCache);
-            String text = render.exchangeRateConversion(pointCache[1],
-                    render.getAdapter().getScale().getBaseScale());
+            float value, offset;
+            if (i == 0) {
+                value = extremum[3];
+                offset = lineOffset + attribute.axisLabelTBMargin + rect.height();
+            } else if (i == axisCount - 1) {
+                value = extremum[1];
+                offset = -lineOffset - attribute.axisLabelTBMargin;
+            } else {
+                value = pointCache[1];
+                offset = unilateralTextOffset;
+            }
+            String text = render.exchangeRateConversion(value, render.getAdapter().getScale().getQuoteScale());
             // 绘制横向网格线
             if (attribute.axisLabelLocation == AxisLabelLocation.ALL) {
                 lineBuffer[5] = lineBuffer[7] = lineBuffer[1];
                 lineBuffer[0] = viewRect.left;
-                lineBuffer[2] = left - attribute.axisLabelLRMargin;
-                lineBuffer[4] = right + attribute.axisLabelLRMargin;
+                lineBuffer[2] = left;
+                lineBuffer[4] = right;
                 lineBuffer[6] = viewRect.right;
-                canvas.drawText(text, left, lineBuffer[1] + textCenter, axisLabelPaintLeft);
-                canvas.drawText(text, right, lineBuffer[5] + textCenter, axisLabelPaintRight);
+                offset = textCenter;
             } else {
                 lineBuffer[0] = viewRect.left;
                 lineBuffer[2] = viewRect.right;
-                if (attribute.axisLabelLocation == AxisLabelLocation.LEFT) {
-                    canvas.drawText(text, left, lineBuffer[1] - rect.top + attribute.axisLabelTBMargin,
-                            axisLabelPaintLeft);
-                } else {
-                    canvas.drawText(text, right, lineBuffer[1] - rect.top + attribute.axisLabelTBMargin,
-                            axisLabelPaintRight);
-                }
+            }
+            if (attribute.axisLabelLocation == AxisLabelLocation.LEFT) {
+                canvas.drawText(text, left, lineBuffer[1] + offset, axisLabelPaintLeft);
+            } else if (attribute.axisLabelLocation == AxisLabelLocation.RIGHT) {
+                canvas.drawText(text, right, lineBuffer[1] + offset, axisLabelPaintRight);
+            } else {
+                canvas.drawText(text, left, lineBuffer[1] + offset, axisLabelPaintLeft);
+                canvas.drawText(text, right, lineBuffer[5] + offset, axisLabelPaintRight);
             }
             if (attribute.axisLineState) {
-                canvas.drawLine(lineBuffer[0], lineBuffer[1], lineBuffer[2], lineBuffer[3], axisPaint);
+                canvas.drawLines(lineBuffer, axisPaint);
             }
         }
     }
@@ -106,8 +126,9 @@ public class AxisDrawing extends AbsDrawing<AbsRender, AbsChartModule> {
 
     @Override
     public void onViewChange() {
-        regionHeight = viewRect.height() / attribute.axisCount;
+        regionHeight = viewRect.height() / (axisCount - 1);
         left = viewRect.left + attribute.axisLabelLRMargin;
         right = viewRect.right - attribute.axisLabelLRMargin;
+        Arrays.fill(lineBuffer, 0f);
     }
 }

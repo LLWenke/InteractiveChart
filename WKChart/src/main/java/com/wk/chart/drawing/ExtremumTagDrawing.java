@@ -13,7 +13,7 @@ import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.enumeration.ExtremumTagDrawableLocation;
-import com.wk.chart.module.CandleChartModule;
+import com.wk.chart.module.CandleModule;
 import com.wk.chart.render.CandleRender;
 
 /**
@@ -21,21 +21,21 @@ import com.wk.chart.render.CandleRender;
  * 极值标签组件
  */
 
-public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleChartModule> {
+public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> {
     private static final String TAG = "ExtremumTagDrawing";
     private CandleAttribute attribute;//配置文件
     // 当前可见区域内的极值画笔
-    private TextPaint extremumPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-    private Paint drawablePaint = new Paint(Paint.ANTI_ALIAS_FLAG);//极值标签drawable画笔
+    private final TextPaint extremumPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint drawablePaint = new Paint(Paint.ANTI_ALIAS_FLAG);//极值标签drawable画笔
     private final Rect extremumRect = new Rect(); // 用于计算极值文字位置
     private final Rect maxDrawableRect = new Rect(); // MAX标签drawable位置区域
     private final Rect minDrawableRect = new Rect(); // MIN标签drawable位置区域
-    private float[] extremumBuffer = new float[4]; // 用于计算极值坐标
+    private final float[] extremumBuffer = new float[4]; // 用于计算极值坐标
     private float drawableWidth, drawableHeight, expandWidth;//drawable的宽高,扩展宽度
     private Bitmap bitmap;//极值标签drawable转换成的Bitmap
 
     @Override
-    public void onInit(CandleRender render, CandleChartModule chartModule) {
+    public void onInit(CandleRender render, CandleModule chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
 
@@ -75,7 +75,7 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleChartModu
         extremumPaint.getTextBounds(text, 0, text.length(), extremumRect);
         //文字align调整
         float left = extremumBuffer[0];
-        float top = extremumBuffer[1] - extremumRect.height() / 2f;
+        float top = extremumBuffer[1] + extremumRect.height() / 2f;
         float drawableLeft = left + extremumRect.width() + attribute.extremumTagDrawableMarginX;
         float currentExpandWidth = 0;
         if (attribute.extremumTagDrawableLocation == ExtremumTagDrawableLocation.MAX

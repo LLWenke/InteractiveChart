@@ -3,45 +3,38 @@ package com.wk.chart.drawing;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.util.Log;
 
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.CandleEntry;
-import com.wk.chart.module.VolumeChartModule;
+import com.wk.chart.module.VolumeModule;
 import com.wk.chart.render.CandleRender;
 
 /**
  * <p>VolumeDrawing K线成交量的绘制</p>
  */
 
-public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeChartModule> {
+public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeModule> {
     private static final String TAG = "VolumeDrawing";
     private CandleAttribute attribute;//配置文件
-    // 蜡烛图边框线画笔
-    private Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     // 上涨画笔
-    private Paint increasingPaint = new Paint();
+    private final Paint increasingPaint = new Paint();
     // 下跌画笔
-    private Paint decreasingPaint = new Paint();
+    private final Paint decreasingPaint = new Paint();
     // 上涨路径
-    private Path increasingPath = new Path();
+    private final Path increasingPath = new Path();
     // 下跌路径
-    private Path decreasingPath = new Path();
+    private final Path decreasingPath = new Path();
 
-    private float[] rectBuffer = new float[4];
+    private final float[] rectBuffer = new float[4];
 
     private float borderOffset;//边框偏移量
 
     @Override
-    public void onInit(CandleRender render, VolumeChartModule chartModule) {
+    public void onInit(CandleRender render, VolumeModule chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
-
-        borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setStrokeWidth(attribute.borderWidth);
-        borderPaint.setColor(attribute.borderColor);
 
         increasingPaint.setStyle(attribute.increasingStyle);
         increasingPaint.setStrokeWidth(attribute.pointBorderWidth);
@@ -111,9 +104,10 @@ public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeChartModule> {
 
     @Override
     public void drawOver(Canvas canvas) {
-        //绘制外层边框线
-        if (attribute.borderWidth > 0) {
-            canvas.drawRect(borderPts[0], borderPts[1], borderPts[2], borderPts[3], borderPaint);
-        }
+    }
+
+    @Override
+    public void onViewChange() {
+
     }
 }

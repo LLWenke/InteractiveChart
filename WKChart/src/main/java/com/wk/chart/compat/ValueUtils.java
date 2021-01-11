@@ -2,7 +2,6 @@ package com.wk.chart.compat;
 
 import android.text.TextUtils;
 
-
 import com.wk.chart.entry.RateEntry;
 import com.wk.chart.entry.ValueEntry;
 

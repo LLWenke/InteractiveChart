@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 
 import com.wk.chart.adapter.AbsAdapter;
 import com.wk.chart.compat.Utils;
-import com.wk.chart.enumeration.IndicatorType;
+import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.MarkerPointType;
 
 import java.math.BigDecimal;
@@ -26,7 +26,8 @@ public class CandleEntry extends AbsEntry {
     private final ValueEntry volume; // 量
     private final ValueEntry changeAmount; // 涨跌额
     private final ValueEntry changeProportion; // 涨跌幅
-    private final ArrayMap<Integer, ValueEntry[]> indicators; // 指标
+    private final ArrayMap<Integer, ValueEntry[]> index; // 指标
+    private final ArrayMap<Integer, ValueEntry[]> lineIndex; // 折线指标
     private final Rect markerPointRect;//标记点位置区域矩形
     private @MarkerPointType
     int markerPointType = MarkerPointType.NORMAL; // 标记点类型
@@ -53,7 +54,8 @@ public class CandleEntry extends AbsEntry {
         this.volume = buildValue(volume, scale.getBaseScale());
         this.changeAmount = recoveryValue(getClose().result - getOpen().result, scale.getQuoteScale());
         this.changeProportion = recoveryValue(getChangeAmount().result * 10000 / Utils.divisorCorrect(getOpen().result), scale.getBaseScale());
-        this.indicators = new ArrayMap<>();
+        this.index = new ArrayMap<>();
+        this.lineIndex = new ArrayMap<>();
         addAnimatorEntry(this.close, this.high, this.low, this.volume);
     }
 
@@ -79,7 +81,8 @@ public class CandleEntry extends AbsEntry {
         this.volume = buildValue(volume, scale.getBaseScale());
         this.changeAmount = recoveryValue(getClose().result - getOpen().result, scale.getQuoteScale());
         this.changeProportion = recoveryValue(getChangeAmount().result * 10000 / Utils.divisorCorrect(getOpen().result), scale.getBaseScale());
-        this.indicators = new ArrayMap<>();
+        this.index = new ArrayMap<>();
+        this.lineIndex = new ArrayMap<>();
         addAnimatorEntry(this.close, this.high, this.low, this.volume);
     }
 
@@ -131,13 +134,22 @@ public class CandleEntry extends AbsEntry {
         return recoveryValue(value, getScale().getBaseScale());
     }
 
-    public void putIndicator(@IndicatorType int indicatorType, ValueEntry... values) {
-        this.indicators.put(indicatorType, values);
+    public void putLineIndex(@IndexType int indexType, ValueEntry... values) {
+        this.lineIndex.put(indexType, values);
     }
 
     public @Nullable
-    ValueEntry[] getIndicator(@IndicatorType int indicatorType) {
-        return indicators.get(indicatorType);
+    ValueEntry[] getLineIndex(@IndexType int indexType) {
+        return lineIndex.get(indexType);
+    }
+
+    public void putIndex(@IndexType int indexType, ValueEntry... values) {
+        this.index.put(indexType, values);
+    }
+
+    public @Nullable
+    ValueEntry[] getIndex(@IndexType int indexType) {
+        return index.get(indexType);
     }
 
     public @MarkerPointType

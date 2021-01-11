@@ -2,11 +2,9 @@
 package com.wk.chart.compat.attribute;
 
 import android.content.Context;
-
 import androidx.annotation.NonNull;
 
 import com.wk.chart.enumeration.DepthGridStyle;
-
 
 /**
  * <p>深度图属性配置类</p>
