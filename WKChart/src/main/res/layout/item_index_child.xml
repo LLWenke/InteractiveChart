@@ -24,11 +24,12 @@
         android:id="@+id/v_index_background"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:backgroundTint="#374a56"
+        android:background="@drawable/bg_border_do_empty"
         app:layout_constraintBottom_toBottomOf="@id/et_index_value"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_index_check_box"
-        app:layout_constraintTop_toTopOf="@id/et_index_value" />
+        app:layout_constraintTop_toTopOf="@id/et_index_value"
+        tools:backgroundTint="#374a56" />
 
     <com.wk.view.FontTextView
         android:id="@+id/tv_index_label"

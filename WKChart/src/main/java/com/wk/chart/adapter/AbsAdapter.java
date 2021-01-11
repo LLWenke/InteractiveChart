@@ -47,7 +47,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         this.chartData = new ArrayList<>();
         this.uiHandler = new Handler(this);
         this.dataSetObservable = new DataSetObservable();
-        this.animator = new ChartAnimator<>(this, 0);
+        this.animator = new ChartAnimator<>(this, 300);
         this.scale = new ScaleEntry(0, 0, "", "");
         this.rate = new RateEntry(BigDecimal.ONE, scale.getQuoteUnit(), scale.quoteScale);
     }

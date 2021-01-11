@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -54,6 +56,7 @@ import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 import static android.view.View.VISIBLE;
 import static android.widget.Toast.LENGTH_SHORT;
 import static com.wk.demo.util.DataUtils.candleEntries;
+import static com.wk.demo.util.DataUtils.depthEntries;
 
 /**
  * <p>MainActivity</p>
@@ -93,16 +96,19 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
         public void update(Observable o, Object arg) {
             switch ((ObserverArg) arg) {
                 case INIT_AND_RESET:
-                case RESET:
                 case INIT:
-                case ADD:
-                case NORMAL:
-                    loadComplete(candleProgressBar);
-                    loadComplete(depthProgressBar);
                     if (dataShowType == DataType.REAL_TIME.ordinal()) {
                         PushService.stopPush();
                         startPush();
                     }
+                case RESET:
+                case ADD:
+                case NORMAL:
+                    if (null == candleAdapter || candleAdapter.getCount() == 0) {
+                        return;
+                    }
+                    loadComplete(candleProgressBar);
+                    loadComplete(depthProgressBar);
                     break;
             }
         }
@@ -116,7 +122,13 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
         initChart();
         loadBegin(REFRESH_LOADING, candleProgressBar, candleChart);
         loadBegin(REFRESH_LOADING, depthProgressBar, depthChart);
-        recoveryChartState();
+        //延时执行，因为adapter中的异步任务可能与adapter的setBuildConfig中的异步任务冲突而出现无数据的情况，所以暂时使用延时避免，后期再做优化，（如果接入的是网络数据，则没有问题，因为网络请求自带延迟）
+        new Handler().postDelayed(() -> {
+            if (isFinishing()) {
+                return;
+            }
+            recoveryChartState();
+        }, 1000);
     }
 
     @Override
@@ -182,12 +194,14 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
         candleProgressBar = findViewById(R.id.candle_loading_bar);
         depthProgressBar = findViewById(R.id.depth_loading_bar);
         this.constraintSet = new ChartConstraintSet(chartLayout);
+        this.chartLayout.setICacheLoadListener(this);
         if (null != chartTabLayout) {
             this.chartTabLayout.setChartTabListener(this);
         }
         if (null != chartIndexTabLayout) {
             this.chartIndexTabLayout.setChartTabListener(this);
         }
+        IndexManager.INSTANCE.addIndexBuildConfigChangeListener(this);
     }
 
     private void initChart() {
@@ -196,7 +210,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
         }
         this.depthChart.setAdapter(depthAdapter);
         if (null == candleAdapter) {
-            this.candleAdapter = new CandleAdapter();
+            this.candleAdapter = new CandleAdapter(new IndexBuildConfig(IndexManager.INSTANCE.getIndexConfigs(this)));
             this.candleAdapter.setScale(4, 4);
         }
         if (dataShowType == DataType.REAL_TIME.ordinal()) {
@@ -256,7 +270,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
      */
     private void recoveryChartState() {
         if (null == mChartCache) {
-            TimeType timeType = TimeType.oneHour;
+            TimeType timeType = TimeType.fourHour;
             chartTabLayout.checkedDefaultTimeType(timeType, ModuleType.CANDLE);
             chartTabLayout.checkedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.MAIN), ModuleGroupType.MAIN);
             chartTabLayout.checkedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.INDEX), ModuleGroupType.INDEX);
@@ -286,8 +300,9 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
         candleAdapter.resetData(timeType,
                 dataShowType == DataType.REAL_TIME.ordinal() ?
                         getNewestData(500) : getInit());
-        candleAdapter.resetTimeType(timeType);
-
+        if (depthAdapter.getCount() == 0) {
+            depthAdapter.resetData(depthEntries);
+        }
         if (chartLayout.switchModuleType(moduleType, ModuleGroupType.MAIN)) {
             candleChart.onViewInit();
             candleChart.onDataReset();
@@ -375,6 +390,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        IndexManager.INSTANCE.removeIndexBuildConfigChangeListener(this);
         PushService.stopPush();
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
@@ -434,4 +450,5 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     private Boolean isLand() {
         return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
+
 }

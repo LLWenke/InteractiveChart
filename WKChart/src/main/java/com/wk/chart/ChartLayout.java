@@ -59,8 +59,8 @@ import java.util.Map;
 public class ChartLayout extends ConstraintLayout {
     private static final String TAG = "ChartLayout";
     private DataType dataDisplayType;
-    private AbsRender<?, ?> render;
-    private ChartView chartView;
+    private AbsRender<?, ?> candleRender;
+    private ChartView candleChartView;
     private ICacheLoadListener iCacheLoadListener;
 
     public ChartLayout(Context context) {
@@ -94,7 +94,7 @@ public class ChartLayout extends ConstraintLayout {
         candleModule.addDrawing(new IndexLabelDrawing());//指标文字标签组件
         candleModule.addDrawing(new MarkerPointDrawing());//标记点绘制组件
         candleModule.addDrawing(new ExtremumTagDrawing());//极值标签组件
-        candleModule.addDrawing(new BorderDrawing(BorderStyle.BOTTOM));//边框组件
+        candleModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
         candleModule.setEnable(true);
         render.addModule(candleModule);
 
@@ -105,7 +105,7 @@ public class ChartLayout extends ConstraintLayout {
         timeLineModule.addDrawing(new MarkerPointDrawing());//标记点绘制组件
         timeLineModule.addDrawing(new IndexLabelDrawing());//指标文字标签组件
         timeLineModule.addDrawing(new BreathingLampDrawing());//呼吸灯组件
-        timeLineModule.addDrawing(new BorderDrawing(BorderStyle.BOTTOM));//边框组件
+        timeLineModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
         render.addModule(timeLineModule);
 
         VolumeModule volumeModule = new VolumeModule();
@@ -113,7 +113,7 @@ public class ChartLayout extends ConstraintLayout {
         volumeModule.addDrawing(new IndexLineDrawing());
         volumeModule.addDrawing(new IndexLabelDrawing());
         volumeModule.addDrawing(new AxisTagDrawing());
-        volumeModule.addDrawing(new BorderDrawing(BorderStyle.BOTTOM));//边框组件
+        volumeModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
         volumeModule.setEnable(true);
         render.addModule(volumeModule);
 
@@ -121,7 +121,7 @@ public class ChartLayout extends ConstraintLayout {
         indexModule.addDrawing(new MACDDrawing());//macd指标组件
         indexModule.addDrawing(new IndexLineDrawing());//指标线组件
         indexModule.addDrawing(new IndexLabelDrawing());//指标文字标签组件
-        indexModule.addDrawing(new BorderDrawing(BorderStyle.BOTTOM));//边框组件
+        indexModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
         indexModule.setEnable(true);
         render.addModule(indexModule);
 
@@ -132,7 +132,7 @@ public class ChartLayout extends ConstraintLayout {
         floatModule.addDrawing(new GridDrawing());//Y轴组件
         floatModule.addDrawing(candleHighlight);
         floatModule.addDrawing(new CandleSelectorDrawing());
-        floatModule.addDrawing(new BorderDrawing(BorderStyle.TOP | BorderStyle.BOTTOM));//边框组件
+        floatModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
         render.addModule(floatModule);
     }
 
@@ -145,10 +145,12 @@ public class ChartLayout extends ConstraintLayout {
             if (!(view instanceof ChartView)) {
                 continue;
             }
-            this.chartView = (ChartView) view;
-            this.render = chartView.getRender();
+            ChartView chartView = (ChartView) view;
+            AbsRender<?, ?> render = chartView.getRender();
             switch (chartView.getRenderModel()) {
                 case CANDLE://蜡烛图
+                    this.candleChartView = chartView;
+                    this.candleRender = render;
                     initChartModules(render);
                     break;
                 case DEPTH://深度图
@@ -178,10 +180,10 @@ public class ChartLayout extends ConstraintLayout {
      * @param moduleGroupType 模型分组
      */
     public boolean switchModuleType(@ModuleType int moduleType, @ModuleGroupType int moduleGroupType) {
-        if (null == render) {
+        if (null == candleRender) {
             return false;
         }
-        List<AbsModule<AbsEntry>> modules = render.getModules().get(moduleGroupType);
+        List<AbsModule<AbsEntry>> modules = candleRender.getModules().get(moduleGroupType);
         if (null == modules || modules.isEmpty()) {
             return false;
         }
@@ -208,10 +210,10 @@ public class ChartLayout extends ConstraintLayout {
      * @param moduleGroupType 模型分组
      */
     public boolean switchIndexType(@IndexType int indexType, @ModuleGroupType int moduleGroupType) {
-        if (null == render) {
+        if (null == candleRender) {
             return false;
         }
-        List<AbsModule<AbsEntry>> modules = render.getModules().get(moduleGroupType);
+        List<AbsModule<AbsEntry>> modules = candleRender.getModules().get(moduleGroupType);
         if (null == modules || modules.isEmpty()) {
             return false;
         }
@@ -229,7 +231,7 @@ public class ChartLayout extends ConstraintLayout {
 
     public @IndexType
     int getNowIndexType(@ModuleGroupType int moduleGroupType) {
-        List<AbsModule<AbsEntry>> modules = render.getModules().get(moduleGroupType);
+        List<AbsModule<AbsEntry>> modules = candleRender.getModules().get(moduleGroupType);
         if (null == modules || modules.isEmpty()) {
             return IndexType.NONE;
         }
@@ -248,17 +250,17 @@ public class ChartLayout extends ConstraintLayout {
      */
     public @Nullable
     ChartCache chartCache() {
-        if (null == render) {
+        if (null == candleRender) {
             return null;
         }
         ChartCache chartCache = new ChartCache();
-        chartCache.scale = render.getAttribute().currentScale;
-        chartCache.beginPosition = render.getBegin();
-        AbsAdapter adapter = render.getAdapter();
+        chartCache.scale = candleRender.getAttribute().currentScale;
+        chartCache.beginPosition = candleRender.getBegin();
+        AbsAdapter adapter = candleRender.getAdapter();
         if (adapter instanceof CandleAdapter) {
             chartCache.timeType = ((CandleAdapter) adapter).getTimeType();
         }
-        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : render.getModules().entrySet()) {
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : candleRender.getModules().entrySet()) {
             for (AbsModule<AbsEntry> module : item.getValue()) {
                 if (module.isEnable()) {
                     chartCache.types.add(new ChartCache.TypeEntry(module.getModuleType(),
@@ -274,12 +276,12 @@ public class ChartLayout extends ConstraintLayout {
      * 加载图表缓存信息
      */
     public void loadChartCache(@NotNull final ChartCache chartCache) {
-        if (null == render || null == chartView) {
+        if (null == candleRender || null == candleChartView) {
             return;
         }
         boolean isLoadData = false, isViewChanged = false;
-        render.getAttribute().currentScale = chartCache.scale;
-        AbsAdapter adapter = render.getAdapter();
+        candleRender.getAttribute().currentScale = chartCache.scale;
+        AbsAdapter adapter = candleRender.getAdapter();
         if (adapter instanceof CandleAdapter) {
             CandleAdapter candleAdapter = (CandleAdapter) adapter;
             isLoadData = candleAdapter.resetTimeType(chartCache.timeType);
@@ -291,11 +293,11 @@ public class ChartLayout extends ConstraintLayout {
             }
         }
         if (isViewChanged) {
-            this.chartView.onViewInit();
+            this.candleChartView.onViewInit();
         }
-        this.chartView.post(() -> {
-            chartView.onDataReset();
-            render.toTransX(chartCache.beginPosition);
+        this.candleChartView.post(() -> {
+            candleChartView.onDataReset();
+            candleRender.toTransX(chartCache.beginPosition);
         });
         if (null != iCacheLoadListener) {
             this.iCacheLoadListener.onLoadCacheTypes(chartCache.timeType, isLoadData, chartCache.types);

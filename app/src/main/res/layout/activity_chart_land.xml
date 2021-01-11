@@ -2,124 +2,137 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <FrameLayout
+    <com.wk.chart.ChartLayout
+        android:id="@+id/chart_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="45dp"
-        android:orientation="horizontal">
+        android:layout_marginEnd="65.5dp"
+        android:layout_marginBottom="40dp">
 
-        <com.wk.chart.ChartLayout
-            android:id="@+id/chart_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="65.5dp"
-            android:layout_marginBottom="40dp">
-
-            <com.wk.chart.ChartView
-                android:id="@+id/candle_chart"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:axisLabelLocation="right"
-                app:axisLabelTBMargin="0dp"
-                app:axisLineState="false"
-                app:axisTagMarginY="3dp"
-                app:borderWidth="0.5dp"
-                app:breathingLampRadius="3dp"
-                app:candleExtremumLabelSize="10sp"
-                app:decreasingStyle="fill"
-                app:gridCount="5"
-                app:gridLabelMarginBottom="3dp"
-                app:gridLineLength="3dp"
-                app:gridLineStyle="graduation"
-                app:increasingStyle="fill"
-                app:indexTextMarginX="10dp"
-                app:indexTextMarginY="3dp"
-                app:indexTextSize="10sp"
-                app:labelSize="10sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:lineWidth="1dp"
-                app:markerLRPadding="5dp"
-                app:markerPointJointMargin="1dp"
-                app:markerPointJointRadius="2dp"
-                app:markerPointLineDefaultLength="4dp"
-                app:markerPointLineWidth="0.5dp"
-                app:markerPointMinMargin="1dp"
-                app:markerPointTextMarginX="4dp"
-                app:markerPointTextMarginY="3dp"
-                app:markerPointTextSize="9sp"
-                app:markerRadius="2dp"
-                app:markerStyle="fill_and_stroke"
-                app:markerTBPadding="2dp"
-                app:markerTextSize="11sp"
-                app:pointBorderWidth="1.5dp"
-                app:pointSpace="2dp"
-                app:pointWidth="5dp"
-                app:renderModel="candle"
-                app:rightScrollOffset="100dp"
-                app:selectorBorderWidth="0.5dp"
-                app:selectorLabelSize="8sp"
-                app:selectorMarginY="30dp"
-                app:selectorValueSize="8sp"
-                app:spreadCursorBorderWidth="0.7dp"
-                app:spreadCursorTextLRMargin="4dp"
-                app:spreadCursorTextTBMargin="2dp"
-                app:spreadTriangleHeight="3dp"
-                app:spreadTriangleWidth="3dp"
-                app:timeLineWidth="1dp"
-                app:waterMarkingMarginX="24dp"
-                app:waterMarkingMarginY="10dp" />
-
-            <ProgressBar
-                android:id="@+id/candle_loading_bar"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="@+id/candle_chart"
-                app:layout_constraintTop_toTopOf="@+id/candle_chart" />
-
-        </com.wk.chart.ChartLayout>
-
-        <View
-            android:layout_width="0.5dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:layout_marginEnd="65dp"
-            android:background="#132a38" />
-
-        <com.wk.view.tab.ChartIndexTabLayout
-            android:id="@+id/chart_index_tab_view"
-            android:layout_width="65dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:background="#061D2C" />
-
-        <com.wk.view.tab.ChartTabLayout
-            android:id="@+id/chart_tab_view"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_gravity="bottom"
-            android:layout_marginEnd="65dp"
-            android:background="#061D2C"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+        <com.wk.chart.ChartView
+            android:id="@+id/candle_chart"
+            android:layout_width="0dp"
+            android:layout_height="230dp"
+            app:axisLabelLocation="right"
+            app:axisLabelTBMargin="0dp"
+            app:axisLineState="false"
+            app:axisTagMarginY="3dp"
+            app:borderWidth="0.5dp"
+            app:breathingLampRadius="3dp"
+            app:candleExtremumLabelSize="10sp"
+            app:decreasingStyle="fill"
+            app:gridCount="5"
+            app:gridLabelMarginBottom="3dp"
+            app:gridLineLength="3dp"
+            app:gridLineStyle="graduation"
+            app:increasingStyle="fill"
+            app:indexTextMarginX="10dp"
+            app:indexTextMarginY="3dp"
+            app:indexTextSize="10sp"
+            app:labelSize="10sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:orientation="horizontal"
-            app:tabAlign="top"
-            app:tabType="spot" />
+            app:lineWidth="1dp"
+            app:markerLRPadding="5dp"
+            app:markerPointJointMargin="1dp"
+            app:markerPointJointRadius="2dp"
+            app:markerPointLineDefaultLength="4dp"
+            app:markerPointLineWidth="0.5dp"
+            app:markerPointMinMargin="1dp"
+            app:markerPointTextMarginX="4dp"
+            app:markerPointTextMarginY="3dp"
+            app:markerPointTextSize="9sp"
+            app:markerRadius="2dp"
+            app:markerStyle="fill_and_stroke"
+            app:markerTBPadding="2dp"
+            app:markerTextSize="11sp"
+            app:pointBorderWidth="1.5dp"
+            app:pointSpace="2dp"
+            app:pointWidth="5dp"
+            app:renderModel="candle"
+            app:rightScrollOffset="70dp"
+            app:selectorBorderWidth="0.5dp"
+            app:selectorLabelSize="8sp"
+            app:selectorMarginY="30dp"
+            app:selectorValueSize="8sp"
+            app:spreadCursorBorderWidth="0.7dp"
+            app:spreadCursorTextLRMargin="4dp"
+            app:spreadCursorTextTBMargin="2dp"
+            app:spreadTriangleHeight="3dp"
+            app:spreadTriangleWidth="3dp"
+            app:timeLineWidth="1dp"
+            app:waterMarkingMarginX="24dp"
+            app:waterMarkingMarginY="10dp" />
 
-    </FrameLayout>
+        <ProgressBar
+            android:id="@+id/candle_loading_bar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/candle_chart"
+            app:layout_constraintTop_toTopOf="@+id/candle_chart" />
+
+        <com.wk.chart.ChartView
+            android:id="@+id/depth_chart"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            app:axisLabelLocation="all"
+            app:borderWidth="0dp"
+            app:gridLabelMarginBottom="8dp"
+            app:gridLabelMarginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/candle_chart"
+            app:layout_constraintVertical_weight="1"
+            app:lineWidth="1dp"
+            app:markerStyle="fill_and_stroke"
+            app:markerTextSize="7sp"
+            app:renderModel="depth"
+            app:selectorMarginY="19dp"
+            app:viewInterval="0dp" />
+
+        <ProgressBar
+            android:id="@+id/depth_loading_bar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/depth_chart"
+            app:layout_constraintTop_toTopOf="@+id/depth_chart" />
+    </com.wk.chart.ChartLayout>
 
     <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:layout_marginTop="45dp"
+        android:layout_width="0.5dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:layout_marginEnd="65dp"
         android:background="#132a38" />
+
+    <com.wk.view.tab.ChartIndexTabLayout
+        android:id="@+id/chart_index_tab_view"
+        android:layout_width="65dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="#061D2C" />
+
+    <com.wk.view.tab.ChartTabLayout
+        android:id="@+id/chart_tab_view"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_gravity="bottom"
+        android:layout_marginEnd="65dp"
+        android:background="#061D2C"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:orientation="horizontal"
+        app:tabAlign="top"
+        app:tabType="spot" />
+
 </FrameLayout>

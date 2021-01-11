@@ -33,7 +33,7 @@ class IndexChildProvider : BaseNodeProvider() {
         helper.setText(R.id.tv_index_label, entity.name)
         input.setText(if (0 == entity.flag) null else entity.flag.toString())
         if (entity.color == 0) {
-            helper.getView<View>(R.id.v_index_background).backgroundTintList =ColorStateList.valueOf(Color.parseColor("#374a56"))
+            helper.getView<View>(R.id.v_index_background).backgroundTintList =ColorStateList.valueOf(Color.parseColor("#6a879d"))
             input.setTextColor(Color.parseColor("#FFFFFF"))
         } else {
             helper.getView<View>(R.id.v_index_background).backgroundTintList = ColorStateList.valueOf(entity.color)
