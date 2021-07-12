@@ -93,7 +93,8 @@
             app:markerStyle="fill_and_stroke"
             app:markerTextSize="7sp"
             app:renderModel="depth"
-            app:selectorMarginY="19dp"
+            app:selectorIntervalY="2dp"
+            app:selectorMarginY="0dp"
             app:viewInterval="0dp" />
 
         <ProgressBar

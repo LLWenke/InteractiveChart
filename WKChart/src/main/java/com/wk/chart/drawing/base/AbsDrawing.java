@@ -7,8 +7,11 @@ import android.graphics.RectF;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
 
+import java.util.Arrays;
+
 /**
  * <p>AbsDrawing</p>
+ * 绘制组件基类
  */
 
 public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<?>> {
@@ -34,6 +37,7 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
         this.render = render;
         this.absChartModule = chartModule;
         this.viewRect = chartModule.getRect();
+        Arrays.fill(margin, 0);
     }
 
     /**
@@ -72,9 +76,16 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
     public abstract void drawOver(Canvas canvas);
 
     /**
-     * 当视图改变时调用此方法，用于一些属性的重制和运算
+     * 初始化配置信息
      */
-    public abstract void onViewChange();
+    public void onInitConfig() {
+    }
+
+    /**
+     * 当视图布局完成后调用此方法，将依赖于视图的大小和位置的属进行重置和运算
+     */
+    public void onLayoutComplete() {
+    }
 
     /**
      * 是否初始化完成

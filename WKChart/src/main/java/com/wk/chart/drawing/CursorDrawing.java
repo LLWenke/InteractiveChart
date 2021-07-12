@@ -106,7 +106,7 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
         cursorPoint[0] = render.getAdapter().getLastPosition() + 1;
         cursorPoint[1] = last.getClose().value;
         render.mapPoints(cursorPoint);
-        String value = render.exchangeRateConversion(last.getClose().value, render.getAdapter().getScale().getQuoteScale());
+        String value = render.rateConversion(last.getClose().value, render.getAdapter().getScale().getQuoteScale(), true);
         //防止文字抖动现象
         float textWidth = foldedCharsWidth * (float) value.length();
         float textRight = viewRect.right - attribute.axisLabelLRMargin;
@@ -175,9 +175,5 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
     @Override
     public boolean onDrawingClick(float x, float y) {
         return clickable && cursorRect.contains(x, y);
-    }
-
-    @Override
-    public void onViewChange() {
     }
 }

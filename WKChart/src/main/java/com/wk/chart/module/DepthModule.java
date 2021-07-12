@@ -12,7 +12,6 @@ public class DepthModule extends MainModule<DepthEntry> {
 
     public DepthModule() {
         super(ModuleType.DEPTH);
-        setEnable(true);
     }
 
     @Override

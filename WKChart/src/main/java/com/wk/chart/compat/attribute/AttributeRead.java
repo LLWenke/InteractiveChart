@@ -26,6 +26,15 @@ public class AttributeRead {
         /*
          * 各个视图模块的配置信息有关属性
          */
+        attribute.mainViewHeight = a.getDimension(R.styleable.ChartAttr_mainViewHeight,
+                attribute.mainViewHeight);// 主图模块高度
+
+        attribute.auxiliaryViewHeight = a.getDimension(R.styleable.ChartAttr_auxiliaryViewHeight,
+                attribute.auxiliaryViewHeight);// 副图模块高度
+
+        attribute.indexViewHeight = a.getDimension(R.styleable.ChartAttr_indexViewHeight,
+                attribute.indexViewHeight);// 指标模块高度
+
         attribute.viewInterval = a.getDimension(R.styleable.ChartAttr_viewInterval,
                 attribute.viewInterval);// 各个视图模块间的间隔
 
@@ -339,7 +348,7 @@ public class AttributeRead {
         attribute.minScale = minScale > 0 ? minScale : 0.1f;
 
         attribute.currentScale =
-                a.getFloat(R.styleable.ChartAttr_currentScale, attribute.currentScale);// 当前X轴缩放倍数
+                a.getFloat(R.styleable.ChartAttr_currentScale, attribute.currentScale);// 当前缩放倍数
 
         /*
          * 与股票指标有关的属性

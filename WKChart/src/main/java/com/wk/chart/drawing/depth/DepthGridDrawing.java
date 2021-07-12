@@ -59,15 +59,6 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
     }
 
     @Override
-    public float[] onInitMargin() {
-        margin[3] = attribute.gridLabelMarginTop
-                + attribute.gridLabelMarginBottom
-                + rect.height()
-                + attribute.borderWidth;
-        return margin;
-    }
-
-    @Override
     public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
     }
 
@@ -118,8 +109,7 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
                 pointCache[0] = x - (i > (attribute.gridCount / 2) ? absChartModule.getXOffset() :
                         -absChartModule.getXOffset());
                 render.invertMapPoints(render.getMainModule().getMatrix(), pointCache);
-                value = render.exchangeRateConversion(pointCache[0],
-                        render.getAdapter().getScale().getQuoteScale());
+                value = render.rateConversion(pointCache[0], render.getAdapter().getScale().getQuoteScale(), false);
                 pointCache[0] = x;
                 canvas.drawText(value, pointCache[0], gridLabelY, gridLabelPaint);
             }
@@ -131,7 +121,7 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
     }
 
     @Override
-    public void onViewChange() {
+    public void onLayoutComplete() {
         regionWidth = viewRect.width() / (attribute.gridCount - 1);
         gridLabelY = viewRect.bottom - attribute.borderWidth - attribute.gridLabelMarginBottom;
     }

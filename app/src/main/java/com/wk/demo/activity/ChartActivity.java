@@ -5,10 +5,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -45,7 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.prefs.Preferences;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -95,20 +91,20 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
         @Override
         public void update(Observable o, Object arg) {
             switch ((ObserverArg) arg) {
-                case INIT_AND_RESET:
                 case INIT:
+                case ATTR_UPDATE:
                     if (dataShowType == DataType.REAL_TIME.ordinal()) {
                         PushService.stopPush();
-                        startPush();
                     }
-                case RESET:
                 case ADD:
                 case NORMAL:
+                case REFRESH:
                     if (null == candleAdapter || candleAdapter.getCount() == 0) {
                         return;
                     }
                     loadComplete(candleProgressBar);
                     loadComplete(depthProgressBar);
+                    startPush();
                     break;
             }
         }
@@ -305,7 +301,6 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
         }
         if (chartLayout.switchModuleType(moduleType, ModuleGroupType.MAIN)) {
             candleChart.onViewInit();
-            candleChart.onDataReset();
         }
     }
 
@@ -429,7 +424,6 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     public void onIndexTypeChange(int indexType, int moduleGroupType) {
         chartLayout.switchIndexType(indexType, moduleGroupType);
         candleChart.onViewInit();
-        candleChart.onDataReset();
     }
 
     @Override

@@ -56,7 +56,7 @@ public class WaterMarkingDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?
     }
 
     @Override
-    public void onViewChange() {
+    public void onLayoutComplete() {
         if (null == bitmap) {
             return;
         }

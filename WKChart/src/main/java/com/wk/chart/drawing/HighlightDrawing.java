@@ -136,8 +136,8 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatModule> {
         highlightPoint[1] = entry.getClose().value;
         render.mapPoints(chartModule.getMatrix(), highlightPoint);
         highlightPoint[0] = render.getHighlightPoint()[0];
-        markerText[1] = render.exchangeRateConversion(entry.getClose().text,
-                render.getAdapter().getScale().getQuoteScale());
+        markerText[1] = render.rateConversion(entry.getClose().value,
+                render.getAdapter().getScale().getQuoteScale(), true);
 
         for (AbsMarker<AbsRender<?, ?>> markerView : markerViewList) {
             markerView.onMarkerViewMeasure(chartModule.getRect(),
@@ -201,20 +201,5 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatModule> {
         for (AbsMarker<AbsRender<?, ?>> markerView : markerViewList) {
             markerView.onMarkerViewDraw(canvas, markerText);
         }
-    }
-
-    @Override
-    public void onViewChange() {
-    }
-
-    /**
-     * 获取坐标反转后的值（此处已做精度控制）
-     */
-    private String getInvertPoint(AbsModule<AbsEntry> chartModule) {
-        highlightInvertPoint[1] = highlightPoint[1];
-        render.invertMapPoints(chartModule.getMatrix(), highlightInvertPoint);
-        return render.exchangeRateConversion(highlightInvertPoint[1],
-                render.getAdapter().getScale().getQuoteScale()
-        );
     }
 }

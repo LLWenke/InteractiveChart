@@ -11,6 +11,7 @@ import com.wk.chart.adapter.DepthAdapter;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.DepthEntry;
+import com.wk.chart.entry.ScaleEntry;
 import com.wk.demo.MyApp;
 import com.wk.demo.model.DepthWrapper;
 
@@ -32,7 +33,7 @@ public class DataUtils {
     public static List<DepthEntry> depthEntries;
 
     @SuppressLint("StaticFieldLeak")
-    public static void loadData(AbsAdapter.ScaleEntry scaleEntry, LoadingListener listener) {
+    public static void loadData(ScaleEntry scaleEntry, LoadingListener listener) {
         task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -52,7 +53,7 @@ public class DataUtils {
         }.execute();
     }
 
-    private static List<CandleEntry> getCandelData(AbsAdapter.ScaleEntry scaleEntry) {
+    private static List<CandleEntry> getCandelData(ScaleEntry scaleEntry) {
         String kLineData;
         List<CandleEntry> dataList = new ArrayList<>();
         try {
@@ -84,7 +85,7 @@ public class DataUtils {
         return dataList;
     }
 
-    private static List<DepthEntry> getDepthData(AbsAdapter.ScaleEntry scaleEntry) {
+    private static List<DepthEntry> getDepthData(ScaleEntry scaleEntry) {
         try {
             InputStream in = MyApp.context.getResources().getAssets().open("depth_data.json");
             int length = in.available();

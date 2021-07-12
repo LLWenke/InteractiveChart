@@ -77,14 +77,14 @@ public class AxisTagDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<AbsEnt
         String topLabel, bottomLabel = null;
         switch (absChartModule.getModuleType()) {
             case ModuleType.VOLUME:
-                topLabel = ValueUtils.formatBig(absChartModule.getMaxY().value,
+                topLabel = ValueUtils.quantization(absChartModule.getMaxY().value,
                         render.getAdapter().getScale().getQuoteScale());
                 break;
             default:
-                topLabel = render.exchangeRateConversion(extremum[3],
-                        render.getAdapter().getScale().getQuoteScale());
-                bottomLabel = render.exchangeRateConversion(extremum[1],
-                        render.getAdapter().getScale().getQuoteScale());
+                topLabel = render.rateConversion(extremum[3],
+                        render.getAdapter().getScale().getQuoteScale(), false);
+                bottomLabel = render.rateConversion(extremum[1],
+                        render.getAdapter().getScale().getQuoteScale(), false);
                 break;
         }
         if (null != topLabel) {
@@ -119,14 +119,14 @@ public class AxisTagDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<AbsEnt
 
     @SuppressLint("SwitchIntDef")
     @Override
-    public void onViewChange() {
+    public void onLayoutComplete() {
         float top = viewRect.top, bottom = viewRect.bottom;
         switch (attribute.axisTagLocation) {
             case LEFT:
             case RIGHT:
             case ALL:
-                top = viewRect.top - attribute.axisTagMarginY;
-                bottom = viewRect.bottom + rect.height() + attribute.axisTagMarginY;
+                top = viewRect.top - attribute.axisTagMarginY - attribute.borderWidth;
+                bottom = viewRect.bottom + rect.height() + attribute.axisTagMarginY + attribute.borderWidth;
                 break;
             case LEFT_INSIDE:
             case RIGHT_INSIDE:

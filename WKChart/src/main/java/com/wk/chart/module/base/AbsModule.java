@@ -30,9 +30,9 @@ public abstract class AbsModule<T extends AbsEntry> {
 
     protected final ValueEntry zeroEntry; //0
 
-    private RectF rect = new RectF();
+    private final RectF rect = new RectF();
 
-    private float[] margin; //边距[left, top, right, bottom]
+    private final float[] drawingMargin; //边距[left, top, right, bottom]
 
     protected float[] rectBuffer;//数据点的矩形坐标点
 
@@ -43,10 +43,6 @@ public abstract class AbsModule<T extends AbsEntry> {
     private int paddingLeft = 0;
 
     private int paddingRight = 0;
-
-    private float width;//宽度
-
-    private float height;//高度
 
     private boolean enable = false;
 
@@ -83,7 +79,7 @@ public abstract class AbsModule<T extends AbsEntry> {
         this.zeroEntry = new ValueEntry(0);
         this.maxEntry.result = -Long.MAX_VALUE;
         this.minEntry.result = Long.MAX_VALUE;
-        this.margin = new float[4];
+        this.drawingMargin = new float[4];
         this.rectBuffer = new float[8];
     }
 
@@ -116,6 +112,7 @@ public abstract class AbsModule<T extends AbsEntry> {
      * 重置组件
      */
     public void resetDrawing() {
+        Arrays.fill(drawingMargin, 0);
         for (AbsDrawing<?, ?> drawing : getDrawingList()) {
             drawing.resetInit();
         }
@@ -131,41 +128,33 @@ public abstract class AbsModule<T extends AbsEntry> {
             if (!drawing.isInit()) {
                 drawing.onInit(render, this);
             }
-            drawing.onViewChange();
+            drawing.onInitConfig();
         }
     }
 
     /**
      * 初始化组件的边距
-     *
-     * @return 修改数量
      */
-    public int initMargin() {
-        int updateCount = 0;
-        Arrays.fill(margin, 0);
+    public void initDrawingMargin() {
+        Arrays.fill(drawingMargin, 0);
         for (AbsDrawing<AbsRender<?, ?>, AbsModule<?>> drawing : getDrawingList()) {
             if (!drawing.isInit()) {
                 continue;
             }
             float[] margins = drawing.onInitMargin();
-            if (margins[0] > margin[0]) {
-                margin[0] = margins[0];
-                updateCount++;
+            if (margins[0] > drawingMargin[0]) {
+                drawingMargin[0] = margins[0];
             }
-            if (margins[1] > margin[1]) {
-                margin[1] = margins[1];
-                updateCount++;
+            if (margins[1] > drawingMargin[1]) {
+                drawingMargin[1] = margins[1];
             }
-            if (margins[2] > margin[2]) {
-                margin[2] = margins[2];
-                updateCount++;
+            if (margins[2] > drawingMargin[2]) {
+                drawingMargin[2] = margins[2];
             }
-            if (margins[3] > margin[3]) {
-                margin[3] = margins[3];
-                updateCount++;
+            if (margins[3] > drawingMargin[3]) {
+                drawingMargin[3] = margins[3];
             }
         }
-        return updateCount;
     }
 
     public ArrayList<AbsDrawing<AbsRender<?, ?>, AbsModule<?>>> getDrawingList() {
@@ -241,6 +230,7 @@ public abstract class AbsModule<T extends AbsEntry> {
 
     public void setAttachIndexType(@IndexType int attachIndexType) {
         this.attachIndexType = attachIndexType;
+
     }
 
     public @ModuleType
@@ -317,22 +307,6 @@ public abstract class AbsModule<T extends AbsEntry> {
         return maxY.value - minY.value;
     }
 
-    public float getWidth() {
-        return width;
-    }
-
-    public void setWidth(float width) {
-        this.width = width;
-    }
-
-    public Float getHeight() {
-        return height;
-    }
-
-    public void setHeight(float height) {
-        this.height = height;
-    }
-
     public float getXCorrectedValue() {
         return xCorrectedValue;
     }
@@ -359,11 +333,19 @@ public abstract class AbsModule<T extends AbsEntry> {
         return yOffset;
     }
 
-    public float[] getMargin() {
-        return margin;
+    public float[] getDrawingMargin() {
+        return drawingMargin;
     }
 
     public float[] getPointRect(AbsRender<?, ?> render, T entry, int current) {
         return rectBuffer;
+    }
+
+    public void onLayoutComplete() {
+        for (AbsDrawing<AbsRender<?, ?>, AbsModule<?>> drawing : getDrawingList()) {
+            if (drawing.isInit()) {
+                drawing.onLayoutComplete();
+            }
+        }
     }
 }

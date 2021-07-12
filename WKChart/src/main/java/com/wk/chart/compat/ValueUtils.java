@@ -1,20 +1,19 @@
 package com.wk.chart.compat;
 
-import android.text.TextUtils;
-
+import com.wk.chart.entry.QuantizationEntry;
 import com.wk.chart.entry.RateEntry;
 import com.wk.chart.entry.ValueEntry;
 
 import java.math.BigDecimal;
 
 public class ValueUtils {
-    private static final int[] values;
+    private static final Long[] values;
     private static final String[] units;
     private static final String[] zeros;
 
     static {
-        values = new int[]{1000, 1000000};
-        units = new String[]{"K", "M"};
+        values = new Long[]{1000L, 1000000L, 1000000000L, 1000000000000L};
+        units = new String[]{"K", "M", "B", "T"};
         zeros = new String[11];
         zeros[0] = "0.";
         zeros[1] = "0.0";
@@ -113,35 +112,73 @@ public class ValueUtils {
     /**
      * 格式化value
      *
-     * @param value 传入的value值
-     * @param scale 精度
-     * @param rate  比率(传入NULL不作比率转换)
+     * @param value   传入的value值
+     * @param scale   精度
+     * @param rate    比率(传入NULL不作比率转换)
+     * @param hasUnit 带汇率标识，如：¥
      * @return 返回字符串
      */
-    public static String format(float value, int scale, RateEntry rate) {
+    public static String format(float value, int scale, RateEntry rate, boolean hasUnit) {
         value = (Float.isNaN(value) || Float.isInfinite(value)) ? 0 : value;
-        return format(String.valueOf(value), scale, rate);
+        if (null == rate || rate.getRate().compareTo(BigDecimal.ONE) == 0) {
+            return new BigDecimal(value).setScale(scale, BigDecimal.ROUND_DOWN).toPlainString();
+        }
+        value = rate(value, rate);
+        value = (Float.isNaN(value) || Float.isInfinite(value)) ? 0 : value;
+        String text = new BigDecimal(value)
+                .setScale(rate.getScale(), BigDecimal.ROUND_HALF_UP)
+                .toPlainString();
+        if (hasUnit) {
+            text = rate.getUnit().concat(text);
+        }
+        return text;
     }
 
     /**
-     * 格式化value
+     * 格式化value(量化)
+     *
+     * @param value        传入的value值
+     * @param scale        精度
+     * @param rate         比率(传入NULL不作比率转换)
+     * @param quantization 量化实例
+     * @param hasUnit      带汇率标识，如：¥
+     * @return 返回字符串
+     */
+    public static String format(float value, int scale, RateEntry rate, QuantizationEntry quantization, boolean hasUnit) {
+        value = (Float.isNaN(value) || Float.isInfinite(value)) ? 0 : value;
+        if (null == rate || rate.getRate().compareTo(BigDecimal.ONE) == 0) {
+            if (value > quantization.getMinFormatNum()) {
+                return quantization(value, quantization.getScale());
+            }
+            return new BigDecimal(value).setScale(scale, BigDecimal.ROUND_DOWN).toPlainString();
+        }
+        value = rate(value, rate);
+        value = (Float.isNaN(value) || Float.isInfinite(value)) ? 0 : value;
+        String text;
+        if (value > quantization.getMinFormatNum()) {
+            text = quantization(value, quantization.getScale());
+        } else {
+            text = new BigDecimal(value).setScale(rate.getScale(), BigDecimal.ROUND_HALF_UP).toPlainString();
+        }
+        if (hasUnit) {
+            text = rate.getUnit().concat(text);
+        }
+        return text;
+    }
+
+    /**
+     * 计算比率值
      *
      * @param value 传入的value值
-     * @param scale 精度
      * @param rate  比率(传入NULL不作比率转换)
      * @return 返回字符串
      */
-    public static String format(String value, int scale, RateEntry rate) {
-        value = TextUtils.isEmpty(value) ? "0" : value;
+    public static float rate(float value, RateEntry rate) {
+        value = (Float.isNaN(value) || Float.isInfinite(value)) ? 0 : value;
         if (null == rate || rate.getRate().compareTo(BigDecimal.ONE) == 0) {
-            return new BigDecimal(value)
-                    .setScale(scale, BigDecimal.ROUND_DOWN)
-                    .toPlainString();
+            return value;
         }
-        return new BigDecimal(value)
-                .multiply(rate.getRate())
-                .setScale(rate.getScale(), BigDecimal.ROUND_HALF_UP)
-                .toPlainString();
+        return value * rate.getRate().floatValue();
     }
 
     /**
@@ -150,8 +187,8 @@ public class ValueUtils {
      * @param value 数值
      * @return 量化后的字符串（带量化单位）
      */
-    public static String formatBig(float value, int scale) {
-        value = (Float.isNaN(value) || Float.isInfinite(value)) ? 0 : value;
+    public static String quantization(double value, int scale) {
+        value = (Double.isNaN(value) || Double.isInfinite(value)) ? 0 : value;
         String unit = "";
         int i = values.length - 1;
         while (i >= 0) {
@@ -164,34 +201,7 @@ public class ValueUtils {
         }
         return new BigDecimal(value)
                 .setScale(scale, BigDecimal.ROUND_DOWN)
+                .stripTrailingZeros()
                 .toPlainString().concat(unit);
-    }
-
-    /**
-     * 量化大数值(如果为0，则不带精度)
-     *
-     * @param value 数值
-     * @return 量化后的字符串（带量化单位）
-     */
-    public static String formatBigZero(float value, int scale) {
-        value = (Float.isNaN(value) || Float.isInfinite(value)) ? 0 : value;
-        if (value == 0) {
-            return "0";
-        } else {
-            String unit = "";
-            int i = values.length - 1;
-            while (i >= 0) {
-                if (value > values[i]) {
-                    value /= values[i];
-                    unit = units[i];
-                    break;
-                }
-                i--;
-            }
-            return new BigDecimal(value)
-                    .setScale(scale, BigDecimal.ROUND_DOWN)
-                    .stripTrailingZeros()
-                    .toPlainString().concat(unit);
-        }
     }
 }

@@ -31,6 +31,9 @@ public class BaseAttribute {
     /**
      * 各个视图模块的配置信息有关属性
      */
+    public float mainViewHeight = 400;//主图模块高度
+    public float auxiliaryViewHeight = 180;//副图模块高度
+    public float indexViewHeight = 200;//指标模块高度
     public float viewInterval = 0; // 各个视图模块间的间隔
     public float leftScrollOffset = 0;//X 轴方向的最小滚动值固定偏移量（左边）
     public float rightScrollOffset = 0;//X 轴方向的最大滚动值固定偏移量（右边）
@@ -168,8 +171,8 @@ public class BaseAttribute {
     public float pointWidth = 28f;//数据点初始宽度（缩放都将以此宽度为基准）
     public float visibleCount = 20; // 竖屏状态下的默认缩放倍数下显示多少个蜡烛图。注：横屏时会自动根据视图宽高变化比例计算，不需要手工设置
     public float maxScale = 10;// 最多放大倍数
-    public float minScale = 3;// 最多缩小倍数(缩小后的宽度不会小于 蜡烛图矩形边框线宽度（candleBorderWidth）)
-    public float currentScale = 1;// 当前X轴缩放倍数
+    public float minScale = 4;// 最多缩小倍数(缩小后的宽度不会小于 蜡烛图矩形边框线宽度（candleBorderWidth）)
+    public float currentScale = 1;// 当前缩放倍数
 
     /**
      * 极值有关属性

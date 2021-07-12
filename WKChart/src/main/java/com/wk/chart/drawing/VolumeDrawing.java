@@ -106,8 +106,4 @@ public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeModule> {
     public void drawOver(Canvas canvas) {
     }
 
-    @Override
-    public void onViewChange() {
-
-    }
 }

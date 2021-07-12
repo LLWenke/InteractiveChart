@@ -1,6 +1,7 @@
 
 package com.wk.chart.compat;
 
+import android.annotation.SuppressLint;
 import android.graphics.RectF;
 
 import androidx.annotation.NonNull;
@@ -32,15 +33,22 @@ public class MeasureUtils {
     /**
      * 测量模块大小
      */
-    public void measureModuleSize(float width, float height) {
+    public void measureModuleSize(float width, float height, boolean isProrate) {
         int moduleGroupCount = render.getModuleGroupCount();
+        float viewHeight = height - attribute.borderWidth;
         RectF rectF = measureAvailableSize(width, height);
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : render.getModules().entrySet()) {
             for (AbsModule<AbsEntry> module : item.getValue()) {
-                if (module.isAttach()) {
-                    float availableHeight = module.getModuleGroup() == ModuleGroupType.FLOAT ? (height - attribute.borderWidth * 2f) : rectF.height();
-                    module.setWidth(rectF.width());
-                    module.setHeight(availableHeight * getDefaultProportion(module.getModuleGroup(), moduleGroupCount));
+                if (!module.isAttach()) {
+                    continue;
+                }
+                if (isProrate) {
+                    float availableHeight = module.getModuleGroup() == ModuleGroupType.FLOAT ? viewHeight : rectF.height();
+                    float moduleHeight = availableHeight * getProportion(module.getModuleGroup(), moduleGroupCount);
+                    module.setRect(0, 0, rectF.width(), moduleHeight);
+                } else {
+                    float moduleHeight = module.getModuleGroup() == ModuleGroupType.FLOAT ? viewHeight : getHeight(module.getModuleGroup());
+                    module.setRect(0, 0, rectF.width(), moduleHeight);
                 }
             }
         }
@@ -50,37 +58,124 @@ public class MeasureUtils {
      * 测量视图可用大小
      */
     private RectF measureAvailableSize(float width, float height) {
-        float viewBorderWidthCount = attribute.borderWidth * 2f;
+        float marginLeft = 0f, marginRight = 0f, borderWidthCount = attribute.borderWidth * 2f;
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : render.getModules().entrySet()) {
-            float marginLeft = 0f, marginTop = 0f, marginRight = 0f, marginBottom = 0f;
+            float marginTop = 0f, marginBottom = 0f, viewInterval = 0f;
+            boolean isValid = false;
             for (AbsModule<AbsEntry> module : item.getValue()) {
-                if (module.isAttach()) {
-                    float[] margin = module.getMargin();
-                    if (margin[0] > marginLeft) {
-                        marginLeft = margin[0];
-                    }
-                    if (margin[1] > marginTop) {
-                        marginTop = margin[1];
-                    }
-                    if (margin[2] > marginRight) {
-                        marginRight = margin[2];
-                    }
-                    if (margin[3] > marginBottom) {
-                        marginBottom = margin[3];
-                    }
+                if (!module.isAttach()) {
+                    continue;
+                }
+                isValid = true;
+                if (module.getModuleGroup() == ModuleGroupType.FLOAT) {
+                    viewInterval = 0;
+                } else {
+                    viewInterval = attribute.viewInterval;
+                }
+                float[] margin = module.getDrawingMargin();
+                if (margin[0] > marginLeft) {
+                    marginLeft = margin[0];
+                }
+                if (margin[1] > marginTop) {
+                    marginTop = margin[1];
+                }
+                if (margin[2] > marginRight) {
+                    marginRight = margin[2];
+                }
+                if (margin[3] > marginBottom) {
+                    marginBottom = margin[3];
                 }
             }
-            width -= (marginLeft + marginRight + viewBorderWidthCount);
-            height -= (marginTop + marginBottom + viewBorderWidthCount + attribute.viewInterval);
-//            Log.e("height" + height, "marginTop:" + marginTop + "   marginBottom:" + marginBottom);
+            if (!isValid) {
+                continue;
+            }
+            height -= (marginTop + marginBottom + borderWidthCount + viewInterval);
+//            if (render instanceof DepthRender)
+//                Log.e("height" + height, "marginTop:" + marginTop + "   marginBottom:" + marginBottom);
         }
-        return new RectF(attribute.borderWidth, attribute.borderWidth, width, height + attribute.viewInterval);
+        width -= (marginLeft + marginRight + attribute.borderWidth);
+        return new RectF(0, 0, width, height + attribute.viewInterval);
     }
 
     /**
-     * 智能分配图表类型组的高度比例
+     * 测量视图(实际)占用高度
      */
-    private float getDefaultProportion(@ModuleGroupType int moduleGroupType, int moduleGroupCount) {
+    public int measureActualOccupyHeight() {
+        float viewHeight = 0f, borderWidthCount = attribute.borderWidth * 2f;
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : render.getModules().entrySet()) {
+            float marginTop = 0f, marginBottom = 0f, moduleHeight = 0f, viewInterval = 0f;
+            boolean isValid = false;
+            for (AbsModule<AbsEntry> module : item.getValue()) {
+                if (!module.isAttach()) {
+                    continue;
+                }
+                isValid = true;
+                if (module.getModuleGroup() == ModuleGroupType.FLOAT) {
+                    moduleHeight = 0;
+                    viewInterval = 0;
+                } else {
+                    moduleHeight += module.getRect().height();
+                    viewInterval = attribute.viewInterval;
+                }
+                float[] margin = module.getDrawingMargin();
+                if (margin[1] > marginTop) {
+                    marginTop = margin[1];
+                }
+                if (margin[3] > marginBottom) {
+                    marginBottom = margin[3];
+                }
+            }
+            if (!isValid) {
+                continue;
+            }
+            viewHeight += (moduleHeight + marginTop + marginBottom + borderWidthCount + viewInterval);
+//            if (render instanceof CandleRender)
+//                Log.e("height(实际)：" + moduleHeight, "marginTop:" + marginTop + "   marginBottom:" + marginBottom + "   viewBorderWidthCount:" + borderWidthCount);
+        }
+        return (int) (viewHeight - attribute.viewInterval);
+    }
+
+    /**
+     * 测量视图(预计)占用高度
+     */
+    public int measureEstimateOccupyHeight() {
+        float viewHeight = 0f, borderWidthCount = attribute.borderWidth * 2f;
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : render.getModules().entrySet()) {
+            float marginTop = 0f, marginBottom = 0f, moduleHeight = 0f, viewInterval = 0f;
+            boolean isValid = false;
+            for (AbsModule<AbsEntry> module : item.getValue()) {
+                if (!module.isAttach()) {
+                    continue;
+                }
+                isValid = true;
+                if (module.getModuleGroup() == ModuleGroupType.FLOAT) {
+                    moduleHeight = 0;
+                    viewInterval = 0;
+                } else {
+                    moduleHeight += getHeight(module.getModuleGroup());
+                    viewInterval = attribute.viewInterval;
+                }
+                float[] margin = module.getDrawingMargin();
+                if (margin[1] > marginTop) {
+                    marginTop = margin[1];
+                }
+                if (margin[3] > marginBottom) {
+                    marginBottom = margin[3];
+                }
+            }
+            if (!isValid) {
+                continue;
+            }
+            viewHeight += (moduleHeight + marginTop + marginBottom + borderWidthCount + viewInterval);
+//            Log.e("height(预计)：" + moduleHeight, "marginTop:" + marginTop + "   marginBottom:" + marginBottom + "   viewBorderWidthCount:" + borderWidthCount);
+        }
+        return (int) Math.ceil(viewHeight - attribute.viewInterval);
+    }
+
+    /**
+     * 获取模块高度比例
+     */
+    private float getProportion(@ModuleGroupType int moduleGroupType, int moduleGroupCount) {
         switch (moduleGroupType) {
             case ModuleGroupType.MAIN://主图
                 return 1f - 0.15f * (float) (moduleGroupCount - 1);
@@ -90,6 +185,23 @@ public class MeasureUtils {
             case ModuleGroupType.FLOAT:  // 浮动模块
                 return 1f;
             case ModuleGroupType.NONE:  // 空
+            default:
+                return 0f;
+        }
+    }
+
+    /**
+     * 获取模块高度
+     */
+    @SuppressLint("SwitchIntDef")
+    private float getHeight(@ModuleGroupType int moduleGroupType) {
+        switch (moduleGroupType) {
+            case ModuleGroupType.MAIN://主图
+                return attribute.mainViewHeight;
+            case ModuleGroupType.AUXILIARY: // 副图
+                return attribute.auxiliaryViewHeight;
+            case ModuleGroupType.INDEX:  // 指标
+                return attribute.indexViewHeight;
             default:
                 return 0f;
         }

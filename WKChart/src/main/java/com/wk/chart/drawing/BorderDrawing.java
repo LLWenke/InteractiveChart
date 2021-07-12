@@ -64,7 +64,7 @@ public class BorderDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<AbsEntr
     }
 
     @Override
-    public void onViewChange() {
+    public void onLayoutComplete() {
         borderPath.rewind();
         if (attribute.borderWidth <= 0f) {
             return;

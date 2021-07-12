@@ -11,11 +11,12 @@ import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.config.AbsBuildConfig;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.BuildData;
+import com.wk.chart.entry.QuantizationEntry;
 import com.wk.chart.entry.RateEntry;
+import com.wk.chart.entry.ScaleEntry;
 import com.wk.chart.enumeration.ObserverArg;
 import com.wk.chart.thread.WorkThread;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     private List<T> chartData;//数据列表
     private final ScaleEntry scale;// 精度
     private RateEntry rate;// 比率
+    private QuantizationEntry quantizationEntry;//量化
     private final Handler uiHandler; //主线程Handler
     private final ChartAnimator<T> animator;//数据更新动画
     private boolean isWorking = false;//是否为工作中
@@ -47,9 +49,10 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         this.chartData = new ArrayList<>();
         this.uiHandler = new Handler(this);
         this.dataSetObservable = new DataSetObservable();
-        this.animator = new ChartAnimator<>(this, 300);
+        this.animator = new ChartAnimator<>(this, 0);
         this.scale = new ScaleEntry(0, 0, "", "");
-        this.rate = new RateEntry(BigDecimal.ONE, scale.getQuoteUnit(), scale.quoteScale);
+        this.rate = new RateEntry(BigDecimal.ONE, scale.getQuoteUnit(), scale.getQuoteScale());
+        this.quantizationEntry = new QuantizationEntry();
     }
 
     AbsAdapter(@NonNull AbsAdapter<T, F> absAdapter) {
@@ -61,6 +64,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         this.minYIndex = absAdapter.minYIndex;
         this.highlightIndex = absAdapter.highlightIndex;
         this.rate = absAdapter.rate;
+        this.quantizationEntry = absAdapter.quantizationEntry;
         this.isWorking = absAdapter.isWorking;
         this.dataSize = chartData.size();
         this.setScale(absAdapter.getScale().getBaseScale()
@@ -69,14 +73,23 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
                 , absAdapter.getScale().getQuoteUnit());
     }
 
+    /**
+     * 获取最大值下标
+     */
     public int getMaxYIndex() {
         return maxYIndex;
     }
 
+    /**
+     * 获取最小值下标
+     */
     public int getMinYIndex() {
         return minYIndex;
     }
 
+    /**
+     * 获取高亮值下标
+     */
     public int getHighlightIndex() {
         return highlightIndex;
     }
@@ -136,15 +149,34 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         this.scale.reset(baseScale, quoteScale);
     }
 
+    /**
+     * 设置量化配置
+     *
+     * @param minFormatNum 最小量化数（即小于此数，不量化）
+     * @param scale        量化后小数的精度
+     */
+    public void setQuantization(long minFormatNum, int scale) {
+        this.quantizationEntry.reset(minFormatNum, scale);
+        notifyDataSetChanged(ObserverArg.REFRESH);
+    }
 
     /**
-     * 获取比率
+     * 获取比率实例
      *
      * @return 比率值
      */
     public @NonNull
     RateEntry getRate() {
         return rate;
+    }
+
+    /**
+     * 获取量化实例
+     *
+     * @return 取量值
+     */
+    public QuantizationEntry getQuantizationEntry() {
+        return quantizationEntry;
     }
 
     /**
@@ -158,15 +190,15 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         this.rate.setRate(rateValue);
         this.rate.setUnit(unit);
         this.rate.setScale(scale);
-        notifyDataSetChanged(ObserverArg.RESET_RATE);
+        notifyDataSetChanged(ObserverArg.INIT);
     }
 
     /**
      * 重置比率
      */
     public void resetRate() {
-        this.rate = new RateEntry(BigDecimal.ONE, scale.getQuoteUnit(), scale.quoteScale);
-        notifyDataSetChanged(ObserverArg.RESET_RATE);
+        this.rate = new RateEntry(BigDecimal.ONE, scale.getQuoteUnit(), scale.getQuoteScale());
+        notifyDataSetChanged(ObserverArg.INIT);
     }
 
     /**
@@ -190,6 +222,9 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      */
     public void setBuildConfig(F buildConfig) {
         this.buildConfig = buildConfig;
+        if (chartData.isEmpty()) {
+            return;
+        }
         setWorking(true);
         onAsyTask(buildConfig, chartData, ObserverArg.INIT);
     }
@@ -236,7 +271,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
             notifyDataSetChanged(ObserverArg.CLEAR);
         } else {
             setWorking(true);
-            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.RESET : ObserverArg.INIT_AND_RESET);
+            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.REFRESH : ObserverArg.INIT);
         }
     }
 
@@ -250,7 +285,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
             notifyDataSetChanged(ObserverArg.CLEAR);
         } else {
             setWorking(true);
-            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.REFRESH : ObserverArg.INIT_AND_RESET);
+            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.REFRESH : ObserverArg.INIT);
         }
     }
 
@@ -437,67 +472,4 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     public float getAnimatorFraction() {
         return null == animator ? 1f : animator.getAnimatedFraction();
     }
-
-    public static class ScaleEntry implements Serializable {
-        private int baseScale;// base 精度
-        private int quoteScale;// quote 精度
-        private String baseUnit;// base 单位
-        private String quoteUnit;// quote 单位
-
-        public ScaleEntry(int baseScale, int quoteScale, String baseUnit, String quoteUnit) {
-            this.baseScale = baseScale;
-            this.quoteScale = quoteScale;
-            this.baseUnit = baseUnit;
-            this.quoteUnit = quoteUnit;
-        }
-
-        public ScaleEntry(int baseScale, int quoteScale) {
-            this.baseScale = baseScale;
-            this.quoteScale = quoteScale;
-            this.baseUnit = "";
-            this.quoteUnit = "";
-        }
-
-        void reset(int baseScale, int quoteScale) {
-            this.baseScale = baseScale;
-            this.quoteScale = quoteScale;
-        }
-
-        void reset(int baseScale, int quoteScale, String baseUnit, String quoteUnit) {
-            this.baseScale = baseScale;
-            this.quoteScale = quoteScale;
-            this.baseUnit = baseUnit;
-            this.quoteUnit = quoteUnit;
-        }
-
-        /**
-         * 获取Base精度
-         */
-        public int getBaseScale() {
-            return baseScale;
-        }
-
-        /**
-         * 获取Quote精度
-         */
-        public int getQuoteScale() {
-            return quoteScale;
-        }
-
-        /**
-         * 设置Base单位
-         */
-        public String getBaseUnit() {
-            return baseUnit;
-        }
-
-        /**
-         * 设置Quote单位
-         */
-        public String getQuoteUnit() {
-            return quoteUnit;
-        }
-
-    }
-
 }

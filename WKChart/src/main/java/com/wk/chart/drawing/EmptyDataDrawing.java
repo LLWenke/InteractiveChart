@@ -59,9 +59,4 @@ public class EmptyDataDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<AbsE
                     textPaint);
         }
     }
-
-    @Override
-    public void onViewChange() {
-
-    }
 }

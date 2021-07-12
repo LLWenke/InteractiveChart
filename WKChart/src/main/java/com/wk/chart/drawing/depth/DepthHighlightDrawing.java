@@ -160,10 +160,6 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<Abs
         }
     }
 
-    @Override
-    public void onViewChange() {
-    }
-
     public void addMarkerView(AbsMarker markerView) {
         markerViewList.add(markerView);
     }

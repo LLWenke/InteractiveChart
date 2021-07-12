@@ -2,8 +2,6 @@ package com.wk.chart.entry;
 
 import androidx.annotation.NonNull;
 
-
-import com.wk.chart.adapter.AbsAdapter;
 import com.wk.chart.compat.ValueUtils;
 
 import java.math.BigDecimal;
@@ -16,13 +14,13 @@ public abstract class AbsEntry {
     private final Date time; // 时间
 
     private final List<ValueEntry> AnimatorEntry;//用于动画的属性列表
-    private final AbsAdapter.ScaleEntry scale;// 精度
+    private final ScaleEntry scale;// 精度
 
     public Date getTime() {
         return time;
     }
 
-    public AbsEntry(@NonNull AbsAdapter.ScaleEntry scale, Date time) {
+    public AbsEntry(@NonNull ScaleEntry scale, Date time) {
         this.scale = scale;
         this.time = time;
         this.AnimatorEntry = new ArrayList<>();
@@ -33,7 +31,7 @@ public abstract class AbsEntry {
      *
      * @return 精度实例
      */
-    public final AbsAdapter.ScaleEntry getScale() {
+    public final ScaleEntry getScale() {
         return scale;
     }
 

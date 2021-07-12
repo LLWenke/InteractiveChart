@@ -18,10 +18,8 @@ import com.wk.chart.render.AbsRender;
 public class CandleModule extends MainModule<CandleEntry> implements IMarkerPoint {
     private int markerPointCount;//标签数量
 
-    public CandleModule(@IndexType int indexType) {
+    public CandleModule() {
         super(ModuleType.CANDLE);
-        setAttachIndexType(indexType);
-        setEnable(true);
     }
 
     @Override

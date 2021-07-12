@@ -9,8 +9,10 @@ import android.graphics.Path;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.IndexConfigEntry;
 import com.wk.chart.entry.ValueEntry;
+import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
 
@@ -18,7 +20,7 @@ import com.wk.chart.render.CandleRender;
  * <p>MACDDrawing</p>
  */
 
-public class MACDDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
+public class MACDDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
     private static final String TAG = "MACDDrawing";
     private CandleAttribute attribute;//配置文件
 
@@ -46,6 +48,10 @@ public class MACDDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
     private final float[] rectBuffer = new float[4];
 
     private float borderOffset;//边框偏移量
+
+    public MACDDrawing() {
+        super(IndexType.MACD);
+    }
 
     @Override
     public void onInit(CandleRender render, AbsModule<?> chartModule) {
@@ -76,13 +82,23 @@ public class MACDDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
     }
 
     @Override
+    public void onInitConfig() {
+        IndexConfigEntry indexTag = render.getAdapter().getBuildConfig().getIndexTags(indexType);
+        if (null == indexTag || indexTag.getFlagEntries().length < 3) {
+            return;
+        }
+        diffPaint.setColor(indexTag.getFlagEntries()[0].getColor());
+        deaPaint.setColor(indexTag.getFlagEntries()[1].getColor());
+    }
+
+    @Override
     public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
 
     }
 
     @Override
     public void onComputation(int begin, int end, int current, float[] extremum) {
-        ValueEntry[] values = render.getAdapter().getItem(current).getIndex(absChartModule.getAttachIndexType());
+        ValueEntry[] values = render.getAdapter().getItem(current).getIndex(indexType);
         if (null == values || values.length < 3) {
             return;
         }
@@ -170,15 +186,5 @@ public class MACDDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
 
     @Override
     public void drawOver(Canvas canvas) {
-    }
-
-    @Override
-    public void onViewChange() {
-        IndexConfigEntry indexTag = render.getAdapter().getBuildConfig().getIndexTags(absChartModule.getAttachIndexType());
-        if (null == indexTag || indexTag.getFlagEntries().length < 3) {
-            return;
-        }
-        diffPaint.setColor(indexTag.getFlagEntries()[0].getColor());
-        deaPaint.setColor(indexTag.getFlagEntries()[1].getColor());
     }
 }

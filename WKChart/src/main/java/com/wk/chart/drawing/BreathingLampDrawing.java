@@ -106,11 +106,6 @@ public class BreathingLampDrawing extends AbsDrawing<CandleRender, TimeLineModul
     public void drawOver(Canvas canvas) {
     }
 
-    @Override
-    public void onViewChange() {
-
-    }
-
     /**
      * 启动自动闪烁
      */
