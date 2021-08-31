@@ -178,28 +178,28 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         selectorInfo[1]
                 .setLabel(attribute.context.getString(R.string.wk_open))
                 .setLabelPaint(labelPaint)
-                .setValue(render.rateConversion(point.getOpen().value,
+                .setValue(render.getAdapter().rateConversion(point.getOpen().value,
                         render.getAdapter().getScale().getQuoteScale(), true))
                 .setValuePaint(valuePaint);
         //高
         selectorInfo[2]
                 .setLabel(attribute.context.getString(R.string.wk_high))
                 .setLabelPaint(labelPaint)
-                .setValue(render.rateConversion(point.getHigh().value,
+                .setValue(render.getAdapter().rateConversion(point.getHigh().value,
                         render.getAdapter().getScale().getQuoteScale(), true))
                 .setValuePaint(valuePaint);
         //低
         selectorInfo[3]
                 .setLabel(attribute.context.getString(R.string.wk_low))
                 .setLabelPaint(labelPaint)
-                .setValue(render.rateConversion(point.getLow().value,
+                .setValue(render.getAdapter().rateConversion(point.getLow().value,
                         render.getAdapter().getScale().getQuoteScale(), true))
                 .setValuePaint(valuePaint);
         //收
         selectorInfo[4]
                 .setLabel(attribute.context.getString(R.string.wk_close))
                 .setLabelPaint(labelPaint)
-                .setValue(render.rateConversion(point.getClose().value,
+                .setValue(render.getAdapter().rateConversion(point.getClose().value,
                         render.getAdapter().getScale().getQuoteScale(), true))
                 .setValuePaint(valuePaint);
         //涨跌幅
@@ -221,7 +221,7 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         selectorInfo[6]
                 .setLabel(attribute.context.getString(R.string.wk_change_amount))
                 .setLabelPaint(labelPaint)
-                .setValue(symbol.concat(render.rateConversion(point.getChangeAmount().value,
+                .setValue(symbol.concat(render.getAdapter().rateConversion(point.getChangeAmount().value,
                         render.getAdapter().getScale().getQuoteScale(), true)))
                 .setValuePaint(paint);
         //成交量

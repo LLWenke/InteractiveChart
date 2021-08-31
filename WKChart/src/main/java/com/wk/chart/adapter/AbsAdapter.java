@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import com.wk.chart.animator.ChartAnimator;
 import com.wk.chart.compat.DataSetObservable;
 import com.wk.chart.compat.Utils;
+import com.wk.chart.compat.ValueUtils;
 import com.wk.chart.compat.config.AbsBuildConfig;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.BuildData;
@@ -190,7 +191,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         this.rate.setRate(rateValue);
         this.rate.setUnit(unit);
         this.rate.setScale(scale);
-        notifyDataSetChanged(ObserverArg.INIT);
+        notifyDataSetChanged(ObserverArg.RATE_UPDATE);
     }
 
     /**
@@ -198,7 +199,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      */
     public void resetRate() {
         this.rate = new RateEntry(BigDecimal.ONE, scale.getQuoteUnit(), scale.getQuoteScale());
-        notifyDataSetChanged(ObserverArg.INIT);
+        notifyDataSetChanged(ObserverArg.RATE_UPDATE);
     }
 
     /**
@@ -265,13 +266,14 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      * 重置数据
      */
     public synchronized void resetData(List<T> data) {
+        ObserverArg observerArg = buildConfig.isInit() ? ObserverArg.RESET : ObserverArg.INIT;
         if (Utils.listIsEmpty(data)) {
             this.chartData.clear();
             this.dataSize = chartData.size();
-            notifyDataSetChanged(ObserverArg.CLEAR);
+            notifyDataSetChanged(observerArg);
         } else {
             setWorking(true);
-            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.REFRESH : ObserverArg.INIT);
+            onAsyTask(buildConfig, data, observerArg);
         }
     }
 
@@ -279,13 +281,14 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      * 刷新数据
      */
     public synchronized void refreshData(List<T> data) {
+        ObserverArg observerArg = buildConfig.isInit() ? ObserverArg.REFRESH : ObserverArg.INIT;
         if (Utils.listIsEmpty(data)) {
             this.chartData.clear();
             this.dataSize = chartData.size();
-            notifyDataSetChanged(ObserverArg.CLEAR);
+            notifyDataSetChanged(observerArg);
         } else {
             setWorking(true);
-            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.REFRESH : ObserverArg.INIT);
+            onAsyTask(buildConfig, data, observerArg);
         }
     }
 
@@ -471,5 +474,27 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      */
     public float getAnimatorFraction() {
         return null == animator ? 1f : animator.getAnimatedFraction();
+    }
+
+    /**
+     * 汇率转换（此处已做精度控制）
+     *
+     * @param value   传入的value值
+     * @param scale   精度
+     * @param hasUnit 带汇率标识，如：¥
+     */
+    public String rateConversion(float value, int scale, boolean hasUnit) {
+        return ValueUtils.format(value, scale, getRate(), hasUnit);
+    }
+
+    /**
+     * 汇率转换(量化)（此处已做精度控制）
+     *
+     * @param value   传入的value值
+     * @param scale   精度
+     * @param hasUnit 带汇率标识，如：¥
+     */
+    public String rateQuantizationConversion(float value, int scale, boolean hasUnit) {
+        return ValueUtils.format(value, scale, getRate(), getQuantizationEntry(), hasUnit);
     }
 }

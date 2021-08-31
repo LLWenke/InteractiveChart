@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 
 import com.wk.chart.adapter.AbsAdapter;
 import com.wk.chart.compat.MeasureUtils;
-import com.wk.chart.compat.ValueUtils;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.compat.config.AbsBuildConfig;
 import com.wk.chart.drawing.base.AbsDrawing;
@@ -1145,27 +1144,5 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
             }
         }
         return newViewTBCoordinates;
-    }
-
-    /**
-     * 汇率转换（此处已做精度控制）
-     *
-     * @param value   传入的value值
-     * @param scale   精度
-     * @param hasUnit 带汇率标识，如：¥
-     */
-    public String rateConversion(float value, int scale, boolean hasUnit) {
-        return ValueUtils.format(value, scale, getAdapter().getRate(), hasUnit);
-    }
-
-    /**
-     * 汇率转换(量化)（此处已做精度控制）
-     *
-     * @param value   传入的value值
-     * @param scale   精度
-     * @param hasUnit 带汇率标识，如：¥
-     */
-    public String rateQuantizationConversion(float value, int scale, boolean hasUnit) {
-        return ValueUtils.format(value, scale, getAdapter().getRate(), getAdapter().getQuantizationEntry(), hasUnit);
     }
 }

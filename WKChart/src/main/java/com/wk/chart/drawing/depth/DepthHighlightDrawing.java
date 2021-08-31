@@ -15,6 +15,7 @@ import com.wk.chart.entry.DepthEntry;
 import com.wk.chart.enumeration.HighLightStyle;
 import com.wk.chart.marker.AbsMarker;
 import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.render.AbsRender;
 import com.wk.chart.render.DepthRender;
 
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<Abs
     private final float[] markerViewInfo = new float[4];//markerView的left,top,right,bottom信息
     private final String[] markerText = new String[2];//marker中显示的值
 
-    private final List<AbsMarker> markerViewList = new ArrayList<>();
+    private final List<AbsMarker<AbsRender<?, ?>>> markerViewList = new ArrayList<>();
 
     @Override
     public void onInit(DepthRender render, AbsModule<AbsEntry> chartModule) {
@@ -69,18 +70,19 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<Abs
             askHighlightPaint.setPathEffect(dashPathEffect);
         }
 
-        for (AbsMarker markerView : markerViewList) {
+        for (AbsMarker<AbsRender<?, ?>> markerView : markerViewList) {
             markerView.onInit(render);
         }
     }
 
     @Override
     public float[] onInitMargin() {
-        for (AbsMarker markerView : markerViewList) {
-            margin[0] = Math.max(margin[0], markerView.getMargin()[0]);
-            margin[1] = Math.max(margin[1], markerView.getMargin()[1]);
-            margin[2] = Math.max(margin[2], markerView.getMargin()[2]);
-            margin[3] = Math.max(margin[3], markerView.getMargin()[3]);
+        for (AbsMarker<AbsRender<?, ?>> markerView : markerViewList) {
+            float[] markerMargin = markerView.onInitMargin();
+            margin[0] = Math.max(margin[0], markerMargin[0]);
+            margin[1] = Math.max(margin[1], markerMargin[1]);
+            margin[2] = Math.max(margin[2], markerMargin[2]);
+            margin[3] = Math.max(margin[3], markerMargin[3]);
         }
         return margin;
     }

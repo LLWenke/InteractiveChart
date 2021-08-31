@@ -165,14 +165,15 @@ public abstract class AbsModule<T extends AbsEntry> {
         drawingList.add((AbsDrawing<AbsRender<?, ?>, AbsModule<?>>) drawing);
     }
 
-    public void removeDrawing(Class<? extends AbsDrawing<?, ?>> drawing) {
+    public boolean removeDrawing(Class<? extends AbsDrawing<?, ?>> drawing) {
         for (int i = 0; i < drawingList.size(); i++) {
             AbsDrawing<AbsRender<?, ?>, AbsModule<?>> item = drawingList.get(i);
-            if (item.getClass().isInstance(drawing)) {
+            if (item.getClass().isAssignableFrom(drawing)) {
                 drawingList.remove(i);
-                break;
+                return true;
             }
         }
+        return false;
     }
 
 

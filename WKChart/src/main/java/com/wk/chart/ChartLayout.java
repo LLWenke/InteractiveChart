@@ -33,6 +33,7 @@ import com.wk.chart.drawing.depth.DepthSelectorDrawing;
 import com.wk.chart.drawing.timeLine.TimeLineDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.ChartCache;
+import com.wk.chart.enumeration.AxisTagVisible;
 import com.wk.chart.enumeration.BorderStyle;
 import com.wk.chart.enumeration.DataType;
 import com.wk.chart.enumeration.IndexType;
@@ -114,7 +115,7 @@ public class ChartLayout extends ConstraintLayout {
         volumeModule.addDrawing(new VolumeDrawing());//交易量组件
         volumeModule.addDrawing(new IndexLineDrawing(IndexType.VOLUME_MA));//MA组件
         volumeModule.addDrawing(new IndexLabelDrawing(IndexType.VOLUME_MA));//MA指标文字标签组件
-        volumeModule.addDrawing(new AxisTagDrawing());//x轴标签组件
+        volumeModule.addDrawing(new AxisTagDrawing(AxisTagVisible.TOP_VISIBLE));//x轴标签组件
         volumeModule.addDrawing(new BorderDrawing(BorderStyle.BOTTOM));//边框组件
         volumeModule.setAttachIndexType(IndexType.VOLUME_MA);
         volumeModule.setEnable(true);
@@ -140,7 +141,7 @@ public class ChartLayout extends ConstraintLayout {
         floatModule.addDrawing(new GridDrawing());//Y轴组件
         floatModule.addDrawing(candleHighlight);
         floatModule.addDrawing(new CandleSelectorDrawing());
-        floatModule.addDrawing(new BorderDrawing(BorderStyle.TOP));//边框组件
+//        floatModule.addDrawing(new BorderDrawing(BorderStyle.TOP));//边框组件
         render.addModule(floatModule);
     }
 
@@ -150,9 +151,9 @@ public class ChartLayout extends ConstraintLayout {
     private void initDepthChartModules(AbsRender<?, ?> render) {
         DepthModule depthModule = new DepthModule();
         depthModule.addDrawing(new AxisDrawing(4, true));//x轴组件
-        depthModule.addDrawing(new DepthGridDrawing());//Y轴组件
+        depthModule.addDrawing(new AxisTagDrawing(AxisTagVisible.BOTTOM_VISIBLE));//x轴标签组件
         depthModule.addDrawing(new DepthDrawing());//深度图组件
-        depthModule.addDrawing(new BorderDrawing(BorderStyle.LEFT | BorderStyle.RIGHT | BorderStyle.BOTTOM));
+        depthModule.addDrawing(new BorderDrawing(BorderStyle.BOTTOM));
         depthModule.setEnable(true);
         render.addModule(depthModule);
 
@@ -161,7 +162,9 @@ public class ChartLayout extends ConstraintLayout {
         depthHighlight.addMarkerView(new AxisTextMarker());
         depthHighlight.addMarkerView(new GridTextMarker());
         floatModule.addDrawing(depthHighlight);
+        floatModule.addDrawing(new DepthGridDrawing());//Y轴组件
         floatModule.addDrawing(new DepthSelectorDrawing());
+        floatModule.addDrawing(new BorderDrawing(BorderStyle.LEFT | BorderStyle.RIGHT | BorderStyle.BOTTOM));
         render.addModule(floatModule);
     }
 

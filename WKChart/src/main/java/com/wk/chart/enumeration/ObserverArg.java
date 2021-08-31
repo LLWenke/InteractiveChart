@@ -12,11 +12,13 @@ public enum ObserverArg {
 
     REFRESH(3),//刷新
 
-    INIT(4),//初始化
+    RESET(4),//重置
 
-    CLEAR(5),//清空
+    INIT(5),//初始化
 
-    ATTR_UPDATE(6);//配置属性更新
+    ATTR_UPDATE(6),//配置属性更新
+
+    RATE_UPDATE(7);//比率更新
 
     ObserverArg(int nativeInt) {
         this.nativeInt = nativeInt;

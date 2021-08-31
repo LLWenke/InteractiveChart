@@ -97,11 +97,11 @@ public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
         highlightPoints[0] = getHighlightPoint()[0] + getMainModule().getXOffset();
         String value;
         if (highlightX - highlightPoints[0] < 5) {
-            value = rateQuantizationConversion(highlightEntry.getPrice().value,
+            value = getAdapter().rateQuantizationConversion(highlightEntry.getPrice().value,
                     getAdapter().getScale().getQuoteScale(), true);
         } else {
             invertMapPoints(highlightPoints);
-            value = rateQuantizationConversion(highlightPoints[0],
+            value = getAdapter().rateQuantizationConversion(highlightPoints[0],
                     getAdapter().getScale().getQuoteScale(), true);
         }
         return value;

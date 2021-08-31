@@ -171,7 +171,7 @@ public class BaseAttribute {
     public float pointWidth = 28f;//数据点初始宽度（缩放都将以此宽度为基准）
     public float visibleCount = 20; // 竖屏状态下的默认缩放倍数下显示多少个蜡烛图。注：横屏时会自动根据视图宽高变化比例计算，不需要手工设置
     public float maxScale = 10;// 最多放大倍数
-    public float minScale = 4;// 最多缩小倍数(缩小后的宽度不会小于 蜡烛图矩形边框线宽度（candleBorderWidth）)
+    public float minScale = 6;// 最多缩小倍数(缩小后的宽度不会小于 蜡烛图矩形边框线宽度（candleBorderWidth）)
     public float currentScale = 1;// 当前缩放倍数
 
     /**

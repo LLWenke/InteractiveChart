@@ -28,7 +28,7 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
 
     private final TextPaint axisLabelPaintLeft = new TextPaint(Paint.ANTI_ALIAS_FLAG); // Axis 轴标签文字的画笔(左)
     private final TextPaint axisLabelPaintRight = new TextPaint(Paint.ANTI_ALIAS_FLAG); // Axis 轴标签文字的画笔（右）
-    private final Paint axisPaint = new Paint(Paint.ANTI_ALIAS_FLAG); // Axis 轴的画笔
+    private final Paint axisLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG); // Axis 轴线条的画笔
     private final Rect rect = new Rect();//用于测量文字的实际占用区域
 
     private final float[] pointCache = new float[2];
@@ -62,9 +62,10 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
         axisLabelPaintRight.setTextSize(attribute.labelSize);
         axisLabelPaintRight.setColor(attribute.labelColor);
         axisLabelPaintRight.setTextAlign(Paint.Align.RIGHT);
-        axisPaint.setStyle(Paint.Style.STROKE);
-        axisPaint.setStrokeWidth(attribute.lineWidth);
-        axisPaint.setColor(attribute.lineColor);
+
+        axisLinePaint.setStyle(Paint.Style.STROKE);
+        axisLinePaint.setStrokeWidth(attribute.lineWidth);
+        axisLinePaint.setColor(attribute.lineColor);
 
         Utils.measureTextArea(axisLabelPaintLeft, rect);
         axisStart = attribute.showFirstAxis ? 0 : 1;
@@ -72,14 +73,6 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
         textCenter = rect.height() / 2f;
         lineOffset = attribute.lineWidth / 2f;
         unilateralTextOffset = attribute.axisLineState ? -rect.top + attribute.axisLabelTBMargin + lineOffset : textCenter;
-    }
-
-    @Override
-    public float[] onInitMargin() {
-        if (attribute.axisLabelLocation == AxisLabelLocation.ALL) {
-            margin[1] = margin[3] = textCenter;
-        }
-        return margin;
     }
 
     @Override
@@ -110,9 +103,9 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
             }
             String text;
             if (isQuantization) {
-                text = render.rateQuantizationConversion(value, render.getAdapter().getScale().getQuoteScale(), false);
+                text = render.getAdapter().rateQuantizationConversion(value, render.getAdapter().getScale().getQuoteScale(), false);
             } else {
-                text = render.rateConversion(value, render.getAdapter().getScale().getQuoteScale(), false);
+                text = render.getAdapter().rateConversion(value, render.getAdapter().getScale().getQuoteScale(), false);
             }
             // 绘制横向网格线
             if (attribute.axisLabelLocation == AxisLabelLocation.ALL) {
@@ -135,7 +128,7 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
                 canvas.drawText(text, right, lineBuffer[5] + offset, axisLabelPaintRight);
             }
             if (attribute.axisLineState) {
-                canvas.drawLines(lineBuffer, axisPaint);
+                canvas.drawLines(lineBuffer, axisLinePaint);
             }
         }
     }

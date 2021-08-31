@@ -45,7 +45,10 @@ public class GridTextMarker extends AbsMarker<AbsRender<?, ?>> {
         inset = attribute.markerBorderWidth / 2;
         width = (attribute.markerLRPadding + attribute.markerBorderWidth) * 2f;
         height = textRect.height() + (attribute.markerTBPadding + attribute.markerBorderWidth) * 2f;
+    }
 
+    @Override
+    public float[] onInitMargin() {
         switch (attribute.gridMarkerAlign) {
             case TOP://上
                 setMargin(0, height, 0, 0);
@@ -54,6 +57,7 @@ public class GridTextMarker extends AbsMarker<AbsRender<?, ?>> {
                 setMargin(0, 0, 0, height);
                 break;
         }
+        return margin;
     }
 
     @Override

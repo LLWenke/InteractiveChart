@@ -97,9 +97,12 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:axisLabelLocation="all"
+            app:axisTagLocation="all_inside"
+            app:axisTagMarginY="0dp"
             app:borderWidth="1dp"
-            app:gridLabelMarginBottom="8dp"
-            app:gridLabelMarginTop="8dp"
+            app:gridLabelMarginBottom="2dp"
+            app:gridLabelMarginTop="2dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -111,6 +114,7 @@
             app:renderModel="depth"
             app:selectorIntervalY="2dp"
             app:selectorMarginY="10dp"
+            app:showLastAxis="false"
             app:viewInterval="0dp" />
 
         <ProgressBar

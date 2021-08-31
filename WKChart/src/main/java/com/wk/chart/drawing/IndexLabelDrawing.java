@@ -253,7 +253,7 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
         switch (indexType) {
             case IndexType.CANDLE_MA:
             case IndexType.BOLL:
-                label = name.concat(render.rateConversion(value.value,
+                label = name.concat(render.getAdapter().rateConversion(value.value,
                         render.getAdapter().getScale().getQuoteScale(), false));
                 break;
             case IndexType.VOLUME_MA:

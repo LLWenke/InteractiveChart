@@ -179,7 +179,7 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
         selectorInfo[2]
                 .setLabel(attribute.context.getString(R.string.wk_total_cost))
                 .setLabelPaint(labelPaint)
-                .setValue(render.rateQuantizationConversion(point.getTotalPrice().value,
+                .setValue(render.getAdapter().rateQuantizationConversion(point.getTotalPrice().value,
                         render.getAdapter().getScale().getQuoteScale(), true))
                 .setValuePaint(valuePaint)
                 .setUnit(" ".concat(render.getAdapter().getRate().getUnit()))

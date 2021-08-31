@@ -27,7 +27,7 @@ public class GestureMoveActionCompat {
 
     /**
      * 是否响应点击事件
-     *
+     * <p>
      * 因为有手指抖动的影响，有时候会产生少量的 ACTION_MOVE 事件，造成程序识别错误。
      */
     private boolean mEnableClick = true;
@@ -35,7 +35,7 @@ public class GestureMoveActionCompat {
     /**
      * 避免程序识别错误的一个阀值。只有触摸移动的距离大于这个阀值时，才认为是一个有效的移动。
      */
-    private int touchSlop = 20;
+    private int touchSlop = 30;
 
     private boolean dragging = false;
 
@@ -59,7 +59,6 @@ public class GestureMoveActionCompat {
      * @param e 事件 e
      * @param x 本次事件的坐标 x。可以是 e.getRawX() 或是 e.getX()，具体看情况
      * @param y 本次事件的坐标 y。可以是 e.getRawY() 或是 e.getY()，具体看情况
-     *
      * @return 事件是否是横向滑动
      */
     public boolean onTouchEvent(MotionEvent e, float x, float y) {
@@ -80,19 +79,16 @@ public class GestureMoveActionCompat {
                  * 如果之前是横向滑动，即使现在是垂直滑动，仍然认为它是横向滑动的
                  * 防止在一个方向上来回滑动时，发生垂直滑动和横向滑动的频繁切换，造成识别错误
                  */
-                if (interceptStatus != 1 &&
-                        (dragging || deltaX > deltaY && deltaX > touchSlop)) {
+                if (interceptStatus != 1 && (dragging || deltaX > deltaY && deltaX > touchSlop)) {
                     interceptStatus = 2;
                     dragging = true;
 
                     if (gestureMoveListener != null) {
                         gestureMoveListener.onHorizontalMove(e, x, y);
                     }
-                } else if (interceptStatus != 2 &&
-                        (dragging || deltaX < deltaY && deltaY > touchSlop)) {
+                } else if (interceptStatus != 2 && (dragging || deltaX < deltaY && deltaY > touchSlop)) {
                     interceptStatus = 1;
                     dragging = true;
-
                     if (gestureMoveListener != null) {
                         gestureMoveListener.onVerticalMove(e, x, y);
                     }

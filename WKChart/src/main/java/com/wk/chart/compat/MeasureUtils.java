@@ -132,7 +132,7 @@ public class MeasureUtils {
 //            if (render instanceof CandleRender)
 //                Log.e("height(实际)：" + moduleHeight, "marginTop:" + marginTop + "   marginBottom:" + marginBottom + "   viewBorderWidthCount:" + borderWidthCount);
         }
-        return (int) (viewHeight - attribute.viewInterval);
+        return (int) Math.ceil((viewHeight - attribute.viewInterval));
     }
 
     /**
