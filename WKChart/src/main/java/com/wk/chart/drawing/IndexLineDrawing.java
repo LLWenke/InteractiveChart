@@ -9,6 +9,7 @@ import android.graphics.Path;
 
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.IndexConfigEntry;
 import com.wk.chart.entry.ValueEntry;
 import com.wk.chart.enumeration.IndexType;
@@ -20,7 +21,7 @@ import com.wk.chart.render.CandleRender;
  * 指标线组件
  */
 
-public class IndexLineDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
+public class IndexLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
     private CandleAttribute attribute;//配置文件
     private final Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG); //边框画笔
     private final Paint centerLinePaint = new Paint(); //中心线画笔
@@ -28,6 +29,10 @@ public class IndexLineDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
     private final float[] gridBuffer = new float[2]; //grid轴坐标
     private Paint[] paints;//画笔数组
     private Path[] paths;//绘制路径数组
+
+    public IndexLineDrawing(int indexType) {
+        super(indexType);
+    }
 
     @Override
     public void onInit(CandleRender render, AbsModule chartModule) {
@@ -44,13 +49,34 @@ public class IndexLineDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
     }
 
     @Override
+    public void onInitConfig() {
+        IndexConfigEntry indexTag = render.getAdapter().getBuildConfig().getIndexTags(indexType);
+        if (null == indexTag) {
+            return;
+        }
+        //重置指标线画笔/路径等资源
+        if (null == paints || paints.length != indexTag.getFlagEntries().length) {
+            paints = new Paint[indexTag.getFlagEntries().length];
+            paths = new Path[indexTag.getFlagEntries().length];
+            for (int i = 0; i < indexTag.getFlagEntries().length; i++) {
+                Paint linePaint = new Paint();
+                linePaint.setStyle(Paint.Style.STROKE);
+                linePaint.setStrokeWidth(attribute.lineWidth);
+                linePaint.setColor(indexTag.getFlagEntries()[i].getColor());
+                paints[i] = linePaint;
+                paths[i] = new Path();
+            }
+        }
+    }
+
+    @Override
     public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
 
     }
 
     @Override
     public void onComputation(int begin, int end, int current, float[] extremum) {
-        ValueEntry[] values = render.getAdapter().getItem(current).getLineIndex(absChartModule.getAttachIndexType());
+        ValueEntry[] values = render.getAdapter().getItem(current).getLineIndex(indexType);
         if (null == values || null == paths) {
             return;
         }
@@ -82,7 +108,7 @@ public class IndexLineDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
         canvas.save();
         canvas.clipRect(viewRect);
         //为指定的指标绘制中心线
-        switch (absChartModule.getAttachIndexType()) {
+        switch (indexType) {
             case IndexType.WR:
             case IndexType.RSI:
             case IndexType.KDJ:
@@ -108,26 +134,5 @@ public class IndexLineDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
 
     @Override
     public void drawOver(Canvas canvas) {
-    }
-
-    @Override
-    public void onViewChange() {
-        IndexConfigEntry indexTag = render.getAdapter().getBuildConfig().getIndexTags(absChartModule.getAttachIndexType());
-        if (null == indexTag) {
-            return;
-        }
-        //重置指标线画笔/路径等资源
-        if (null == paints || paints.length != indexTag.getFlagEntries().length) {
-            paints = new Paint[indexTag.getFlagEntries().length];
-            paths = new Path[indexTag.getFlagEntries().length];
-            for (int i = 0; i < indexTag.getFlagEntries().length; i++) {
-                Paint linePaint = new Paint();
-                linePaint.setStyle(Paint.Style.STROKE);
-                linePaint.setStrokeWidth(attribute.lineWidth);
-                linePaint.setColor(indexTag.getFlagEntries()[i].getColor());
-                paints[i] = linePaint;
-                paths[i] = new Path();
-            }
-        }
     }
 }

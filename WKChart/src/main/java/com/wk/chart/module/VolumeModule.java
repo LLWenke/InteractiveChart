@@ -14,7 +14,6 @@ public class VolumeModule extends AuxiliaryModule<CandleEntry> {
 
     public VolumeModule() {
         super(ModuleType.VOLUME);
-        setAttachIndexType(IndexType.VOLUME_MA);
     }
 
     @Override

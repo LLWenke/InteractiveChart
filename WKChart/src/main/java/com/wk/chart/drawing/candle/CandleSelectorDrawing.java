@@ -162,10 +162,6 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         }
     }
 
-    @Override
-    public void onViewChange() {
-    }
-
     /**
      * 装载选择器的内容信息
      */
@@ -182,29 +178,29 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         selectorInfo[1]
                 .setLabel(attribute.context.getString(R.string.wk_open))
                 .setLabelPaint(labelPaint)
-                .setValue(render.exchangeRateConversion(point.getOpen().text,
-                        render.getAdapter().getScale().getQuoteScale()))
+                .setValue(render.getAdapter().rateConversion(point.getOpen().value,
+                        render.getAdapter().getScale().getQuoteScale(), true))
                 .setValuePaint(valuePaint);
         //高
         selectorInfo[2]
                 .setLabel(attribute.context.getString(R.string.wk_high))
                 .setLabelPaint(labelPaint)
-                .setValue(render.exchangeRateConversion(point.getHigh().text,
-                        render.getAdapter().getScale().getQuoteScale()))
+                .setValue(render.getAdapter().rateConversion(point.getHigh().value,
+                        render.getAdapter().getScale().getQuoteScale(), true))
                 .setValuePaint(valuePaint);
         //低
         selectorInfo[3]
                 .setLabel(attribute.context.getString(R.string.wk_low))
                 .setLabelPaint(labelPaint)
-                .setValue(render.exchangeRateConversion(point.getLow().text,
-                        render.getAdapter().getScale().getQuoteScale()))
+                .setValue(render.getAdapter().rateConversion(point.getLow().value,
+                        render.getAdapter().getScale().getQuoteScale(), true))
                 .setValuePaint(valuePaint);
         //收
         selectorInfo[4]
                 .setLabel(attribute.context.getString(R.string.wk_close))
                 .setLabelPaint(labelPaint)
-                .setValue(render.exchangeRateConversion(point.getClose().text,
-                        render.getAdapter().getScale().getQuoteScale()))
+                .setValue(render.getAdapter().rateConversion(point.getClose().value,
+                        render.getAdapter().getScale().getQuoteScale(), true))
                 .setValuePaint(valuePaint);
         //涨跌幅
         String symbol;
@@ -225,14 +221,14 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         selectorInfo[6]
                 .setLabel(attribute.context.getString(R.string.wk_change_amount))
                 .setLabelPaint(labelPaint)
-                .setValue(symbol.concat(render.exchangeRateConversion(point.getChangeAmount().text,
-                        render.getAdapter().getScale().getQuoteScale())))
+                .setValue(symbol.concat(render.getAdapter().rateConversion(point.getChangeAmount().value,
+                        render.getAdapter().getScale().getQuoteScale(), true)))
                 .setValuePaint(paint);
         //成交量
         selectorInfo[7]
                 .setLabel(attribute.context.getString(R.string.wk_volume))
                 .setLabelPaint(labelPaint)
-                .setValue(ValueUtils.formatBig(point.getVolume().value,
+                .setValue(ValueUtils.quantization(point.getVolume().value,
                         render.getAdapter().getScale().getBaseScale()))
                 .setValuePaint(valuePaint);
     }

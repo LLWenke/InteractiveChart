@@ -10,17 +10,15 @@ public enum ObserverArg {
 
     PUSH(2),//推送
 
-    RESET(3),//重置
+    REFRESH(3),//刷新
 
-    REFRESH(4),//刷新
+    RESET(4),//重置
 
     INIT(5),//初始化
 
-    INIT_AND_RESET(6),//初始化+重置
+    ATTR_UPDATE(6),//配置属性更新
 
-    RESET_RATE(7),//重置汇率
-
-    CLEAR(8);//清空
+    RATE_UPDATE(7);//比率更新
 
     ObserverArg(int nativeInt) {
         this.nativeInt = nativeInt;

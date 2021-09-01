@@ -165,11 +165,6 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
     public void drawOver(Canvas canvas) {
     }
 
-    @Override
-    public void onViewChange() {
-
-    }
-
     /**
      * 计算标记点位置
      */

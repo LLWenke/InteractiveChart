@@ -2,6 +2,12 @@
 
     <declare-styleable name="ChartAttr">
         <!-- 各个视图模块的配置信息有关属性 -->
+        <!-- 主图模块高度 -->
+        <attr name="mainViewHeight" format="dimension" />
+        <!-- 副图模块高度 -->
+        <attr name="auxiliaryViewHeight" format="dimension" />
+        <!-- 指标模块高度 -->
+        <attr name="indexViewHeight" format="dimension" />
         <!-- 各个视图模块间的间隔 -->
         <attr name="viewInterval" format="dimension" />
         <!-- X 轴方向的最小滚动值固定偏移量（左边） -->
@@ -274,7 +280,7 @@
         <attr name="maxScale" format="float" />
         <!-- 最多缩小倍数 -->
         <attr name="minScale" format="float" />
-        <!-- 当前X轴缩放倍数 -->
+        <!-- 当前缩放倍数 -->
         <attr name="currentScale" format="float" />
 
         <!-- 与股票指标有关的属性 -->

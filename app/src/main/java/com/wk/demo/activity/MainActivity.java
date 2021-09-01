@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.wk.chart.adapter.AbsAdapter;
+import com.wk.chart.entry.ScaleEntry;
 import com.wk.chart.enumeration.DataType;
 import com.wk.demo.R;
 import com.wk.demo.util.DataUtils;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.loadingTips.setVisibility(View.VISIBLE);
         this.realTimeDataBtn.setEnabled(false);
         this.historicalDataBtn.setEnabled(false);
-        DataUtils.loadData(new AbsAdapter.ScaleEntry(4, 4), this);
+        DataUtils.loadData(new ScaleEntry(4, 4), this);
     }
 
     @Override

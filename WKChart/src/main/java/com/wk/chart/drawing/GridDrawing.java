@@ -58,11 +58,10 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
 
     @Override
     public float[] onInitMargin() {
-        margin[3] = attribute.gridLabelMarginTop
+        margin[3] = (float) Math.ceil(attribute.gridLabelMarginTop
                 + attribute.gridLabelMarginBottom
                 + rect.height()
-                + attribute.borderWidth
-                + (attribute.gridLineStyle == GridLineStyle.GRADUATION ? attribute.gridLineLength : 0);
+                + (attribute.gridLineStyle == GridLineStyle.GRADUATION ? attribute.gridLineLength : 0));
         return margin;
     }
 
@@ -85,15 +84,20 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
 
     @Override
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
+        canvas.save();
+        canvas.clipRect(viewRect);
         render.mapPoints(render.getMainModule().getMatrix(), point);
         for (int i = 0; i < label.length; i++) {
             if (TextUtils.isEmpty(label[i])) {
                 continue;
             }
             int xIndex = i * 2;
+            if (point[xIndex] < viewRect.left || point[xIndex] > viewRect.right) {
+                continue;
+            }
             canvas.drawText(label[i], point[xIndex], gridLabelY, gridLabelPaint);
             // 跳过超出显示区域的线
-            if (attribute.gridLineStyle == GridLineStyle.NONE || point[xIndex] < viewRect.left || point[xIndex] > viewRect.right) {
+            if (attribute.gridLineStyle == GridLineStyle.NONE) {
                 continue;
             }
             float x = point[xIndex];
@@ -103,9 +107,11 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
             } else if (attribute.gridLineStyle == GridLineStyle.GRADUATION_INSIDE) {
                 canvas.drawLine(x, y, x, y - attribute.gridLineLength, gridPaint);
             } else if (attribute.gridLineStyle == GridLineStyle.GRADUATION) {
-                canvas.drawLine(x, y, x, y + attribute.gridLineLength + attribute.borderWidth, gridPaint);
+                y = y + attribute.borderWidth;
+                canvas.drawLine(x, y, x, y + attribute.gridLineLength, gridPaint);
             }
         }
+        canvas.restore();
     }
 
     @Override
@@ -113,7 +119,7 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
     }
 
     @Override
-    public void onViewChange() {
-        gridLabelY = viewRect.bottom - attribute.borderWidth - attribute.gridLabelMarginBottom;
+    public void onLayoutComplete() {
+        gridLabelY = viewRect.bottom - attribute.gridLabelMarginBottom;
     }
 }

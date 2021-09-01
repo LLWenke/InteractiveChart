@@ -40,12 +40,10 @@ public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
      */
     @Override
     protected void resetMatrix() {
-        RectF rectF = getMainModule().getRect();
-        initMatrixValue(rectF);
-        postMatrixOffset(rectF.left + getMainModule().getXOffset() * 2f,
-                viewRect.top - getMainModule().getYOffset());
-        postMatrixTouch(rectF.width() - getMainModule().getXCorrectedValue(),
-                getAdapter().getCount());
+        AbsModule<AbsEntry> module = getMainModule();
+        initMatrixValue(module.getRect());
+        postMatrixOffset(module.getRect().left + module.getXOffset() * 2f, viewRect.top - module.getYOffset());
+        postMatrixTouch(module.getRect(), module.getRect().width() - module.getXCorrectedValue(), getAdapter().getCount());
     }
 
     /**
@@ -99,12 +97,12 @@ public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
         highlightPoints[0] = getHighlightPoint()[0] + getMainModule().getXOffset();
         String value;
         if (highlightX - highlightPoints[0] < 5) {
-            value = exchangeRateConversion(highlightEntry.getPrice().text,
-                    getAdapter().getScale().getQuoteScale());
+            value = getAdapter().rateQuantizationConversion(highlightEntry.getPrice().value,
+                    getAdapter().getScale().getQuoteScale(), true);
         } else {
             invertMapPoints(highlightPoints);
-            value = exchangeRateConversion(highlightPoints[0],
-                    getAdapter().getScale().getQuoteScale());
+            value = getAdapter().rateQuantizationConversion(highlightPoints[0],
+                    getAdapter().getScale().getQuoteScale(), true);
         }
         return value;
     }

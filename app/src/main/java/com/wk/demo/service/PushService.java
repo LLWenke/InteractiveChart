@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 
 import com.wk.chart.adapter.AbsAdapter;
 import com.wk.chart.entry.CandleEntry;
+import com.wk.chart.entry.ScaleEntry;
 import com.wk.demo.model.ServiceMessage;
 
 import org.greenrobot.eventbus.EventBus;
@@ -38,7 +39,7 @@ public class PushService extends IntentService {
         if (null == intent) {
             return;
         }
-        AbsAdapter.ScaleEntry scaleEntry = (AbsAdapter.ScaleEntry) intent.getSerializableExtra("scale");
+        ScaleEntry scaleEntry = (ScaleEntry) intent.getSerializableExtra("scale");
         double open = intent.getFloatExtra("open", 0);
         double high = intent.getFloatExtra("high", 0);
         double low = intent.getFloatExtra("low", 0);
@@ -77,7 +78,7 @@ public class PushService extends IntentService {
     /**
      * 蜡烛图推送数据运算
      */
-    private CandleEntry candlePushDataOperation(AbsAdapter.ScaleEntry scaleEntry, double open, double high, double low,
+    private CandleEntry candlePushDataOperation(ScaleEntry scaleEntry, double open, double high, double low,
                                                 double close, double volume, Date time, int pushType) {
         double closeUpdate = (Math.random() - 0.5) * 2;
         BigDecimal closeValue;

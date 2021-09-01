@@ -33,6 +33,7 @@ import com.wk.chart.drawing.depth.DepthSelectorDrawing;
 import com.wk.chart.drawing.timeLine.TimeLineDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.ChartCache;
+import com.wk.chart.enumeration.AxisTagVisible;
 import com.wk.chart.enumeration.BorderStyle;
 import com.wk.chart.enumeration.DataType;
 import com.wk.chart.enumeration.IndexType;
@@ -82,46 +83,54 @@ public class ChartLayout extends ConstraintLayout {
     }
 
     /**
-     * 构建图表组件
+     * 构建蜡烛图组件
      */
-    private void initChartModules(AbsRender render) {
+    private void initCandleChartModules(AbsRender<?, ?> render) {
         render.resetChartModules();
-        CandleModule candleModule = new CandleModule(IndexType.CANDLE_MA);
+        CandleModule candleModule = new CandleModule();
         candleModule.addDrawing(new WaterMarkingDrawing());//水印组件
         candleModule.addDrawing(new CandleDrawing());//蜡烛图组件
-        candleModule.addDrawing(new IndexLineDrawing());//平均线组件
-        candleModule.addDrawing(new AxisDrawing(5));//x轴组件
-        candleModule.addDrawing(new IndexLabelDrawing());//指标文字标签组件
+        candleModule.addDrawing(new IndexLineDrawing(IndexType.CANDLE_MA));//MA组件
+        candleModule.addDrawing(new IndexLabelDrawing(IndexType.CANDLE_MA));//MA指标文字标签组件
+        candleModule.addDrawing(new IndexLineDrawing(IndexType.BOLL));//BOLL平均线组件
+        candleModule.addDrawing(new IndexLabelDrawing(IndexType.BOLL));//BOLL指标文字标签组件
         candleModule.addDrawing(new MarkerPointDrawing());//标记点绘制组件
+        candleModule.addDrawing(new AxisDrawing(5, false));//x轴组件
         candleModule.addDrawing(new ExtremumTagDrawing());//极值标签组件
-        candleModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
+        candleModule.addDrawing(new BorderDrawing(BorderStyle.BOTTOM));//边框组件
+        candleModule.setAttachIndexType(IndexType.CANDLE_MA);
         candleModule.setEnable(true);
         render.addModule(candleModule);
 
         TimeLineModule timeLineModule = new TimeLineModule();
         timeLineModule.addDrawing(new WaterMarkingDrawing());//水印组件
-        timeLineModule.addDrawing(new AxisDrawing(5));//x轴组件
+        timeLineModule.addDrawing(new AxisDrawing(5, false));//x轴组件
         timeLineModule.addDrawing(new TimeLineDrawing());//分时图组件
         timeLineModule.addDrawing(new MarkerPointDrawing());//标记点绘制组件
-        timeLineModule.addDrawing(new IndexLabelDrawing());//指标文字标签组件
         timeLineModule.addDrawing(new BreathingLampDrawing());//呼吸灯组件
-        timeLineModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
+        timeLineModule.addDrawing(new BorderDrawing(BorderStyle.BOTTOM));//边框组件
         render.addModule(timeLineModule);
 
         VolumeModule volumeModule = new VolumeModule();
-        volumeModule.addDrawing(new VolumeDrawing());
-        volumeModule.addDrawing(new IndexLineDrawing());
-        volumeModule.addDrawing(new IndexLabelDrawing());
-        volumeModule.addDrawing(new AxisTagDrawing());
-        volumeModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
+        volumeModule.addDrawing(new VolumeDrawing());//交易量组件
+        volumeModule.addDrawing(new IndexLineDrawing(IndexType.VOLUME_MA));//MA组件
+        volumeModule.addDrawing(new IndexLabelDrawing(IndexType.VOLUME_MA));//MA指标文字标签组件
+        volumeModule.addDrawing(new AxisTagDrawing(AxisTagVisible.TOP_VISIBLE));//x轴标签组件
+        volumeModule.addDrawing(new BorderDrawing(BorderStyle.BOTTOM));//边框组件
+        volumeModule.setAttachIndexType(IndexType.VOLUME_MA);
         volumeModule.setEnable(true);
         render.addModule(volumeModule);
 
-        CandleIndexModule indexModule = new CandleIndexModule(IndexType.NONE);
-        indexModule.addDrawing(new MACDDrawing());//macd指标组件
-        indexModule.addDrawing(new IndexLineDrawing());//指标线组件
-        indexModule.addDrawing(new IndexLabelDrawing());//指标文字标签组件
-        indexModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
+        CandleIndexModule indexModule = new CandleIndexModule();
+        indexModule.addDrawing(new MACDDrawing());//MACD 指标组件
+        indexModule.addDrawing(new IndexLabelDrawing(IndexType.MACD));//MACD 指标文字标签组件
+        indexModule.addDrawing(new IndexLineDrawing(IndexType.KDJ));//KDJ 指标线组件
+        indexModule.addDrawing(new IndexLabelDrawing(IndexType.KDJ));//KDJ 指标文字标签组件
+        indexModule.addDrawing(new IndexLineDrawing(IndexType.RSI));//RSI 指标线组件
+        indexModule.addDrawing(new IndexLabelDrawing(IndexType.RSI));//RSI 指标文字标签组件
+        indexModule.addDrawing(new IndexLineDrawing(IndexType.WR));//WR 指标线组件
+        indexModule.addDrawing(new IndexLabelDrawing(IndexType.WR));//WR 指标文字标签组件
+        indexModule.addDrawing(new BorderDrawing(BorderStyle.BOTTOM));//边框组件
         indexModule.setEnable(true);
         render.addModule(indexModule);
 
@@ -132,7 +141,30 @@ public class ChartLayout extends ConstraintLayout {
         floatModule.addDrawing(new GridDrawing());//Y轴组件
         floatModule.addDrawing(candleHighlight);
         floatModule.addDrawing(new CandleSelectorDrawing());
-        floatModule.addDrawing(new BorderDrawing(BorderStyle.ALL));//边框组件
+//        floatModule.addDrawing(new BorderDrawing(BorderStyle.TOP));//边框组件
+        render.addModule(floatModule);
+    }
+
+    /**
+     * 构建深度图组件
+     */
+    private void initDepthChartModules(AbsRender<?, ?> render) {
+        DepthModule depthModule = new DepthModule();
+        depthModule.addDrawing(new AxisDrawing(4, true));//x轴组件
+        depthModule.addDrawing(new AxisTagDrawing(AxisTagVisible.BOTTOM_VISIBLE));//x轴标签组件
+        depthModule.addDrawing(new DepthDrawing());//深度图组件
+        depthModule.addDrawing(new BorderDrawing(BorderStyle.BOTTOM));
+        depthModule.setEnable(true);
+        render.addModule(depthModule);
+
+        FloatModule floatModule = new FloatModule();
+        DepthHighlightDrawing depthHighlight = new DepthHighlightDrawing();
+        depthHighlight.addMarkerView(new AxisTextMarker());
+        depthHighlight.addMarkerView(new GridTextMarker());
+        floatModule.addDrawing(depthHighlight);
+        floatModule.addDrawing(new DepthGridDrawing());//Y轴组件
+        floatModule.addDrawing(new DepthSelectorDrawing());
+        floatModule.addDrawing(new BorderDrawing(BorderStyle.LEFT | BorderStyle.RIGHT | BorderStyle.BOTTOM));
         render.addModule(floatModule);
     }
 
@@ -151,21 +183,10 @@ public class ChartLayout extends ConstraintLayout {
                 case CANDLE://蜡烛图
                     this.candleChartView = chartView;
                     this.candleRender = render;
-                    initChartModules(render);
+                    initCandleChartModules(render);
                     break;
                 case DEPTH://深度图
-                    DepthModule depthModule = new DepthModule();
-                    depthModule.addDrawing(new AxisDrawing(4));//x轴组件
-                    depthModule.addDrawing(new DepthGridDrawing());//Y轴组件
-                    depthModule.addDrawing(new DepthDrawing());//深度图组件
-                    FloatModule floatModule = new FloatModule();
-                    DepthHighlightDrawing depthHighlight = new DepthHighlightDrawing();
-                    depthHighlight.addMarkerView(new AxisTextMarker());
-                    depthHighlight.addMarkerView(new GridTextMarker());
-                    floatModule.addDrawing(depthHighlight);
-                    floatModule.addDrawing(new DepthSelectorDrawing());
-                    render.addModule(depthModule);
-                    render.addModule(floatModule);
+                    initDepthChartModules(render);
                     chartView.setEnableRightRefresh(false);
                     chartView.setEnableLeftRefresh(false);
                     break;
@@ -256,7 +277,7 @@ public class ChartLayout extends ConstraintLayout {
         ChartCache chartCache = new ChartCache();
         chartCache.scale = candleRender.getAttribute().currentScale;
         chartCache.beginPosition = candleRender.getBegin();
-        AbsAdapter adapter = candleRender.getAdapter();
+        AbsAdapter<?, ?> adapter = candleRender.getAdapter();
         if (adapter instanceof CandleAdapter) {
             chartCache.timeType = ((CandleAdapter) adapter).getTimeType();
         }
@@ -279,26 +300,19 @@ public class ChartLayout extends ConstraintLayout {
         if (null == candleRender || null == candleChartView) {
             return;
         }
-        boolean isLoadData = false, isViewChanged = false;
+        boolean isLoadData = false;
         candleRender.getAttribute().currentScale = chartCache.scale;
-        AbsAdapter adapter = candleRender.getAdapter();
+        candleRender.setFirstLoadPosition(chartCache.beginPosition);
+        AbsAdapter<?, ?> adapter = candleRender.getAdapter();
         if (adapter instanceof CandleAdapter) {
             CandleAdapter candleAdapter = (CandleAdapter) adapter;
             isLoadData = candleAdapter.resetTimeType(chartCache.timeType);
         }
         for (ChartCache.TypeEntry entry : chartCache.types) {
-            if (switchModuleType(entry.getModuleType(), entry.getModuleGroupType()) ||
-                    switchIndexType(entry.getIndexType(), entry.getModuleGroupType())) {
-                isViewChanged = true;
-            }
+            switchModuleType(entry.getModuleType(), entry.getModuleGroupType());
+            switchIndexType(entry.getIndexType(), entry.getModuleGroupType());
         }
-        if (isViewChanged) {
-            this.candleChartView.onViewInit();
-        }
-        this.candleChartView.post(() -> {
-            candleChartView.onDataReset();
-            candleRender.toTransX(chartCache.beginPosition);
-        });
+        this.candleChartView.post(() -> candleChartView.onViewInit());
         if (null != iCacheLoadListener) {
             this.iCacheLoadListener.onLoadCacheTypes(chartCache.timeType, isLoadData, chartCache.types);
         }

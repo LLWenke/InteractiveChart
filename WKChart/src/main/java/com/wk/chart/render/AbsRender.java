@@ -12,10 +12,10 @@ import androidx.annotation.Nullable;
 
 import com.wk.chart.adapter.AbsAdapter;
 import com.wk.chart.compat.MeasureUtils;
-import com.wk.chart.compat.ValueUtils;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.compat.config.AbsBuildConfig;
 import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.enumeration.ModuleGroupType;
 import com.wk.chart.enumeration.ModuleType;
@@ -24,7 +24,6 @@ import com.wk.chart.module.base.MainModule;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,6 +57,8 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     private AbsModule<AbsEntry> focusAreaModule = null;//焦点区域的ChartModule
     private boolean highlight = false;//长按事件状态
     private boolean firstLoad = true;//首次加载
+    private int firstLoadPosition = -1;//首次加载下标
+    private boolean isProrate = true;//是否按比例计算module大小
     private float borderCorrection;//边框修正数值
     private float minScrollOffset = 0; // 最小滚动量
     private float maxScrollOffset = 0; // 最大滚动量
@@ -88,6 +89,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      * 初始化图标
      */
     public void resetChart() {
+        firstLoadPosition = -1;
         firstLoad = true;
         setOverScrollOffset(0);
         setCurrentTransX(0);
@@ -231,6 +233,20 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     }
 
     /**
+     * 是否按比例计算module大小
+     */
+    public void setProrate(boolean prorate) {
+        this.isProrate = prorate;
+    }
+
+    /**
+     * 设置第一次加载应滚动到的下标位置
+     */
+    public void setFirstLoadPosition(int firstLoadPosition) {
+        this.firstLoadPosition = firstLoadPosition;
+    }
+
+    /**
      * 是否可以滚动
      */
     public boolean canScroll(float dx) {
@@ -302,20 +318,57 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     }
 
     /**
+     * 初始化模块
+     * tips:当View高度模式为WRAP_CONTENT时，可能会出现view的高度与模块实际所需的高度不相符，
+     * 这时就需要返回false，通知view调用requestLayout()重新计算view的高度
+     *
+     * @return true:高度相符 false：高度不符
+     */
+    public boolean onModuleInit() {
+        if (null == adapter) {
+            return true;
+        }
+        measureModuleSize();
+        initModuleDrawing();
+        if (isProrate) {
+            measureModuleSize();
+            return true;
+        }
+        int height = measureActualOccupyHeight();
+//        if (this instanceof CandleRender) {
+//            Log.e(TAG, "实际高度：" + height + "    view高度：" + ((int) viewRect.height()));
+//        }
+        return height == (int) viewRect.height();
+    }
+
+    /**
      * 当ViewRect发生改变时，修改viewRectChange状态，用于重新定位和更新所需参数
      */
     public void onViewInit() {
-        measureModuleSize();
         layoutModule();
-        initViewCoordinates();
-        if (!isReady()) {
-            return;
+        if (isReady()) {
+            initViewCoordinates();
+            resetPointsWidth();
+            correctVisibleCount();
+            resetInterval();
+            resetMatrix();
+            onReady();
         }
-        resetPointsWidth();
-        correctVisibleCount();
-        resetInterval();
-        resetMatrix();
-        initDrawing();
+    }
+
+    /**
+     * 初始化模块中的绘图组件
+     */
+    public void initModuleDrawing() {
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
+            for (AbsModule<AbsEntry> module : item.getValue()) {
+                if (!module.isAttach()) {
+                    continue;
+                }
+                module.initDrawing(this);
+                module.initDrawingMargin();
+            }
+        }
     }
 
     /**
@@ -324,15 +377,19 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     void layoutModule() {
         float left = viewRect.left + attribute.borderWidth;
         float top = viewRect.top + attribute.borderWidth;
-        float right = viewRect.right - attribute.borderWidth;
-        float bottom = viewRect.bottom - attribute.borderWidth;
+        float y;
         float marginTop = 0;
         final List<AbsModule<AbsEntry>> floatModules = chartModules.get(ModuleGroupType.FLOAT);
         if (null != floatModules) {
             for (AbsModule<AbsEntry> module : floatModules) {
-                module.setRect(left, top, right, bottom);
-                marginTop = Math.max(marginTop, module.getMargin()[1]);
+                module.setRect(
+                        left + module.getPaddingLeft(),
+                        top + module.getPaddingTop(),
+                        module.getRect().width() - module.getPaddingRight(),
+                        module.getRect().height() - module.getPaddingBottom());
+                marginTop = Math.max(marginTop, module.getDrawingMargin()[1]);
             }
+            top = top + attribute.borderWidth;
         }
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
             for (AbsModule<AbsEntry> module : item.getValue()) {
@@ -349,18 +406,23 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
                 }
                 //更新最底部的图表模型
                 this.bottomModule = module;
-//            Log.e(TAG, "getViewHeight" + module.getIndicatorType() + "   " + module.getViewHeight());
                 //分配图表大小和位置
-                marginTop = Math.max(module.getMargin()[1], marginTop);
+                marginTop = Math.max(module.getDrawingMargin()[1], marginTop);
                 top += marginTop;
-                bottom = top + module.getHeight();
+//                if (this instanceof CandleRender) {
+//                    Log.e(TAG, "top111111:" + top);
+//                }
+                y = top + module.getRect().height();
                 module.setRect(
                         left + module.getPaddingLeft(),
                         top + module.getPaddingTop(),
-                        right - module.getPaddingRight(),
-                        bottom - module.getPaddingBottom());
-                top = bottom + attribute.viewInterval + module.getMargin()[3] + attribute.borderWidth * 2f;
+                        module.getRect().width() - module.getPaddingRight(),
+                        y - module.getPaddingBottom());
+                top = y + attribute.viewInterval + module.getDrawingMargin()[3] + attribute.borderWidth * 2f;
                 marginTop = 0;
+//                if (this instanceof CandleRender) {
+//                    Log.e(TAG, "moduleRect:" + module.getRect().toString() + "    top:" + top);
+//                }
             }
         }
     }
@@ -371,7 +433,21 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     void resetMatrix() {
         initMatrixValue(mainModule.getRect());
         postMatrixOffset(mainModule.getRect().left, viewRect.top);
-        postMatrixTouch(mainModule.getRect().width(), attribute.visibleCount);
+        postMatrixTouch(mainModule.getRect(), mainModule.getRect().width(), attribute.visibleCount);
+    }
+
+    /**
+     * 视图准备就绪
+     */
+    private void onReady() {
+        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
+            for (AbsModule<AbsEntry> module : item.getValue()) {
+                if (!module.isAttach()) {
+                    continue;
+                }
+                module.onLayoutComplete();
+            }
+        }
     }
 
     /**
@@ -676,10 +752,11 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     /**
      * 手势滑动缩放矩阵运算
      *
-     * @param width        当前显示区域的宽
+     * @param rect         当前显示区域矩形
+     * @param width        当前显示区域宽度
      * @param visibleCount 当前显示区域的 X 轴方向上需要显示多少个 entry 值
      */
-    protected void postMatrixTouch(float width, float visibleCount) {
+    protected void postMatrixTouch(RectF rect, float width, float visibleCount) {
         final float scaleX = adapter.getCount() / visibleCount;
         matrixTouch.reset();
         matrixTouch.postScale(scaleX, 1);
@@ -701,9 +778,14 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
 //            Log.e(TAG, "##d postMatrixTouch: currentOffset = " + touchValues[Matrix.MTRANS_X]
 //                    + ", rightScrollOffset = " + attribute.rightScrollOffset);
         } else if (firstLoad) {
-            // 通常首次加载时定位到最末尾
-            setCurrentTransX(-maxScrollOffset);
-            firstLoad = false;
+            this.firstLoad = false;
+            float firstScrollOffset;
+            if (firstLoadPosition < 0) { // 通常首次加载时定位到最末尾
+                firstScrollOffset = -maxScrollOffset;
+            } else { //如果有需要第一次加载滚动到的下标位置，则滚动到该下标对应位置
+                firstScrollOffset = getTransX(rect, attribute.visibleCount, firstLoadPosition) - 1f;
+            }
+            setCurrentTransX(firstScrollOffset);
         }
         //Log.e(TAG, "##d postMatrixTouch: currentOffset = " + touchValues[Matrix.MTRANS_X]
         //    + ", maxScrollOffset = " + -maxScrollOffset
@@ -735,45 +817,67 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     }
 
     /**
-     * 初始化Drawing
+     * 渲染Drawing
      */
-    private void initDrawing() {
-        for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
-            for (AbsModule<AbsEntry> module : item.getValue()) {
-                if (module.isAttach()) {
-                    module.initDrawing(this);
+    private void renderDrawing(Canvas canvas, AbsModule<AbsEntry> module) {
+        for (AbsDrawing<?, ?> drawing : module.getDrawingList()) {
+            if (checkDrawingState(drawing, module)) {
+                drawing.readyComputation(canvas, begin, end, extremum);
+            }
+        }
+        for (AbsDrawing<?, ?> drawing : module.getDrawingList()) {
+            if (checkDrawingState(drawing, module)) {
+                for (int i = begin; i < end; i++) {
+                    drawing.onComputation(begin, end, i, extremum);
                 }
+            }
+        }
+        for (AbsDrawing<?, ?> drawing : module.getDrawingList()) {
+            if (checkDrawingState(drawing, module)) {
+                drawing.onDraw(canvas, begin, end, extremum);
+            }
+        }
+        for (AbsDrawing<?, ?> drawing : module.getDrawingList()) {
+            if (checkDrawingState(drawing, module)) {
+                drawing.drawOver(canvas);
             }
         }
     }
 
     /**
-     * 渲染Drawing
+     * 检查绘制组件状态
+     *
+     * @return true:绘制  false:不绘制
      */
-    private void renderDrawing(Canvas canvas, ArrayList<AbsDrawing<AbsRender<?, ?>,
-            AbsModule<?>>> drawingList) {
-        for (AbsDrawing<?, ?> drawing : drawingList) {
-            drawing.readyComputation(canvas, begin, end, extremum);
+    private boolean checkDrawingState(AbsDrawing<?, ?> drawing, AbsModule<AbsEntry> module) {
+        if (!drawing.isInit()) {
+            return false;
         }
-        for (AbsDrawing<?, ?> drawing : drawingList) {
-            for (int i = begin; i < end; i++) {
-                drawing.onComputation(begin, end, i, extremum);
-            }
+        if (drawing instanceof IndexDrawing) {
+            return ((IndexDrawing<?, ?>) drawing).getIndexType() == module.getAttachIndexType();
         }
-        for (AbsDrawing<?, ?> drawing : drawingList) {
-            drawing.onDraw(canvas, begin, end, extremum);
-        }
+        return true;
+    }
 
-        for (AbsDrawing<?, ?> drawing : drawingList) {
-            drawing.drawOver(canvas);
-        }
+    /**
+     * 测量模块(预计)占用高度（用于View高度模式为WRAP_CONTENT时）
+     */
+    public int measureEstimateOccupyHeight() {
+        return measureUtils.measureEstimateOccupyHeight();
+    }
+
+    /**
+     * 测量模块(实际)占用高度（用于View高度模式为WRAP_CONTENT时）
+     */
+    public int measureActualOccupyHeight() {
+        return measureUtils.measureActualOccupyHeight();
     }
 
     /**
      * 测量模块大小
      */
     public void measureModuleSize() {
-        measureUtils.measureModuleSize(viewRect.width(), viewRect.height());
+        measureUtils.measureModuleSize(viewRect.width(), viewRect.height(), isProrate);
     }
 
     /**
@@ -914,7 +1018,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
                     continue;
                 }
                 postMatrixValue(module);
-                renderDrawing(canvas, module.getDrawingList());
+                renderDrawing(canvas, module);
             }
         }
     }
@@ -953,24 +1057,6 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
                 module.resetDrawing();
             }
         }
-        onViewInit();
-    }
-
-    /**
-     * 数据重置回调
-     *
-     * @return 修改数量
-     */
-    public int onDataReset() {
-        int updateCount = 0;
-        if (isReady()) {
-            for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
-                for (AbsModule<AbsEntry> module : item.getValue()) {
-                    updateCount += module.initMargin();
-                }
-            }
-        }
-        return updateCount;
     }
 
     /**
@@ -1058,26 +1144,5 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
             }
         }
         return newViewTBCoordinates;
-    }
-
-    /**
-     * 汇率转换（此处已做精度控制）
-     *
-     * @param value 值
-     */
-    public String exchangeRateConversion(float value, int scale) {
-        return ValueUtils.format(value, scale, getAdapter().getRate());
-    }
-
-    /**
-     * 汇率转换（此处已做精度控制）
-     *
-     * @param value 值
-     */
-    public String exchangeRateConversion(String value, int scale) {
-        if (getAdapter().getRate().getRate().compareTo(BigDecimal.ONE) == 0) {
-            return value;
-        }
-        return getAdapter().getRate().getUnit().concat(ValueUtils.format(value, scale, getAdapter().getRate()));
     }
 }

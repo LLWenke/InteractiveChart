@@ -19,7 +19,7 @@
             app:axisLabelTBMargin="0dp"
             app:axisLineState="false"
             app:axisTagMarginY="3dp"
-            app:borderWidth="0.5dp"
+            app:borderWidth="1dp"
             app:breathingLampRadius="3dp"
             app:candleExtremumLabelSize="10sp"
             app:decreasingStyle="fill"
@@ -81,7 +81,7 @@
             android:layout_height="0dp"
             android:layout_marginTop="10dp"
             app:axisLabelLocation="all"
-            app:borderWidth="0dp"
+            app:borderWidth="1dp"
             app:gridLabelMarginBottom="8dp"
             app:gridLabelMarginTop="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -93,7 +93,8 @@
             app:markerStyle="fill_and_stroke"
             app:markerTextSize="7sp"
             app:renderModel="depth"
-            app:selectorMarginY="19dp"
+            app:selectorIntervalY="2dp"
+            app:selectorMarginY="0dp"
             app:viewInterval="0dp" />
 
         <ProgressBar

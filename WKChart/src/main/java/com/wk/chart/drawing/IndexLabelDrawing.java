@@ -7,12 +7,11 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.ValueUtils;
 import com.wk.chart.compat.attribute.CandleAttribute;
-import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.IndexConfigEntry;
 import com.wk.chart.entry.ValueEntry;
@@ -25,7 +24,7 @@ import com.wk.chart.render.CandleRender;
  * <p>IndexLabelDrawing</p>
  */
 
-public class IndexLabelDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
+public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
     private static final String TAG = "IndexLabelDrawing";
     private CandleAttribute attribute;//配置文件
     private TextPaint[] labelPaints; // 标签画笔
@@ -34,6 +33,10 @@ public class IndexLabelDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
     private IndexConfigEntry tagEntry;//指标配置
     private float x, y, left, right, offset;
     private int lines = 1, lineItemCount = 0;//行数,行item数量
+
+    public IndexLabelDrawing(int indexType) {
+        super(indexType);
+    }
 
     @Override
     public void onInit(CandleRender render, AbsModule<?> chartModule) {
@@ -49,6 +52,27 @@ public class IndexLabelDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
         left = viewRect.left + attribute.indexTextMarginX;
         right = viewRect.right - attribute.indexTextMarginX;
         offset = attribute.indexTextMarginY + rect.height();
+    }
+
+    @Override
+    public void onInitConfig() {
+        tagEntry = render.getAdapter().getBuildConfig().getIndexTags(indexType);
+        if (null == tagEntry) {
+            return;
+        }
+        IndexConfigEntry.FlagEntry[] flagEntries = tagEntry.getFlagEntries();
+        Paint.Align align = getTextAlign();
+        //重置指标线画笔/路径等资源
+        if (null == labelPaints || labelPaints.length != flagEntries.length) {
+            labelPaints = new TextPaint[flagEntries.length];
+            for (int i = 0; i < flagEntries.length; i++) {
+                TextPaint labelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+                labelPaint.setTextSize(attribute.indexTextSize);
+                labelPaint.setColor(flagEntries[i].getColor());
+                labelPaint.setTextAlign(align);
+                labelPaints[i] = labelPaint;
+            }
+        }
     }
 
     @Override
@@ -84,11 +108,9 @@ public class IndexLabelDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
             }
         }
         lines = (int) Math.ceil(currentX / viewRect.width());
-        Log.e("lines" + lines, "     lineItemCount" + lineItemCount + "   count" + count);
+//        Log.e("lines" + lines, "     lineItemCount" + lineItemCount + "   count" + count);
         float indexLabelHeight = attribute.indexTextMarginY * 2f + rect.height();
-        if (lines > 1) {
-            indexLabelHeight *= 2;
-        }
+        indexLabelHeight *= lines;
         switch (attribute.indexLabelLocation) {
             case LEFT_TOP://左上
             case RIGHT_TOP://右上
@@ -173,24 +195,7 @@ public class IndexLabelDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
     }
 
     @Override
-    public void onViewChange() {
-        tagEntry = render.getAdapter().getBuildConfig().getIndexTags(absChartModule.getAttachIndexType());
-        if (null == tagEntry) {
-            return;
-        }
-        IndexConfigEntry.FlagEntry[] flagEntries = tagEntry.getFlagEntries();
-        Paint.Align align = getTextAlign();
-        //重置指标线画笔/路径等资源
-        if (null == labelPaints || labelPaints.length != flagEntries.length) {
-            labelPaints = new TextPaint[flagEntries.length];
-            for (int i = 0; i < flagEntries.length; i++) {
-                TextPaint labelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-                labelPaint.setTextSize(attribute.indexTextSize);
-                labelPaint.setColor(flagEntries[i].getColor());
-                labelPaint.setTextAlign(align);
-                labelPaints[i] = labelPaint;
-            }
-        }
+    public void onLayoutComplete() {
         float lineHeight = 0;
         if (lines > 1) {
             lineHeight = offset;
@@ -234,8 +239,8 @@ public class IndexLabelDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
 
 
     private String getTag(String tag, CandleEntry entry) {
-        if (absChartModule.getAttachIndexType() == IndexType.VOLUME_MA) {
-            return tag.concat(ValueUtils.formatBig(entry.getVolume().value,
+        if (indexType == IndexType.VOLUME_MA) {
+            return tag.concat(ValueUtils.quantization(entry.getVolume().value,
                     render.getAdapter().getScale().getBaseScale()));
         } else {
             return tag;
@@ -245,14 +250,14 @@ public class IndexLabelDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
     @SuppressLint("SwitchIntDef")
     private String getLabel(String name, ValueEntry value) {
         String label;
-        switch (absChartModule.getAttachIndexType()) {
+        switch (indexType) {
             case IndexType.CANDLE_MA:
             case IndexType.BOLL:
-                label = name.concat(render.exchangeRateConversion(value.text,
-                        render.getAdapter().getScale().getQuoteScale()));
+                label = name.concat(render.getAdapter().rateConversion(value.value,
+                        render.getAdapter().getScale().getQuoteScale(), false));
                 break;
             case IndexType.VOLUME_MA:
-                label = name.concat(ValueUtils.formatBig(value.value,
+                label = name.concat(ValueUtils.quantization(value.value,
                         render.getAdapter().getScale().getBaseScale()));
                 break;
             default:
@@ -263,7 +268,7 @@ public class IndexLabelDrawing extends AbsDrawing<CandleRender, AbsModule<?>> {
     }
 
     private ValueEntry[] getIndexValue(CandleEntry entry) {
-        int type = absChartModule.getAttachIndexType();
+        int type = indexType;
         if (type == IndexType.MACD) {
             return entry.getIndex(type);
         } else {

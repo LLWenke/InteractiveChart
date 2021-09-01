@@ -117,7 +117,7 @@ public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
     }
 
     @Override
-    public void onViewChange() {
+    public void onLayoutComplete() {
         timeShaderPaint.setShader(
                 new LinearGradient(0, viewRect.top, 0, viewRect.bottom,
                         new int[]{Utils.getColorWithAlpha(attribute.timeLineColor, attribute.shaderBeginColorAlpha)

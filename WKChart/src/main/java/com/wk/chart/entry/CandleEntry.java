@@ -6,7 +6,6 @@ import android.util.ArrayMap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.wk.chart.adapter.AbsAdapter;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.MarkerPointType;
@@ -43,7 +42,7 @@ public class CandleEntry extends AbsEntry {
      * @param volume 量
      * @param time   时间
      */
-    public CandleEntry(@NonNull AbsAdapter.ScaleEntry scale, double open, double high, double low, double close,
+    public CandleEntry(@NonNull ScaleEntry scale, double open, double high, double low, double close,
                        double volume, Date time) {
         super(scale, time);
         this.markerPointRect = new Rect();
@@ -70,7 +69,7 @@ public class CandleEntry extends AbsEntry {
      * @param volume 量
      * @param time   时间
      */
-    public CandleEntry(@NonNull AbsAdapter.ScaleEntry scale, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close,
+    public CandleEntry(@NonNull ScaleEntry scale, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close,
                        BigDecimal volume, Date time) {
         super(scale, time);
         this.markerPointRect = new Rect();

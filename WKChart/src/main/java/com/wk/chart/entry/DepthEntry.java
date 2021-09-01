@@ -1,6 +1,5 @@
 package com.wk.chart.entry;
 
-import com.wk.chart.adapter.AbsAdapter;
 import com.wk.chart.compat.Utils;
 
 import java.math.BigDecimal;
@@ -26,7 +25,7 @@ public class DepthEntry extends AbsEntry {
      * @param type        类型
      * @param time        时间
      */
-    public DepthEntry(AbsAdapter.ScaleEntry scale, double price, double amount,
+    public DepthEntry(ScaleEntry scale, double price, double amount,
                       double totalAmount, int type, Date time) {
         super(scale, time);
         this.price = buildValue(price, scale.getQuoteScale());
@@ -45,7 +44,7 @@ public class DepthEntry extends AbsEntry {
      * @param type        类型
      * @param time        时间
      */
-    public DepthEntry(AbsAdapter.ScaleEntry scale, BigDecimal price, BigDecimal amount,
+    public DepthEntry(ScaleEntry scale, BigDecimal price, BigDecimal amount,
                       BigDecimal totalAmount, int type, Date time) {
         super(scale, time);
         this.price = buildValue(price, scale.getQuoteScale());
@@ -64,7 +63,7 @@ public class DepthEntry extends AbsEntry {
      * @param type        类型
      * @param time        时间
      */
-    public DepthEntry(AbsAdapter.ScaleEntry scale, long price, long amount,
+    public DepthEntry(ScaleEntry scale, long price, long amount,
                       long totalAmount, int type, Date time) {
         super(scale, time);
         this.price = recoveryValue(price, scale.getQuoteScale());

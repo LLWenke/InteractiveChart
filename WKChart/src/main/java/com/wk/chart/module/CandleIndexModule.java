@@ -13,9 +13,8 @@ import com.wk.chart.module.base.IndexModule;
 
 public class CandleIndexModule extends IndexModule<CandleEntry> {
 
-    public CandleIndexModule(@IndexType int indexType) {
+    public CandleIndexModule() {
         super(ModuleType.MUTATION);
-        setAttachIndexType(indexType);
     }
 
     @Override

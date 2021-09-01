@@ -153,10 +153,6 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
         }
     }
 
-    @Override
-    public void onViewChange() {
-    }
-
     /**
      * 装载选择器的内容信息
      */
@@ -183,8 +179,8 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
         selectorInfo[2]
                 .setLabel(attribute.context.getString(R.string.wk_total_cost))
                 .setLabelPaint(labelPaint)
-                .setValue(render.exchangeRateConversion(point.getTotalPrice().text,
-                        render.getAdapter().getScale().getQuoteScale()))
+                .setValue(render.getAdapter().rateQuantizationConversion(point.getTotalPrice().value,
+                        render.getAdapter().getScale().getQuoteScale(), true))
                 .setValuePaint(valuePaint)
                 .setUnit(" ".concat(render.getAdapter().getRate().getUnit()))
                 .setUnitPaint(unitPaint);

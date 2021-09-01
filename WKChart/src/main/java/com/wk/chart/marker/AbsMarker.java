@@ -21,7 +21,7 @@ public abstract class AbsMarker<T extends AbsRender<?, ?>> {
     public boolean isInit = false;
     protected BaseAttribute attribute;
     protected T render;
-    private float[] margin; //边距[left, top, right, bottom]
+    protected float[] margin; //边距[left, top, right, bottom]
 
     /**
      * 初始化
@@ -55,7 +55,7 @@ public abstract class AbsMarker<T extends AbsRender<?, ?>> {
     /**
      * 获取边距
      */
-    public final float[] getMargin() {
+    public float[] onInitMargin() {
         return margin;
     }
 

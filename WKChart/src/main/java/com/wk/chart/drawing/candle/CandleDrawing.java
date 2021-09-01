@@ -137,7 +137,4 @@ public class CandleDrawing extends AbsDrawing<CandleRender, CandleModule> {
     public void drawOver(Canvas canvas) {
     }
 
-    @Override
-    public void onViewChange() {
-    }
 }

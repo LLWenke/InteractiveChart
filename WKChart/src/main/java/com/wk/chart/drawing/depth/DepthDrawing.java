@@ -58,8 +58,6 @@ public class DepthDrawing extends AbsDrawing<DepthRender, DepthModule> {
         askPolylinePaint.setStrokeWidth(attribute.polylineWidth);
         askPolylinePaint.setColor(attribute.decreasingColor);
         askPolylinePaint.setStyle(Paint.Style.STROKE);
-
-        offset = chartModule.getXOffset();
     }
 
     @Override
@@ -133,7 +131,8 @@ public class DepthDrawing extends AbsDrawing<DepthRender, DepthModule> {
     }
 
     @Override
-    public void onViewChange() {
+    public void onLayoutComplete() {
+        offset = absChartModule.getXOffset();
         left = viewRect.left - attribute.polylineWidth;
         right = viewRect.right + attribute.polylineWidth;
 
