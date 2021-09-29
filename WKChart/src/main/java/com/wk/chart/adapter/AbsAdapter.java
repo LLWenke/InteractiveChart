@@ -15,10 +15,10 @@ import com.wk.chart.entry.BuildData;
 import com.wk.chart.entry.QuantizationEntry;
 import com.wk.chart.entry.RateEntry;
 import com.wk.chart.entry.ScaleEntry;
+import com.wk.chart.entry.ValueEntry;
 import com.wk.chart.enumeration.ObserverArg;
 import com.wk.chart.thread.WorkThread;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
@@ -50,9 +50,9 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         this.chartData = new ArrayList<>();
         this.uiHandler = new Handler(this);
         this.dataSetObservable = new DataSetObservable();
-        this.animator = new ChartAnimator<>(this, 0);
+        this.animator = new ChartAnimator<>(this, 400);
         this.scale = new ScaleEntry(0, 0, "", "");
-        this.rate = new RateEntry(BigDecimal.ONE, scale.getQuoteUnit(), scale.getQuoteScale());
+        this.rate = new RateEntry(1.0, scale.getQuoteUnit(), scale.getQuoteScale());
         this.quantizationEntry = new QuantizationEntry();
     }
 
@@ -187,9 +187,9 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      * @param unit      单位
      * @param scale     精度
      */
-    public void setRate(BigDecimal rateValue, String unit, int scale) {
+    public void setRate(Double rateValue, String unit, int scale) {
         this.rate.setRate(rateValue);
-        this.rate.setUnit(unit);
+        this.rate.setSign(unit);
         this.rate.setScale(scale);
         notifyDataSetChanged(ObserverArg.RATE_UPDATE);
     }
@@ -198,7 +198,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      * 重置比率
      */
     public void resetRate() {
-        this.rate = new RateEntry(BigDecimal.ONE, scale.getQuoteUnit(), scale.getQuoteScale());
+        this.rate = new RateEntry(1.0, scale.getQuoteUnit(), scale.getQuoteScale());
         notifyDataSetChanged(ObserverArg.RATE_UPDATE);
     }
 
@@ -206,7 +206,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      * 获取汇率设置状态
      */
     public boolean getRateState() {
-        return getRate().getRate().compareTo(BigDecimal.ONE) != 0;
+        return getRate().isSet();
     }
 
     /**
@@ -479,22 +479,49 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     /**
      * 汇率转换（此处已做精度控制）
      *
-     * @param value   传入的value值
-     * @param scale   精度
-     * @param hasUnit 带汇率标识，如：¥
+     * @param entry              传入的entry
+     * @param isQuantization     是否量化转换
+     * @param stripTrailingZeros 去除无用的0（如：2.4560->2.456）
      */
-    public String rateConversion(float value, int scale, boolean hasUnit) {
-        return ValueUtils.format(value, scale, getRate(), hasUnit);
+    public String rateConversion(ValueEntry entry, boolean isQuantization, boolean stripTrailingZeros) {
+        return rateConversion(entry.result, entry.getScale(), isQuantization, stripTrailingZeros);
     }
 
     /**
-     * 汇率转换(量化)（此处已做精度控制）
+     * 汇率转换（此处已做精度控制）
      *
-     * @param value   传入的value值
-     * @param scale   精度
-     * @param hasUnit 带汇率标识，如：¥
+     * @param value              传入的value值
+     * @param scale              精度
+     * @param isQuantization     是否量化转换
+     * @param stripTrailingZeros 去除无用的0（如：2.4560->2.456）
      */
-    public String rateQuantizationConversion(float value, int scale, boolean hasUnit) {
-        return ValueUtils.format(value, scale, getRate(), getQuantizationEntry(), hasUnit);
+    public String rateConversion(double value, int scale, boolean isQuantization, boolean stripTrailingZeros) {
+        return rateConversion(ValueUtils.buildResult(value, scale), scale, isQuantization, stripTrailingZeros);
+    }
+
+    /**
+     * 汇率转换（此处已做精度控制）
+     *
+     * @param result             传入的result值
+     * @param scale              精度
+     * @param isQuantization     是否量化转换
+     * @param stripTrailingZeros 去除无用的0（如：2.4560->2.456）
+     */
+    public String rateConversion(long result, int scale, boolean isQuantization, boolean stripTrailingZeros) {
+        if (isQuantization) {
+            return ValueUtils.rateFormat(result, scale, getRate(), getQuantizationEntry(), stripTrailingZeros);
+        } else {
+            return ValueUtils.rateFormat(result, scale, getRate(), null, stripTrailingZeros);
+        }
+    }
+
+    /**
+     * 量化转换（此处已做精度控制）
+     *
+     * @param entry              传入的entry
+     * @param stripTrailingZeros 去除无用的0（如：2.4560->2.456）
+     */
+    public String quantizationConversion(ValueEntry entry, boolean stripTrailingZeros) {
+        return ValueUtils.rateFormat(entry.result, entry.getScale(), null, getQuantizationEntry(), stripTrailingZeros);
     }
 }

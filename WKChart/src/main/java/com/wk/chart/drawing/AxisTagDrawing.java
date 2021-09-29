@@ -9,7 +9,6 @@ import android.text.TextPaint;
 
 import com.wk.chart.compat.FontStyle;
 import com.wk.chart.compat.Utils;
-import com.wk.chart.compat.ValueUtils;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
@@ -174,8 +173,8 @@ public class AxisTagDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<AbsEnt
      */
     private String getLabelText(float value) {
         if (absChartModule.getModuleType() == ModuleType.VOLUME) {
-            return ValueUtils.quantization(absChartModule.getMaxY().value, render.getAdapter().getScale().getQuoteScale());
+            return render.getAdapter().quantizationConversion(absChartModule.getMaxY(), true);
         }
-        return render.getAdapter().rateConversion(value, render.getAdapter().getScale().getQuoteScale(), false);
+        return render.getAdapter().rateConversion(value, render.getAdapter().getScale().getQuoteScale(), false, false);
     }
 }

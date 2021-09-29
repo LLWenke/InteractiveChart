@@ -6,7 +6,7 @@ import android.util.ArrayMap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.wk.chart.compat.Utils;
+import com.wk.chart.compat.ValueUtils;
 import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.MarkerPointType;
 
@@ -51,8 +51,8 @@ public class CandleEntry extends AbsEntry {
         this.low = buildValue(low, scale.getQuoteScale());
         this.close = buildValue(close, scale.getQuoteScale());
         this.volume = buildValue(volume, scale.getBaseScale());
-        this.changeAmount = recoveryValue(getClose().result - getOpen().result, scale.getQuoteScale());
-        this.changeProportion = recoveryValue(getChangeAmount().result * 10000 / Utils.divisorCorrect(getOpen().result), scale.getBaseScale());
+        this.changeAmount = buildValue(getClose().result - getOpen().result, scale.getQuoteScale());
+        this.changeProportion = buildValue(ValueUtils.scaleDivide(getChangeAmount().result, getOpen().result, 4), 2);
         this.index = new ArrayMap<>();
         this.lineIndex = new ArrayMap<>();
         addAnimatorEntry(this.close, this.high, this.low, this.volume);
@@ -78,8 +78,8 @@ public class CandleEntry extends AbsEntry {
         this.low = buildValue(low, scale.getQuoteScale());
         this.close = buildValue(close, scale.getQuoteScale());
         this.volume = buildValue(volume, scale.getBaseScale());
-        this.changeAmount = recoveryValue(getClose().result - getOpen().result, scale.getQuoteScale());
-        this.changeProportion = recoveryValue(getChangeAmount().result * 10000 / Utils.divisorCorrect(getOpen().result), scale.getBaseScale());
+        this.changeAmount = buildValue(getClose().result - getOpen().result, scale.getQuoteScale());
+        this.changeProportion = buildValue(ValueUtils.scaleDivide(getChangeAmount().result, getOpen().result, 4), 2);
         this.index = new ArrayMap<>();
         this.lineIndex = new ArrayMap<>();
         addAnimatorEntry(this.close, this.high, this.low, this.volume);
@@ -114,23 +114,23 @@ public class CandleEntry extends AbsEntry {
     }
 
     /**
-     * 复原QuoteScale精度的value
+     * 构建QuoteScale精度的value
      *
      * @param value 值
      * @return 复原后的ValueEntry
      */
-    public ValueEntry recoveryQuoteScaleValue(long value) {
-        return recoveryValue(value, getScale().getQuoteScale());
+    public ValueEntry buildQuoteScaleValue(long value) {
+        return buildValue(value, getScale().getQuoteScale());
     }
 
     /**
-     * 复原BaseScale精度的value
+     * 构建BaseScale精度的value
      *
      * @param value 值
      * @return 复原后的ValueEntry
      */
-    public ValueEntry recoveryBaseScaleValue(long value) {
-        return recoveryValue(value, getScale().getBaseScale());
+    public ValueEntry buildBaseScaleValue(long value) {
+        return buildValue(value, getScale().getBaseScale());
     }
 
     public void putLineIndex(@IndexType int indexType, ValueEntry... values) {

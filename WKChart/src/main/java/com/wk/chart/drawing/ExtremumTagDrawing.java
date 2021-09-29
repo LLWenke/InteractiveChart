@@ -70,7 +70,7 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> {
         extremumBuffer[3] = min.getLow().value;
         render.mapPoints(extremumBuffer);
         // 绘制当前显示区域的最大文字（max）
-        String maxValue = render.getAdapter().rateConversion(max.getHigh().value, render.getAdapter().getScale().getQuoteScale(), true);
+        String maxValue = render.getAdapter().rateConversion(max.getHigh(), false, false);
         String text = "← ".concat(maxValue);
         extremumPaint.getTextBounds(text, 0, text.length(), extremumRect);
         //文字align调整
@@ -102,7 +102,7 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> {
         }
 
         // 绘制当前显示区域的最小文字（min）
-        String minValue = render.getAdapter().rateConversion(min.getLow().value, render.getAdapter().getScale().getQuoteScale(), true);
+        String minValue = render.getAdapter().rateConversion(min.getLow(), false, false);
         text = "← ".concat(minValue);
         extremumPaint.getTextBounds(text, 0, text.length(), extremumRect);
         //文字align调整

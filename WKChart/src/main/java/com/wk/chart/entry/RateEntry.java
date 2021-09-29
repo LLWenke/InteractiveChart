@@ -1,35 +1,33 @@
 package com.wk.chart.entry;
 
-import java.math.BigDecimal;
-
 /**
  * 比率实例
  */
 public class RateEntry {
-    private BigDecimal rate;  //比率
-    private String unit; //单位
+    private double rate;  //比率
+    private String sign; //标识
     private int scale;//精度
 
-    public RateEntry(BigDecimal rate, String unit, int scale) {
+    public RateEntry(Double rate, String unit, int scale) {
         setRate(rate);
-        setUnit(unit);
+        setSign(unit);
         setScale(scale);
     }
 
-    public BigDecimal getRate() {
+    public double getRate() {
         return rate;
     }
 
-    public void setRate(BigDecimal rate) {
-        this.rate = null == rate ? BigDecimal.ONE : rate;
+    public void setRate(Double rate) {
+        this.rate = null == rate ? 1.0 : rate;
     }
 
-    public String getUnit() {
-        return unit;
+    public String getSign() {
+        return sign;
     }
 
-    public void setUnit(String unit) {
-        this.unit = null == unit ? "" : unit;
+    public void setSign(String sign) {
+        this.sign = null == sign ? "" : sign;
     }
 
     public int getScale() {
@@ -38,5 +36,12 @@ public class RateEntry {
 
     public void setScale(int scale) {
         this.scale = scale;
+    }
+
+    /**
+     * 是否设置(true:已设置 false:未设置)
+     */
+    public boolean isSet() {
+        return getRate() != 1.0;
     }
 }

@@ -103,9 +103,9 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
             }
             String text;
             if (isQuantization) {
-                text = render.getAdapter().rateQuantizationConversion(value, render.getAdapter().getScale().getQuoteScale(), false);
+                text = render.getAdapter().rateConversion(value, render.getAdapter().getScale().getQuoteScale(), true, false);
             } else {
-                text = render.getAdapter().rateConversion(value, render.getAdapter().getScale().getQuoteScale(), false);
+                text = render.getAdapter().rateConversion(value, render.getAdapter().getScale().getQuoteScale(), false, false);
             }
             // 绘制横向网格线
             if (attribute.axisLabelLocation == AxisLabelLocation.ALL) {

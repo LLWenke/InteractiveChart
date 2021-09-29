@@ -1,6 +1,6 @@
 package com.wk.chart.entry;
 
-import com.wk.chart.compat.Utils;
+import com.wk.chart.compat.ValueUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -15,7 +15,7 @@ public class DepthEntry extends AbsEntry {
     private final ValueEntry amount;
     private final ValueEntry totalAmount;
     private ValueEntry totalPrice;
-    private int type;
+    private final int type;
 
     /**
      * @param scale       精度实例
@@ -66,9 +66,9 @@ public class DepthEntry extends AbsEntry {
     public DepthEntry(ScaleEntry scale, long price, long amount,
                       long totalAmount, int type, Date time) {
         super(scale, time);
-        this.price = recoveryValue(price, scale.getQuoteScale());
-        this.amount = recoveryValue(amount, scale.getBaseScale());
-        this.totalAmount = recoveryValue(totalAmount, scale.getBaseScale());
+        this.price = buildValue(price, scale.getQuoteScale());
+        this.amount = buildValue(amount, scale.getBaseScale());
+        this.totalAmount = buildValue(totalAmount, scale.getBaseScale());
         this.type = type;
         resetTotalPrice();
     }
@@ -94,8 +94,7 @@ public class DepthEntry extends AbsEntry {
     }
 
     private void resetTotalPrice() {
-        this.totalPrice = recoveryValue(getTotalAmount().result
-                / Utils.divisorCorrect((long) Math.pow(10, getScale().getBaseScale()))
-                * getPrice().result, getScale().getQuoteScale());
+        this.totalPrice = buildValue(ValueUtils.scaleMultiply(getPrice().result, getTotalAmount().result,
+                getTotalAmount().getScale()), getScale().getQuoteScale());
     }
 }

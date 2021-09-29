@@ -13,7 +13,6 @@ import com.wk.chart.R;
 import com.wk.chart.compat.DisplayTypeUtils;
 import com.wk.chart.compat.FontStyle;
 import com.wk.chart.compat.Utils;
-import com.wk.chart.compat.ValueUtils;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.CandleEntry;
@@ -44,7 +43,7 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
     private float selectedHeight;//信息选择框的高度
     private SelectorItemEntry[] selectorInfo;//选择器信息集合
     private float selectorBorderOffset;//选择器边框偏移量
-    private int itemCount = 8;//选择器中的条目数
+    private final int itemCount = 8;//选择器中的条目数
 
     @Override
     public void onInit(CandleRender render, FloatModule chartModule) {
@@ -118,7 +117,7 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
                 + firstItem.getValuePaint().measureText(firstItem.getValue())
                 + attribute.selectorPadding * 2
                 + attribute.selectorIntervalX;
-        this.selectedWidth = selectedWidth < width ? width : selectedWidth;
+        this.selectedWidth = Math.max(selectedWidth, width);
         this.selectedHeight = selectedHeight > 0 ? selectedHeight : attribute.selectorIntervalY *
                 (selectorInfo.length + 1) + textHeight * selectorInfo.length;
 
@@ -178,29 +177,25 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         selectorInfo[1]
                 .setLabel(attribute.context.getString(R.string.wk_open))
                 .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(point.getOpen().value,
-                        render.getAdapter().getScale().getQuoteScale(), true))
+                .setValue(render.getAdapter().rateConversion(point.getOpen(), false, false))
                 .setValuePaint(valuePaint);
         //高
         selectorInfo[2]
                 .setLabel(attribute.context.getString(R.string.wk_high))
                 .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(point.getHigh().value,
-                        render.getAdapter().getScale().getQuoteScale(), true))
+                .setValue(render.getAdapter().rateConversion(point.getHigh(), false, false))
                 .setValuePaint(valuePaint);
         //低
         selectorInfo[3]
                 .setLabel(attribute.context.getString(R.string.wk_low))
                 .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(point.getLow().value,
-                        render.getAdapter().getScale().getQuoteScale(), true))
+                .setValue(render.getAdapter().rateConversion(point.getLow(), false, false))
                 .setValuePaint(valuePaint);
         //收
         selectorInfo[4]
                 .setLabel(attribute.context.getString(R.string.wk_close))
                 .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(point.getClose().value,
-                        render.getAdapter().getScale().getQuoteScale(), true))
+                .setValue(render.getAdapter().rateConversion(point.getClose(), false, false))
                 .setValuePaint(valuePaint);
         //涨跌幅
         String symbol;
@@ -221,15 +216,13 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         selectorInfo[6]
                 .setLabel(attribute.context.getString(R.string.wk_change_amount))
                 .setLabelPaint(labelPaint)
-                .setValue(symbol.concat(render.getAdapter().rateConversion(point.getChangeAmount().value,
-                        render.getAdapter().getScale().getQuoteScale(), true)))
+                .setValue(symbol.concat(render.getAdapter().rateConversion(point.getChangeAmount(), false, true)))
                 .setValuePaint(paint);
         //成交量
         selectorInfo[7]
                 .setLabel(attribute.context.getString(R.string.wk_volume))
                 .setLabelPaint(labelPaint)
-                .setValue(ValueUtils.quantization(point.getVolume().value,
-                        render.getAdapter().getScale().getBaseScale()))
+                .setValue(render.getAdapter().quantizationConversion(point.getVolume(), true))
                 .setValuePaint(valuePaint);
     }
 

@@ -1,5 +1,7 @@
 package com.wk.chart.compat;
 
+import androidx.annotation.Nullable;
+
 import com.wk.chart.entry.QuantizationEntry;
 import com.wk.chart.entry.RateEntry;
 import com.wk.chart.entry.ValueEntry;
@@ -14,7 +16,7 @@ public class ValueUtils {
     static {
         values = new Long[]{1000L, 1000000L, 1000000000L, 1000000000000L};
         units = new String[]{"K", "M", "B", "T"};
-        zeros = new String[11];
+        zeros = new String[13];
         zeros[0] = "0.";
         zeros[1] = "0.0";
         zeros[2] = "0.00";
@@ -26,6 +28,8 @@ public class ValueUtils {
         zeros[8] = "0.00000000";
         zeros[9] = "0.000000000";
         zeros[10] = "0.0000000000";
+        zeros[11] = "0.00000000000";
+        zeros[12] = "0.000000000000";
     }
 
     /**
@@ -35,59 +39,39 @@ public class ValueUtils {
      * @param scale  精度
      * @return 返回构建后的ValueEntry
      */
-    public static ValueEntry buildValue(BigDecimal result, int scale) {
+    public static ValueEntry buildEntry(BigDecimal result, int scale) {
         ValueEntry value = new ValueEntry(scale);
         result = result.setScale(scale, BigDecimal.ROUND_DOWN);
         value.text = result.toPlainString();
         value.value = result.floatValue();
-        value.result = (long) (scale > 0 ? value.value * Math.pow(10, scale) : value.value);
+        value.result = result.unscaledValue().longValue();
         return value;
     }
 
     /**
-     * 复原ValueEntry
+     * 构建ValueEntry
      *
      * @param result 传入的result值
      * @param scale  精度
      * @return 返回构建后的ValueEntry
      */
-    public static ValueEntry recoveryValue(long result, int scale) {
+    public static ValueEntry buildEntry(long result, int scale) {
         ValueEntry value = new ValueEntry(scale);
-        StringBuilder text = new StringBuilder(String.valueOf(result));
-        if (scale > 0) {
-            int length;
-            int offset;
-            if (result < 0) {
-                length = text.length() - 1;
-                offset = 1;
-            } else {
-                length = text.length();
-                offset = 0;
-            }
-            if (scale < length) {
-                text.insert(length - scale + offset, ".");
-            } else {
-                int zeroCount = scale - length;
-                text.insert(offset, zeroCount < zeros.length ? zeros[zeroCount] : zeros[zeros.length - 1]);
-            }
-            value.value = (float) (result / Math.pow(10, scale));
-        } else {
-            value.value = result;
-        }
-        value.text = text.toString();
+        value.value = (float) buildValue(result, scale);
+        value.text = buildText(result, scale, false);
         value.result = result;
         return value;
     }
 
     /**
-     * 复原ValueEntry中的Text属性值
+     * 构建ValueEntry中的Text属性值
      *
-     * @param result 传入的result值
-     * @param scale  精度
+     * @param result             传入的result值
+     * @param scale              精度
+     * @param stripTrailingZeros 去除无用的0（如：2.4560->2.456）
      * @return 返回构建后ValueEntry中的Text属性值
      */
-
-    public static String recoveryText(long result, int scale) {
+    public static String buildText(long result, int scale, boolean stripTrailingZeros) {
         StringBuilder text = new StringBuilder(String.valueOf(result));
         if (scale > 0) {
             int length;
@@ -104,104 +88,135 @@ public class ValueUtils {
             } else {
                 int zeroCount = scale - length;
                 text.insert(offset, zeroCount < zeros.length ? zeros[zeroCount] : zeros[zeros.length - 1]);
+            }
+            if (stripTrailingZeros) {
+                Integer deleteIndex = null;
+                for (int i = text.length() - 1; i > 0; i--) {
+                    if ('0' != text.charAt(i)) {
+                        break;
+                    }
+                    deleteIndex = i;
+                }
+                if (null != deleteIndex) {
+                    text.delete(deleteIndex, text.length());
+                }
             }
         }
         return text.toString();
     }
 
     /**
-     * 格式化value
+     * 构建ValueEntry中的value属性值
      *
-     * @param value   传入的value值
-     * @param scale   精度
-     * @param rate    比率(传入NULL不作比率转换)
-     * @param hasUnit 带汇率标识，如：¥
-     * @return 返回字符串
+     * @param result 传入的result值
+     * @param scale  精度
+     * @return 返回构建后ValueEntry中的value属性值
      */
-    public static String format(float value, int scale, RateEntry rate, boolean hasUnit) {
-        value = (Float.isNaN(value) || Float.isInfinite(value)) ? 0 : value;
-        if (null == rate || rate.getRate().compareTo(BigDecimal.ONE) == 0) {
-            return new BigDecimal(value).setScale(scale, BigDecimal.ROUND_DOWN).toPlainString();
+    public static double buildValue(long result, int scale) {
+        if (scale > 0) {
+            return (double) result / pow10(scale);
         }
-        value = rate(value, rate);
-        value = (Float.isNaN(value) || Float.isInfinite(value)) ? 0 : value;
-        String text = new BigDecimal(value)
-                .setScale(rate.getScale(), BigDecimal.ROUND_HALF_UP)
-                .toPlainString();
-        if (hasUnit) {
-            text = rate.getUnit().concat(text);
-        }
-        return text;
+        return result;
     }
 
     /**
-     * 格式化value(量化)
-     *
-     * @param value        传入的value值
-     * @param scale        精度
-     * @param rate         比率(传入NULL不作比率转换)
-     * @param quantization 量化实例
-     * @param hasUnit      带汇率标识，如：¥
-     * @return 返回字符串
-     */
-    public static String format(float value, int scale, RateEntry rate, QuantizationEntry quantization, boolean hasUnit) {
-        value = (Float.isNaN(value) || Float.isInfinite(value)) ? 0 : value;
-        if (null == rate || rate.getRate().compareTo(BigDecimal.ONE) == 0) {
-            if (value > quantization.getMinFormatNum()) {
-                return quantization(value, quantization.getScale());
-            }
-            return new BigDecimal(value).setScale(scale, BigDecimal.ROUND_DOWN).toPlainString();
-        }
-        value = rate(value, rate);
-        value = (Float.isNaN(value) || Float.isInfinite(value)) ? 0 : value;
-        String text;
-        if (value > quantization.getMinFormatNum()) {
-            text = quantization(value, quantization.getScale());
-        } else {
-            text = new BigDecimal(value).setScale(rate.getScale(), BigDecimal.ROUND_HALF_UP).toPlainString();
-        }
-        if (hasUnit) {
-            text = rate.getUnit().concat(text);
-        }
-        return text;
-    }
-
-    /**
-     * 计算比率值
+     * 构建ValueEntry中的value属性值
+     * ！！！此方法慎用，可能会导致精度丢失 ！！！
      *
      * @param value 传入的value值
-     * @param rate  比率(传入NULL不作比率转换)
-     * @return 返回字符串
+     * @param scale 精度
+     * @return 返回构建后ValueEntry中的value属性值
      */
-    public static float rate(float value, RateEntry rate) {
-        value = (Float.isNaN(value) || Float.isInfinite(value)) ? 0 : value;
-        if (null == rate || rate.getRate().compareTo(BigDecimal.ONE) == 0) {
-            return value;
+    public static long buildResult(double value, int scale) {
+        if (scale > 0) {
+            return (long) (value * pow10(scale));
         }
-        return value * rate.getRate().floatValue();
+        return (long) value;
     }
 
     /**
-     * 量化大数值
+     * 格式化value(可选：比率转换、量化转换)
+     * ！！！比率精度和量化精度不宜超过数值本身的精度，否则可能导致精度丢失 ！！！
      *
-     * @param value 数值
-     * @return 量化后的字符串（带量化单位）
+     * @param result             传入的result值
+     * @param scale              精度
+     * @param rate               比率(传入NULL不作比率转换)
+     * @param quantization       量化实例(传入NULL不作量化转换)
+     * @param stripTrailingZeros 去除无用的0（如：2.4560->2.456）
+     * @return 返回格式化后的字符串
      */
-    public static String quantization(double value, int scale) {
-        value = (Double.isNaN(value) || Double.isInfinite(value)) ? 0 : value;
+    public static String rateFormat(long result, int scale, @Nullable RateEntry rate,
+                                    @Nullable QuantizationEntry quantization, boolean stripTrailingZeros) {
+        long scalePow = (long) pow10(scale);
+        int valueScale = scale;
+        String sign = "";
         String unit = "";
-        int i = values.length - 1;
-        while (i >= 0) {
-            if (value > values[i]) {
-                value /= values[i];
-                unit = units[i];
-                break;
-            }
-            i--;
+        //比率转换
+        if (null != rate && rate.isSet()) {
+            long rateResult = (long) (rate.getRate() * scalePow);
+            result = scaleMultiply(result, rateResult, scale);
+            valueScale = rate.getScale();
+            sign = rate.getSign();
         }
-        return new BigDecimal(value)
-                .setScale(scale, BigDecimal.ROUND_DOWN)
-                .stripTrailingZeros()
-                .toPlainString().concat(unit);
+        //量化转换
+        if (null != quantization && result > (quantization.getMinFormatNum() * scalePow)) {
+            valueScale = quantization.getScale();
+            for (int i = values.length - 1; i >= 0; i--) {
+                long num = values[i] * scalePow;
+                if (result >= num) {
+                    result = scaleDivide(result, num, scale);
+                    unit = units[i];
+                    break;
+                }
+            }
+        }
+        //校准结果精度值
+        if (scale > valueScale) {
+            result /= pow10(scale - valueScale);
+        } else if (scale < valueScale) {
+            result *= pow10(valueScale - scale);
+        }
+        //生成格式化后的字符串
+        return sign.concat(buildText(result, valueScale, stripTrailingZeros)).concat(unit);
+    }
+
+    /**
+     * 精度乘法
+     *
+     * @param result1 数值1
+     * @param result2 数值2
+     * @param scale   精度
+     * @return 乘法结果
+     */
+    public static long scaleMultiply(long result1, long result2, int scale) {
+        if (scale > 0) {
+            return (long) (result1 * result2 / pow10(scale));
+        }
+        return result1 * result2;
+    }
+
+    /**
+     * 精度除法
+     *
+     * @param result1 数值1
+     * @param result2 数值2
+     * @param scale   精度
+     * @return 除法结果
+     */
+    public static long scaleDivide(long result1, long result2, int scale) {
+        if (scale > 0) {
+            return (long) (result1 * pow10(scale) / result2);
+        }
+        return result1 / result2;
+    }
+
+    /**
+     * 计算10的幂
+     *
+     * @param pow 幂
+     * @return 计算幂值
+     */
+    public static double pow10(int pow) {
+        return Math.pow(10, pow);
     }
 }

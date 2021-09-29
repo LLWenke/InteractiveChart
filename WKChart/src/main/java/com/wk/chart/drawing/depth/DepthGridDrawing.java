@@ -117,7 +117,7 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
                 pointCache[0] = x - (i > (attribute.gridCount / 2) ? absChartModule.getXOffset() :
                         -absChartModule.getXOffset());
                 render.invertMapPoints(render.getMainModule().getMatrix(), pointCache);
-                value = render.getAdapter().rateConversion(pointCache[0], render.getAdapter().getScale().getQuoteScale(), false);
+                value = render.getAdapter().rateConversion(pointCache[0], render.getAdapter().getScale().getQuoteScale(), false, false);
                 pointCache[0] = x;
                 canvas.drawText(value, pointCache[0], gridLabelY, gridLabelPaint);
             }

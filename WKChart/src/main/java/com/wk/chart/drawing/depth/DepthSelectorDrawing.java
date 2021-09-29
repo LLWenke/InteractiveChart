@@ -164,7 +164,7 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
                 .setLabelPaint(labelPaint)
                 .setValue(render.getHighlightXValue(point))
                 .setValuePaint(valuePaint)
-                .setUnit(" ".concat(render.getAdapter().getRate().getUnit()))
+                .setUnit(" ".concat(render.getAdapter().getRate().getSign()))
                 .setUnitPaint(unitPaint);
 
         //总量
@@ -179,10 +179,9 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
         selectorInfo[2]
                 .setLabel(attribute.context.getString(R.string.wk_total_cost))
                 .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateQuantizationConversion(point.getTotalPrice().value,
-                        render.getAdapter().getScale().getQuoteScale(), true))
+                .setValue(render.getAdapter().rateConversion(point.getTotalPrice(), true, true))
                 .setValuePaint(valuePaint)
-                .setUnit(" ".concat(render.getAdapter().getRate().getUnit()))
+                .setUnit(" ".concat(render.getAdapter().getRate().getSign()))
                 .setUnitPaint(unitPaint);
     }
 
