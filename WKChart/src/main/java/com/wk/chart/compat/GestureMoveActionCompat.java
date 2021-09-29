@@ -8,7 +8,7 @@ import android.view.MotionEvent;
  */
 
 public class GestureMoveActionCompat {
-    private OnGestureMoveListener gestureMoveListener;
+    private final OnGestureMoveListener gestureMoveListener;
 
     /**
      * 本次 ACTION_DOWN 事件的坐标 x

@@ -241,7 +241,6 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                     lastFlingX = 0;
                     if (!onLongPress && !onDoubleFingerPress && render.canScroll(0)) {
-
                         scroller.fling(0, 0, (int) -velocityX, 0,
                                 Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
                         return true;
@@ -521,6 +520,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                     || gestureCompat.isDragging()
                     || event.getPointerCount() == 2) {
                 getParent().requestDisallowInterceptTouchEvent(true);
+                return super.dispatchTouchEvent(event);
             }
             getParent().requestDisallowInterceptTouchEvent(false);
             return super.dispatchTouchEvent(event);
@@ -531,20 +531,17 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent e) {
+        final boolean state = gestureDetector.onTouchEvent(e) | scaleDetector.onTouchEvent(e);
         final int action = e.getAction();
-        gestureDetector.onTouchEvent(e);
-        scaleDetector.onTouchEvent(e);
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 onTouch = true;
                 onDragging = false;
                 onLongPress = false;
                 break;
-
             case MotionEvent.ACTION_POINTER_DOWN:
                 onDoubleFingerPress = true;
                 break;
-
             case MotionEvent.ACTION_MOVE:
                 if (onLongPress) {
                     highlight(e.getX(), e.getY());
@@ -565,8 +562,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 }
                 break;
         }
-
-        return true;
+        return state;
     }
 
     /**

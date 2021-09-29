@@ -136,8 +136,7 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatModule> {
         highlightPoint[1] = entry.getClose().value;
         render.mapPoints(chartModule.getMatrix(), highlightPoint);
         highlightPoint[0] = render.getHighlightPoint()[0];
-        markerText[1] = render.getAdapter().rateConversion(entry.getClose().value,
-                render.getAdapter().getScale().getQuoteScale(), true);
+        markerText[1] = render.getAdapter().rateConversion(entry.getClose(), false, false);
 
         for (AbsMarker<AbsRender<?, ?>> markerView : markerViewList) {
             markerView.onMarkerViewMeasure(chartModule.getRect(),

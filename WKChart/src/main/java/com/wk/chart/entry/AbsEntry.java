@@ -59,7 +59,7 @@ public abstract class AbsEntry {
      * @return 返回构建后的value
      */
     public ValueEntry buildValue(double value, int scale) {
-        return ValueUtils.buildValue(new BigDecimal(String.valueOf(value)), scale);
+        return ValueUtils.buildEntry(new BigDecimal(String.valueOf(value)), scale);
     }
 
     /**
@@ -70,17 +70,17 @@ public abstract class AbsEntry {
      * @return 返回构建后的value
      */
     public ValueEntry buildValue(BigDecimal value, int scale) {
-        return ValueUtils.buildValue(value, scale);
+        return ValueUtils.buildEntry(value, scale);
     }
 
     /**
-     * 复原value
+     * 构建value
      *
      * @param result 传入的value值
      * @param scale  精度
      * @return 返回构建后的value
      */
-    public ValueEntry recoveryValue(long result, int scale) {
-        return ValueUtils.recoveryValue(result, scale);
+    public ValueEntry buildValue(long result, int scale) {
+        return ValueUtils.buildEntry(result, scale);
     }
 }

@@ -1,9 +1,9 @@
 package com.wk.chart.animator;
 
 import android.animation.ValueAnimator;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
-
 
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.ValueUtils;
@@ -15,7 +15,7 @@ import java.util.List;
 
 public class ChartAnimator<T extends AbsEntry> extends ValueAnimator
         implements ValueAnimator.AnimatorUpdateListener {
-    private final List<Float> endValues;
+    private final List<Long> endResults;
     private final AnimationListener<T> animationListener;
     private boolean buildState;//数据构建状态（true:代表新数据，需要构建数据，false：为旧数据，无需构建数据）
     private int position;
@@ -24,7 +24,7 @@ public class ChartAnimator<T extends AbsEntry> extends ValueAnimator
 
     public ChartAnimator(@NonNull AnimationListener<T> animationListener, long duration) {
         this.animationListener = animationListener;
-        this.endValues = new ArrayList<>();
+        this.endResults = new ArrayList<>();
         setDuration(duration);
         setFloatValues(0, 1);
         addUpdateListener(this);
@@ -47,7 +47,7 @@ public class ChartAnimator<T extends AbsEntry> extends ValueAnimator
             this.beginDate = beginDate;
         }
         this.endData = endData;
-        this.endValues.clear();
+        this.endResults.clear();
         start();
     }
 
@@ -60,24 +60,22 @@ public class ChartAnimator<T extends AbsEntry> extends ValueAnimator
         if (animation.getAnimatedFraction() == 0.0f) {
             return;
         }
-//        Log.e("动画执行进度", "begin:" + beginDate.toString() + "\nend:" + endData.toString());
-        boolean isInit = endValues.size() == 0;
+        boolean isInit = endResults.size() == 0;
         for (int i = 0, z = beginDate.getAnimatorEntry().size(); i < z; i++) {
             ValueEntry begin = beginDate.getAnimatorEntry().get(i);
             ValueEntry end = endData.getAnimatorEntry().get(i);
             if (isInit) {
-                this.endValues.add(end.value);
+                this.endResults.add(end.result);
             }
-            float endValue = endValues.get(i);
-            if (begin.value == endValue) {
+            long endResult = endResults.get(i);
+            if (begin.result == endResult) {
 //                Log.e("动画执行进度", "begin.value == endValue--->continue");
                 continue;
             }
-            float updateValue = animation.getAnimatedFraction() == 1.0f ? endValue :
-                    (begin.value + ((endValue - begin.value) * animation.getAnimatedFraction()));
-            end.result = (long) (updateValue * Math.pow(10, end.getScale()));
-            end.text = ValueUtils.recoveryText(end.result, end.getScale());
-            end.value = updateValue;
+            end.result = animation.getAnimatedFraction() == 1.0f ? endResult :
+                    (long) (begin.result + ((endResult - begin.result) * animation.getAnimatedFraction()));
+            end.text = ValueUtils.buildText(end.result, end.getScale(), false);
+            end.value = (float) ValueUtils.buildValue(end.result, end.getScale());
 //            Log.e("动画执行进度", end.text + "     执行进度:" + animation.getAnimatedFraction() + "    beginScale:" + begin.getScale() + "    endScale:" + end.getScale());
 //            Log.e("动画执行进度", "result:" + end.result + "   value:" + end.value + "   text:" + end.text);
         }

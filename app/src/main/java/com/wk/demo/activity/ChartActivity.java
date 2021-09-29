@@ -93,18 +93,18 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
             switch ((ObserverArg) arg) {
                 case INIT:
                 case ATTR_UPDATE:
+                case REFRESH:
                     if (dataShowType == DataType.REAL_TIME.ordinal()) {
                         PushService.stopPush();
+                        startPush();
                     }
                 case ADD:
                 case NORMAL:
-                case REFRESH:
                     if (null == candleAdapter || candleAdapter.getCount() == 0) {
                         return;
                     }
                     loadComplete(candleProgressBar);
                     loadComplete(depthProgressBar);
-                    startPush();
                     break;
             }
         }
@@ -266,7 +266,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
      */
     private void recoveryChartState() {
         if (null == mChartCache) {
-            TimeType timeType = TimeType.fourHour;
+            TimeType timeType = TimeType.day;
             chartTabLayout.checkedDefaultTimeType(timeType, ModuleType.CANDLE);
             chartTabLayout.checkedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.MAIN), ModuleGroupType.MAIN);
             chartTabLayout.checkedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.INDEX), ModuleGroupType.INDEX);

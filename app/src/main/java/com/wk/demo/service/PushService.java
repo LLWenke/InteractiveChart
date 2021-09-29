@@ -22,7 +22,7 @@ public class PushService extends IntentService {
     private static boolean isPush;
     private final int UPDATE = 0;
     private final int ADD = 1;
-    private int updateCount = 20;//更新次数
+    private int updateCount = 50;//更新次数
 
     public PushService() {
         super("PushService");
@@ -53,7 +53,7 @@ public class PushService extends IntentService {
                     updateCount--;
                     pushType = UPDATE;
                 } else {
-                    updateCount = 20;
+                    updateCount = 50;
                     pushType = ADD;
                 }
                 CandleEntry pushData =
@@ -68,7 +68,7 @@ public class PushService extends IntentService {
                 message.setWhat(CANDLE);
                 message.setEntry(pushData);
                 EventBus.getDefault().post(message);
-                Thread.sleep(3_000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -80,7 +80,7 @@ public class PushService extends IntentService {
      */
     private CandleEntry candlePushDataOperation(ScaleEntry scaleEntry, double open, double high, double low,
                                                 double close, double volume, Date time, int pushType) {
-        double closeUpdate = (Math.random() - 0.5) * 2;
+        double closeUpdate = (Math.random() - 0.5) * 10;
         BigDecimal closeValue;
         BigDecimal openValue;
         BigDecimal highValue;

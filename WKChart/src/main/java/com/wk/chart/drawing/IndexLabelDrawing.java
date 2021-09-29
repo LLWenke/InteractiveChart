@@ -9,7 +9,6 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 
 import com.wk.chart.compat.Utils;
-import com.wk.chart.compat.ValueUtils;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.CandleEntry;
@@ -240,8 +239,7 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
 
     private String getTag(String tag, CandleEntry entry) {
         if (indexType == IndexType.VOLUME_MA) {
-            return tag.concat(ValueUtils.quantization(entry.getVolume().value,
-                    render.getAdapter().getScale().getBaseScale()));
+            return tag.concat(render.getAdapter().quantizationConversion(entry.getVolume(), true));
         } else {
             return tag;
         }
@@ -253,12 +251,10 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
         switch (indexType) {
             case IndexType.CANDLE_MA:
             case IndexType.BOLL:
-                label = name.concat(render.getAdapter().rateConversion(value.value,
-                        render.getAdapter().getScale().getQuoteScale(), false));
+                label = name.concat(render.getAdapter().rateConversion(value, false, false));
                 break;
             case IndexType.VOLUME_MA:
-                label = name.concat(ValueUtils.quantization(value.value,
-                        render.getAdapter().getScale().getBaseScale()));
+                label = name.concat(render.getAdapter().quantizationConversion(value, true));
                 break;
             default:
                 label = name.concat(value.text);

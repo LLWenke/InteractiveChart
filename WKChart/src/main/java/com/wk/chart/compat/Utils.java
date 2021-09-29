@@ -107,15 +107,6 @@ public class Utils {
     }
 
     /**
-     * 被除数修正（防止被除数为0而导致程序异常）
-     *
-     * @param divisor 被除数
-     */
-    public static long divisorCorrect(long divisor) {
-        return divisor == 0 ? 1 : divisor;
-    }
-
-    /**
      * Drawable转换成一个Bitmap
      *
      * @param drawable drawable对象
