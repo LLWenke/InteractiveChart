@@ -15,6 +15,7 @@ import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.IndexConfigEntry;
 import com.wk.chart.entry.ValueEntry;
 import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.enumeration.PositionType;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
 
@@ -30,7 +31,7 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
     private final Rect rect = new Rect(); //用于测量文字的实际占用区域
     private TextPaint tagPaint;//tips画笔
     private IndexConfigEntry tagEntry;//指标配置
-    private float x, y, left, right, offset;
+    private float x, y, left, right, lineHeight;
     private int lines = 1, lineItemCount = 0;//行数,行item数量
 
     public IndexLabelDrawing(int indexType) {
@@ -48,9 +49,9 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
         tagPaint.setTextAlign(getTextAlign());
 
         Utils.measureTextArea(tagPaint, rect);
-        left = viewRect.left + attribute.indexTextMarginX;
-        right = viewRect.right - attribute.indexTextMarginX;
-        offset = attribute.indexTextMarginY + rect.height();
+        left = viewRect.left + attribute.indexTextMarginHorizontal;
+        right = viewRect.right - attribute.indexTextMarginHorizontal;
+        lineHeight = rect.height();
     }
 
     @Override
@@ -107,18 +108,14 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
             }
         }
         lines = (int) Math.ceil(currentX / viewRect.width());
-//        Log.e("lines" + lines, "     lineItemCount" + lineItemCount + "   count" + count);
-        float indexLabelHeight = attribute.indexTextMarginY * 2f + rect.height();
-        indexLabelHeight *= lines;
-        switch (attribute.indexLabelLocation) {
-            case LEFT_TOP://左上
-            case RIGHT_TOP://右上
-                margin[1] = indexLabelHeight;
-                break;
-            case LEFT_BOTTOM://左下
-            case RIGHT_BOTTOM://右下
-                margin[3] = indexLabelHeight;
-                break;
+        float height = 0;
+        if ((attribute.indexLabelPosition & PositionType.OUTSIDE_VERTICAL) != 0) {
+            height = attribute.indexTextMarginVertical + (attribute.indexTextMarginVertical + lineHeight) * lines;
+        }
+        if ((attribute.indexLabelPosition & PositionType.BOTTOM) != 0) {
+            margin[3] = height;
+        } else {
+            margin[1] = height;
         }
         return margin;
     }
@@ -166,24 +163,15 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
             }
             String label = getLabel(tagEntry.getFlagEntries()[i].getNameText(), value);
             canvas.drawText(label, currentX, currentY, labelPaints[i]);
-            switch (attribute.indexLabelLocation) {
-                case LEFT_TOP_INSIDE://左上（内部）
-                case LEFT_TOP://左上
-                case LEFT_BOTTOM_INSIDE://左下（内部）
-                case LEFT_BOTTOM://左下
-                    currentX += (labelPaints[i].measureText(label) + attribute.indexTextInterval);
-                    break;
-                case RIGHT_TOP_INSIDE://右上（内部）
-                case RIGHT_TOP://右上
-                case RIGHT_BOTTOM_INSIDE://右下（内部）
-                case RIGHT_BOTTOM://右下
-                    int z = labelPaints.length - 1 - i;
-                    currentX -= (labelPaints[z].measureText(label) + attribute.indexTextInterval);
-                    break;
+            if ((attribute.indexLabelPosition & PositionType.END) != 0) {
+                int z = labelPaints.length - 1 - i;
+                currentX -= (labelPaints[z].measureText(label) + attribute.indexTextInterval);
+            } else {
+                currentX += (labelPaints[i].measureText(label) + attribute.indexTextInterval);
             }
             if (lineItemCount > 0 && (i + 1) % lineItemCount == 0) {
                 currentX = x;
-                currentY += offset;
+                currentY += (lineHeight + attribute.indexTextMarginVertical);
             }
         }
     }
@@ -195,47 +183,27 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
 
     @Override
     public void onLayoutComplete() {
-        float lineHeight = 0;
-        if (lines > 1) {
-            lineHeight = offset;
-        }
         //计算指标文字位置信息
-        switch (attribute.indexLabelLocation) {
-            case LEFT_TOP_INSIDE://左上（内部）
-                x = left;
-                y = viewRect.top + offset + attribute.borderWidth;
-                break;
-            case RIGHT_TOP_INSIDE://右上（内部）
-                x = right;
-                y = viewRect.top + offset + attribute.borderWidth;
-                break;
-            case LEFT_TOP://左上
-                x = left;
-                y = viewRect.top - attribute.indexTextMarginY - attribute.borderWidth - lineHeight;
-                break;
-            case RIGHT_TOP://右上
-                x = right;
-                y = viewRect.top - attribute.indexTextMarginY - attribute.borderWidth - lineHeight;
-                break;
-            case LEFT_BOTTOM_INSIDE://左下（内部）
-                x = left;
-                y = viewRect.bottom - attribute.indexTextMarginY - attribute.borderWidth - lineHeight;
-                break;
-            case RIGHT_BOTTOM_INSIDE://右下（内部）
-                x = right;
-                y = viewRect.bottom - attribute.indexTextMarginY - attribute.borderWidth - lineHeight;
-                break;
-            case LEFT_BOTTOM://左下
-                x = left;
-                y = viewRect.bottom + offset + attribute.borderWidth;
-                break;
-            case RIGHT_BOTTOM://右下
-                x = right;
-                y = viewRect.bottom + offset + attribute.borderWidth;
-                break;
+        float lineOffset = lines > 1 ? lineHeight * lines : attribute.indexTextMarginVertical;
+        if ((attribute.indexLabelPosition & PositionType.END) != 0) {
+            x = right;
+        } else {
+            x = left;
+        }
+        if ((attribute.indexLabelPosition & PositionType.OUTSIDE_VERTICAL) != 0) {
+            if ((attribute.indexLabelPosition & PositionType.BOTTOM) != 0) {
+                y = viewRect.bottom + attribute.borderWidth + attribute.indexTextMarginVertical + lineHeight;
+            } else {
+                y = viewRect.top - attribute.borderWidth - lineOffset;
+            }
+        } else {
+            if ((attribute.indexLabelPosition & PositionType.BOTTOM) != 0) {
+                y = viewRect.bottom - attribute.borderWidth - lineOffset;
+            } else {
+                y = viewRect.top + attribute.borderWidth + attribute.indexTextMarginVertical + lineHeight;
+            }
         }
     }
-
 
     private String getTag(String tag, CandleEntry entry) {
         if (indexType == IndexType.VOLUME_MA) {
@@ -273,14 +241,10 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
     }
 
     private Paint.Align getTextAlign() {
-        switch (attribute.indexLabelLocation) {
-            case RIGHT_TOP:
-            case RIGHT_BOTTOM:
-            case RIGHT_TOP_INSIDE:
-            case RIGHT_BOTTOM_INSIDE:
-                return Paint.Align.RIGHT;
-            default:
-                return Paint.Align.LEFT;
+        if ((attribute.indexLabelPosition & PositionType.END) != 0) {
+            return Paint.Align.RIGHT;
+        } else {
+            return Paint.Align.LEFT;
         }
     }
 }

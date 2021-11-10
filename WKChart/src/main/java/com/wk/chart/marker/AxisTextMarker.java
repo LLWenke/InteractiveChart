@@ -11,7 +11,7 @@ import android.text.TextPaint;
 import androidx.annotation.NonNull;
 import androidx.annotation.Size;
 
-import com.wk.chart.enumeration.AxisMarkerAlign;
+import com.wk.chart.enumeration.PositionType;
 import com.wk.chart.render.AbsRender;
 
 /**
@@ -44,8 +44,8 @@ public class AxisTextMarker extends AbsMarker<AbsRender<?, ?>> {
         //用于计算的文字宽度
         charsWidth = markerTextPaint.measureText(chars);
         inset = attribute.markerBorderWidth / 2;
-        width = (attribute.markerLRPadding + attribute.markerBorderWidth) * 2f;
-        height = textRect.height() + (attribute.markerTBPadding + attribute.markerBorderWidth) * 2f;
+        width = (attribute.markerPaddingHorizontal + attribute.markerBorderWidth) * 2f;
+        height = textRect.height() + (attribute.markerPaddingVertical + attribute.markerBorderWidth) * 2f;
     }
 
     @Override
@@ -67,9 +67,9 @@ public class AxisTextMarker extends AbsMarker<AbsRender<?, ?>> {
             highlightPointY = viewRect.bottom - height - inset;
         }
 
-        if (attribute.axisMarkerAlign == AxisMarkerAlign.LEFT_INSIDE) {
+        if ((attribute.axisMarkerPosition & PositionType.START) != 0) {
             markerInsets.left = viewRect.left + inset;
-        } else if (attribute.axisMarkerAlign == AxisMarkerAlign.RIGHT_INSIDE) {
+        } else if ((attribute.axisMarkerPosition & PositionType.END) != 0) {
             markerInsets.left = viewRect.right - markerWidth - inset;
         } else if (highlightPointX > viewRect.left + viewRect.width() / 2) {
             markerInsets.left = viewRect.right - markerWidth - inset;

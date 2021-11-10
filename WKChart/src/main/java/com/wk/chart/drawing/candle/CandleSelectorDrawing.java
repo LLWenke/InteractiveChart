@@ -106,7 +106,7 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         //初始信息
         float textHeight = metrics.descent - metrics.ascent;
         float left;
-        float top = viewRect.top + attribute.selectorMarginY + attribute.borderWidth;
+        float top = viewRect.top + attribute.selectorMarginVertical + attribute.borderWidth;
 
         //添加选择器内容
         loadSelectorInfo();
@@ -116,17 +116,17 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         float width = firstItem.getLabelPaint().measureText(firstItem.getLabel())
                 + firstItem.getValuePaint().measureText(firstItem.getValue())
                 + attribute.selectorPadding * 2
-                + attribute.selectorIntervalX;
+                + attribute.selectorIntervalHorizontal;
         this.selectedWidth = Math.max(selectedWidth, width);
-        this.selectedHeight = selectedHeight > 0 ? selectedHeight : attribute.selectorIntervalY *
+        this.selectedHeight = selectedHeight > 0 ? selectedHeight : attribute.selectorIntervalVertical *
                 (selectorInfo.length + 1) + textHeight * selectorInfo.length;
 
         //负责选择器左右漂浮
         float x = render.getHighlightPoint()[0];
         if (x > viewRect.width() / 2) {
-            left = viewRect.left + attribute.selectorMarginX + attribute.borderWidth;
+            left = viewRect.left + attribute.selectorMarginHorizontal + attribute.borderWidth;
         } else {
-            left = viewRect.right - selectedWidth - attribute.selectorMarginX - attribute.borderWidth;
+            left = viewRect.right - selectedWidth - attribute.selectorMarginHorizontal - attribute.borderWidth;
         }
 
         //计算选择器坐标位置
@@ -146,7 +146,7 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
                 attribute.selectorRadius, attribute.selectorRadius, selectorBackgroundPaint);
 
         //绘制选择器内容信息
-        float y = top + attribute.selectorIntervalY + (textHeight - metrics.bottom - metrics.top) / 2;
+        float y = top + attribute.selectorIntervalVertical + (textHeight - metrics.bottom - metrics.top) / 2;
         for (SelectorItemEntry item : selectorInfo) {
             //绘制label
             canvas.drawText(item.getLabel(), viewRectBuffer[0] + attribute.selectorPadding, y,
@@ -157,7 +157,7 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
                             - item.getValuePaint().measureText(item.getValue())
                             - attribute.selectorPadding, y, item.getValuePaint());
             //计算Y轴位置
-            y += textHeight + attribute.selectorIntervalY;
+            y += textHeight + attribute.selectorIntervalVertical;
         }
     }
 

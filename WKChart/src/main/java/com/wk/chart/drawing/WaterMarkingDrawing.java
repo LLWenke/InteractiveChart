@@ -9,7 +9,7 @@ import android.graphics.Paint;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
-import com.wk.chart.enumeration.DrawingAlign;
+import com.wk.chart.enumeration.PositionType;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
 
@@ -64,13 +64,16 @@ public class WaterMarkingDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?
         float height = attribute.waterMarkingHeight == 0 ? bitmap.getHeight() : attribute.waterMarkingHeight;
         matrix.reset();
         matrix.setScale(width / bitmap.getWidth(), height / bitmap.getHeight());
-        float x = attribute.waterMarkingMarginX + attribute.borderWidth;
-        float y = attribute.waterMarkingMarginY + attribute.borderWidth;
-        if ((attribute.waterMarkingAlign & DrawingAlign.RIGHT) != 0) {
-            x = viewRect.right - width - x;
+        float x, y;
+        if ((attribute.waterMarkingPosition & PositionType.END) != 0) {
+            x = viewRect.right - attribute.waterMarkingMarginHorizontal - width;
+        } else {
+            x = viewRect.left + attribute.waterMarkingMarginHorizontal;
         }
-        if ((attribute.waterMarkingAlign & DrawingAlign.BOTTOM) != 0) {
-            y = viewRect.bottom - height - y;
+        if ((attribute.waterMarkingPosition & PositionType.BOTTOM) != 0) {
+            y = viewRect.bottom - attribute.waterMarkingMarginVertical - height;
+        } else {
+            y = viewRect.top + attribute.waterMarkingMarginVertical;
         }
         matrix.setTranslate(x, y);
     }

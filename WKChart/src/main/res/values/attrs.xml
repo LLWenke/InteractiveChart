@@ -1,6 +1,6 @@
 <resources>
 
-    <declare-styleable name="ChartAttr">
+    <declare-styleable name="ChartView">
         <!-- 各个视图模块的配置信息有关属性 -->
         <!-- 主图模块高度 -->
         <attr name="mainViewHeight" format="dimension" />
@@ -37,53 +37,62 @@
         <attr name="borderColor" format="color" />
 
         <!-- 与 grid 标尺刻度有关属性 -->
-        <!-- grid 标签上边距 -->
-        <attr name="gridLabelMarginTop" format="dimension" />
-        <!-- grid 标签下边距 -->
-        <attr name="gridLabelMarginBottom" format="dimension" />
+        <!-- grid 标签垂直Margin -->
+        <attr name="gridLabelMarginVertical" format="dimension" />
         <!-- grid 行数 -->
         <attr name="gridCount" format="integer" />
-        <!-- grid 线条长度 -->
-        <attr name="gridLineLength" format="dimension" />
-        <!-- grid 线条是否显示-->
-        <attr name="gridLineStyle">
+        <!-- grid 刻度短线长度 -->
+        <attr name="gridScaleShortLineLength" format="dimension" />
+        <!-- grid 刻度样式-->
+        <attr name="gridScaleLineStyle">
+            <!-- 无(不显示)-->
             <enum name="none" value="0" />
-            <enum name="line" value="1" />
-            <enum name="graduation" value="2" />
-            <enum name="graduation_inside" value="3" />
+            <!-- 虚线-->
+            <enum name="dotted" value="1" />
+            <!-- 实线-->
+            <enum name="solid" value="2" />
+            <!-- 短线（外向）-->
+            <enum name="short_outside" value="3" />
+            <!-- 短线 (内向)-->
+            <enum name="short_inside" value="4" />
         </attr>
 
         <!-- 与 axis 标尺刻度有关属性 -->
-        <!-- axis 标签左右Margin -->
-        <attr name="axisLabelLRMargin" format="dimension" />
-        <!-- axis 标签上下Margin -->
-        <attr name="axisLabelTBMargin" format="dimension" />
-        <!-- axis 线条是否显示 -->
-        <attr name="axisLineState" format="boolean" />
+        <!-- axis 标签水平Margin -->
+        <attr name="axisLabelMarginHorizontal" format="dimension" />
+        <!-- axis 标签垂直Margin -->
+        <attr name="axisLabelMarginVertical" format="dimension" />
+        <!-- axis 刻度短线长度 -->
+        <attr name="axisScaleShortLineLength" format="dimension" />
         <!-- axis 是否显示第一条 -->
-        <attr name="showFirstAxis" format="boolean" />
+        <attr name="axisShowFirst" format="boolean" />
         <!-- axis 是否显示最后一条 -->
-        <attr name="showLastAxis" format="boolean" />
-        <!-- axis 标签显示位置 -->
-        <attr name="axisLabelLocation">
-            <enum name="left" value="0" />
-            <enum name="right" value="1" />
-            <enum name="all" value="2" />
+        <attr name="axisShowLast" format="boolean" />
+        <!-- axis 刻度样式-->
+        <attr name="axisScaleLineStyle">
+            <!-- 无(不显示)-->
+            <enum name="none" value="0" />
+            <!-- 虚线-->
+            <enum name="dotted" value="1" />
+            <!-- 实线-->
+            <enum name="solid" value="2" />
+            <!-- 短线 (内向)-->
+            <enum name="short_inside" value="4" />
         </attr>
-
-        <!-- 与 axis tag有关属性 -->
-        <!-- axis tag文字左右margin -->
-        <attr name="axisTagMarginX" format="dimension" />
-        <!-- axis tag文字上下margin -->
-        <attr name="axisTagMarginY" format="dimension" />
-        <!-- axis tag显示位置 -->
-        <attr name="axisTagLocation">
-            <enum name="left" value="0" />
-            <enum name="left_inside" value="1" />
-            <enum name="right" value="2" />
-            <enum name="right_inside" value="3" />
-            <enum name="all" value="4" />
-            <enum name="all_inside" value="5" />
+        <!-- axis 标签显示位置 -->
+        <attr name="axisLabelPosition">
+            <!-- 开始 -->
+            <flag name="start" value="2" />
+            <!-- 上 -->
+            <flag name="top" value="4" />
+            <!-- 结束 -->
+            <flag name="end" value="8" />
+            <!-- 下 -->
+            <flag name="bottom" value="16" />
+            <!-- 左和右 -->
+            <flag name="start_and_end" value="128" />
+            <!-- 垂直居中 -->
+            <flag name="center_vertical" value="512" />
         </attr>
 
         <!-- 与高亮线有关的属性 -->
@@ -105,10 +114,10 @@
         <!-- 与MarkerView有关的属性 -->
         <!-- MarkerView 边框圆角 -->
         <attr name="markerRadius" format="dimension" />
-        <!-- MarkerView 上下padding -->
-        <attr name="markerTBPadding" format="dimension" />
-        <!-- MarkerView 左右padding -->
-        <attr name="markerLRPadding" format="dimension" />
+        <!-- MarkerView 垂直padding -->
+        <attr name="markerPaddingVertical" format="dimension" />
+        <!-- MarkerView 水平padding -->
+        <attr name="markerPaddingHorizontal" format="dimension" />
         <!-- MarkerView 边框宽度 -->
         <attr name="markerBorderWidth" format="dimension" />
         <!-- MarkerView 边框颜色 -->
@@ -117,19 +126,25 @@
         <attr name="markerTextSize" format="dimension" />
         <!-- MarkerView 字符颜色 -->
         <attr name="markerTextColor" format="color" />
-        <!-- X 轴 MarkerView 对齐方向 -->
-        <attr name="gridMarkerAlign">
-            <enum name="top" value="0" />
-            <enum name="bottom" value="1" />
-            <enum name="top_inside" value="2" />
-            <enum name="bottom_inside" value="3" />
-            <enum name="auto" value="4" />
+        <!-- grid 轴 MarkerView 位置 -->
+        <attr name="gridMarkerPosition">
+            <!-- 自动 -->
+            <flag name="auto" value="0" />
+            <!-- 开始 -->
+            <flag name="top" value="4" />
+            <!-- 结束 -->
+            <flag name="bottom" value="16" />
+            <!-- 垂直居外 -->
+            <flag name="outside_vertical" value="2048" />
         </attr>
-        <!-- Y 轴 MarkerView 对齐方向 -->
-        <attr name="axisMarkerAlign">
-            <enum name="left" value="0" />
-            <enum name="right" value="1" />
-            <enum name="auto" value="2" />
+        <!-- axis 轴 MarkerView 位置 -->
+        <attr name="axisMarkerPosition">
+            <!-- 自动 -->
+            <flag name="auto" value="0" />
+            <!-- 开始 -->
+            <flag name="start" value="2" />
+            <!-- 结束 -->
+            <flag name="end" value="8" />
         </attr>
         <!-- MarkerView填充样式。默认实心 -->
         <attr name="markerStyle">
@@ -142,14 +157,14 @@
         <!-- 与选择器有关的属性 -->
         <!-- 信息选择框的padding -->
         <attr name="selectorPadding" format="dimension" />
-        <!-- 信息选择框的左右margin -->
-        <attr name="selectorMarginX" format="dimension" />
-        <!-- 信息选择框的上下margin -->
-        <attr name="selectorMarginY" format="dimension" />
-        <!-- 信息选择框的item上下间隔 -->
-        <attr name="selectorIntervalY" format="dimension" />
-        <!-- 信息选择框的item左右间隔 -->
-        <attr name="selectorIntervalX" format="dimension" />
+        <!-- 信息选择框的水平margin -->
+        <attr name="selectorMarginHorizontal" format="dimension" />
+        <!-- 信息选择框的垂直margin -->
+        <attr name="selectorMarginVertical" format="dimension" />
+        <!-- 信息选择框的item垂直间隔 -->
+        <attr name="selectorIntervalVertical" format="dimension" />
+        <!-- 信息选择框的item水平间隔 -->
+        <attr name="selectorIntervalHorizontal" format="dimension" />
         <!-- 信息选择框的圆角度数 -->
         <attr name="selectorRadius" format="dimension" />
         <!-- 选择器边框线宽度 -->
@@ -170,24 +185,26 @@
         <!-- 与指标文字有关的属性 -->
         <!-- 指标文字大小 -->
         <attr name="indexTextSize" format="dimension" />
-        <!-- 指标文字左右margin -->
-        <attr name="indexTextMarginX" format="dimension" />
-        <!-- 指标文字上下margin -->
-        <attr name="indexTextMarginY" format="dimension" />
+        <!-- 指标文字水平margin -->
+        <attr name="indexTextMarginHorizontal" format="dimension" />
+        <!-- 指标文字垂直margin -->
+        <attr name="indexTextMarginVertical" format="dimension" />
         <!-- 指标文字的间隔 -->
         <attr name="indexTextInterval" format="dimension" />
         <!-- 指标默认显示最后一条的数据 -->
         <attr name="defaultShowLastItem" format="color" />
         <!-- 指标文字的位置 -->
-        <attr name="indexLabelLocation">
-            <enum name="left_top_inside" value="0" />
-            <enum name="right_top_inside" value="1" />
-            <enum name="left_top" value="2" />
-            <enum name="right_top" value="3" />
-            <enum name="left_bottom_inside" value="4" />
-            <enum name="right_bottom_inside" value="5" />
-            <enum name="left_bottom" value="6" />
-            <enum name="right_bottom" value="7" />
+        <attr name="indexLabelPosition">
+            <!-- 开始 -->
+            <flag name="start" value="2" />
+            <!-- 上 -->
+            <flag name="top" value="4" />
+            <!-- 结束 -->
+            <flag name="end" value="8" />
+            <!-- 下 -->
+            <flag name="bottom" value="16" />
+            <!-- 垂直居外 -->
+            <flag name="outside_vertical" value="2048" />
         </attr>
 
         <!-- 与游标指示器有关的属性 -->
@@ -207,16 +224,33 @@
         <attr name="spreadCursorBorderWidth" format="dimension" />
         <!-- （展开时）游标文字容器圆角 -->
         <attr name="spreadCursorRadius" format="dimension" />
-        <!-- （展开时）游标文字左右Margin -->
-        <attr name="spreadCursorTextLRMargin" format="dimension" />
-        <!-- （展开时）游标文字上下Margin -->
-        <attr name="spreadCursorTextTBMargin" format="dimension" />
+        <!-- （展开时）游标文字水平Margin -->
+        <attr name="spreadCursorTextMarginHorizontal" format="dimension" />
+        <!-- （展开时）游标文字垂直Margin -->
+        <attr name="spreadCursorTextMarginVertical" format="dimension" />
         <!-- （展开时）游标三角宽度 -->
         <attr name="spreadTriangleWidth" format="dimension" />
         <!-- （展开时）游标三角高度 -->
         <attr name="spreadTriangleHeight" format="dimension" />
 
-        <!-- 与极值有关的属性 -->
+        <!-- 极值Label有关属性 -->
+        <!-- 极值Label的水平边距 -->
+        <attr name="extremumLabelMarginHorizontal" format="dimension" />
+        <!-- 极值Label的垂直边距 -->
+        <attr name="extremumLabelMarginVertical" format="dimension" />
+        <!-- 极值Label的位置 -->
+        <attr name="extremumLabelPosition">
+            <!-- 开始 -->
+            <flag name="start" value="2" />
+            <!-- 结束 -->
+            <flag name="end" value="8" />
+            <!-- 开始和结束 -->
+            <flag name="start_and_end" value="128" />
+            <!-- 垂直居外 -->
+            <flag name="outside_vertical" value="2048" />
+        </attr>
+
+        <!-- 与极值Tag有关的属性 -->
         <!-- 极值字符大小 -->
         <attr name="candleExtremumLabelSize" format="dimension" />
         <!-- 极值字符颜色 -->
@@ -229,16 +263,14 @@
         <attr name="extremumTagDrawableWidth" format="dimension" />
         <!-- 极值标签Drawable高度 -->
         <attr name="extremumTagDrawableHeight" format="dimension" />
-        <!-- 极值标签Drawable左右margin -->
-        <attr name="extremumTagDrawableMarginX" format="dimension" />
-        <!-- 极值标签的Drawable显示位置 -->
-        <attr name="extremumTagDrawableLocation">
+        <!-- 极值标签Drawable水平margin -->
+        <attr name="extremumTagDrawableMarginVertical" format="dimension" />
+        <!-- 极值标签的Drawable显示模式 -->
+        <attr name="extremumTagDrawableVisible">
             <!-- MAX标签显示 -->
-            <enum name="max" value="0" />
+            <enum name="max_visible" value="2" />
             <!-- MIN标签显示 -->
-            <enum name="min" value="1" />
-            <!-- MAX和MIN都显示 -->
-            <enum name="all" value="2" />
+            <enum name="min_visible" value="4" />
         </attr>
 
         <!-- 与涨跌有关的属性 -->
@@ -294,22 +326,22 @@
         <attr name="waterMarkingWidth" format="dimension" />
         <!-- 水印高度 -->
         <attr name="waterMarkingHeight" format="dimension" />
-        <!-- 水印左右margin -->
-        <attr name="waterMarkingMarginX" format="dimension" />
-        <!-- 水印上下margin -->
-        <attr name="waterMarkingMarginY" format="dimension" />
+        <!-- 水印水平margin -->
+        <attr name="waterMarkingMarginHorizontal" format="dimension" />
+        <!-- 水印垂直margin -->
+        <attr name="waterMarkingMarginVertical" format="dimension" />
         <!-- 水印Drawable -->
         <attr name="waterMarkingDrawable" format="reference" />
-        <!-- 水印对其齐方向 -->
-        <attr name="waterMarkingAlign">
-            <!-- 左 -->
-            <flag name="left" value="0x00000001" />
+        <!-- 水印位置 -->
+        <attr name="waterMarkingPosition">
+            <!-- 开始 -->
+            <flag name="start" value="2" />
             <!-- 上 -->
-            <flag name="top" value="0x00000002" />
-            <!-- 右 -->
-            <flag name="right" value="0x00000004" />
+            <flag name="top" value="4" />
+            <!-- 结束 -->
+            <flag name="end" value="8" />
             <!-- 下 -->
-            <flag name="bottom" value="0x00000008" />
+            <flag name="bottom" value="16" />
         </attr>
 
         <!--与呼吸灯有关的属性-->
@@ -323,10 +355,10 @@
         <!--  与标记点有关的属性 -->
         <!--  标记点最小边距 -->
         <attr name="markerPointMinMargin" format="dimension" />
-        <!--  标记点文字上下边距 -->
-        <attr name="markerPointTextMarginY" format="dimension" />
-        <!--  标记点文字左右边距 -->
-        <attr name="markerPointTextMarginX" format="dimension" />
+        <!--  标记点文字垂直边距 -->
+        <attr name="markerPointTextMarginVertical" format="dimension" />
+        <!--  标记点文字水平边距 -->
+        <attr name="markerPointTextMarginHorizontal" format="dimension" />
         <!--  标记点连接线宽度 -->
         <attr name="markerPointLineWidth" format="dimension" />
         <!--  标记点连接线默认长度 -->
@@ -345,7 +377,6 @@
         <attr name="markerPointColorS" format="color" />
         <!--  T标记点颜色 -->
         <attr name="markerPointColorT" format="color" />
-
 
         <!-- 与loading和error有关的属性 -->
         <!-- 加载字符大小 -->

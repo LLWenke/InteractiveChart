@@ -87,8 +87,8 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
         markerPointsTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
         markerPointsTextPaint.getTextBounds("S", 0, 1, textRect);
-        pointRectHalfWidth = (int) ((textRect.width() + attribute.markerPointTextMarginX * 2) / 2);
-        pointRectHeight = (textRect.height() + attribute.markerPointTextMarginY * 2);
+        pointRectHalfWidth = (int) ((textRect.width() + attribute.markerPointTextMarginHorizontal * 2) / 2);
+        pointRectHeight = (textRect.height() + attribute.markerPointTextMarginVertical * 2);
         jointSize = (int) (attribute.markerPointJointRadius * 2);
         textY = (pointRectHeight - textRect.height()) / 2;
         triangleHeight = jointSize - jointSize / 3;
