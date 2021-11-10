@@ -3,6 +3,7 @@ package com.wk.chart.drawing;
 
 
 import android.graphics.Canvas;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.TextPaint;
@@ -11,9 +12,14 @@ import com.wk.chart.compat.FontStyle;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
-import com.wk.chart.enumeration.AxisLabelLocation;
+import com.wk.chart.entry.ValueEntry;
+import com.wk.chart.enumeration.PositionType;
+import com.wk.chart.enumeration.ModuleType;
+import com.wk.chart.enumeration.ScaleLineStyle;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -31,12 +37,13 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
     private final Paint axisLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG); // Axis 轴线条的画笔
     private final Rect rect = new Rect();//用于测量文字的实际占用区域
 
-    private final float[] pointCache = new float[2];
-    private final float[] lineBuffer = new float[8];
-    private final int axisCount;
+    private final float[] pointCache = new float[2];//[x,y]
+    private final float[] labelBuffer = new float[4];//[x1,y1,x2,y2]
+    private final float[] lineBuffer = new float[8];//[x1,y1,x2,y2,x3,y4,x4,y4]
     private final boolean isQuantization;
+    private final int axisCount;
     private int axisStart = 0, axisEnd = 0;
-    private float left, right, textCenter, regionHeight, unilateralTextOffset, lineOffset;
+    private float textHeight, textCenter, regionHeight, sortLineOffset, lineHeightOffset;
 
     /**
      * 构造
@@ -68,11 +75,37 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
         axisLinePaint.setColor(attribute.lineColor);
 
         Utils.measureTextArea(axisLabelPaintLeft, rect);
-        axisStart = attribute.showFirstAxis ? 0 : 1;
-        axisEnd = attribute.showLastAxis ? axisCount : axisCount - 1;
-        textCenter = rect.height() / 2f;
-        lineOffset = attribute.lineWidth / 2f;
-        unilateralTextOffset = attribute.axisLineState ? -rect.top + attribute.axisLabelTBMargin + lineOffset : textCenter;
+        axisStart = attribute.axisShowFirst ? 0 : 1;
+        axisEnd = attribute.axisShowLast ? axisCount : axisCount - 1;
+        lineHeightOffset = attribute.lineWidth / 2f;
+        textHeight = rect.height();
+        textCenter = textHeight / 2f;
+        switch (attribute.axisScaleLineStyle) {
+            case SOLID:
+                sortLineOffset = 0;
+                axisLinePaint.setPathEffect(null);
+                break;
+            case DOTTED:
+                sortLineOffset = 0;
+                axisLinePaint.setPathEffect(new DashPathEffect(new float[]{10f, 5f}, 0));
+                break;
+            case SHORT_INSIDE:
+            case SHORT_OUTSIDE:
+                sortLineOffset = attribute.axisScaleShortLineLength;
+                break;
+        }
+    }
+
+    @Override
+    public float[] onInitMargin() {
+        float height = (float) Math.ceil(textHeight + attribute.axisLabelMarginVertical * 2f);
+        if (attribute.axisShowFirst && (attribute.axisLabelPosition & PositionType.TOP) != 0) {//第一条可见
+            margin[1] = height;
+        }
+        if (attribute.axisShowLast && (attribute.axisLabelPosition & PositionType.BOTTOM) != 0) {//最后一条可见
+            margin[3] = height;
+        }
+        return margin;
     }
 
     @Override
@@ -88,46 +121,61 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
     @Override
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
         for (int i = axisStart; i < axisEnd; i++) {
-            pointCache[1] = lineBuffer[1] = lineBuffer[3] = viewRect.top + i * regionHeight;
-            render.invertMapPoints(pointCache);
-            float value, offset;
-            if (i == 0) {
-                value = extremum[3];
-                offset = lineOffset + attribute.axisLabelTBMargin + rect.height();
-            } else if (i == axisCount - 1) {
-                value = extremum[1];
-                offset = -lineOffset - attribute.axisLabelTBMargin;
-            } else {
-                value = pointCache[1];
-                offset = unilateralTextOffset;
-            }
+            float centerOffset, axisY;
             String text;
-            if (isQuantization) {
-                text = render.getAdapter().rateConversion(value, render.getAdapter().getScale().getQuoteScale(), true, false);
+            axisY = viewRect.top + i * regionHeight;
+            pointCache[1] = axisY;
+            render.invertMapPoints(pointCache);
+            if (i == 0) {
+                centerOffset = textCenter;
+                text = getScaleLabel(extremum[3], absChartModule.getMaxY());
+            } else if (i == axisCount - 1) {
+                centerOffset = -textCenter;
+                text = getScaleLabel(extremum[1], absChartModule.getMinY());
             } else {
-                text = render.getAdapter().rateConversion(value, render.getAdapter().getScale().getQuoteScale(), false, false);
+                centerOffset = 0;
+                text = getScaleLabel(pointCache[1], null);
             }
-            // 绘制横向网格线
-            if (attribute.axisLabelLocation == AxisLabelLocation.ALL) {
-                lineBuffer[5] = lineBuffer[7] = lineBuffer[1];
-                lineBuffer[0] = viewRect.left;
-                lineBuffer[2] = left;
-                lineBuffer[4] = right;
-                lineBuffer[6] = viewRect.right;
-                offset = textCenter;
+            //绘制刻度值
+            if ((attribute.axisLabelPosition & PositionType.BOTTOM) != 0) {
+                labelBuffer[1] = axisY + textHeight + lineHeightOffset + attribute.axisLabelMarginVertical;
+                labelBuffer[3] = labelBuffer[1];
+            } else if ((attribute.axisLabelPosition & PositionType.CENTER_VERTICAL) != 0) {
+                labelBuffer[1] = axisY + centerOffset + attribute.axisLabelMarginVertical;
+                labelBuffer[3] = labelBuffer[1];
             } else {
+                labelBuffer[1] = axisY - lineHeightOffset - attribute.axisLabelMarginVertical;
+                labelBuffer[3] = labelBuffer[1];
+            }
+            if ((attribute.axisLabelPosition & PositionType.START_AND_END) != 0) {
+                labelBuffer[0] = viewRect.left + attribute.axisLabelMarginHorizontal + sortLineOffset;
+                labelBuffer[2] = viewRect.right - attribute.axisLabelMarginHorizontal - sortLineOffset;
+                canvas.drawText(text, labelBuffer[0], labelBuffer[1], axisLabelPaintLeft);
+                canvas.drawText(text, labelBuffer[2], labelBuffer[3], axisLabelPaintRight);
+            } else if ((attribute.axisLabelPosition & PositionType.END) != 0) {
+                labelBuffer[2] = viewRect.right - attribute.axisLabelMarginHorizontal - sortLineOffset;
+                canvas.drawText(text, labelBuffer[2], labelBuffer[3], axisLabelPaintRight);
+            } else {
+                labelBuffer[0] = viewRect.left + attribute.axisLabelMarginHorizontal + sortLineOffset;
+                canvas.drawText(text, labelBuffer[0], labelBuffer[1], axisLabelPaintLeft);
+            }
+            // 绘制横刻度线
+            if (attribute.axisScaleLineStyle == ScaleLineStyle.SHORT_OUTSIDE
+                    || attribute.axisScaleLineStyle == ScaleLineStyle.SHORT_INSIDE) {
+                lineBuffer[1] = lineBuffer[5] = axisY;
+                lineBuffer[3] = lineBuffer[7] = axisY + centerOffset;
+                lineBuffer[0] = viewRect.left;
+                lineBuffer[2] = viewRect.left + sortLineOffset;
+                lineBuffer[4] = viewRect.right;
+                lineBuffer[6] = viewRect.right - sortLineOffset;
+                canvas.drawLines(lineBuffer, axisLinePaint);
+            } else if (attribute.axisScaleLineStyle == ScaleLineStyle.DOTTED
+                    || attribute.axisScaleLineStyle == ScaleLineStyle.SOLID) {
+                lineBuffer[1] = lineBuffer[3] = lineBuffer[5] = lineBuffer[7] = axisY;
                 lineBuffer[0] = viewRect.left;
                 lineBuffer[2] = viewRect.right;
-            }
-            if (attribute.axisLabelLocation == AxisLabelLocation.LEFT) {
-                canvas.drawText(text, left, lineBuffer[1] + offset, axisLabelPaintLeft);
-            } else if (attribute.axisLabelLocation == AxisLabelLocation.RIGHT) {
-                canvas.drawText(text, right, lineBuffer[1] + offset, axisLabelPaintRight);
-            } else {
-                canvas.drawText(text, left, lineBuffer[1] + offset, axisLabelPaintLeft);
-                canvas.drawText(text, right, lineBuffer[5] + offset, axisLabelPaintRight);
-            }
-            if (attribute.axisLineState) {
+                lineBuffer[4] = 0;
+                lineBuffer[6] = 0;
                 canvas.drawLines(lineBuffer, axisLinePaint);
             }
         }
@@ -140,9 +188,21 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
 
     @Override
     public void onLayoutComplete() {
-        regionHeight = viewRect.height() / (axisCount - 1);
-        left = viewRect.left + attribute.axisLabelLRMargin;
-        right = viewRect.right - attribute.axisLabelLRMargin;
+        regionHeight = viewRect.height() / (float) (axisCount - 1);
         Arrays.fill(lineBuffer, 0f);
+        Arrays.fill(labelBuffer, 0f);
+    }
+
+    /**
+     * 格式化刻度标签
+     */
+    private String getScaleLabel(float value, @Nullable ValueEntry entry) {
+        if (null != entry && absChartModule.getModuleType() == ModuleType.VOLUME) {
+            return render.getAdapter().quantizationConversion(entry, true);
+        } else if (isQuantization) {
+            return render.getAdapter().rateConversion(value, render.getAdapter().getScale().getQuoteScale(), true, false);
+        } else {
+            return render.getAdapter().rateConversion(value, render.getAdapter().getScale().getQuoteScale(), false, false);
+        }
     }
 }

@@ -60,9 +60,7 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
 
     @Override
     public float[] onInitMargin() {
-        margin[3] = (float) Math.ceil(attribute.gridLabelMarginTop
-                + attribute.gridLabelMarginBottom
-                + rect.height());
+        margin[3] = (float) Math.ceil(attribute.axisLabelMarginVertical * 2f + rect.height());
         return margin;
     }
 
@@ -130,8 +128,8 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
 
     @Override
     public void onLayoutComplete() {
-        regionWidth = viewRect.width() / (attribute.gridCount - 1);
-        gridLabelY = viewRect.bottom - attribute.gridLabelMarginBottom;
+        regionWidth = viewRect.width() / (float) (attribute.gridCount - 1);
+        gridLabelY = viewRect.bottom - attribute.axisLabelMarginVertical;
     }
 
 }

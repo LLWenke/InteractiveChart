@@ -7,15 +7,10 @@ import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
 
-import com.wk.chart.enumeration.AxisLabelLocation;
-import com.wk.chart.enumeration.AxisMarkerAlign;
-import com.wk.chart.enumeration.AxisTagLocation;
-import com.wk.chart.enumeration.DrawingAlign;
-import com.wk.chart.enumeration.ExtremumTagDrawableLocation;
-import com.wk.chart.enumeration.GridLineStyle;
-import com.wk.chart.enumeration.GridMarkerAlign;
+import com.wk.chart.enumeration.ExtremumVisible;
+import com.wk.chart.enumeration.PositionType;
+import com.wk.chart.enumeration.ScaleLineStyle;
 import com.wk.chart.enumeration.HighLightStyle;
-import com.wk.chart.enumeration.IndexLabelLocation;
 
 /**
  * <p>视图属性配置基类</p>
@@ -56,28 +51,21 @@ public class BaseAttribute {
     /**
      * 与 grid 标尺刻度有关属性
      */
-    public int gridCount = 4; // grid数量
-    public float gridLabelMarginTop = 0; // grid标签上边距
-    public float gridLabelMarginBottom = 0; // grid标签下边距
-    public float gridLineLength = 4; // grid线条长度
-    public GridLineStyle gridLineStyle = GridLineStyle.LINE;//grid 线条样式
+    public int gridCount = 4; // grid 数量
+    public float gridLabelMarginVertical = 0; // grid 标签垂直Margin
+    public float gridScaleShortLineLength = 10; // grid 刻度短线长度
+    public ScaleLineStyle gridScaleLineStyle = ScaleLineStyle.DOTTED;//grid 刻度样式
 
     /**
      * 与 axis 标尺刻度有关属性
      */
-    public float axisLabelLRMargin = 16f;//axis标签左右Margin
-    public float axisLabelTBMargin = 8f;//axis标签上下Margin
-    public boolean showFirstAxis = true;//axis 是否显示第一条
-    public boolean showLastAxis = true;//axis 是否显示最后一条
-    public boolean axisLineState = true;//axis 线条是否显示
-    public AxisLabelLocation axisLabelLocation = AxisLabelLocation.LEFT; // axis 标签显示位置
-
-    /**
-     * 与 axis tag有关属性
-     */
-    public float axisTagMarginX = 16f;//tag文字左右margin
-    public float axisTagMarginY = 8f;//tag文字上下margin
-    public AxisTagLocation axisTagLocation = AxisTagLocation.RIGHT; // axis tag显示位置
+    public float axisLabelMarginHorizontal = 16f;//axis 标签水平Margin
+    public float axisLabelMarginVertical = 8f;//axis 标签垂直Margin
+    public float axisScaleShortLineLength = 10; //axis 刻度短线长度
+    public boolean axisShowFirst = true;//axis 是否显示第一条
+    public boolean axisShowLast = true;//axis 是否显示最后一条
+    public int axisLabelPosition = PositionType.END | PositionType.TOP; //axis 标签位置
+    public ScaleLineStyle axisScaleLineStyle = ScaleLineStyle.SOLID;//axis 刻度样式
 
     /**
      * 与高亮线有关的属性
@@ -98,24 +86,24 @@ public class BaseAttribute {
      * 与MarkerView 有关的属性
      */
     public float markerRadius = 0; // MarkerView 边框圆角
-    public float markerTBPadding = 5f; // MarkerView 上下padding
-    public float markerLRPadding = 10f; // MarkerView 左右padding
+    public float markerPaddingVertical = 5f; // MarkerView 垂直padding
+    public float markerPaddingHorizontal = 10f; // MarkerView 水平padding
     public float markerBorderWidth = 3f; // MarkerView 边框宽度
     public int markerBorderColor = 0xff4d6370; // MarkerView 边框颜色
     public float markerTextSize = 26; // MarkerView 字符大小
     public int markerTextColor = 0xffffffff; // MarkerView 字符颜色
     public Paint.Style markerStyle = Paint.Style.STROKE; //  MarkerView 的style（边框/边框和填充）
-    public AxisMarkerAlign axisMarkerAlign = AxisMarkerAlign.AUTO; // X 轴 MarkerView 对齐方向
-    public GridMarkerAlign gridMarkerAlign = GridMarkerAlign.BOTTOM; // Y 轴 MarkerView 对齐方向
+    public int axisMarkerPosition = PositionType.AUTO; // axis 轴 MarkerView 位置
+    public int gridMarkerPosition = PositionType.BOTTOM | PositionType.OUTSIDE_VERTICAL; // grid 轴 MarkerView 位置
 
     /**
      * 与选择器有关的属性
      */
     public float selectorPadding = 16;//信息选择框的padding
-    public float selectorMarginX = 16;//信息选择框的左右margin
-    public float selectorMarginY = 40;//信息选择框的上下margin
-    public float selectorIntervalY = 16;//信息选择框的item上下间隔
-    public float selectorIntervalX = 50;//信息选择框的item左右间隔
+    public float selectorMarginHorizontal = 16;//信息选择框的水平margin
+    public float selectorMarginVertical = 40;//信息选择框的垂直margin
+    public float selectorIntervalVertical = 16;//信息选择框的item垂直间隔
+    public float selectorIntervalHorizontal = 50;//信息选择框的item水平间隔
     public float selectorRadius = 5f;//信息选择框的圆角度数
     public float selectorBorderWidth = 3f;//选择器边框线宽度
     public int selectorBorderColor = 0x55bdd9e6;//选择器边框线颜色
@@ -129,11 +117,11 @@ public class BaseAttribute {
      * 与指标文字有关的属性
      */
     public float indexTextSize = 26f;//指标文字大小
-    public float indexTextMarginX = 0f;//指标文字左右margin
-    public float indexTextMarginY = 8f;//指标文字上下margin
+    public float indexTextMarginHorizontal = 0f;//指标文字水平margin
+    public float indexTextMarginVertical = 8f;//指标文字垂直margin
     public float indexTextInterval = 16f;//指标文字的间隔
     public boolean indexDefaultShowLastItemInfo = true;//指标默认显示最后一条的数据
-    public IndexLabelLocation indexLabelLocation = IndexLabelLocation.LEFT_TOP;//指标文字的位置
+    public int indexLabelPosition = PositionType.START | PositionType.TOP | PositionType.OUTSIDE_VERTICAL;//指标文字的位置
 
     /**
      * 与游标指示器有关的属性
@@ -146,8 +134,8 @@ public class BaseAttribute {
     public int spreadCursorBorderColor = 0xff00efff;//（展开时）游标值容器边框颜色
     public float spreadCursorBorderWidth = 3;//（展开时）游标文字容器边框宽度
     public float spreadCursorRadius = 5;//（展开时）游标文字容器圆角
-    public float spreadCursorTextLRMargin = 10f;//（展开时）游标文字左右Margin
-    public float spreadCursorTextTBMargin = 6f;//（展开时）游标文字上下Margin
+    public float spreadCursorTextMarginHorizontal = 10f;//（展开时）游标文字水平Margin
+    public float spreadCursorTextMarginVertical = 6f;//（展开时）游标文字垂直Margin
     public float spreadTriangleWidth = 10;//（展开时）游标三角宽度
     public float spreadTriangleHeight = 10;//（展开时）游标三角高度
 
@@ -175,15 +163,22 @@ public class BaseAttribute {
     public float currentScale = 1;// 当前缩放倍数
 
     /**
-     * 极值有关属性
+     * 极值Label有关属性
+     */
+    public float extremumLabelMarginHorizontal = 16f;//极值Label的水平边距
+    public float extremumLabelMarginVertical = 8f;//极值Label的垂直边距
+    public int extremumLabelPosition = PositionType.END | PositionType.OUTSIDE_VERTICAL; // 极值Label的位置
+
+    /**
+     * 极值Tag有关属性
      */
     public float candleExtremumLabelSize = 26; // 极值字符大小
     public int candleExtremumLableColor = 0xffffffff; // 极值字符颜色
     public Drawable extremumTagDrawable = null;//极值标签Drawable
     public float extremumTagDrawableWidth = 0;//极值标签Drawable宽度
     public float extremumTagDrawableHeight = 0;//极值标签Drawable高度
-    public float extremumTagDrawableMarginX = 10;//极值标签Drawable左右margin
-    public int extremumTagDrawableLocation = ExtremumTagDrawableLocation.MAX;//极值标签的Drawable显示位置
+    public float extremumTagDrawableMarginHorizontal = 10;//极值标签Drawable水平margin
+    public int extremumTagDrawableVisible = ExtremumVisible.MAX_VISIBLE;//极值标签的Drawable显示模式
 
     /**
      * 与指标有关的属性
@@ -196,10 +191,10 @@ public class BaseAttribute {
      */
     public float waterMarkingWidth = 0;//水印宽度
     public float waterMarkingHeight = 0;//水印高度
-    public float waterMarkingMarginX = 30;//水印左右margin
-    public float waterMarkingMarginY = 55;//水印上下margin
+    public float waterMarkingMarginHorizontal = 0;//水印水平margin
+    public float waterMarkingMarginVertical = 0;//水印垂直margin
     public Drawable waterMarkingDrawable = null;//水印Drawable
-    public int waterMarkingAlign = DrawingAlign.LEFT | DrawingAlign.BOTTOM;//水印对其齐方向
+    public int waterMarkingPosition = PositionType.START | PositionType.TOP;//水印位置
 
     /**
      * 与呼吸灯有关的属性
@@ -211,8 +206,8 @@ public class BaseAttribute {
     /**
      * 与标记点有关的属性
      */
-    public float markerPointTextMarginY = 8;//标记点文字上下边距
-    public float markerPointTextMarginX = 12;//标记点文字左右边距
+    public float markerPointTextMarginVertical = 8;//标记点文字垂直边距
+    public float markerPointTextMarginHorizontal = 12;//标记点文字水平边距
     public float markerPointMinMargin = 2;//标记点最小边距
     public float markerPointLineWidth = 2;//标记点连接线宽度
     public float markerPointLineDefaultLength = 20;//标记点连接线默认长度

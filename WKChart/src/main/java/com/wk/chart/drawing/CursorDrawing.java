@@ -109,7 +109,7 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
         String value = render.getAdapter().rateConversion(last.getClose(), false, false);
         //防止文字抖动现象
         float textWidth = foldedCharsWidth * (float) value.length();
-        float textRight = viewRect.right - attribute.axisLabelLRMargin;
+        float textRight = viewRect.right - attribute.axisLabelMarginHorizontal;
         float textLeft = textRight - textWidth;
         float textY;
         if (cursorPoint[0] < textLeft) {
@@ -132,7 +132,7 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
             //防止文字抖动现象
             textWidth = spreadCharsWidth * (float) value.length();
             //修正坐标，防止出界
-            float cursorHalfHeight = spreadTextHalfHeight + attribute.spreadCursorTextTBMargin;//游标的一半高度
+            float cursorHalfHeight = spreadTextHalfHeight + attribute.spreadCursorTextMarginVertical;//游标的一半高度
             float topLimit = viewRect.top + cursorHalfHeight;
             float bottomLimit = viewRect.bottom - cursorHalfHeight;
             if (cursorPoint[1] < topLimit) {
@@ -141,11 +141,11 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
                 cursorPoint[1] = bottomLimit;
             }
             textY = cursorPoint[1] + spreadTextHalfHeight;
-            textRight -= (attribute.rightScrollOffset + attribute.spreadCursorTextLRMargin);
+            textRight -= (attribute.rightScrollOffset + attribute.spreadCursorTextMarginHorizontal);
             textLeft = textRight - textWidth;
-            cursorRect.left = textLeft - attribute.spreadCursorTextLRMargin;
+            cursorRect.left = textLeft - attribute.spreadCursorTextMarginHorizontal;
             cursorRect.top = cursorPoint[1] - cursorHalfHeight;
-            cursorRect.right = textRight + attribute.spreadCursorTextLRMargin;
+            cursorRect.right = textRight + attribute.spreadCursorTextMarginHorizontal;
             cursorRect.bottom = cursorPoint[1] + cursorHalfHeight;
             //绘制游标值区域背景
             float cursorRight = cursorRect.right + attribute.spreadTriangleWidth;

@@ -119,9 +119,9 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         super(context, attrs, defStyleAttr);
         setPadding(0, 0, 0, 0);
         final TypedArray a = context.getTheme().obtainStyledAttributes(
-                attrs, R.styleable.ChartAttr, defStyleAttr, defStyleAttr);
+                attrs, R.styleable.ChartView, defStyleAttr, defStyleAttr);
         try {
-            int type = a.getInteger(R.styleable.ChartAttr_renderModel, RenderModel.CANDLE.ordinal());
+            int type = a.getInteger(R.styleable.ChartView_renderModel, RenderModel.CANDLE.ordinal());
             init(a, RenderModel.values()[type]);
         } catch (Exception e) {
             e.printStackTrace();

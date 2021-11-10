@@ -14,6 +14,7 @@ import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.enumeration.HighLightStyle;
+import com.wk.chart.enumeration.PositionType;
 import com.wk.chart.marker.AbsMarker;
 import com.wk.chart.module.FloatModule;
 import com.wk.chart.module.base.AbsModule;
@@ -37,7 +38,6 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatModule> {
 
     private final float[] markerViewInfo = new float[4];//markerView的left,top,right,bottom信息
     private final float[] highlightPoint = new float[2];//高亮线条x，y
-    private final float[] highlightInvertPoint = new float[2];//高亮线条坐标反转后的x，y
     private final String[] markerText = new String[2];//marker中显示的值
     private final List<AbsMarker<AbsRender<?, ?>>> markerViewList = new ArrayList<>();
 
@@ -147,18 +147,12 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatModule> {
                     markerViewInfo);
         }
         RectF focusRect;
-        switch (attribute.gridMarkerAlign) {
-            case TOP_INSIDE:
-            case TOP:
-                focusRect = render.getTopModule().getRect();
-                break;
-            case BOTTOM:
-            case BOTTOM_INSIDE:
-                focusRect = render.getBottomModule().getRect();
-                break;
-            default:
-                focusRect = chartModule.getRect();
-                break;
+        if ((attribute.gridMarkerPosition & PositionType.TOP) != 0) {
+            focusRect = render.getTopModule().getRect();
+        } else if ((attribute.gridMarkerPosition & PositionType.BOTTOM) != 0) {
+            focusRect = render.getBottomModule().getRect();
+        } else {
+            focusRect = chartModule.getRect();
         }
         if (markerViewInfo[1] < focusRect.top + focusRect.height() / 2) {
             top = markerViewInfo[3] > 0 ? markerViewInfo[3] : focusRect.top;

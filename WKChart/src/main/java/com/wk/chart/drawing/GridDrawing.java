@@ -2,6 +2,7 @@
 package com.wk.chart.drawing;
 
 import android.graphics.Canvas;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.TextPaint;
@@ -13,7 +14,7 @@ import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
-import com.wk.chart.enumeration.GridLineStyle;
+import com.wk.chart.enumeration.ScaleLineStyle;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
 
@@ -26,13 +27,11 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
     private static final String TAG = "GridDrawing";
     private BaseAttribute attribute;//配置文件
     private final TextPaint gridLabelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG); // Grid 轴标签的画笔
-    private final Paint gridPaint = new Paint(Paint.ANTI_ALIAS_FLAG); // Grid 轴网格线画笔
+    private final Paint gridLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG); // Grid 轴刻度线画笔
     private float[] point;
     private String[] label;
     private final Rect rect = new Rect(); //用于测量文字的实际占用区域
-
     private float gridLabelY;//gridLabel的Y轴坐标
-
     private int position;//label下标
 
     @Override
@@ -45,23 +44,26 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
         gridLabelPaint.setColor(attribute.labelColor);
         gridLabelPaint.setTextAlign(Paint.Align.CENTER);
 
-        gridPaint.setStyle(Paint.Style.STROKE);
-        gridPaint.setStrokeWidth(attribute.lineWidth);
-        gridPaint.setColor(attribute.lineColor);
+        gridLinePaint.setStyle(Paint.Style.STROKE);
+        gridLinePaint.setStrokeWidth(attribute.lineWidth);
+        gridLinePaint.setColor(attribute.lineColor);
 
         int size = attribute.gridCount + 3;
         point = new float[size * 2];
         label = new String[size];
 
         Utils.measureTextArea(gridLabelPaint, rect);
+
+        if (attribute.gridScaleLineStyle == ScaleLineStyle.DOTTED) {
+            gridLinePaint.setPathEffect(new DashPathEffect(new float[]{10f, 5f}, 0));
+        }
     }
 
     @Override
     public float[] onInitMargin() {
-        margin[3] = (float) Math.ceil(attribute.gridLabelMarginTop
-                + attribute.gridLabelMarginBottom
+        margin[3] = (float) Math.ceil(attribute.gridLabelMarginVertical * 2f
                 + rect.height()
-                + (attribute.gridLineStyle == GridLineStyle.GRADUATION ? attribute.gridLineLength : 0));
+                + (attribute.gridScaleLineStyle == ScaleLineStyle.SHORT_OUTSIDE ? attribute.gridScaleShortLineLength : 0));
         return margin;
     }
 
@@ -97,18 +99,19 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
             }
             canvas.drawText(label[i], point[xIndex], gridLabelY, gridLabelPaint);
             // 跳过超出显示区域的线
-            if (attribute.gridLineStyle == GridLineStyle.NONE) {
+            if (attribute.gridScaleLineStyle == ScaleLineStyle.NONE) {
                 continue;
             }
             float x = point[xIndex];
             float y = render.getBottomModule().getRect().bottom;
-            if (attribute.gridLineStyle == GridLineStyle.LINE) {
-                canvas.drawLines(render.buildViewLRCoordinates(x, x), gridPaint);
-            } else if (attribute.gridLineStyle == GridLineStyle.GRADUATION_INSIDE) {
-                canvas.drawLine(x, y, x, y - attribute.gridLineLength, gridPaint);
-            } else if (attribute.gridLineStyle == GridLineStyle.GRADUATION) {
+            if (attribute.gridScaleLineStyle == ScaleLineStyle.DOTTED
+                    || attribute.gridScaleLineStyle == ScaleLineStyle.SOLID) {
+                canvas.drawLines(render.buildViewLRCoordinates(x, x), gridLinePaint);
+            } else if (attribute.gridScaleLineStyle == ScaleLineStyle.SHORT_INSIDE) {
+                canvas.drawLine(x, y, x, y - attribute.gridScaleShortLineLength, gridLinePaint);
+            } else if (attribute.gridScaleLineStyle == ScaleLineStyle.SHORT_OUTSIDE) {
                 y = y + attribute.borderWidth;
-                canvas.drawLine(x, y, x, y + attribute.gridLineLength, gridPaint);
+                canvas.drawLine(x, y, x, y + attribute.gridScaleShortLineLength, gridLinePaint);
             }
         }
         canvas.restore();
@@ -120,6 +123,6 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
 
     @Override
     public void onLayoutComplete() {
-        gridLabelY = viewRect.bottom - attribute.gridLabelMarginBottom;
+        gridLabelY = viewRect.bottom - attribute.gridLabelMarginVertical;
     }
 }

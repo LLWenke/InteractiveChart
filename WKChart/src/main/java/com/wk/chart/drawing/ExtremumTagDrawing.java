@@ -12,7 +12,7 @@ import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.CandleEntry;
-import com.wk.chart.enumeration.ExtremumTagDrawableLocation;
+import com.wk.chart.enumeration.ExtremumVisible;
 import com.wk.chart.module.CandleModule;
 import com.wk.chart.render.CandleRender;
 
@@ -76,16 +76,15 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> {
         //文字align调整
         float left = extremumBuffer[0];
         float top = extremumBuffer[1] + extremumRect.height() / 2f;
-        float drawableLeft = left + extremumRect.width() + attribute.extremumTagDrawableMarginX;
+        float drawableLeft = left + extremumRect.width() + attribute.extremumTagDrawableMarginHorizontal;
         float currentExpandWidth = 0;
-        if (attribute.extremumTagDrawableLocation == ExtremumTagDrawableLocation.MAX
-                || attribute.extremumTagDrawableLocation == ExtremumTagDrawableLocation.ALL) {
+        if ((attribute.extremumTagDrawableVisible & ExtremumVisible.MAX_VISIBLE) != 0) {
             currentExpandWidth = expandWidth;
         }
         if (extremumBuffer[0] + extremumRect.width() + currentExpandWidth > viewRect.right) {
             text = maxValue.concat(" →");
             left = extremumBuffer[0] - extremumRect.width();
-            drawableLeft = left - drawableWidth - attribute.extremumTagDrawableMarginX;
+            drawableLeft = left - drawableWidth - attribute.extremumTagDrawableMarginHorizontal;
         }
         //绘制文字
         canvas.drawText(text, left, top, extremumPaint);
@@ -108,16 +107,15 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> {
         //文字align调整
         left = extremumBuffer[2];
         top = extremumBuffer[3] + extremumRect.height() / 2f;
-        drawableLeft = left + extremumRect.width() + attribute.extremumTagDrawableMarginX;
+        drawableLeft = left + extremumRect.width() + attribute.extremumTagDrawableMarginHorizontal;
         currentExpandWidth = 0;
-        if (attribute.extremumTagDrawableLocation == ExtremumTagDrawableLocation.MIN
-                || attribute.extremumTagDrawableLocation == ExtremumTagDrawableLocation.ALL) {
+        if ((attribute.extremumTagDrawableVisible & ExtremumVisible.MIN_VISIBLE) != 0) {
             currentExpandWidth = expandWidth;
         }
         if (extremumBuffer[2] + extremumRect.width() + currentExpandWidth > viewRect.right) {
             text = minValue.concat(" →");
             left = extremumBuffer[2] - extremumRect.width();
-            drawableLeft = left - drawableWidth - attribute.extremumTagDrawableMarginX;
+            drawableLeft = left - drawableWidth - attribute.extremumTagDrawableMarginHorizontal;
         }
         //绘制文字
         canvas.drawText(text, left, top, extremumPaint);
@@ -146,7 +144,7 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> {
         }
         drawableWidth = attribute.extremumTagDrawableWidth == 0 ? bitmap.getWidth() : attribute.extremumTagDrawableWidth;
         drawableHeight = attribute.extremumTagDrawableHeight == 0 ? bitmap.getHeight() : attribute.extremumTagDrawableHeight;
-        expandWidth = drawableWidth + attribute.extremumTagDrawableMarginX * 2f;
+        expandWidth = drawableWidth + attribute.extremumTagDrawableMarginHorizontal * 2f;
     }
 
     @Override

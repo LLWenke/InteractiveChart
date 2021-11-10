@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Size;
 
 import com.wk.chart.compat.Utils;
-import com.wk.chart.enumeration.GridMarkerAlign;
+import com.wk.chart.enumeration.PositionType;
 import com.wk.chart.render.AbsRender;
 
 /**
@@ -27,7 +27,7 @@ public class GridTextMarker extends AbsMarker<AbsRender<?, ?>> {
 
     private final RectF markerInsets = new RectF(0, 0, 0, 0);
     private final Rect textRect = new Rect();
-    private float width, height, inset = 0;
+    private float width, height, borderOffset = 0;
 
     @Override
     public void onInit(AbsRender<?, ?> render) {
@@ -42,20 +42,23 @@ public class GridTextMarker extends AbsMarker<AbsRender<?, ?>> {
 
         Utils.measureTextArea(markerTextPaint, textRect);
 
-        inset = attribute.markerBorderWidth / 2;
-        width = (attribute.markerLRPadding + attribute.markerBorderWidth) * 2f;
-        height = textRect.height() + (attribute.markerTBPadding + attribute.markerBorderWidth) * 2f;
+        borderOffset = attribute.markerBorderWidth / 2;
+        width = (attribute.markerPaddingHorizontal + attribute.markerBorderWidth) * 2f;
+        height = textRect.height() + (attribute.markerPaddingVertical + attribute.markerBorderWidth) * 2f;
     }
 
     @Override
     public float[] onInitMargin() {
-        switch (attribute.gridMarkerAlign) {
-            case TOP://上
-                setMargin(0, height, 0, 0);
-                break;
-            case BOTTOM://下
-                setMargin(0, 0, 0, height);
-                break;
+        float marketHeight = 0;
+        if ((attribute.gridMarkerPosition & PositionType.OUTSIDE_VERTICAL) != 0) {
+            marketHeight = height;
+        }
+        if ((attribute.gridMarkerPosition & PositionType.TOP) != 0) {
+            setMargin(0, marketHeight, 0, 0);
+        } else if ((attribute.gridMarkerPosition & PositionType.BOTTOM) != 0) {
+            setMargin(0, 0, 0, marketHeight);
+        } else {
+            setMargin(0, marketHeight, 0, marketHeight);
         }
         return margin;
     }
@@ -69,43 +72,39 @@ public class GridTextMarker extends AbsMarker<AbsRender<?, ?>> {
         }
         markerTextPaint.getTextBounds(markerText[0], 0, markerText[0].length(), textRect);
         float markerWidth = width + textRect.width();
-
         highlightPointX = highlightPointX - markerWidth / 2;
         if (highlightPointX <= viewRect.left) {
-            highlightPointX = viewRect.left + inset;
+            highlightPointX = viewRect.left + borderOffset;
         }
         if (highlightPointX >= viewRect.right - markerWidth) {
-            highlightPointX = viewRect.right - markerWidth - inset;
+            highlightPointX = viewRect.right - markerWidth - borderOffset;
         }
-
         markerInsets.left = highlightPointX;
-
-        if (attribute.gridMarkerAlign == GridMarkerAlign.TOP_INSIDE) {
-            markerInsets.top = render.getTopModule().getRect().top + inset;
-        } else if (attribute.gridMarkerAlign == GridMarkerAlign.TOP) {
-            markerInsets.top = render.getTopModule().getRect().top - height - attribute.borderWidth;
-        } else if (attribute.gridMarkerAlign == GridMarkerAlign.BOTTOM_INSIDE) {
-            markerInsets.top = render.getBottomModule().getRect().bottom - height - inset;
-        } else if (attribute.gridMarkerAlign == GridMarkerAlign.BOTTOM) {
-            markerInsets.top = render.getBottomModule().getRect().bottom + attribute.borderWidth;
-        } else if (highlightPointY < viewRect.top + viewRect.height() / 2) {
-            markerInsets.top = viewRect.bottom - height - inset;
+        float offset;
+        if ((attribute.gridMarkerPosition & PositionType.OUTSIDE_VERTICAL) != 0) {
+            offset = -(height + attribute.borderWidth + borderOffset);
         } else {
-            markerInsets.top = viewRect.top + inset;
+            offset = borderOffset;
         }
-
+        if ((attribute.gridMarkerPosition & PositionType.TOP) != 0) {
+            markerInsets.top = render.getTopModule().getRect().top + offset;
+        } else if ((attribute.gridMarkerPosition & PositionType.BOTTOM) != 0) {
+            markerInsets.top = render.getBottomModule().getRect().bottom - height - offset;
+        } else if (highlightPointY < viewRect.top + viewRect.height() / 2) {
+            markerInsets.top = viewRect.bottom - height - offset;
+        } else {
+            markerInsets.top = viewRect.top + offset;
+        }
         markerInsets.right = markerInsets.left + markerWidth;
         markerInsets.bottom = markerInsets.top + height;
-
-        markerViewInfo[1] = markerInsets.top - inset;
-        markerViewInfo[3] = markerInsets.bottom + inset;
+        markerViewInfo[1] = markerInsets.top;
+        markerViewInfo[3] = markerInsets.bottom;
     }
 
     @Override
     public void onMarkerViewDraw(Canvas canvas, String[] markerText) {
         canvas.drawRoundRect(markerInsets, attribute.markerRadius, attribute.markerRadius,
                 markerBorderPaint);
-
         canvas.drawText(markerText[0],
                 markerInsets.left + markerInsets.width() / 2,
                 markerInsets.top + (markerInsets.height() + textRect.height()) / 2,

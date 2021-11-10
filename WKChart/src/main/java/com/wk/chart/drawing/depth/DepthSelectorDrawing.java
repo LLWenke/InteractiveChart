@@ -98,7 +98,7 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
         //初始信息
         float textHeight = metrics.descent - metrics.ascent;
         float left;
-        float top = viewRect.top + attribute.selectorMarginY + attribute.borderWidth;
+        float top = viewRect.top + attribute.selectorMarginVertical + attribute.borderWidth;
 
         //添加选择器内容
         loadSelectorInfo();
@@ -111,9 +111,9 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
                     + item.getUnitPaint().measureText(item.getUnit());
             width = width < textWidth ? textWidth : width;
         }
-        width += (attribute.selectorPadding * 2 + attribute.selectorIntervalX);
+        width += (attribute.selectorPadding * 2 + attribute.selectorIntervalHorizontal);
         this.selectedWidth = selectedWidth < width ? width : selectedWidth;
-        this.selectedHeight = selectedHeight > 0 ? selectedHeight : attribute.selectorIntervalY *
+        this.selectedHeight = selectedHeight > 0 ? selectedHeight : attribute.selectorIntervalVertical *
                 (selectorInfo.length + 1) + textHeight * selectorInfo.length;
 
         //负责选择器显示位置
@@ -136,7 +136,7 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
                 attribute.selectorRadius, attribute.selectorRadius, selectorBackgroundPaint);
 
         //绘制选择器内容信息
-        float y = top + attribute.selectorIntervalY + (textHeight - metrics.bottom - metrics.top) / 2;
+        float y = top + attribute.selectorIntervalVertical + (textHeight - metrics.bottom - metrics.top) / 2;
         for (SelectorItemEntry item : selectorInfo) {
             //绘制label
             float x = viewRectBuffer[0] + attribute.selectorPadding;
@@ -149,7 +149,7 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
             x -= item.getValuePaint().measureText(item.getValue());
             canvas.drawText(item.getValue(), x, y, item.getValuePaint());
             //计算Y轴位置
-            y += textHeight + attribute.selectorIntervalY;
+            y += textHeight + attribute.selectorIntervalVertical;
         }
     }
 

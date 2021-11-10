@@ -8,7 +8,7 @@ import android.graphics.Path;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
-import com.wk.chart.enumeration.BorderStyle;
+import com.wk.chart.enumeration.PositionType;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
 
@@ -20,16 +20,16 @@ import com.wk.chart.render.AbsRender;
 public class BorderDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<AbsEntry>> {
     private static final String TAG = "BorderDrawing";
     private BaseAttribute attribute;//配置文件
-    private final int borderStyle;
+    private final int borderPosition;//边框位置
     private final Paint borderPaint = new Paint();  //边框线画笔
     private final Path borderPath = new Path();// 边框线绘制路径
 
     public BorderDrawing() {
-        this(BorderStyle.ALL);
+        this(PositionType.ALL);
     }
 
-    public BorderDrawing(int borderStyle) {
-        this.borderStyle = borderStyle;
+    public BorderDrawing(int positionType) {
+        this.borderPosition = positionType;
     }
 
     @Override
@@ -70,19 +70,19 @@ public class BorderDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<AbsEntr
             return;
         }
         float[] borderPts = render.getBorderPoints(viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
-        if (borderStyle == BorderStyle.ALL || (borderStyle & BorderStyle.LEFT) != 0) {
+        if (borderPosition == PositionType.ALL || (borderPosition & PositionType.START) != 0) {
             borderPath.moveTo(borderPts[0], borderPts[1]);
             borderPath.lineTo(borderPts[0], borderPts[3]);
         }
-        if (borderStyle == BorderStyle.ALL || (borderStyle & BorderStyle.TOP) != 0) {
+        if (borderPosition == PositionType.ALL || (borderPosition & PositionType.TOP) != 0) {
             borderPath.moveTo(borderPts[0], borderPts[1]);
             borderPath.lineTo(borderPts[2], borderPts[1]);
         }
-        if (borderStyle == BorderStyle.ALL || (borderStyle & BorderStyle.RIGHT) != 0) {
+        if (borderPosition == PositionType.ALL || (borderPosition & PositionType.END) != 0) {
             borderPath.moveTo(borderPts[2], borderPts[1]);
             borderPath.lineTo(borderPts[2], borderPts[3]);
         }
-        if (borderStyle == BorderStyle.ALL || (borderStyle & BorderStyle.BOTTOM) != 0) {
+        if (borderPosition == PositionType.ALL || (borderPosition & PositionType.BOTTOM) != 0) {
             borderPath.moveTo(borderPts[0], borderPts[3]);
             borderPath.lineTo(borderPts[2], borderPts[3]);
         }
