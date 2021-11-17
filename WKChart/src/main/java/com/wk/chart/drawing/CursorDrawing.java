@@ -30,7 +30,7 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
     private final TextPaint foldedCursorTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//（折叠时）游标值画笔
     private final Paint spreadCursorLinePaint = new Paint();//（展开时）游标线画笔
     private final TextPaint spreadCursorTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//展开时）游标值画笔
-    private final Paint spreadCursorBorderPaint = new Paint();//展开时）游标值容器边框画笔
+    private final Paint spreadCursorBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);//展开时）游标值容器边框画笔
     private final Paint cursorBackgroundPaint = new Paint();//游标值容器背景画笔
     private final Path cursorPath = new Path();//游标绘制路径
     private final Rect foldedTextRect = new Rect();//（折叠时）游标文字显示区域
@@ -75,12 +75,10 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
 
         cursorBackgroundPaint.setStyle(Paint.Style.FILL);
         cursorBackgroundPaint.setColor(attribute.cursorBackgroundColor);
-
-        String chars = "0";
-        foldedCursorTextPaint.getTextBounds(chars, 0, 1, foldedTextRect);
-        foldedCharsWidth = foldedTextRect.width() + Utils.sp2px(attribute.context, 0.5f);
-        spreadCursorTextPaint.getTextBounds(chars, 0, 1, spreadTextRect);
-        spreadCharsWidth = spreadTextRect.width() + Utils.sp2px(attribute.context, 0.5f);
+        Utils.measureTextArea(foldedCursorTextPaint, foldedTextRect);
+        Utils.measureTextArea(spreadCursorTextPaint, spreadTextRect);
+        foldedCharsWidth = foldedTextRect.width();
+        spreadCharsWidth = spreadTextRect.width();
         foldedTextHalfHeight = foldedTextRect.height() / 2f;
         spreadTextHalfHeight = spreadTextRect.height() / 2f;
         triangleHalfHeight = attribute.spreadTriangleHeight / 2f;
@@ -108,16 +106,16 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
         render.mapPoints(cursorPoint);
         String value = render.getAdapter().rateConversion(last.getClose(), false, false);
         //防止文字抖动现象
-        float textWidth = foldedCharsWidth * (float) value.length();
-        float textRight = viewRect.right - attribute.axisLabelMarginHorizontal;
-        float textLeft = textRight - textWidth;
+        float textWidth = foldedCharsWidth * (float) value.length() + spreadCharsWidth / 2f;
+        float cursorRight = viewRect.right - attribute.axisLabelMarginHorizontal;
+        float textLeft = cursorRight - textWidth;
         float textY;
         if (cursorPoint[0] < textLeft) {
             clickable = false;
             textY = cursorPoint[1] + foldedTextHalfHeight;
             cursorRect.left = textLeft;
             cursorRect.top = textY - foldedTextRect.height();
-            cursorRect.right = textRight;
+            cursorRect.right = cursorRight;
             cursorRect.bottom = textY;
             //绘制游标值区域背景
             canvas.drawRect(cursorRect, cursorBackgroundPaint);
@@ -130,34 +128,37 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
         } else {
             clickable = true;
             //防止文字抖动现象
-            textWidth = spreadCharsWidth * (float) value.length();
+            textWidth = spreadCharsWidth * (float) value.length() + spreadCharsWidth / 2f;
             //修正坐标，防止出界
-            float cursorHalfHeight = spreadTextHalfHeight + attribute.spreadCursorTextMarginVertical;//游标的一半高度
-            float topLimit = viewRect.top + cursorHalfHeight;
-            float bottomLimit = viewRect.bottom - cursorHalfHeight;
+            float spreadCursorHalfHeight = spreadTextHalfHeight + attribute.spreadCursorPaddingVertical + attribute.spreadCursorBorderWidth;
+            float topLimit = viewRect.top + spreadCursorHalfHeight;
+            float bottomLimit = viewRect.bottom - spreadCursorHalfHeight;
             if (cursorPoint[1] < topLimit) {
                 cursorPoint[1] = topLimit;
             } else if (cursorPoint[1] > bottomLimit) {
                 cursorPoint[1] = bottomLimit;
             }
             textY = cursorPoint[1] + spreadTextHalfHeight;
-            textRight -= (attribute.rightScrollOffset + attribute.spreadCursorTextMarginHorizontal);
-            textLeft = textRight - textWidth;
-            cursorRect.left = textLeft - attribute.spreadCursorTextMarginHorizontal;
-            cursorRect.top = cursorPoint[1] - cursorHalfHeight;
-            cursorRect.right = textRight + attribute.spreadCursorTextMarginHorizontal;
-            cursorRect.bottom = cursorPoint[1] + cursorHalfHeight;
+            cursorRight -= attribute.rightScrollOffset;
+            textLeft = cursorRight - textWidth - attribute.spreadCursorBorderWidth - attribute.spreadCursorPaddingHorizontal - attribute.spreadTriangleWidth;
+            cursorRect.left = textLeft - attribute.spreadCursorBorderWidth - attribute.spreadCursorPaddingHorizontal;
+            cursorRect.top = cursorPoint[1] - spreadCursorHalfHeight;
+            cursorRect.right = cursorRight - attribute.spreadTriangleWidth;
+            cursorRect.bottom = cursorPoint[1] + spreadCursorHalfHeight;
             //绘制游标值区域背景
-            float cursorRight = cursorRect.right + attribute.spreadTriangleWidth;
             cursorPath.rewind();
-            cursorPath.moveTo(cursorRect.left, cursorRect.top);
-            cursorPath.lineTo(cursorRect.right, cursorRect.top);
-            cursorPath.lineTo(cursorRect.right, cursorRect.top + cursorHalfHeight - triangleHalfHeight);
-            cursorPath.lineTo(cursorRight, cursorRect.top + cursorHalfHeight);
-            cursorPath.lineTo(cursorRect.right, cursorRect.top + cursorHalfHeight + triangleHalfHeight);
-            cursorPath.lineTo(cursorRect.right, cursorRect.bottom);
-            cursorPath.lineTo(cursorRect.left, cursorRect.bottom);
-            cursorPath.lineTo(cursorRect.left, cursorRect.top);
+            cursorPath.moveTo(cursorRect.left + attribute.spreadCursorRadius, cursorRect.top);
+            cursorPath.lineTo(cursorRect.right - attribute.spreadCursorRadius, cursorRect.top);
+            cursorPath.quadTo(cursorRect.right, cursorRect.top, cursorRect.right, cursorRect.top + attribute.spreadCursorRadius);
+            cursorPath.lineTo(cursorRect.right, cursorRect.top + spreadCursorHalfHeight - triangleHalfHeight);
+            cursorPath.lineTo(cursorRect.right + attribute.spreadTriangleWidth, cursorRect.top + spreadCursorHalfHeight);
+            cursorPath.lineTo(cursorRect.right, cursorRect.top + spreadCursorHalfHeight + triangleHalfHeight);
+            cursorPath.lineTo(cursorRect.right, cursorRect.bottom - attribute.spreadCursorRadius);
+            cursorPath.quadTo(cursorRect.right, cursorRect.bottom, cursorRect.right - attribute.spreadCursorRadius, cursorRect.bottom);
+            cursorPath.lineTo(cursorRect.left + attribute.spreadCursorRadius, cursorRect.bottom);
+            cursorPath.quadTo(cursorRect.left, cursorRect.bottom, cursorRect.left, cursorRect.bottom - attribute.spreadCursorRadius);
+            cursorPath.lineTo(cursorRect.left, cursorRect.top + attribute.spreadCursorRadius);
+            cursorPath.quadTo(cursorRect.left, cursorRect.top, cursorRect.left + attribute.spreadCursorRadius, cursorRect.top);
             canvas.drawPath(cursorPath, cursorBackgroundPaint);
             canvas.drawPath(cursorPath, spreadCursorBorderPaint);
             //绘制游标值

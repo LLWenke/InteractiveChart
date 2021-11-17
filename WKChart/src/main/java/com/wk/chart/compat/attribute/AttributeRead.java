@@ -250,11 +250,11 @@ public class AttributeRead {
         attribute.spreadCursorRadius = a.getDimension(R.styleable.ChartView_spreadCursorRadius,
                 attribute.spreadCursorRadius); //（展开时） 游标文字容器圆角
 
-        attribute.spreadCursorTextMarginHorizontal = a.getDimension(R.styleable.ChartView_spreadCursorTextMarginHorizontal,
-                attribute.spreadCursorTextMarginHorizontal); //（展开时） 游标文字水平Margin
+        attribute.spreadCursorPaddingHorizontal = a.getDimension(R.styleable.ChartView_spreadCursorPaddingHorizontal,
+                attribute.spreadCursorPaddingHorizontal); //（展开时） 游标文字水平Padding
 
-        attribute.spreadCursorTextMarginVertical = a.getDimension(R.styleable.ChartView_spreadCursorTextMarginVertical,
-                attribute.spreadCursorTextMarginVertical); //（展开时） 游标文字垂直Margin
+        attribute.spreadCursorPaddingVertical = a.getDimension(R.styleable.ChartView_spreadCursorPaddingVertical,
+                attribute.spreadCursorPaddingVertical); //（展开时） 游标文字垂直Padding
 
         attribute.spreadTriangleWidth = a.getDimension(R.styleable.ChartView_spreadTriangleWidth,
                 attribute.spreadTriangleWidth); //（展开时） 游标三角宽度

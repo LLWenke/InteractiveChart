@@ -37,9 +37,9 @@
             app:decreasingStyle="fill"
             app:extremumLabelMarginHorizontal="10dp"
             app:extremumLabelMarginVertical="3dp"
-            app:extremumTagDrawable="@drawable/ic_invalid"
             app:extremumLabelPosition="end|outside_vertical"
             app:extremumLineState="false"
+            app:extremumTagDrawable="@drawable/ic_invalid"
             app:gridCount="4"
             app:gridLabelMarginVertical="3dp"
             app:gridScaleLineStyle="solid"
@@ -77,11 +77,11 @@
             app:selectorLabelSize="8sp"
             app:selectorMarginVertical="30dp"
             app:selectorValueSize="8sp"
-            app:spreadCursorBorderWidth="0.7dp"
-            app:spreadCursorTextMarginHorizontal="4dp"
-            app:spreadCursorTextMarginVertical="2dp"
-            app:spreadTriangleHeight="3dp"
-            app:spreadTriangleWidth="3dp"
+            app:spreadCursorBorderWidth="1dp"
+            app:spreadCursorPaddingHorizontal="4dp"
+            app:spreadCursorPaddingVertical="2dp"
+            app:spreadTriangleHeight="5dp"
+            app:spreadTriangleWidth="4dp"
             app:timeLineWidth="1dp" />
 
         <ProgressBar
