@@ -11,6 +11,7 @@ import android.text.TextPaint;
 import androidx.annotation.NonNull;
 import androidx.annotation.Size;
 
+import com.wk.chart.compat.Utils;
 import com.wk.chart.enumeration.PositionType;
 import com.wk.chart.render.AbsRender;
 
@@ -39,10 +40,9 @@ public class AxisTextMarker extends AbsMarker<AbsRender<?, ?>> {
         markerBorderPaint.setStrokeWidth(attribute.markerBorderWidth);
         markerBorderPaint.setColor(attribute.markerBorderColor);
 
-        String chars = "0";
-        markerTextPaint.getTextBounds(chars, 0, 1, textRect);
         //用于计算的文字宽度
-        charsWidth = markerTextPaint.measureText(chars);
+        Utils.measureTextArea(markerTextPaint, textRect);
+        charsWidth = textRect.width() + Utils.sp2px(attribute.context, 0.5f);
         inset = attribute.markerBorderWidth / 2;
         width = (attribute.markerPaddingHorizontal + attribute.markerBorderWidth) * 2f;
         height = textRect.height() + (attribute.markerPaddingVertical + attribute.markerBorderWidth) * 2f;
@@ -57,7 +57,7 @@ public class AxisTextMarker extends AbsMarker<AbsRender<?, ?>> {
         }
         int length = markerText[1].length();
         markerTextPaint.getTextBounds(markerText[1], 0, length, textRect);
-        float markerWidth = width + charsWidth * length;
+        float markerWidth = width + charsWidth * length + charsWidth / 2f;
 
         highlightPointY = highlightPointY - height / 2;
         if (highlightPointY < viewRect.top) {

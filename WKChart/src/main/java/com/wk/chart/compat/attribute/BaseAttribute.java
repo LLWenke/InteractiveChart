@@ -133,9 +133,9 @@ public class BaseAttribute {
     public int spreadCursorTextColor = 0xff00efff;//（展开时）游标值颜色
     public int spreadCursorBorderColor = 0xff00efff;//（展开时）游标值容器边框颜色
     public float spreadCursorBorderWidth = 3;//（展开时）游标文字容器边框宽度
-    public float spreadCursorRadius = 5;//（展开时）游标文字容器圆角
-    public float spreadCursorTextMarginHorizontal = 10f;//（展开时）游标文字水平Margin
-    public float spreadCursorTextMarginVertical = 6f;//（展开时）游标文字垂直Margin
+    public float spreadCursorRadius = 10;//（展开时）游标文字容器圆角
+    public float spreadCursorPaddingHorizontal = 10f;//（展开时）游标文字水平Padding
+    public float spreadCursorPaddingVertical = 6f;//（展开时）游标文字垂直Padding
     public float spreadTriangleWidth = 10;//（展开时）游标三角宽度
     public float spreadTriangleHeight = 10;//（展开时）游标三角高度
 

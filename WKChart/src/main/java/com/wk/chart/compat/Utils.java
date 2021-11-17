@@ -68,7 +68,7 @@ public class Utils {
      * @param rect         计算后的矩形（此矩形位文字的实际占用区域）
      */
     public static void measureTextArea(TextPaint measurePaint, Rect rect) {
-        String test = "9.Y";
+        String test = "9";
         measurePaint.getTextBounds(test, 0, test.length(), rect);
     }
 

@@ -224,10 +224,10 @@
         <attr name="spreadCursorBorderWidth" format="dimension" />
         <!-- （展开时）游标文字容器圆角 -->
         <attr name="spreadCursorRadius" format="dimension" />
-        <!-- （展开时）游标文字水平Margin -->
-        <attr name="spreadCursorTextMarginHorizontal" format="dimension" />
-        <!-- （展开时）游标文字垂直Margin -->
-        <attr name="spreadCursorTextMarginVertical" format="dimension" />
+        <!-- （展开时）游标文字水平Padding -->
+        <attr name="spreadCursorPaddingHorizontal" format="dimension" />
+        <!-- （展开时）游标文字垂直Padding -->
+        <attr name="spreadCursorPaddingVertical" format="dimension" />
         <!-- （展开时）游标三角宽度 -->
         <attr name="spreadTriangleWidth" format="dimension" />
         <!-- （展开时）游标三角高度 -->
