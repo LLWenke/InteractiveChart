@@ -46,15 +46,14 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     private final float[] touchValues = new float[9]; // 存储缩放和平移信息
     private final float[] extremum = new float[4];//极值[x0, y0, x1, y1]
     private final float[] highlightPoint = new float[2];//长按位置
-    private float[] oldViewTBCoordinates;//用来储存每个已经启用的View的坐标[x0 y0 x1 y1 x2 y2 ...](old)
-    private float[] newViewTBCoordinates;//用来储存每个已经启用的View的坐标[x0 y0 x1 y1 x2 y2 ...](new)
+    private float[] moduleCoordinatePoint;//已经启用的module的坐标点[x0 y0 x1 y1 x2 y2 ...]
     protected final RectF viewRect; // 整个的视图区域
     protected final A attribute; // 配置信息
     protected T adapter; // 数据适配器
     private MainModule<AbsEntry> mainModule;//主图
     private AbsModule<AbsEntry> topModule;//最顶部的图表模型
     private AbsModule<AbsEntry> bottomModule;//最底部的图表模型
-    private AbsModule<AbsEntry> focusAreaModule = null;//焦点区域的ChartModule
+    private AbsModule<AbsEntry> focusModuleCache = null;//焦点区域的ChartModule
     private boolean highlight = false;//长按事件状态
     private boolean firstLoad = true;//首次加载
     private int firstLoadPosition = -1;//首次加载下标
@@ -178,16 +177,17 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      */
     public void onHighlight(float x, float y) {
         highlight = false;
-        focusAreaModule = null;
+        focusModuleCache = mainModule;
         if (adapter.getCount() == 0) {
             return;
         }
-        resetChartModuleInFocusArea(x, y);
+        AbsModule<AbsEntry> focusModule = getFocusModule(x, y);
+        this.focusModuleCache = focusModule.getModuleType() == ModuleType.FLOAT ? this.focusModuleCache : focusModule;
         //如果存在结果，则对x轴坐标进行修正，使之不超过焦点区域内的ChartModule的left和right
-        if (x < focusAreaModule.getRect().left) {
-            x = focusAreaModule.getRect().left;
-        } else if (x > focusAreaModule.getRect().right) {
-            x = focusAreaModule.getRect().right;
+        if (x < this.focusModuleCache.getRect().left) {
+            x = this.focusModuleCache.getRect().left;
+        } else if (x > this.focusModuleCache.getRect().right) {
+            x = this.focusModuleCache.getRect().right;
         }
         highlightPoint[0] = x;
         highlightPoint[1] = y;
@@ -195,18 +195,17 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     }
 
     /**
-     * 重置当前焦点区域内的chartModule
+     * 获取当前焦点区域内的Module
      */
-    public void resetChartModuleInFocusArea(float x, float y) {
+    public AbsModule<AbsEntry> getFocusModule(float x, float y) {
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
             for (AbsModule<AbsEntry> module : item.getValue()) {
                 if (module.isAttach() && module.getRect().contains(x, y)) {
-                    focusAreaModule = module;
-                    return;
+                    return module;
                 }
             }
         }
-        focusAreaModule = mainModule;
+        return mainModule;
     }
 
     /**
@@ -706,13 +705,6 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         } else {
             matrixInvert.reset();
             matrix.invert(matrixInvert);
-            matrixOffset.invert(matrixInvert);
-            matrixInvert.mapPoints(pts);
-
-            matrixTouch.invert(matrixInvert);
-            matrixInvert.mapPoints(pts);
-
-            matrixValue.invert(matrixInvert);
             matrixInvert.mapPoints(pts);
         }
     }
@@ -951,11 +943,11 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     }
 
     /**
-     * 获取当前焦点区域内的chartModule
+     * 获取焦点module缓存
      */
     public @Nullable
-    AbsModule<AbsEntry> getModuleInFocusArea() {
-        return focusAreaModule;
+    AbsModule<AbsEntry> getFocusModuleCache() {
+        return focusModuleCache;
     }
 
     /**
@@ -1096,19 +1088,18 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      */
     public void initViewCoordinates() {
         int coordinatesCount = getModuleGroupCount() * 4;
-        if (null == oldViewTBCoordinates || coordinatesCount != oldViewTBCoordinates.length) {
-            oldViewTBCoordinates = new float[coordinatesCount];
-            newViewTBCoordinates = new float[coordinatesCount];
+        if (null == moduleCoordinatePoint || coordinatesCount != moduleCoordinatePoint.length) {
+            moduleCoordinatePoint = new float[coordinatesCount];
         }
         int point = -1;
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
-            for (int i = 0, z = item.getValue().size(); i < z && i < oldViewTBCoordinates.length; i++) {
-                AbsModule module = item.getValue().get(i);
+            for (int i = 0, z = item.getValue().size(); i < z && i < moduleCoordinatePoint.length; i++) {
+                AbsModule<AbsEntry> module = item.getValue().get(i);
                 if (module.isAttach() && module.getModuleType() != ModuleType.FLOAT) {
                     point += 2;
-                    oldViewTBCoordinates[point] = module.getRect().top;
+                    moduleCoordinatePoint[point] = module.getRect().top;
                     point += 2;
-                    oldViewTBCoordinates[point] = module.getRect().bottom;
+                    moduleCoordinatePoint[point] = module.getRect().bottom;
                 }
             }
         }
@@ -1119,30 +1110,11 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      * 此方法只更新left和right(如：x0 x1)
      */
     public float[] buildViewLRCoordinates(float x0, float x1) {
-        return buildViewLRCoordinates(x0, x1, 0, 0, null);
-    }
-
-    /**
-     * 构建每个已经启用的View的坐标[x0 y0 x1 y1 x2 y2 ...]
-     * 此方法只更新left和right(如：x0 x1)
-     * 如果focusArea不为null的时候，会在focusArea所在的坐标上更新y0 y1 (即top 和 bottom)
-     */
-    public float[] buildViewLRCoordinates(float x0, float x1, float y0, float y1, RectF focusArea) {
-        for (int i = 0; i < newViewTBCoordinates.length; i += 2) {
-            newViewTBCoordinates[i] = x0;
+        for (int i = 0; i < moduleCoordinatePoint.length; i += 2) {
+            moduleCoordinatePoint[i] = x0;
             i += 2;
-            newViewTBCoordinates[i] = x1;
-            int topPosition = i - 1;
-            int bottomPosition = i + 1;
-            if (null != focusArea && focusArea.top <= oldViewTBCoordinates[topPosition]
-                    && focusArea.bottom >= oldViewTBCoordinates[bottomPosition]) {
-                newViewTBCoordinates[topPosition] = y0;
-                newViewTBCoordinates[bottomPosition] = y1;
-            } else {
-                newViewTBCoordinates[topPosition] = oldViewTBCoordinates[topPosition];
-                newViewTBCoordinates[bottomPosition] = oldViewTBCoordinates[bottomPosition];
-            }
+            moduleCoordinatePoint[i] = x1;
         }
-        return newViewTBCoordinates;
+        return moduleCoordinatePoint;
     }
 }

@@ -96,20 +96,29 @@
         </attr>
 
         <!-- 与高亮线有关的属性 -->
-        <!-- X高亮线条是否显示  -->
-        <attr name="xHighlightIsHide" format="boolean" />
-        <!-- X高亮线条是否启用自动宽度管理(启用后xHighlightWidth将失效，宽度将实时跟随candleWidth)  -->
-        <attr name="xHighlightAutoWidth" format="boolean" />
-        <!-- X高亮线条颜色 -->
-        <attr name="xHighlightColor" format="color" />
-        <!-- Y高亮线条是否显示  -->
-        <attr name="yHighlightIsHide" format="boolean" />
-        <!-- Y高亮线条是否启用自动宽度管理(启用后yHighlightWidth将失效，宽度将实时跟随candleWidth)  -->
-        <attr name="yHighlightAutoWidth" format="boolean" />
-        <!-- Y高亮线条是否启用自动分割 -->
-        <attr name="yHighlightAutoDivision" format="boolean" />
-        <!-- Y高亮线条颜色 -->
-        <attr name="yHighlightColor" format="color" />
+        <!-- axis高亮线条自动宽度  -->
+        <attr name="axisHighlightAutoWidth" format="boolean" />
+        <!-- axis高亮线条文字自动选择对应区域值  -->
+        <attr name="axisHighlightLabelAutoSelect" format="boolean" />
+        <!-- axis高亮线条颜色 -->
+        <attr name="axisHighlightColor" format="color" />
+        <!-- grid高亮线条自动宽度 -->
+        <attr name="gridHighlightAutoWidth" format="boolean" />
+        <!-- grid高亮线条颜色 -->
+        <attr name="gridHighlightColor" format="color" />
+        <!-- 高亮线样式 -->
+        <attr name="highLightStyle">
+            <!-- 无 -->
+            <flag name="none" value="0" />
+            <!-- 连续 -->
+            <flag name="continuity" value="2" />
+            <!-- 分隔 -->
+            <flag name="division" value="4" />
+            <!-- 实线 -->
+            <flag name="solid" value="8" />
+            <!-- 虚线 -->
+            <flag name="dotted" value="16" />
+        </attr>
 
         <!-- 与MarkerView有关的属性 -->
         <!-- MarkerView 边框圆角 -->

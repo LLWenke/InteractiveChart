@@ -141,7 +141,7 @@ public class ChartLayout extends ConstraintLayout {
         floatModule.addDrawing(new GridDrawing());//Y轴组件
         floatModule.addDrawing(candleHighlight);
         floatModule.addDrawing(new CandleSelectorDrawing());
-//        floatModule.addDrawing(new BorderDrawing( PositionType .TOP));//边框组件
+        floatModule.addDrawing(new BorderDrawing(PositionType.ALL));//边框组件
         render.addModule(floatModule);
     }
 

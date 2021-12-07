@@ -161,10 +161,6 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
         canvas.restore();
     }
 
-    @Override
-    public void drawOver(Canvas canvas) {
-    }
-
     /**
      * 计算标记点位置
      */

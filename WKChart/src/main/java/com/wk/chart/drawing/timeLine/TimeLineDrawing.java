@@ -113,10 +113,6 @@ public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
     }
 
     @Override
-    public void drawOver(Canvas canvas) {
-    }
-
-    @Override
     public void onLayoutComplete() {
         timeShaderPaint.setShader(
                 new LinearGradient(0, viewRect.top, 0, viewRect.bottom,

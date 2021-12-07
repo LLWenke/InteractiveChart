@@ -63,9 +63,9 @@ public abstract class AbsModule<T extends AbsEntry> {
 
     private ValueEntry minX;// X 轴上指标的最小值
 
-    private float xScale = 0;// X 轴缩放因子
+    private final float xScale = 0;// X 轴缩放因子
 
-    private float yScale = 0.04f;// Y 轴缩放因子
+    private final float yScale = 0.04f;// Y 轴缩放因子
 
     private float xCorrectedValue, yCorrectedValue;// X,Y 轴校正值（这里多用于line的宽度修正）
     private float xOffset, yOffset;// X,Y 轴实际偏移数值（用于修正折线偏移后被影响的数值）

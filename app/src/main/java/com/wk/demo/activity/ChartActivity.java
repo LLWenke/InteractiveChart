@@ -150,7 +150,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
         startIntent.putExtra("close", lastEntry.getClose().value);
         startIntent.putExtra("volume", lastEntry.getVolume().value);
         startIntent.putExtra("time", lastEntry.getTime().getTime());
-//        this.startService(startIntent);
+        this.startService(startIntent);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

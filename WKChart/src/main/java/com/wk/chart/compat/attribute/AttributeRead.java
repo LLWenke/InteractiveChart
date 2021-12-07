@@ -103,26 +103,23 @@ public class AttributeRead {
         /*
          * 与高亮线有关的属性
          */
-        attribute.xHighlightAutoWidth = a.getBoolean(R.styleable.ChartView_xHighlightAutoWidth,
-                attribute.xHighlightAutoWidth);// X高亮线条是否启用自动宽度管理(启用后xHighlightWidth将失效，宽度将实时跟随candleWidth)
+        attribute.axisHighlightAutoWidth = a.getBoolean(R.styleable.ChartView_axisHighlightAutoWidth,
+                attribute.axisHighlightAutoWidth);// axis高亮线条自动宽度
 
-        attribute.xHighlightColor = a.getColor(R.styleable.ChartView_xHighlightColor,
-                attribute.xHighlightColor);// X高亮线条颜色
+        attribute.axisHighlightLabelAutoSelect = a.getBoolean(R.styleable.ChartView_axisHighlightLabelAutoSelect,
+                attribute.axisHighlightLabelAutoSelect);// axis高亮线条文字自动选择对应区域值
 
-        attribute.xHighlightIsHide = a.getBoolean(R.styleable.ChartView_xHighlightIsHide,
-                attribute.xHighlightIsHide);// X高亮线条是否显示
+        attribute.axisHighlightColor = a.getColor(R.styleable.ChartView_axisHighlightColor,
+                attribute.axisHighlightColor);// axis高亮线条颜色
 
-        attribute.yHighlightAutoWidth = a.getBoolean(R.styleable.ChartView_yHighlightAutoWidth,
-                attribute.yHighlightAutoWidth);// Y高亮线条是否启用自动宽度管理(启用后yHighlightWidth将失效，宽度将实时跟随candleWidth)
+        attribute.gridHighlightAutoWidth = a.getBoolean(R.styleable.ChartView_gridHighlightAutoWidth,
+                attribute.gridHighlightAutoWidth);// grid高亮线条自动宽度
 
-        attribute.yHighlightAutoDivision = a.getBoolean(R.styleable.ChartView_yHighlightAutoDivision,
-                attribute.yHighlightAutoDivision);// Y高亮线条是否启用自动分割
+        attribute.gridHighlightColor = a.getColor(R.styleable.ChartView_gridHighlightColor,
+                attribute.gridHighlightColor);// grid高亮线条颜色
 
-        attribute.yHighlightColor = a.getColor(R.styleable.ChartView_yHighlightColor,
-                attribute.yHighlightColor);// Y高亮线条颜色
-
-        attribute.yHighlightIsHide = a.getBoolean(R.styleable.ChartView_yHighlightIsHide,
-                attribute.yHighlightIsHide);// Y高亮线条是否显示
+        attribute.highLightStyle = a.getInt(R.styleable.ChartView_highLightStyle,
+                attribute.highLightStyle);// 高亮线条样式
 
         /*
          * 与MarkerView 有关的属性

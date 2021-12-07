@@ -132,9 +132,4 @@ public class CandleDrawing extends AbsDrawing<CandleRender, CandleModule> {
         increasingPath.rewind();
         canvas.restore();
     }
-
-    @Override
-    public void drawOver(Canvas canvas) {
-    }
-
 }

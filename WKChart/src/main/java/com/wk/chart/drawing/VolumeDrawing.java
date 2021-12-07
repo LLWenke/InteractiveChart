@@ -50,11 +50,6 @@ public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeModule> {
     }
 
     @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-
-    }
-
-    @Override
     public void onComputation(int begin, int end, int current, float[] extremum) {
         // 设置画笔颜色
         CandleEntry entry = render.getAdapter().getItem(current);
@@ -101,9 +96,4 @@ public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeModule> {
         increasingPath.rewind();
         canvas.restore();
     }
-
-    @Override
-    public void drawOver(Canvas canvas) {
-    }
-
 }

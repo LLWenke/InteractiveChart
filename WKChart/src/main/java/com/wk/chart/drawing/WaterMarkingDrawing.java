@@ -33,26 +33,11 @@ public class WaterMarkingDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?
     }
 
     @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-
-    }
-
-    @Override
-    public void onComputation(int begin, int end, int current, float[] extremum) {
-
-    }
-
-    @Override
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
         if (null == bitmap) {
             return;
         }
         canvas.drawBitmap(bitmap, matrix, paint);
-    }
-
-    @Override
-    public void drawOver(Canvas canvas) {
-
     }
 
     @Override

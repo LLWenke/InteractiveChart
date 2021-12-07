@@ -70,17 +70,12 @@ public class BaseAttribute {
     /**
      * 与高亮线有关的属性
      */
-    public boolean xHighlightIsHide = false; // X高亮线条是否显示
-    // X高亮线条是否启用自动宽度管理(启用后xHighlightWidth将失效，宽度将实时跟随candleWidth)
-    public boolean xHighlightAutoWidth = false;
-    public int xHighlightColor = 0xff4d6370; // X高亮线条颜色 0x33ffffff
-
-    public boolean yHighlightIsHide = false; // Y高亮线条是否显示
-    // Y高亮线条是否启用自动宽度管理(启用后yHighlightWidth将失效，宽度将实时跟随candleWidth)
-    public boolean yHighlightAutoWidth = false;
-    public boolean yHighlightAutoDivision = false; // Y高亮线条是否启用自动分割
-    public int yHighlightColor = 0xff4d6370; // Y高亮线条颜色 0x33ffffff
-    public HighLightStyle highLightStyle = HighLightStyle.DOTTED; // 高亮线条样式(实线/虚线)
+    public boolean axisHighlightAutoWidth = false; // axis高亮线条自动宽度
+    public boolean axisHighlightLabelAutoSelect = false; // axis高亮线条文字自动选择对应区域值
+    public int axisHighlightColor = 0xff4d6370; // axis高亮线条颜色 0x33ffffff
+    public boolean gridHighlightAutoWidth = false; // grid高亮线条自动宽度
+    public int gridHighlightColor = 0xff4d6370; // grid高亮线条颜色 0x33ffffff
+    public int highLightStyle = HighLightStyle.SOLID; // 高亮线条样式
 
     /**
      * 与MarkerView 有关的属性

@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextPaint;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Size;
@@ -66,12 +67,15 @@ public class GridTextMarker extends AbsMarker<AbsRender<?, ?>> {
     @Override
     public void onMarkerViewMeasure(RectF viewRect, Matrix matrix, float highlightPointX,
                                     float highlightPointY, String[] markerText,
-                                    @Size(min = 4) @NonNull float[] markerViewInfo) {
+                                    @Size(min = 4) @NonNull float[] markerViewInfo,
+                                    boolean isReverse) {
         if (viewRect.left > highlightPointX || highlightPointX > viewRect.right) {
             return;
         }
-        markerTextPaint.getTextBounds(markerText[0], 0, markerText[0].length(), textRect);
+        markerTextPaint.getTextBounds(markerText[1], 0, markerText[1].length(), textRect);
         float markerWidth = width + textRect.width();
+        float top = render.getTopModule().getRect().top;
+        float bottom = render.getBottomModule().getRect().bottom;
         highlightPointX = highlightPointX - markerWidth / 2;
         if (highlightPointX <= viewRect.left) {
             highlightPointX = viewRect.left + borderOffset;
@@ -87,25 +91,25 @@ public class GridTextMarker extends AbsMarker<AbsRender<?, ?>> {
             offset = borderOffset;
         }
         if ((attribute.gridMarkerPosition & PositionType.TOP) != 0) {
-            markerInsets.top = render.getTopModule().getRect().top + offset;
+            markerInsets.top = top + offset;
         } else if ((attribute.gridMarkerPosition & PositionType.BOTTOM) != 0) {
-            markerInsets.top = render.getBottomModule().getRect().bottom - height - offset;
-        } else if (highlightPointY < viewRect.top + viewRect.height() / 2) {
-            markerInsets.top = viewRect.bottom - height - offset;
+            markerInsets.top = bottom - height - offset;
+        } else if (highlightPointY < top + (bottom - top) / 2) {
+            markerInsets.top = isReverse ? bottom - height - offset : top + offset;
         } else {
-            markerInsets.top = viewRect.top + offset;
+            markerInsets.top = isReverse ? top + offset : bottom - height - offset;
         }
         markerInsets.right = markerInsets.left + markerWidth;
         markerInsets.bottom = markerInsets.top + height;
-        markerViewInfo[1] = markerInsets.top;
-        markerViewInfo[3] = markerInsets.bottom;
+        markerViewInfo[1] = markerInsets.top - borderOffset;
+        markerViewInfo[3] = markerInsets.bottom + borderOffset;
     }
 
     @Override
     public void onMarkerViewDraw(Canvas canvas, String[] markerText) {
         canvas.drawRoundRect(markerInsets, attribute.markerRadius, attribute.markerRadius,
                 markerBorderPaint);
-        canvas.drawText(markerText[0],
+        canvas.drawText(markerText[1],
                 markerInsets.left + markerInsets.width() / 2,
                 markerInsets.top + (markerInsets.height() + textRect.height()) / 2,
                 markerTextPaint);

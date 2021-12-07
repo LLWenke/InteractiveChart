@@ -43,18 +43,6 @@ public class BorderDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<AbsEntr
     }
 
     @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-    }
-
-    @Override
-    public void onComputation(int begin, int end, int current, float[] extremum) {
-    }
-
-    @Override
-    public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
-    }
-
-    @Override
     public void drawOver(Canvas canvas) {
         // 绘制外层边框线
         if (borderPath.isEmpty()) {

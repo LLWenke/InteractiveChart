@@ -83,20 +83,6 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         }
     }
 
-    @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-
-    }
-
-    @Override
-    public void onComputation(int begin, int end, int current, float[] extremum) {
-    }
-
-    @Override
-    public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
-
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void drawOver(Canvas canvas) {
@@ -165,42 +151,42 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
      * 装载选择器的内容信息
      */
     private void loadSelectorInfo() {
-        CandleEntry point = render.getAdapter().getItem(render.getAdapter().getHighlightIndex());
+        CandleEntry entry = render.getAdapter().getItem(render.getAdapter().getHighlightIndex());
         //时间
         selectorInfo[0]
                 .setLabel(attribute.context.getString(R.string.wk_time_value))
                 .setLabelPaint(labelPaint)
-                .setValue(DisplayTypeUtils.selectorFormat(point.getTime(),
+                .setValue(DisplayTypeUtils.selectorFormat(entry.getTime(),
                         render.getAdapter().getTimeType()))
                 .setValuePaint(valuePaint);
         //开
         selectorInfo[1]
                 .setLabel(attribute.context.getString(R.string.wk_open))
                 .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(point.getOpen(), false, false))
+                .setValue(render.getAdapter().rateConversion(entry.getOpen(), false, false))
                 .setValuePaint(valuePaint);
         //高
         selectorInfo[2]
                 .setLabel(attribute.context.getString(R.string.wk_high))
                 .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(point.getHigh(), false, false))
+                .setValue(render.getAdapter().rateConversion(entry.getHigh(), false, false))
                 .setValuePaint(valuePaint);
         //低
         selectorInfo[3]
                 .setLabel(attribute.context.getString(R.string.wk_low))
                 .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(point.getLow(), false, false))
+                .setValue(render.getAdapter().rateConversion(entry.getLow(), false, false))
                 .setValuePaint(valuePaint);
         //收
         selectorInfo[4]
                 .setLabel(attribute.context.getString(R.string.wk_close))
                 .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(point.getClose(), false, false))
+                .setValue(render.getAdapter().rateConversion(entry.getClose(), false, false))
                 .setValuePaint(valuePaint);
         //涨跌幅
         String symbol;
         TextPaint paint;
-        if (point.getClose().value < point.getOpen().value) {
+        if (entry.getClose().value < entry.getOpen().value) {
             paint = decreasingValuePaint;//下跌
             symbol = "";
         } else {
@@ -210,19 +196,19 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         selectorInfo[5]
                 .setLabel(attribute.context.getString(R.string.wk_change_proportion))
                 .setLabelPaint(labelPaint)
-                .setValue(symbol.concat(point.getChangeProportion().text).concat("%"))
+                .setValue(symbol.concat(entry.getChangeProportion().text).concat("%"))
                 .setValuePaint(paint);
         //涨跌额
         selectorInfo[6]
                 .setLabel(attribute.context.getString(R.string.wk_change_amount))
                 .setLabelPaint(labelPaint)
-                .setValue(symbol.concat(render.getAdapter().rateConversion(point.getChangeAmount(), false, true)))
+                .setValue(symbol.concat(render.getAdapter().rateConversion(entry.getChangeAmount(), false, true)))
                 .setValuePaint(paint);
         //成交量
         selectorInfo[7]
                 .setLabel(attribute.context.getString(R.string.wk_volume))
                 .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().quantizationConversion(point.getVolume(), true))
+                .setValue(render.getAdapter().quantizationConversion(entry.getVolume(), true))
                 .setValuePaint(valuePaint);
     }
 

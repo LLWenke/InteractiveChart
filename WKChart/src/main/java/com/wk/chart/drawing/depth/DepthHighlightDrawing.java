@@ -88,30 +88,17 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<Abs
     }
 
     @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-
-    }
-
-    @Override
-    public void onComputation(int begin, int end, int current, float[] extremum) {
-    }
-
-    @Override
-    public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
-    }
-
-    @Override
     public void drawOver(Canvas canvas) {
         if (!render.isHighlight()) {
             return;
         }
         // 绘制高亮
         float top, bottom;
-        Paint circlePant;//圆点画笔1
+        Paint circlePant;//圆点画笔
         Paint highlightPaint;//高亮线画笔
         DepthEntry entry = render.getAdapter().getItem(render.getAdapter().getHighlightIndex());
         //获取当前焦点区域内的chartModule
-        AbsModule chartModule = render.getModuleInFocusArea();
+        AbsModule<? extends AbsEntry> chartModule = render.getFocusModuleCache();
         if (null == chartModule) {
             return;
         }
@@ -126,43 +113,40 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<Abs
 
         highlightPoint[0] = render.getHighlightPoint()[0];
         highlightPoint[1] = render.getHighlightPoint()[1];
-        markerText[0] = render.getHighlightXValue(entry);
-        markerText[1] = entry.getTotalAmount().text;
+        markerText[0] = entry.getTotalAmount().text;
+        markerText[1] = render.getAdapter().rateConversion(entry.getPrice(), false, false);
 
-        for (AbsMarker markerView : markerViewList) {
-            markerView.onMarkerViewMeasure(chartModule.getRect(),
+        for (AbsMarker<AbsRender<?, ?>> markerView : markerViewList) {
+            markerView.onMarkerViewMeasure(
+                    chartModule.getRect(),
                     chartModule.getMatrix(),
                     highlightPoint[0],
                     highlightPoint[1],
                     markerText,
-                    markerViewInfo);
+                    markerViewInfo,
+                    true);
         }
-
-        if (markerViewInfo[1] < chartModule.getRect().top + chartModule.getRect().height() / 2) {
-            top = markerViewInfo[3] > 0 ? markerViewInfo[3] : chartModule.getRect().top;
-            bottom = chartModule.getRect().bottom;
-        } else {
-            top = chartModule.getRect().top;
-            bottom = markerViewInfo[1] > 0 ? markerViewInfo[1] : chartModule.getRect().bottom;
+        if (attribute.highLightStyle != HighLightStyle.NONE) {
+            if (markerViewInfo[1] <= chartModule.getRect().top) {
+                top = markerViewInfo[3];
+                bottom = chartModule.getRect().bottom;
+            } else {
+                top = chartModule.getRect().top;
+                bottom = markerViewInfo[1];
+            }
+            highlightPath.moveTo(highlightPoint[0], top);
+            highlightPath.lineTo(highlightPoint[0], bottom);
+            canvas.drawPath(highlightPath, highlightPaint);
+            highlightPath.rewind();
         }
-        float[] highlightPts = render.buildViewLRCoordinates(highlightPoint[0],
-                highlightPoint[0], top, bottom, chartModule.getRect());
+        canvas.drawCircle(highlightPoint[0], highlightPoint[1], attribute.circleSize / 2, circlePant);
 
-        for (int i = 3; i < highlightPts.length; i += 4) {
-            highlightPath.moveTo(highlightPts[i - 3], highlightPts[i - 2]);
-            highlightPath.lineTo(highlightPts[i - 1], highlightPts[i]);
-        }
-        canvas.drawPath(highlightPath, highlightPaint);
-        highlightPath.rewind();
-        canvas.drawCircle(highlightPoint[0], highlightPoint[1], attribute.circleSize / 2,
-                circlePant);
-
-        for (AbsMarker markerView : markerViewList) {
+        for (AbsMarker<AbsRender<?, ?>> markerView : markerViewList) {
             markerView.onMarkerViewDraw(canvas, markerText);
         }
     }
 
-    public void addMarkerView(AbsMarker markerView) {
+    public void addMarkerView(AbsMarker<AbsRender<?, ?>> markerView) {
         markerViewList.add(markerView);
     }
 }

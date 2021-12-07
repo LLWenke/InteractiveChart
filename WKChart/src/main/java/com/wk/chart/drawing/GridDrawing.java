@@ -118,11 +118,10 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
     }
 
     @Override
-    public void drawOver(Canvas canvas) {
-    }
-
-    @Override
     public void onLayoutComplete() {
-        gridLabelY = viewRect.bottom - attribute.gridLabelMarginVertical;
+        gridLabelY = render.getBottomModule().getRect().bottom
+                + rect.height()
+                + attribute.borderWidth
+                + attribute.gridLabelMarginVertical;
     }
 }

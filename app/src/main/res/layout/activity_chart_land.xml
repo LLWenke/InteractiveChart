@@ -16,6 +16,7 @@
             android:id="@+id/candle_chart"
             android:layout_width="0dp"
             android:layout_height="230dp"
+            app:axisHighlightLabelAutoSelect="true"
             app:axisLabelMarginVertical="0dp"
             app:axisLabelPosition="end"
             app:borderWidth="1dp"

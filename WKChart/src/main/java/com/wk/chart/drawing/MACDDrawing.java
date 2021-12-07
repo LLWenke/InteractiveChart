@@ -8,7 +8,6 @@ import android.graphics.Path;
 
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
-import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.IndexConfigEntry;
 import com.wk.chart.entry.ValueEntry;
@@ -89,11 +88,6 @@ public class MACDDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
         }
         diffPaint.setColor(indexTag.getFlagEntries()[0].getColor());
         deaPaint.setColor(indexTag.getFlagEntries()[1].getColor());
-    }
-
-    @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-
     }
 
     @Override
@@ -182,9 +176,5 @@ public class MACDDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
         deaPath.rewind();
         diffPath.rewind();
         canvas.restore();
-    }
-
-    @Override
-    public void drawOver(Canvas canvas) {
     }
 }

@@ -43,7 +43,7 @@ public abstract class AbsMarker<T extends AbsRender<?, ?>> {
      */
     public abstract void onMarkerViewMeasure(RectF viewRect, Matrix matrix, float highlightPointX,
                                              float highlightPointY, String[] markerText, @Size(min = 4)
-                                             @NonNull float[] markerViewInfo);
+                                             @NonNull float[] markerViewInfo, boolean isReverse);
 
     /**
      * onMarkerViewDraw

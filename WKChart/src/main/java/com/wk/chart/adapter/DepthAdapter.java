@@ -77,10 +77,8 @@ public class DepthAdapter extends AbsAdapter<DepthEntry, NormalBuildConfig> {
             asks.add(askBean);
         }
         //保持买单/卖单数据的价格跨度值一致
-        long bidsDiff = bids.get(0).getPrice().result
-                - bids.get(bids.size() - 1).getPrice().result;//买单数据的价格跨度值
-        long asksDiff = asks.get(asks.size() - 1).getPrice().result
-                - asks.get(0).getPrice().result;//卖单数据的价格跨度值
+        long bidsDiff = bids.get(0).getPrice().result - bids.get(bids.size() - 1).getPrice().result;//买单数据的价格跨度值
+        long asksDiff = asks.get(asks.size() - 1).getPrice().result - asks.get(0).getPrice().result;//卖单数据的价格跨度值
 
         if (bidsDiff > asksDiff) {
             //补齐最低值

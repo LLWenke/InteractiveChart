@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 
 import com.wk.chart.compat.attribute.CandleAttribute;
-import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.IndexConfigEntry;
 import com.wk.chart.entry.ValueEntry;
@@ -35,7 +34,7 @@ public class IndexLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
     }
 
     @Override
-    public void onInit(CandleRender render, AbsModule chartModule) {
+    public void onInit(CandleRender render, AbsModule<?> chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
 
@@ -67,11 +66,6 @@ public class IndexLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
                 paths[i] = new Path();
             }
         }
-    }
-
-    @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-
     }
 
     @Override
@@ -130,9 +124,5 @@ public class IndexLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
             paths[i].rewind();
         }
         canvas.restore();
-    }
-
-    @Override
-    public void drawOver(Canvas canvas) {
     }
 }
