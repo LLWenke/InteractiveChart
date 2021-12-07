@@ -110,14 +110,10 @@
         <attr name="highLightStyle">
             <!-- 无 -->
             <flag name="none" value="0" />
-            <!-- 连续 -->
-            <flag name="continuity" value="2" />
-            <!-- 分隔 -->
-            <flag name="division" value="4" />
             <!-- 实线 -->
-            <flag name="solid" value="8" />
+            <flag name="solid" value="1" />
             <!-- 虚线 -->
-            <flag name="dotted" value="16" />
+            <flag name="dotted" value="2" />
         </attr>
 
         <!-- 与MarkerView有关的属性 -->
