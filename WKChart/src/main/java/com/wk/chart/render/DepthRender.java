@@ -88,21 +88,4 @@ public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
             extremumY[3] = 1;
         }
     }
-
-    /**
-     * 获取高亮线当前位置对应的数值（数据的值，并非屏幕像素点）
-     */
-    public String getHighlightXValue(@NonNull DepthEntry highlightEntry) {
-        float highlightX = getPointX(highlightEntry.getPrice().value, getMainModule().getMatrix());
-        highlightPoints[0] = getHighlightPoint()[0] + getMainModule().getXOffset();
-        String value;
-        if (highlightX - highlightPoints[0] < 5) {
-            value = getAdapter().rateConversion(highlightEntry.getPrice(), true, false);
-        } else {
-            invertMapPoints(highlightPoints);
-            value = getAdapter().rateConversion(highlightPoints[0],
-                    getAdapter().getScale().getQuoteScale(), true, false);
-        }
-        return value;
-    }
 }

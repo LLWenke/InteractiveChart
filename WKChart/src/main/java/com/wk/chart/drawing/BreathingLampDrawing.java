@@ -49,16 +49,6 @@ public class BreathingLampDrawing extends AbsDrawing<CandleRender, TimeLineModul
     }
 
     @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-
-    }
-
-    @Override
-    public void onComputation(int begin, int end, int current, float[] extremum) {
-
-    }
-
-    @Override
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
         CandleEntry entry = render.getAdapter().getItem(render.getAdapter().getLastPosition());
         points[0] = render.getAdapter().getLastPosition() + 0.5f;
@@ -100,10 +90,6 @@ public class BreathingLampDrawing extends AbsDrawing<CandleRender, TimeLineModul
             startAutoTwinkle();
         }
 
-    }
-
-    @Override
-    public void drawOver(Canvas canvas) {
     }
 
     /**

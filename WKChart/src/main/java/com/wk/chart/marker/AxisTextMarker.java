@@ -27,7 +27,7 @@ public class AxisTextMarker extends AbsMarker<AbsRender<?, ?>> {
 
     private final RectF markerInsets = new RectF(0, 0, 0, 0);
     private final Rect textRect = new Rect();
-    private float width, height, inset, charsWidth = 0;
+    private float width, height, borderOffset, charsWidth = 0;
 
     @Override
     public void onInit(AbsRender<?, ?> render) {
@@ -43,7 +43,7 @@ public class AxisTextMarker extends AbsMarker<AbsRender<?, ?>> {
         //用于计算的文字宽度
         Utils.measureTextArea(markerTextPaint, textRect);
         charsWidth = textRect.width() + Utils.sp2px(attribute.context, 0.5f);
-        inset = attribute.markerBorderWidth / 2;
+        borderOffset = attribute.markerBorderWidth / 2;
         width = (attribute.markerPaddingHorizontal + attribute.markerBorderWidth) * 2f;
         height = textRect.height() + (attribute.markerPaddingVertical + attribute.markerBorderWidth) * 2f;
     }
@@ -51,38 +51,38 @@ public class AxisTextMarker extends AbsMarker<AbsRender<?, ?>> {
     @Override
     public void onMarkerViewMeasure(RectF viewRect, Matrix matrix, float highlightPointX,
                                     float highlightPointY, String[] markerText,
-                                    @Size(min = 4) @NonNull float[] markerViewInfo) {
+                                    @Size(min = 4) @NonNull float[] markerViewInfo,
+                                    boolean isReverse) {
         if (viewRect.top > highlightPointY || highlightPointY > viewRect.bottom) {
             return;
         }
-        int length = markerText[1].length();
-        markerTextPaint.getTextBounds(markerText[1], 0, length, textRect);
+        int length = markerText[0].length();
+        markerTextPaint.getTextBounds(markerText[0], 0, length, textRect);
         float markerWidth = width + charsWidth * length + charsWidth / 2f;
 
         highlightPointY = highlightPointY - height / 2;
         if (highlightPointY < viewRect.top) {
-            highlightPointY = viewRect.top + inset;
+            highlightPointY = viewRect.top + borderOffset;
         }
         if (highlightPointY > viewRect.bottom - height) {
-            highlightPointY = viewRect.bottom - height - inset;
+            highlightPointY = viewRect.bottom - height - borderOffset;
         }
 
         if ((attribute.axisMarkerPosition & PositionType.START) != 0) {
-            markerInsets.left = viewRect.left + inset;
+            markerInsets.left = viewRect.left + borderOffset;
         } else if ((attribute.axisMarkerPosition & PositionType.END) != 0) {
-            markerInsets.left = viewRect.right - markerWidth - inset;
-        } else if (highlightPointX > viewRect.left + viewRect.width() / 2) {
-            markerInsets.left = viewRect.right - markerWidth - inset;
+            markerInsets.left = viewRect.right - markerWidth - borderOffset;
+        } else if (highlightPointX < viewRect.left + viewRect.width() / 2) {
+            markerInsets.left = isReverse ? viewRect.right - markerWidth - borderOffset : viewRect.left + borderOffset;
         } else {
-            markerInsets.left = viewRect.left + inset;
+            markerInsets.left = isReverse ? viewRect.left + borderOffset : viewRect.right - markerWidth - borderOffset;
         }
 
         markerInsets.top = highlightPointY;
         markerInsets.right = markerInsets.left + markerWidth;
         markerInsets.bottom = markerInsets.top + height;
-
-        markerViewInfo[0] = markerInsets.left - inset;
-        markerViewInfo[2] = markerInsets.right + inset;
+        markerViewInfo[0] = markerInsets.left - borderOffset;
+        markerViewInfo[2] = markerInsets.right + borderOffset;
     }
 
     @Override
@@ -90,7 +90,7 @@ public class AxisTextMarker extends AbsMarker<AbsRender<?, ?>> {
         canvas.drawRoundRect(markerInsets, attribute.markerRadius, attribute.markerRadius,
                 markerBorderPaint);
 
-        canvas.drawText(markerText[1],
+        canvas.drawText(markerText[0],
                 markerInsets.left + markerInsets.width() / 2,
                 markerInsets.top + (markerInsets.height() + textRect.height()) / 2,
                 markerTextPaint);

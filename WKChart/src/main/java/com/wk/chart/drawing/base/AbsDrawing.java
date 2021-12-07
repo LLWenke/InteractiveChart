@@ -47,7 +47,8 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
      * @param end      结束位置索引
      * @param extremum 当前视图区域的 X,Y 轴的极值[x0, y0, x1, y1]
      */
-    public abstract void readyComputation(Canvas canvas, int begin, int end, float[] extremum);
+    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
+    }
 
     /**
      * 坐标计算
@@ -56,7 +57,8 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
      * @param end     结束位置索引
      * @param current 当前循环中的 entry 索引
      */
-    public abstract void onComputation(int begin, int end, int current, float[] extremum);
+    public void onComputation(int begin, int end, int current, float[] extremum) {
+    }
 
     /**
      * 计算结束，开始绘制
@@ -66,14 +68,16 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
      * @param end      结束位置索引
      * @param extremum 当前视图区域的 X,Y 轴的极值[x0, y0, x1, y1]
      */
-    public abstract void onDraw(Canvas canvas, int begin, int end, float[] extremum);
+    public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
+    }
 
     /**
      * 绘制结束
      *
      * @param canvas canvas
      */
-    public abstract void drawOver(Canvas canvas);
+    public void drawOver(Canvas canvas) {
+    }
 
     /**
      * 初始化配置信息

@@ -85,20 +85,6 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
     }
 
     @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-
-    }
-
-    @Override
-    public void onComputation(int begin, int end, int current, float[] extremum) {
-
-    }
-
-    @Override
-    public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
-    }
-
-    @Override
     public void drawOver(Canvas canvas) {
         CandleEntry last = render.getAdapter().getItem(render.getAdapter().getLastPosition());
         cursorPoint[0] = render.getAdapter().getLastPosition() + 1;

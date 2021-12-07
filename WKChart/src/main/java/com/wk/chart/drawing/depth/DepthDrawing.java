@@ -61,11 +61,6 @@ public class DepthDrawing extends AbsDrawing<DepthRender, DepthModule> {
     }
 
     @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-
-    }
-
-    @Override
     public void onComputation(int begin, int end, int current, float[] extremum) {
         float x0, x1;
         DepthEntry entry = render.getAdapter().getItem(current);

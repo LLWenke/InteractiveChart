@@ -81,16 +81,6 @@ public class ExtremumLabelDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<
         return margin;
     }
 
-    @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-
-    }
-
-    @Override
-    public void onComputation(int begin, int end, int current, float[] extremum) {
-
-    }
-
     @SuppressLint("SwitchIntDef")
     @Override
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
@@ -125,10 +115,6 @@ public class ExtremumLabelDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<
                 canvas.drawText(bottomLabel, labelBuffer[6], labelBuffer[7], labelPaintRight);
             }
         }
-    }
-
-    @Override
-    public void drawOver(Canvas canvas) {
     }
 
     @SuppressLint("SwitchIntDef")

@@ -194,7 +194,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 @Override
                 public boolean onDoubleTap(MotionEvent e) {
                     if (interactiveHandler != null) {
-                        interactiveHandler.onDoubleTap(render.getModuleInFocusArea(), e.getX(), e.getY());
+                        interactiveHandler.onDoubleTap(render.getFocusModule(e.getX(), e.getY()), e.getX(), e.getY());
                     }
                     return true;
                 }
@@ -203,8 +203,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 public boolean onSingleTapConfirmed(MotionEvent e) {
                     boolean consumed = false;
                     if (interactiveHandler != null) {
-                        render.resetChartModuleInFocusArea(e.getX(), e.getY());
-                        consumed = interactiveHandler.onSingleTap(render.getModuleInFocusArea(), e.getX(), e.getY());
+                        consumed = interactiveHandler.onSingleTap(render.getFocusModule(e.getX(), e.getY()), e.getX(), e.getY());
                     }
                     AbsDrawing<?, ?> absDrawing = getRender().onDrawingClick(e.getX(), e.getY());
                     if (absDrawing instanceof CursorDrawing && !consumed) {
@@ -319,6 +318,9 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         }
     }
 
+    /**
+     * 取消高亮处理逻辑
+     */
     private void cancelHighlight() {
         if (!render.isHighlight()) {
             return;
@@ -581,7 +583,6 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (null != render.getAdapter() && getResources().getConfiguration().orientation == orientation) {
-//            this.render.getAdapter().unRegisterListener();
             this.render.getAdapter().onDestroy();
             DelayedHandler.getInstance().onDestroy();
         } else {

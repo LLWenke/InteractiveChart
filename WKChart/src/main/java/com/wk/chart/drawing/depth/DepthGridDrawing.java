@@ -65,10 +65,6 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
     }
 
     @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-    }
-
-    @Override
     public void onComputation(int begin, int end, int current, float[] extremum) {
         //盘口样式
         if (attribute.depthGridStyle == DepthGridStyle.GAP_STYLE) {
@@ -120,10 +116,6 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
                 canvas.drawText(value, pointCache[0], gridLabelY, gridLabelPaint);
             }
         }
-    }
-
-    @Override
-    public void drawOver(Canvas canvas) {
     }
 
     @Override

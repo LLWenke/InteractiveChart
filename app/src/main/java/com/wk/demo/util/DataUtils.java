@@ -3,6 +3,7 @@ package com.wk.demo.util;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.wk.chart.adapter.AbsAdapter;
@@ -95,8 +96,8 @@ public class DataUtils {
             Gson gson = new Gson();
             DepthWrapper data = gson.fromJson(json, DepthWrapper.class);
 
-            Collections.sort(data.getBids(), (arg0, arg1) -> arg1.getPrice()
-                    .compareTo(arg0.getPrice()));
+            Collections.sort(data.getBids(), (arg1, arg0) -> arg0.getPrice()
+                    .compareTo(arg1.getPrice()));
 
             Collections.sort(data.getAsks(), (arg0, arg1) -> arg0.getPrice()
                     .compareTo(arg1.getPrice()));

@@ -3,6 +3,7 @@ package com.wk.chart.compat;
 
 import android.annotation.SuppressLint;
 import android.graphics.RectF;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -11,6 +12,8 @@ import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.enumeration.ModuleGroupType;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
+import com.wk.chart.render.CandleRender;
+import com.wk.chart.render.DepthRender;
 
 import java.util.List;
 import java.util.Map;
@@ -58,6 +61,7 @@ public class MeasureUtils {
      * 测量视图可用大小
      */
     private RectF measureAvailableSize(float width, float height) {
+        float[] topMargin = null, bottomMargin = null;
         float marginLeft = 0f, marginRight = 0f, borderWidthCount = attribute.borderWidth * 2f;
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : render.getModules().entrySet()) {
             float marginTop = 0f, marginBottom = 0f, viewInterval = 0f;
@@ -67,23 +71,27 @@ public class MeasureUtils {
                     continue;
                 }
                 isValid = true;
+                float[] margin = module.getDrawingMargin();
+                marginLeft = Math.max(margin[0], marginLeft);
+                marginRight = Math.max(margin[2], marginRight);
                 if (module.getModuleGroup() == ModuleGroupType.FLOAT) {
                     viewInterval = 0;
+                    if (null == topMargin) {
+                        marginTop = Math.max(margin[1], marginTop);
+                    } else {
+                        marginTop = margin[1] > topMargin[1] ? margin[1] - topMargin[1] : marginTop;
+                    }
+                    if (null == bottomMargin) {
+                        marginBottom = Math.max(margin[3], marginBottom);
+                    } else {
+                        marginBottom = margin[3] > bottomMargin[3] ? margin[3] - bottomMargin[3] : marginBottom;
+                    }
                 } else {
+                    topMargin = null == topMargin ? margin : topMargin;
+                    bottomMargin = margin;
                     viewInterval = attribute.viewInterval;
-                }
-                float[] margin = module.getDrawingMargin();
-                if (margin[0] > marginLeft) {
-                    marginLeft = margin[0];
-                }
-                if (margin[1] > marginTop) {
-                    marginTop = margin[1];
-                }
-                if (margin[2] > marginRight) {
-                    marginRight = margin[2];
-                }
-                if (margin[3] > marginBottom) {
-                    marginBottom = margin[3];
+                    marginTop = Math.max(margin[1], marginTop);
+                    marginBottom = Math.max(margin[3], marginBottom);
                 }
             }
             if (!isValid) {
@@ -101,6 +109,7 @@ public class MeasureUtils {
      * 测量视图(实际)占用高度
      */
     public int measureActualOccupyHeight() {
+        float[] topMargin = null, bottomMargin = null;
         float viewHeight = 0f, borderWidthCount = attribute.borderWidth * 2f;
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : render.getModules().entrySet()) {
             float marginTop = 0f, marginBottom = 0f, moduleHeight = 0f, viewInterval = 0f;
@@ -110,19 +119,27 @@ public class MeasureUtils {
                     continue;
                 }
                 isValid = true;
+                float[] margin = module.getDrawingMargin();
                 if (module.getModuleGroup() == ModuleGroupType.FLOAT) {
                     moduleHeight = 0;
                     viewInterval = 0;
+                    if (null == topMargin) {
+                        marginTop = Math.max(margin[1], marginTop);
+                    } else {
+                        marginTop = margin[1] > topMargin[1] ? margin[1] - topMargin[1] : marginTop;
+                    }
+                    if (null == bottomMargin) {
+                        marginBottom = Math.max(margin[3], marginBottom);
+                    } else {
+                        marginBottom = margin[3] > bottomMargin[3] ? margin[3] - bottomMargin[3] : marginBottom;
+                    }
                 } else {
+                    topMargin = null == topMargin ? margin : topMargin;
+                    bottomMargin = margin;
                     moduleHeight += module.getRect().height();
                     viewInterval = attribute.viewInterval;
-                }
-                float[] margin = module.getDrawingMargin();
-                if (margin[1] > marginTop) {
-                    marginTop = margin[1];
-                }
-                if (margin[3] > marginBottom) {
-                    marginBottom = margin[3];
+                    marginTop = Math.max(margin[1], marginTop);
+                    marginBottom = Math.max(margin[3], marginBottom);
                 }
             }
             if (!isValid) {
@@ -139,6 +156,7 @@ public class MeasureUtils {
      * 测量视图(预计)占用高度
      */
     public int measureEstimateOccupyHeight() {
+        float[] topMargin = null, bottomMargin = null;
         float viewHeight = 0f, borderWidthCount = attribute.borderWidth * 2f;
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : render.getModules().entrySet()) {
             float marginTop = 0f, marginBottom = 0f, moduleHeight = 0f, viewInterval = 0f;
@@ -148,19 +166,27 @@ public class MeasureUtils {
                     continue;
                 }
                 isValid = true;
+                float[] margin = module.getDrawingMargin();
                 if (module.getModuleGroup() == ModuleGroupType.FLOAT) {
                     moduleHeight = 0;
                     viewInterval = 0;
+                    if (null == topMargin) {
+                        marginTop = Math.max(margin[1], marginTop);
+                    } else {
+                        marginTop = margin[1] > topMargin[1] ? margin[1] - topMargin[1] : marginTop;
+                    }
+                    if (null == bottomMargin) {
+                        marginBottom = Math.max(margin[3], marginBottom);
+                    } else {
+                        marginBottom = margin[3] > bottomMargin[3] ? margin[3] - bottomMargin[3] : marginBottom;
+                    }
                 } else {
+                    topMargin = null == topMargin ? margin : topMargin;
+                    bottomMargin = margin;
                     moduleHeight += getHeight(module.getModuleGroup());
                     viewInterval = attribute.viewInterval;
-                }
-                float[] margin = module.getDrawingMargin();
-                if (margin[1] > marginTop) {
-                    marginTop = margin[1];
-                }
-                if (margin[3] > marginBottom) {
-                    marginBottom = margin[3];
+                    marginTop = Math.max(margin[1], marginTop);
+                    marginBottom = Math.max(margin[3], marginBottom);
                 }
             }
             if (!isValid) {

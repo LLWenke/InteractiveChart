@@ -29,21 +29,6 @@ public class EmptyDataDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<AbsE
     }
 
     @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-
-    }
-
-    @Override
-    public void onComputation(int begin, int end, int current, float[] extremum) {
-
-    }
-
-    @Override
-    public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
-
-    }
-
-    @Override
     public void drawOver(Canvas canvas) {
         if (render.getAdapter().getCount() == 0) {
             final String drawText;

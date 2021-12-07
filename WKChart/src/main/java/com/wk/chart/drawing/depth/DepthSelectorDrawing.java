@@ -40,7 +40,7 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
     private float selectedHeight;//信息选择框的高度
     private SelectorItemEntry[] selectorInfo;//选择器信息集合
     private float selectorBorderOffset;//选择器边框偏移量
-    private int itemCount = 3;//选择器中的条目数
+    private final int itemCount = 3;//选择器中的条目数
 
     @Override
     public void onInit(DepthRender render, AbsModule<AbsEntry> chartModule) {
@@ -74,19 +74,6 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
         for (int i = 0; i < itemCount; i++) {
             selectorInfo[i] = new SelectorItemEntry();
         }
-    }
-
-    @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-
-    }
-
-    @Override
-    public void onComputation(int begin, int end, int current, float[] extremum) {
-    }
-
-    @Override
-    public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -157,12 +144,12 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
      * 装载选择器的内容信息
      */
     private void loadSelectorInfo() {
-        DepthEntry point = render.getAdapter().getItem(render.getAdapter().getHighlightIndex());
+        DepthEntry entry = render.getAdapter().getItem(render.getAdapter().getHighlightIndex());
         //价格
         selectorInfo[0]
                 .setLabel(attribute.context.getString(R.string.wk_price))
                 .setLabelPaint(labelPaint)
-                .setValue(render.getHighlightXValue(point))
+                .setValue(render.getAdapter().rateConversion(entry.getPrice(), false, false))
                 .setValuePaint(valuePaint)
                 .setUnit(" ".concat(render.getAdapter().getRate().getSign()))
                 .setUnitPaint(unitPaint);
@@ -171,7 +158,7 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
         selectorInfo[1]
                 .setLabel(attribute.context.getString(R.string.wk_total_amount))
                 .setLabelPaint(labelPaint)
-                .setValue(point.getTotalAmount().text)
+                .setValue(entry.getTotalAmount().text)
                 .setValuePaint(valuePaint)
                 .setUnit(" ".concat(render.getAdapter().getScale().getBaseUnit()))
                 .setUnitPaint(unitPaint);
@@ -179,7 +166,7 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
         selectorInfo[2]
                 .setLabel(attribute.context.getString(R.string.wk_total_cost))
                 .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(point.getTotalPrice(), true, true))
+                .setValue(render.getAdapter().rateConversion(entry.getTotalPrice(), true, true))
                 .setValuePaint(valuePaint)
                 .setUnit(" ".concat(render.getAdapter().getRate().getSign()))
                 .setUnitPaint(unitPaint);

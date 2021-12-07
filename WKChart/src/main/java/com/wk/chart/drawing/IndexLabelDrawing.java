@@ -120,16 +120,6 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
         return margin;
     }
 
-    @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-
-    }
-
-    @Override
-    public void onComputation(int begin, int end, int current, float[] extremum) {
-
-    }
-
     @SuppressLint("SwitchIntDef")
     @Override
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
@@ -177,14 +167,9 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
     }
 
     @Override
-    public void drawOver(Canvas canvas) {
-
-    }
-
-    @Override
     public void onLayoutComplete() {
         //计算指标文字位置信息
-        float lineOffset = lines > 1 ? lineHeight * lines : attribute.indexTextMarginVertical;
+        float lineOffset = lines > 1 ? lineHeight * lines : 0;
         if ((attribute.indexLabelPosition & PositionType.END) != 0) {
             x = right;
         } else {
@@ -194,11 +179,11 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
             if ((attribute.indexLabelPosition & PositionType.BOTTOM) != 0) {
                 y = viewRect.bottom + attribute.borderWidth + attribute.indexTextMarginVertical + lineHeight;
             } else {
-                y = viewRect.top - attribute.borderWidth - lineOffset;
+                y = viewRect.top - attribute.borderWidth - attribute.indexTextMarginVertical - lineOffset;
             }
         } else {
             if ((attribute.indexLabelPosition & PositionType.BOTTOM) != 0) {
-                y = viewRect.bottom - attribute.borderWidth - lineOffset;
+                y = viewRect.bottom - attribute.borderWidth - attribute.indexTextMarginVertical - lineOffset;
             } else {
                 y = viewRect.top + attribute.borderWidth + attribute.indexTextMarginVertical + lineHeight;
             }

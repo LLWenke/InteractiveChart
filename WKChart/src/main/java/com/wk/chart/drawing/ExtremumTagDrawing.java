@@ -48,17 +48,6 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> {
     }
 
     @Override
-    public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
-
-
-    }
-
-    @Override
-    public void onComputation(int begin, int end, int current, float[] extremum) {
-
-    }
-
-    @Override
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
         canvas.save();
         canvas.clipRect(viewRect);
@@ -131,10 +120,6 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> {
                     (int) (minDrawableRect.bottom + attribute.candleExtremumLabelSize));
         }
         canvas.restore();
-    }
-
-    @Override
-    public void drawOver(Canvas canvas) {
     }
 
     @Override
