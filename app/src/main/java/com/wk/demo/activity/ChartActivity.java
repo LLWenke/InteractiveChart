@@ -16,7 +16,6 @@ import com.wk.chart.ChartLayout;
 import com.wk.chart.ChartView;
 import com.wk.chart.adapter.CandleAdapter;
 import com.wk.chart.adapter.DepthAdapter;
-import com.wk.chart.compat.ChartConstraintSet;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.config.IndexBuildConfig;
 import com.wk.chart.entry.AbsEntry;
@@ -51,6 +50,9 @@ import org.jetbrains.annotations.NotNull;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 import static android.view.View.VISIBLE;
 import static android.widget.Toast.LENGTH_SHORT;
+import static com.wk.chart.enumeration.LoadingType.LEFT_LOADING;
+import static com.wk.chart.enumeration.LoadingType.REFRESH_LOADING;
+import static com.wk.chart.enumeration.LoadingType.RIGHT_LOADING;
 import static com.wk.demo.util.DataUtils.candleEntries;
 import static com.wk.demo.util.DataUtils.depthEntries;
 
@@ -61,9 +63,6 @@ import static com.wk.demo.util.DataUtils.depthEntries;
 public class ChartActivity extends AppCompatActivity implements View.OnClickListener,
         ChartTabListener, ICacheLoadListener, IndexManager.IndexConfigChangeListener {
     public static final String DATA_SHOW_KEY = "DATA_SHOW_KEY";//数据展示类型KEY
-    private static final int LEFT_LOADING = 0;//左滑动加载
-    private static final int RIGHT_LOADING = 1;//右滑动加载
-    private static final int REFRESH_LOADING = 2;//刷新
 
     private ChartIndexTabLayout chartIndexTabLayout;
     private ChartTabLayout chartTabLayout;
@@ -72,7 +71,6 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     private ChartView depthChart;
     private ProgressBar candleProgressBar;
     private ProgressBar depthProgressBar;
-    private ChartConstraintSet constraintSet;
 
     private ChartCache mChartCache;
 
@@ -93,7 +91,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
             switch ((ObserverArg) arg) {
                 case INIT:
                 case ATTR_UPDATE:
-                case REFRESH:
+                case RESET:
                     if (dataShowType == DataType.REAL_TIME.ordinal()) {
                         PushService.stopPush();
                         startPush();
@@ -103,8 +101,8 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
                     if (null == candleAdapter || candleAdapter.getCount() == 0) {
                         return;
                     }
-                    loadComplete(candleProgressBar);
-                    loadComplete(depthProgressBar);
+                    chartLayout.loadComplete(candleProgressBar);
+                    chartLayout.loadComplete(depthProgressBar);
                     break;
             }
         }
@@ -116,8 +114,8 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
         this.dataShowType = getIntent().getIntExtra(DATA_SHOW_KEY, DataType.PAGING.ordinal());
         initUI();
         initChart();
-        loadBegin(REFRESH_LOADING, candleProgressBar, candleChart);
-        loadBegin(REFRESH_LOADING, depthProgressBar, depthChart);
+        chartLayout.loadBegin(REFRESH_LOADING, candleProgressBar, candleChart);
+        chartLayout.loadBegin(REFRESH_LOADING, depthProgressBar, depthChart);
         //延时执行，因为adapter中的异步任务可能与adapter的setBuildConfig中的异步任务冲突而出现无数据的情况，所以暂时使用延时避免，后期再做优化，（如果接入的是网络数据，则没有问题，因为网络请求自带延迟）
         new Handler().postDelayed(() -> {
             if (isFinishing()) {
@@ -189,7 +187,6 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
         depthChart = findViewById(R.id.depth_chart);
         candleProgressBar = findViewById(R.id.candle_loading_bar);
         depthProgressBar = findViewById(R.id.depth_loading_bar);
-        this.constraintSet = new ChartConstraintSet(chartLayout);
         this.chartLayout.setICacheLoadListener(this);
         if (null != chartTabLayout) {
             this.chartTabLayout.setChartTabListener(this);
@@ -218,7 +215,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
         this.candleChart.setInteractiveHandler(new InteractiveHandler() {
             @Override
             public void onLeftRefresh(AbsEntry firstData) {
-                loadBegin(LEFT_LOADING, candleProgressBar, candleChart);
+                chartLayout.loadBegin(LEFT_LOADING, candleProgressBar, candleChart);
                 // 模拟耗时
                 candleChart.postDelayed(() -> {
                     List<CandleEntry> entries = getHeader();
@@ -226,13 +223,13 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
                     if (entries.size() == 0) {
                         Toast.makeText(ChartActivity.this, "已经到达最左边了", LENGTH_SHORT).show();
                     }
-                    loadComplete(candleProgressBar);
+                    chartLayout.loadComplete(candleProgressBar);
                 }, 1000);
             }
 
             @Override
             public void onRightRefresh(AbsEntry lastData) {
-                loadBegin(RIGHT_LOADING, candleProgressBar, candleChart);
+                chartLayout.loadBegin(RIGHT_LOADING, candleProgressBar, candleChart);
                 // 模拟耗时
                 candleChart.postDelayed(() -> {
                     List<CandleEntry> entries = getFooter();
@@ -240,7 +237,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
                     if (entries.size() == 0) {
                         Toast.makeText(ChartActivity.this, "已经到达最右边了", LENGTH_SHORT).show();
                     }
-                    loadComplete(candleProgressBar);
+                    chartLayout.loadComplete(candleProgressBar);
                 }, 1000);
             }
         });
@@ -292,10 +289,9 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
      * @param timeType 类型
      */
     private void switchTimeType(TimeType timeType, @ModuleType int moduleType) {
-        loadBegin(REFRESH_LOADING, candleProgressBar, candleChart);
-        candleAdapter.resetData(timeType,
-                dataShowType == DataType.REAL_TIME.ordinal() ?
-                        getNewestData(500) : getInit());
+        chartLayout.loadBegin(REFRESH_LOADING, candleProgressBar, candleChart);
+        candleAdapter.setData(timeType, dataShowType == DataType.REAL_TIME.ordinal() ?
+                getNewestData(500) : getInit());
         if (depthAdapter.getCount() == 0) {
             depthAdapter.resetData(depthEntries);
         }
@@ -350,36 +346,6 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
             entries.add(candleEntries.get(i));
         }
         return entries;
-    }
-
-    /**
-     * 数据开始加载
-     *
-     * @param loadingType 加载框出现类型
-     */
-    public void loadBegin(int loadingType, ProgressBar bar, ChartView chart) {
-        this.constraintSet.setVisibility(bar.getId(), VISIBLE);
-        this.constraintSet.connect(bar.getId(), ConstraintSet.START, chart.getId(),
-                ConstraintSet.START, Utils.dp2px(this, 30));
-        this.constraintSet.connect(bar.getId(), ConstraintSet.END, chart.getId(),
-                ConstraintSet.END, Utils.dp2px(this, 30));
-        switch (loadingType) {
-            case LEFT_LOADING:
-                this.constraintSet.clear(bar.getId(), ConstraintSet.END);
-                break;
-            case RIGHT_LOADING:
-                this.constraintSet.clear(bar.getId(), ConstraintSet.START);
-                break;
-        }
-        this.chartLayout.setConstraintSet(constraintSet);
-    }
-
-    /**
-     * 数据加载完毕
-     */
-    public void loadComplete(ProgressBar bar) {
-        this.constraintSet.setVisibility(bar.getId(), View.INVISIBLE);
-        this.chartLayout.setConstraintSet(constraintSet);
     }
 
     @Override

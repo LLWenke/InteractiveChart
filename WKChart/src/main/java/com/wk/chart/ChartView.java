@@ -98,10 +98,9 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
             case RESET:
                 resetChartState();
                 lockRefresh = false;
-            case REFRESH:
             case ADD:
                 loadingComplete();
-            case PUSH:
+            case UPDATE:
                 onDataUpdate();
                 break;
         }

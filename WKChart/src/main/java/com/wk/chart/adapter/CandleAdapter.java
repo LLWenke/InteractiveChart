@@ -43,14 +43,12 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
     }
 
     /**
-     * 重制时间类型
+     * 是否为相同时间类型的数据
+     *
+     * @return true 相同时间类型  false 不同时间类型
      */
-    public boolean resetTimeType(TimeType timeType) {
-        if (this.timeType == timeType) {
-            return getCount() == 0;
-        }
-        resetData(timeType, null);
-        return true;
+    public boolean isEqualTimeTypeData(TimeType timeType) {
+        return this.timeType == timeType && getCount() > 0;
     }
 
     /**
@@ -81,25 +79,29 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
     }
 
     /**
-     * 重置数据
+     * 清空数据
      */
-    public synchronized void resetData(TimeType type, List<CandleEntry> data) {
-        if (type == null) {
-            return;
-        }
-        stopAnimator();
-        this.timeType = type;
-        this.calculationCache.init();
-        super.resetData(data);
+    @Override
+    public synchronized void clearData() {
+        timeType = null;
+        super.clearData();
     }
 
     /**
      * 刷新数据
      */
-    public synchronized void refreshData(List<CandleEntry> data) {
+    public synchronized void setData(TimeType type, List<CandleEntry> data) {
+        if (null == type) {
+            return;
+        }
         stopAnimator();
         this.calculationCache.init();
-        super.refreshData(data);
+        if (type == timeType) {
+            super.updateData(data);
+        } else {
+            this.timeType = type;
+            super.resetData(data);
+        }
     }
 
     /**

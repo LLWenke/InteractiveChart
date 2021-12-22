@@ -154,7 +154,7 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         CandleEntry entry = render.getAdapter().getItem(render.getAdapter().getHighlightIndex());
         //时间
         selectorInfo[0]
-                .setLabel(attribute.context.getString(R.string.wk_time_value))
+                .setLabel(attribute.context.getString(R.string.wk_time))
                 .setLabelPaint(labelPaint)
                 .setValue(DisplayTypeUtils.selectorFormat(entry.getTime(),
                         render.getAdapter().getTimeType()))
@@ -167,13 +167,13 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
                 .setValuePaint(valuePaint);
         //高
         selectorInfo[2]
-                .setLabel(attribute.context.getString(R.string.wk_high))
+                .setLabel(attribute.context.getString(R.string.ct_high))
                 .setLabelPaint(labelPaint)
                 .setValue(render.getAdapter().rateConversion(entry.getHigh(), false, false))
                 .setValuePaint(valuePaint);
         //低
         selectorInfo[3]
-                .setLabel(attribute.context.getString(R.string.wk_low))
+                .setLabel(attribute.context.getString(R.string.ct_low))
                 .setLabelPaint(labelPaint)
                 .setValue(render.getAdapter().rateConversion(entry.getLow(), false, false))
                 .setValuePaint(valuePaint);
