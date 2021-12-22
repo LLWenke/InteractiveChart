@@ -3,13 +3,15 @@ package com.wk.chart;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 
 import com.wk.chart.adapter.AbsAdapter;
 import com.wk.chart.adapter.CandleAdapter;
-import com.wk.chart.compat.ChartConstraintSet;
+import com.wk.chart.compat.Utils;
 import com.wk.chart.drawing.AxisDrawing;
 import com.wk.chart.drawing.BorderDrawing;
 import com.wk.chart.drawing.BreathingLampDrawing;
@@ -33,12 +35,13 @@ import com.wk.chart.drawing.depth.DepthSelectorDrawing;
 import com.wk.chart.drawing.timeLine.TimeLineDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.ChartCache;
-import com.wk.chart.enumeration.ExtremumVisible;
-import com.wk.chart.enumeration.PositionType;
 import com.wk.chart.enumeration.DataType;
+import com.wk.chart.enumeration.ExtremumVisible;
 import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.enumeration.LoadingType;
 import com.wk.chart.enumeration.ModuleGroupType;
 import com.wk.chart.enumeration.ModuleType;
+import com.wk.chart.enumeration.PositionType;
 import com.wk.chart.enumeration.RenderModel;
 import com.wk.chart.interfaces.ICacheLoadListener;
 import com.wk.chart.marker.AxisTextMarker;
@@ -59,6 +62,7 @@ import java.util.Map;
 
 public class ChartLayout extends ConstraintLayout {
     private static final String TAG = "ChartLayout";
+    private final ConstraintSet constraintSet;
     private DataType dataDisplayType;
     private AbsRender<?, ?> candleRender;
     private ChartView candleChartView;
@@ -74,11 +78,13 @@ public class ChartLayout extends ConstraintLayout {
 
     public ChartLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.constraintSet = new ConstraintSet();
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+        this.constraintSet.clone(this);
         initChart();
     }
 
@@ -97,7 +103,7 @@ public class ChartLayout extends ConstraintLayout {
         candleModule.addDrawing(new MarkerPointDrawing());//标记点绘制组件
         candleModule.addDrawing(new AxisDrawing(5, false));//x轴组件
         candleModule.addDrawing(new ExtremumTagDrawing());//极值标签组件
-        candleModule.addDrawing(new BorderDrawing(PositionType.ALL));//边框组件
+        candleModule.addDrawing(new BorderDrawing(PositionType.BOTTOM));//边框组件
         candleModule.setAttachIndexType(IndexType.CANDLE_MA);
         candleModule.setEnable(true);
         render.addModule(candleModule);
@@ -115,8 +121,8 @@ public class ChartLayout extends ConstraintLayout {
         volumeModule.addDrawing(new VolumeDrawing());//交易量组件
         volumeModule.addDrawing(new IndexLineDrawing(IndexType.VOLUME_MA));//MA组件
         volumeModule.addDrawing(new IndexLabelDrawing(IndexType.VOLUME_MA));//MA指标文字标签组件
-        volumeModule.addDrawing(new ExtremumLabelDrawing(ExtremumVisible.MAX_VISIBLE, true, false));//极值标签组件
-        volumeModule.addDrawing(new BorderDrawing(PositionType.ALL));//边框组件
+        volumeModule.addDrawing(new ExtremumLabelDrawing(ExtremumVisible.MAX_VISIBLE, true, false));//x轴标签组件
+        volumeModule.addDrawing(new BorderDrawing(PositionType.BOTTOM));//边框组件
         volumeModule.setAttachIndexType(IndexType.VOLUME_MA);
         volumeModule.setEnable(true);
         render.addModule(volumeModule);
@@ -130,7 +136,7 @@ public class ChartLayout extends ConstraintLayout {
         indexModule.addDrawing(new IndexLabelDrawing(IndexType.RSI));//RSI 指标文字标签组件
         indexModule.addDrawing(new IndexLineDrawing(IndexType.WR));//WR 指标线组件
         indexModule.addDrawing(new IndexLabelDrawing(IndexType.WR));//WR 指标文字标签组件
-        indexModule.addDrawing(new BorderDrawing(PositionType.ALL));//边框组件
+        indexModule.addDrawing(new BorderDrawing(PositionType.BOTTOM));//边框组件
         indexModule.setEnable(true);
         render.addModule(indexModule);
 
@@ -141,7 +147,7 @@ public class ChartLayout extends ConstraintLayout {
         floatModule.addDrawing(new GridDrawing());//Y轴组件
         floatModule.addDrawing(candleHighlight);
         floatModule.addDrawing(new CandleSelectorDrawing());
-        floatModule.addDrawing(new BorderDrawing(PositionType.ALL));//边框组件
+//        floatModule.addDrawing(new BorderDrawing(BorderStyle.TOP));//边框组件
         render.addModule(floatModule);
     }
 
@@ -150,7 +156,7 @@ public class ChartLayout extends ConstraintLayout {
      */
     private void initDepthChartModules(AbsRender<?, ?> render) {
         DepthModule depthModule = new DepthModule();
-        depthModule.addDrawing(new AxisDrawing(4, true));//x轴组件
+        depthModule.addDrawing(new AxisDrawing(5, true));//x轴组件
         depthModule.addDrawing(new DepthDrawing());//深度图组件
         depthModule.addDrawing(new BorderDrawing(PositionType.BOTTOM));
         depthModule.setEnable(true);
@@ -305,7 +311,7 @@ public class ChartLayout extends ConstraintLayout {
         AbsAdapter<?, ?> adapter = candleRender.getAdapter();
         if (adapter instanceof CandleAdapter) {
             CandleAdapter candleAdapter = (CandleAdapter) adapter;
-            isLoadData = candleAdapter.resetTimeType(chartCache.timeType);
+            isLoadData = !candleAdapter.isEqualTimeTypeData(chartCache.timeType);
         }
         for (ChartCache.TypeEntry entry : chartCache.types) {
             switchModuleType(entry.getModuleType(), entry.getModuleGroupType());
@@ -351,8 +357,34 @@ public class ChartLayout extends ConstraintLayout {
         }
     }
 
-    public void setConstraintSet(ChartConstraintSet set) {
-        set.applyTo(this);
+    /**
+     * 数据开始加载
+     *
+     * @param loadingType 加载框出现类型
+     */
+    public void loadBegin(LoadingType loadingType, ProgressBar bar, ChartView chart) {
+        this.constraintSet.setVisibility(bar.getId(), VISIBLE);
+        this.constraintSet.connect(bar.getId(), ConstraintSet.START, chart.getId(),
+                ConstraintSet.START, Utils.dp2px(getContext(), 30));
+        this.constraintSet.connect(bar.getId(), ConstraintSet.END, chart.getId(),
+                ConstraintSet.END, Utils.dp2px(getContext(), 30));
+        switch (loadingType) {
+            case LEFT_LOADING:
+                this.constraintSet.clear(bar.getId(), ConstraintSet.END);
+                break;
+            case RIGHT_LOADING:
+                this.constraintSet.clear(bar.getId(), ConstraintSet.START);
+                break;
+        }
+        constraintSet.applyTo(this);
+    }
+
+    /**
+     * 数据加载完毕
+     */
+    public void loadComplete(ProgressBar bar) {
+        this.constraintSet.setVisibility(bar.getId(), INVISIBLE);
+        constraintSet.applyTo(this);
     }
 
     public void setICacheLoadListener(ICacheLoadListener iCacheLoadListener) {

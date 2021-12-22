@@ -189,7 +189,7 @@ public class BaseAttribute {
     public float waterMarkingMarginHorizontal = 0;//水印水平margin
     public float waterMarkingMarginVertical = 0;//水印垂直margin
     public Drawable waterMarkingDrawable = null;//水印Drawable
-    public int waterMarkingPosition = PositionType.START | PositionType.TOP;//水印位置
+    public int waterMarkingPosition = PositionType.START | PositionType.BOTTOM;//水印位置
 
     /**
      * 与呼吸灯有关的属性

@@ -158,7 +158,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      */
     public void setQuantization(long minFormatNum, int scale) {
         this.quantizationEntry.reset(minFormatNum, scale);
-        notifyDataSetChanged(ObserverArg.REFRESH);
+        notifyDataSetChanged(ObserverArg.UPDATE);
     }
 
     /**
@@ -263,11 +263,22 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     }
 
     /**
+     * 清空数据
+     */
+    public synchronized void clearData() {
+        stopAnimator();
+        this.chartData.clear();
+        this.dataSize = chartData.size();
+        notifyDataSetChanged(ObserverArg.RESET);
+    }
+
+    /**
      * 重置数据
      */
     public synchronized void resetData(List<T> data) {
         ObserverArg observerArg = buildConfig.isInit() ? ObserverArg.RESET : ObserverArg.INIT;
         if (Utils.listIsEmpty(data)) {
+            stopAnimator();
             this.chartData.clear();
             this.dataSize = chartData.size();
             notifyDataSetChanged(observerArg);
@@ -278,11 +289,12 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     }
 
     /**
-     * 刷新数据
+     * 更新数据
      */
-    public synchronized void refreshData(List<T> data) {
-        ObserverArg observerArg = buildConfig.isInit() ? ObserverArg.REFRESH : ObserverArg.INIT;
+    public synchronized void updateData(List<T> data) {
+        ObserverArg observerArg = buildConfig.isInit() ? ObserverArg.UPDATE : ObserverArg.INIT;
         if (Utils.listIsEmpty(data)) {
+            stopAnimator();
             this.chartData.clear();
             this.dataSize = chartData.size();
             notifyDataSetChanged(observerArg);
@@ -327,7 +339,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
             this.chartData.add(data);
             this.dataSize = chartData.size();
             buildData(buildConfig, chartData);
-            notifyDataSetChanged(ObserverArg.PUSH);
+            notifyDataSetChanged(ObserverArg.UPDATE);
         }
     }
 
@@ -347,11 +359,8 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         if (buildState) {
             this.chartData.set(position, updateData);
             buildData(buildConfig, chartData);
-            notifyDataSetChanged(ObserverArg.PUSH);
-        } else {
-            notifyDataSetChanged(ObserverArg.REFRESH);
         }
-
+        notifyDataSetChanged(ObserverArg.UPDATE);
     }
 
     /**
