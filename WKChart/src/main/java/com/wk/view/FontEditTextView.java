@@ -2,11 +2,11 @@ package com.wk.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.widget.EditText;
 
 import androidx.appcompat.widget.AppCompatEditText;
 
 import com.wk.chart.compat.FontStyle;
-
 
 /**
  * 自定义字体库的EditTextView

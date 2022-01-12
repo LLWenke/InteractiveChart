@@ -289,8 +289,8 @@ public class ChartLayout extends ConstraintLayout {
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : candleRender.getModules().entrySet()) {
             for (AbsModule<AbsEntry> module : item.getValue()) {
                 if (module.isEnable()) {
-                    chartCache.types.add(new ChartCache.TypeEntry(module.getModuleType(),
-                            module.getModuleGroup(), module.getAttachIndexType()));
+                    chartCache.getTypes().put(module.getModuleGroup(), new ChartCache.TypeEntry(
+                            module.getModuleType(), module.getAttachIndexType()));
                     break;
                 }
             }
@@ -305,21 +305,21 @@ public class ChartLayout extends ConstraintLayout {
         if (null == candleRender || null == candleChartView) {
             return;
         }
-        boolean isLoadData = false;
+        boolean isNeedLoadData = false;
         candleRender.getAttribute().currentScale = chartCache.scale;
         candleRender.setFirstLoadPosition(chartCache.beginPosition);
         AbsAdapter<?, ?> adapter = candleRender.getAdapter();
         if (adapter instanceof CandleAdapter) {
             CandleAdapter candleAdapter = (CandleAdapter) adapter;
-            isLoadData = !candleAdapter.isEqualTimeTypeData(chartCache.timeType);
+            isNeedLoadData = candleAdapter.isNeedLoadData(chartCache.timeType);
         }
-        for (ChartCache.TypeEntry entry : chartCache.types) {
-            switchModuleType(entry.getModuleType(), entry.getModuleGroupType());
-            switchIndexType(entry.getIndexType(), entry.getModuleGroupType());
+        for (Map.Entry<Integer, ChartCache.TypeEntry> types : chartCache.getTypes().entrySet()) {
+            switchModuleType(types.getValue().getModuleType(), types.getKey());
+            switchIndexType(types.getValue().getIndexType(), types.getKey());
         }
         this.candleChartView.post(() -> candleChartView.onViewInit());
         if (null != iCacheLoadListener) {
-            this.iCacheLoadListener.onLoadCacheTypes(chartCache.timeType, isLoadData, chartCache.types);
+            this.iCacheLoadListener.onLoadCacheTypes(chartCache.timeType, isNeedLoadData, chartCache.getTypes());
         }
     }
 

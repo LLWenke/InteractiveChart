@@ -3,8 +3,6 @@ package com.wk.chart.adapter;
 import android.os.Handler;
 import android.os.Message;
 
-import androidx.annotation.NonNull;
-
 import com.wk.chart.animator.ChartAnimator;
 import com.wk.chart.compat.DataSetObservable;
 import com.wk.chart.compat.Utils;
@@ -22,6 +20,8 @@ import com.wk.chart.thread.WorkThread;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
+
+import androidx.annotation.NonNull;
 
 public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         implements Handler.Callback, WorkThread.WorkCallBack<BuildData<T, F>>,

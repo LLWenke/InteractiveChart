@@ -1,9 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/recyclerView"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/bg_pop_window"
-    android:overScrollMode="never"
-    android:scrollbars="none" />
+    android:layout_height="wrap_content">
 
+    <View
+        android:id="@+id/top_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:background="@drawable/bg_pop_shadow" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:scrollbars="none"
+        tools:background="@drawable/bg_card_bottom_radius" />
+
+    <View
+        android:id="@+id/bottom_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bg_pop_shadow"
+        android:rotation="180" />
+
+</FrameLayout>

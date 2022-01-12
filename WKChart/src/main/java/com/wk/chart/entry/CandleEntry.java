@@ -3,15 +3,15 @@ package com.wk.chart.entry;
 import android.graphics.Rect;
 import android.util.ArrayMap;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.wk.chart.compat.ValueUtils;
 import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.MarkerPointType;
 
 import java.math.BigDecimal;
 import java.util.Date;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * <p>CandleEntry</p>
@@ -30,6 +30,8 @@ public class CandleEntry extends AbsEntry {
     private final Rect markerPointRect;//标记点位置区域矩形
     private @MarkerPointType
     int markerPointType = MarkerPointType.NORMAL; // 标记点类型
+    private String timeText = ""; // 时间显示文本（正常）
+    private String shortTimeText = ""; // 时间显示文本（简短）
 
     /**
      * 自定义 K 线图用的数据
@@ -169,6 +171,22 @@ public class CandleEntry extends AbsEntry {
 
     public Rect getMarkerPointRect() {
         return markerPointRect;
+    }
+
+    public String getShortTimeText() {
+        return shortTimeText;
+    }
+
+    public void setShortTimeText(String shortTimeText) {
+        this.shortTimeText = null == shortTimeText ? "" : shortTimeText;
+    }
+
+    public String getTimeText() {
+        return timeText;
+    }
+
+    public void setTimeText(String timeText) {
+        this.timeText = null == timeText ? "" : timeText;
     }
 
     @Override

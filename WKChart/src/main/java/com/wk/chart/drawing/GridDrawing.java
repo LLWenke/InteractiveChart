@@ -8,7 +8,6 @@ import android.graphics.Rect;
 import android.text.TextPaint;
 import android.text.TextUtils;
 
-import com.wk.chart.compat.DisplayTypeUtils;
 import com.wk.chart.compat.FontStyle;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.BaseAttribute;
@@ -79,8 +78,7 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
             return;
         }
         point[position * 2] = current + 0.5f;
-        label[position] = DisplayTypeUtils.format(render.getAdapter().getItem(current).getTime(),
-                render.getAdapter().getTimeType());
+        label[position] = render.getAdapter().getItem(current).getShortTimeText();
         position++;
     }
 

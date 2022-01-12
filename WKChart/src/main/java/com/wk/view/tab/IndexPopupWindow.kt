@@ -8,15 +8,17 @@ import android.widget.CompoundButton
 import com.wk.chart.R
 import com.wk.chart.enumeration.IndexType
 import com.wk.chart.enumeration.ModuleGroupType
+import com.wk.view.indexSetting.IndexManager
 import kotlinx.android.synthetic.main.index_tab_layout.view.*
 
 
-class IndexPopupWindow(context: Context, anchor: View, private val chartTabListener: ChartTabListener) : SuperPopWindow(context, anchor), View.OnClickListener {
+class IndexPopupWindow(context: Context, anchor: View, private val chartTabListener: ChartTabListener) : SuperPopWindow(context, anchor),
+        View.OnClickListener {
     private var mMainCheckedView: View? = null
     private var mAuxiliaryCheckedView: View? = null
 
     @SuppressLint("InflateParams")
-    override fun initView(): View {
+    override fun initContentView(): View {
         return LayoutInflater.from(context).inflate(R.layout.index_tab_layout, null)
     }
 
@@ -30,6 +32,7 @@ class IndexPopupWindow(context: Context, anchor: View, private val chartTabListe
         contentView.rb_wr.setOnClickListener(this)
         contentView.iv_auxiliary_index_switch.setOnClickListener(this)
         contentView.tv_index_setting.setOnClickListener(this)
+        contentView.iv_arrow.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
@@ -45,9 +48,16 @@ class IndexPopupWindow(context: Context, anchor: View, private val chartTabListe
                 chartTabListener.onIndexTypeChange(IndexType.BOLL, ModuleGroupType.MAIN)
             }
             R.id.iv_main_index_switch -> {
-                recoveryMainCheckedView()
-                checkedMainView(v)
-                chartTabListener.onIndexTypeChange(IndexType.NONE, ModuleGroupType.MAIN)
+                if (v.isSelected) {
+                    val indexType = IndexManager.getCacheMainIndex(context)
+                    checkedDefaultIndexType(indexType, ModuleGroupType.MAIN)
+                    chartTabListener.onIndexTypeChange(indexType, ModuleGroupType.MAIN)
+                } else {
+                    IndexManager.cacheMainIndex(context, getCheckedIndexType(mMainCheckedView))
+                    recoveryMainCheckedView()
+                    checkedMainView(v)
+                    chartTabListener.onIndexTypeChange(IndexType.NONE, ModuleGroupType.MAIN)
+                }
             }
             R.id.rb_macd -> {
                 recoveryAuxiliaryCheckedView()
@@ -70,10 +80,18 @@ class IndexPopupWindow(context: Context, anchor: View, private val chartTabListe
                 chartTabListener.onIndexTypeChange(IndexType.WR, ModuleGroupType.INDEX)
             }
             R.id.iv_auxiliary_index_switch -> {
-                recoveryAuxiliaryCheckedView()
-                checkedAuxiliaryView(v)
-                chartTabListener.onIndexTypeChange(IndexType.NONE, ModuleGroupType.INDEX)
+                if (v.isSelected) {
+                    val indexType = IndexManager.getCacheAuxiliaryIndex(context)
+                    checkedDefaultIndexType(indexType, ModuleGroupType.INDEX)
+                    chartTabListener.onIndexTypeChange(indexType, ModuleGroupType.INDEX)
+                } else {
+                    IndexManager.cacheAuxiliaryIndex(context, getCheckedIndexType(mAuxiliaryCheckedView))
+                    recoveryAuxiliaryCheckedView()
+                    checkedAuxiliaryView(v)
+                    chartTabListener.onIndexTypeChange(IndexType.NONE, ModuleGroupType.INDEX)
+                }
             }
+            R.id.iv_arrow,
             R.id.tv_index_setting -> {
                 chartTabListener.onSetting()
             }
@@ -156,6 +174,24 @@ class IndexPopupWindow(context: Context, anchor: View, private val chartTabListe
                     checkedAuxiliaryView(contentView.iv_auxiliary_index_switch)
                 }
             }
+        }
+    }
+
+    /**
+     * 获取选中的指标类型
+     */
+    private fun getCheckedIndexType(checkedView: View?): Int {
+        return when (checkedView?.id) {
+            R.id.rb_ma -> IndexType.CANDLE_MA
+            R.id.rb_boll -> IndexType.BOLL
+            R.id.rb_macd -> IndexType.MACD
+            R.id.rb_kdj -> IndexType.KDJ
+            R.id.rb_rsi -> IndexType.RSI
+            R.id.rb_wr -> IndexType.WR
+            R.id.iv_main_index_switch,
+            R.id.iv_auxiliary_index_switch,
+            -> IndexType.NONE
+            else -> IndexType.NONE
         }
     }
 }

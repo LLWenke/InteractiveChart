@@ -1,7 +1,5 @@
 package com.wk.chart.adapter;
 
-import androidx.annotation.NonNull;
-
 import com.wk.chart.compat.DateUtil;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.ValueUtils;
@@ -16,10 +14,13 @@ import com.wk.chart.enumeration.TimeType;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
 
     private CalculationCache calculationCache = new CalculationCache();//计算结果缓存类
-    private TimeType timeType = TimeType.oneHour;//显示模式
+    private TimeType timeType = null;//显示模式
 
     public CandleAdapter() {
         this(new IndexBuildConfig());
@@ -38,17 +39,18 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
     /**
      * 获取时间类型
      */
-    public TimeType getTimeType() {
+    public @Nullable
+    TimeType getTimeType() {
         return timeType;
     }
 
     /**
-     * 是否为相同时间类型的数据
+     * 是否需要加载数据
      *
-     * @return true 相同时间类型  false 不同时间类型
+     * @return true 需要  false 不需要
      */
-    public boolean isEqualTimeTypeData(TimeType timeType) {
-        return this.timeType == timeType && getCount() > 0;
+    public boolean isNeedLoadData(@Nullable TimeType timeType) {
+        return null == this.timeType || this.timeType != timeType || getCount() <= 0;
     }
 
     /**
@@ -109,6 +111,9 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
      */
     @Override
     public synchronized void addHeaderData(List<CandleEntry> data) {
+        if (null == timeType) {
+            return;
+        }
         if (!Utils.listIsEmpty(data)) {
             stopAnimator();
             this.calculationCache.init();
@@ -121,6 +126,9 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
      */
     @Override
     public synchronized void addFooterData(List<CandleEntry> data) {
+        if (null == timeType) {
+            return;
+        }
         if (!Utils.listIsEmpty(data)) {
             stopAnimator();
             this.calculationCache.init();
@@ -132,7 +140,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
      * 数据推送
      */
     public PushType dataPush(CandleEntry data) {
-        if (null == data) {
+        if (null == data || null == timeType) {
             return PushType.INVALID;
         }
         if (getCount() == 0) {
@@ -158,6 +166,9 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
 
     @Override
     public void changeItem(int position, CandleEntry data) {
+        if (null == timeType) {
+            return;
+        }
         CandleEntry entry = getItem(position);
         if (null == entry) {
             return;
@@ -175,7 +186,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         //    getInstance()));
         //Log.e("endDate:", DisplayTypeUtils.selectorFormat(endDate,
         //    getInstance()));
-        if (diff < 0) {
+        if (null == timeType || diff < 0) {
             return PushType.INVALID;
         } else if (diff < timeType.value()) {
             return PushType.UPDATE;//修改
@@ -190,10 +201,13 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
      * 获取时间间隔
      */
     private long getDateDiff(Date startDate, Date endDate) {
-        if (timeType == TimeType.month) {//月
+        if (null == timeType) {
+            return -1;
+        } else if (timeType == TimeType.month) {//月
             return DateUtil.getMonthDiff(startDate, endDate);
+        } else {
+            return DateUtil.getDateDiff(startDate, endDate, timeType.msec());
         }
-        return DateUtil.getDateDiff(startDate, endDate, timeType.msec());
     }
 
     /**
@@ -208,7 +222,21 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         computeBOLL(data, buildConfig);
         computeRSI(data, buildConfig);
         computeKDJ(data, buildConfig);
-        calculateWR(data, buildConfig);
+        computeWR(data, buildConfig);
+        buildTimeText(data);
+    }
+
+    /**
+     * 构建时间显示文字
+     */
+    private void buildTimeText(@NonNull List<CandleEntry> data) {
+        for (int i = calculationCache.index, z = data.size(); i < z; i++) {
+            if (null == timeType) break;
+            CandleEntry entry = data.get(i);
+            entry.setShortTimeText(DateUtil.formatDateToString(entry.getTime(), timeType.pattern()));
+            entry.setTimeText(DateUtil.formatDateToString(entry.getTime(), timeType == TimeType.day
+                    ? DateUtil.DATE_FORMAT_YMD : DateUtil.DATE_FORMAT_YMDHM));
+        }
     }
 
     /**
@@ -499,7 +527,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
     /**
      * 计算 WR
      */
-    private void calculateWR(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig) {
+    private void computeWR(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig) {
         IndexConfigEntry indicatorTag = indicatorConfig.getIndexTags(IndexType.WR);
         int indicatorCount = null == indicatorTag ? 0 : indicatorTag.getFlagEntries().length;
         for (int i = calculationCache.index, z = data.size(); i < z; i++) {

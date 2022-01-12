@@ -7,17 +7,13 @@ import android.graphics.Canvas;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.RectF;
-import android.util.Log;
 
-import com.wk.chart.compat.DisplayTypeUtils;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.enumeration.HighLightStyle;
 import com.wk.chart.enumeration.ModuleType;
-import com.wk.chart.enumeration.PositionType;
 import com.wk.chart.marker.AbsMarker;
 import com.wk.chart.marker.AxisTextMarker;
 import com.wk.chart.module.FloatModule;
@@ -127,7 +123,7 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatModule> {
             default:
                 return;
         }
-        markerText[1] = DisplayTypeUtils.selectorFormat(entry.getTime(), render.getAdapter().getTimeType());
+        markerText[1] = entry.getTimeText();
         highlightPoint[0] = render.getHighlightPoint()[0];
         //标签位置区域计算
         for (AbsMarker<AbsRender<?, ?>> markerView : markerViewList) {
