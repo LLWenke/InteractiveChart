@@ -158,10 +158,10 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
             R.id.rb_2,
             R.id.rb_3,
             R.id.rb_4 -> {
-                v.tag?.let {
+                v.tag?.toString()?.toIntOrNull()?.let {
                     tabRecovery()
                     tabMoreRecovery()
-                    tabChecked(it as Int)?.let { bean ->
+                    tabChecked(it)?.let { bean ->
                         onTimeTypeChange(bean.tabValue, bean.moduleType)
                     }
                 }
@@ -267,7 +267,6 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
         mIndexPopupWindow?.dismiss()
         mChartTabListener?.onSetting()
     }
-
 
     fun checkedDefaultTimeType(type: TimeType, @ModuleType moduleType: Int): TabTimeBean? {
         getCheckedPosition(type, moduleType)?.let {

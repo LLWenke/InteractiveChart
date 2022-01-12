@@ -35,7 +35,7 @@ class IndexSettingActivity : AppCompatActivity(), IndexManager.IndexConfigChange
     private fun initData() {
         IndexManager.getIndexConfigs(this)?.let {
             lv_loading.visibility = View.VISIBLE
-            GlobalScope.launch {
+            MainScope().launch {
                 val data = async(context = Dispatchers.IO) {
                     buildData(it)
                 }

@@ -7,10 +7,7 @@ import android.graphics.Paint;
 import android.os.Build;
 import android.text.TextPaint;
 
-import androidx.annotation.RequiresApi;
-
 import com.wk.chart.R;
-import com.wk.chart.compat.DisplayTypeUtils;
 import com.wk.chart.compat.FontStyle;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
@@ -19,6 +16,8 @@ import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.SelectorItemEntry;
 import com.wk.chart.module.FloatModule;
 import com.wk.chart.render.CandleRender;
+
+import androidx.annotation.RequiresApi;
 
 /**
  * <p>CandleSelectorDrawing</p>
@@ -154,10 +153,9 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         CandleEntry entry = render.getAdapter().getItem(render.getAdapter().getHighlightIndex());
         //时间
         selectorInfo[0]
-                .setLabel(attribute.context.getString(R.string.wk_time))
+                .setLabel(attribute.context.getString(R.string.wk_time_value))
                 .setLabelPaint(labelPaint)
-                .setValue(DisplayTypeUtils.selectorFormat(entry.getTime(),
-                        render.getAdapter().getTimeType()))
+                .setValue(entry.getTimeText())
                 .setValuePaint(valuePaint);
         //开
         selectorInfo[1]
@@ -167,13 +165,13 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
                 .setValuePaint(valuePaint);
         //高
         selectorInfo[2]
-                .setLabel(attribute.context.getString(R.string.ct_high))
+                .setLabel(attribute.context.getString(R.string.wk_high))
                 .setLabelPaint(labelPaint)
                 .setValue(render.getAdapter().rateConversion(entry.getHigh(), false, false))
                 .setValuePaint(valuePaint);
         //低
         selectorInfo[3]
-                .setLabel(attribute.context.getString(R.string.ct_low))
+                .setLabel(attribute.context.getString(R.string.wk_low))
                 .setLabelPaint(labelPaint)
                 .setValue(render.getAdapter().rateConversion(entry.getLow(), false, false))
                 .setValuePaint(valuePaint);

@@ -1,7 +1,6 @@
 package com.wk.view.indexSetting
 
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.chad.library.adapter.base.entity.node.BaseNode
@@ -33,8 +32,8 @@ class IndexChildProvider : BaseNodeProvider() {
         helper.setText(R.id.tv_index_label, entity.name)
         input.setText(if (0 == entity.flag) null else entity.flag.toString())
         if (entity.color == 0) {
-            helper.getView<View>(R.id.v_index_background).backgroundTintList =ColorStateList.valueOf(Color.parseColor("#6a879d"))
-            input.setTextColor(Color.parseColor("#FFFFFF"))
+            helper.getView<View>(R.id.v_index_background).backgroundTintList = ContextCompat.getColorStateList(context, R.color.colorTextAuxiliary)
+            input.setTextColor(ContextCompat.getColor(context, R.color.colorTextImportant))
         } else {
             helper.getView<View>(R.id.v_index_background).backgroundTintList = ColorStateList.valueOf(entity.color)
             input.setTextColor(entity.color)

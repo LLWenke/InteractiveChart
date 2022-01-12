@@ -17,7 +17,7 @@ class MorePopupWindow(context: Context, anchor: View, private val mData: ArrayLi
     private var mAdapter: MoreTabAdapter? = null
 
     @SuppressLint("InflateParams")
-    override fun initView(): View {
+    override fun initContentView(): View {
         return LayoutInflater.from(context).inflate(R.layout.more_tab_layout, null).also {
             it.recyclerView.layoutManager = GridLayoutManager(context, 5)
             mRecyclerView = it.recyclerView
@@ -41,5 +41,16 @@ class MorePopupWindow(context: Context, anchor: View, private val mData: ArrayLi
 
     fun recoveryItem() {
         mAdapter?.itemRecovery()
+    }
+
+    override fun show(align: Int): Boolean {
+        if (align == TOP) {
+            contentView.top_shadow.visibility = View.INVISIBLE
+            contentView.bottom_shadow.visibility = View.VISIBLE
+        } else {
+            contentView.top_shadow.visibility = View.VISIBLE
+            contentView.bottom_shadow.visibility = View.INVISIBLE
+        }
+        return super.show(align)
     }
 }

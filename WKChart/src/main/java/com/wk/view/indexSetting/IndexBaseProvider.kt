@@ -2,6 +2,7 @@ package com.wk.view.indexSetting
 
 import android.text.TextUtils
 import android.view.View
+import android.widget.ImageView
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -25,7 +26,7 @@ class IndexBaseProvider : BaseNodeProvider() {
         get() = R.layout.item_index_base
 
     fun getNext(position: Int): IndexBaseNode? {
-        val node = getAdapter()!!.getItemOrNull(position + 1) ?: return null
+        val node = getAdapter()?.getItemOrNull(position + 1) ?: return null
         return if (node is IndexBaseNode) {
             node
         } else null
@@ -72,10 +73,14 @@ class IndexBaseProvider : BaseNodeProvider() {
             val count = it.expandOrCollapse(position)
             if (data is IndexBaseNode) {
                 if (data.isExpanded) {
-                    val footerPosition = position + count + 1
-                    it.data.add(footerPosition, data.footerNode!!)
-                    it.notifyItemInserted(footerPosition)
+                    helper.getView<ImageView>(R.id.iv_index_item_cion).isSelected = true
+                    data.footerNode?.let { footer ->
+                        val footerPosition = position + count + 1
+                        it.data.add(footerPosition, footer)
+                        it.notifyItemInserted(footerPosition)
+                    }
                 } else {
+                    helper.getView<ImageView>(R.id.iv_index_item_cion).isSelected = false
                     val footerPosition = position + 1
                     it.data.removeAt(footerPosition)
                     it.notifyItemRemoved(footerPosition)

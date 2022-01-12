@@ -92,10 +92,14 @@ public class ValueUtils {
             if (stripTrailingZeros) {
                 Integer deleteIndex = null;
                 for (int i = text.length() - 1; i > 0; i--) {
-                    if ('0' != text.charAt(i)) {
+                    if ('0' == text.charAt(i)) {
+                        deleteIndex = i;
+                    } else if ('.' == text.charAt(i)) {
+                        deleteIndex = i;
+                        break;
+                    } else {
                         break;
                     }
-                    deleteIndex = i;
                 }
                 if (null != deleteIndex) {
                     text.delete(deleteIndex, text.length());

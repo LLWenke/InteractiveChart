@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.wk.chart.R
 import com.wk.chart.enumeration.IndexType
 import com.wk.chart.enumeration.ModuleGroupType
+import com.wk.view.indexSetting.IndexManager
 import kotlinx.android.synthetic.main.view_index_layout.view.*
 
 
@@ -66,6 +67,7 @@ class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
     }
 
     private fun toggleMainCheckedView(view: View, @IndexType indexType: Int) {
+        IndexManager.cacheMainIndex(context, indexType)
         if (view == mMainCheckedView) {
             recoveryMainCheckedView()
         } else {
@@ -77,6 +79,7 @@ class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
     }
 
     private fun toggleAuxiliaryCheckedView(view: View, @IndexType indexType: Int) {
+        IndexManager.cacheAuxiliaryIndex(context, indexType)
         if (view == mAuxiliaryCheckedView) {
             recoveryAuxiliaryCheckedView()
         } else {

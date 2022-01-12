@@ -1,13 +1,13 @@
 package com.wk.chart.adapter;
 
-import androidx.annotation.NonNull;
-
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.config.NormalBuildConfig;
 import com.wk.chart.entry.DepthEntry;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 public class DepthAdapter extends AbsAdapter<DepthEntry, NormalBuildConfig> {
     public final static int BID = 0;//买单类型
@@ -21,7 +21,7 @@ public class DepthAdapter extends AbsAdapter<DepthEntry, NormalBuildConfig> {
     @Override
     void buildData(@NonNull NormalBuildConfig buildConfig, @NonNull List<DepthEntry> data) {
         buildConfig.setInit(true);
-        calculationData(data);
+        computeData(data);
     }
 
     /**
@@ -34,7 +34,7 @@ public class DepthAdapter extends AbsAdapter<DepthEntry, NormalBuildConfig> {
     /**
      * 数据计算
      */
-    private void calculationData(List<DepthEntry> data) {
+    private void computeData(List<DepthEntry> data) {
         if (Utils.listIsEmpty(data)) {
             return;
         }

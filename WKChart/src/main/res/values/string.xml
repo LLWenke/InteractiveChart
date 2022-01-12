@@ -52,4 +52,6 @@
     <string name="wk_rsi_tips">RSI指标是比较价格升降运动以表达价格强度的技术分析工具，是根据一定时期内上涨和下跌幅度之和的比率制作出的一种技术曲线。</string>
     <string name="wk_wr_tips">WR指标是一个震荡指标，是以价格的摆动点来度量是否处于超买或超卖现象，分析多空双方力量的对比，从而提出有效的信号来判断市场中短期行为的走势。</string>
     <string name="wk_reset">重置</string>
+    <string name="reset">重置</string>
+    <string name="ct_introduction">简介</string>
 </resources>

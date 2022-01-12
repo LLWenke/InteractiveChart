@@ -1,7 +1,6 @@
 package com.wk.view.indexSetting
 
 import android.content.Context
-import android.provider.Settings.Global.getString
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.wk.chart.compat.config.IndexBuildConfig
@@ -15,6 +14,8 @@ import kotlin.collections.ArrayList
 
 
 object IndexManager {
+    private const val KEY_MAIN_INDEX = "main_chart_index"
+    private const val KEY_AUXILIARY_INDEX = "auxiliary_chart_index"
     private const val KEY_CHART_INDEX_CONFIG = "chart_index_config"
     private var mDefaultIndexConfigs: LinkedHashMap<Int, IndexConfigEntry>? = null
     private var mIndexConfigs: LinkedHashMap<Int, IndexConfigEntry>? = null
@@ -29,7 +30,7 @@ object IndexManager {
         mIndexConfigs?.let {
             return it
         }
-        Preferences.getString(context,KEY_CHART_INDEX_CONFIG, null)?.let {
+        Preferences.getString(context, KEY_CHART_INDEX_CONFIG, null)?.let {
             GlobalScope.launch {
                 val data = async(context = Dispatchers.IO) {
                     val typeT = object : TypeToken<LinkedHashMap<Int, IndexConfigEntry>>() {}.type
@@ -52,7 +53,7 @@ object IndexManager {
         return getIndexConfigs(indexType)
     }
 
-    fun updateIndexConfigs(context: Context,updateIndexConfigData: List<IndexBaseNode>) {
+    fun updateIndexConfigs(context: Context, updateIndexConfigData: List<IndexBaseNode>) {
         mIndexConfigs?.let {
             GlobalScope.launch(context = Dispatchers.IO) {
                 for (item in updateIndexConfigData) {
@@ -86,7 +87,7 @@ object IndexManager {
                     mGson.toJson(it)
                 }
                 withContext(context = Dispatchers.Main) {
-                    Preferences.saveString(context,KEY_CHART_INDEX_CONFIG, json.await())
+                    Preferences.saveString(context, KEY_CHART_INDEX_CONFIG, json.await())
                 }
             }
         }
@@ -129,6 +130,34 @@ object IndexManager {
                 break
             }
         }
+    }
+
+    /**
+     * 缓存主图指标
+     */
+    fun cacheMainIndex(context: Context, @IndexType indexType: Int) {
+        Preferences.saveInt(context, KEY_MAIN_INDEX, indexType)
+    }
+
+    /**
+     * 缓存副图指标
+     */
+    fun cacheAuxiliaryIndex(context: Context, @IndexType indexType: Int) {
+        Preferences.saveInt(context, KEY_AUXILIARY_INDEX, indexType)
+    }
+
+    /**
+     * 获取缓存的主图指标
+     */
+    fun getCacheMainIndex(context: Context): Int {
+        return Preferences.getInt(context, KEY_MAIN_INDEX, IndexType.NONE)
+    }
+
+    /**
+     * 获取缓存的副图指标
+     */
+    fun getCacheAuxiliaryIndex(context: Context): Int {
+        return Preferences.getInt(context, KEY_AUXILIARY_INDEX, IndexType.NONE)
     }
 
     interface IndexConfigChangeListener {

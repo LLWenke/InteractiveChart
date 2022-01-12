@@ -4,8 +4,13 @@
     <color name="tab_text_checked">#00efff</color>
     <color name="tab_text_unchecked">#365873</color>
     <color name="tab_background">#092234</color>
-
-
+    <color name="colorTextImportant">#D6E6F8</color>
+    <color name="colorBackgroundLayout">#091F30</color>
+    <color name="colorBackgroundWindow">#061520</color>
+    <color name="colorTextAuxiliary">#996A879D</color>
+    <color name="colorDividerLine2">#0DFFFFFF</color>
+    <color name="colorPrimaryAccent">#00E6FF</color>
+    <color name="colorText">#6A879D</color>
     <color name="white">#ffffff</color>
 
 </resources>

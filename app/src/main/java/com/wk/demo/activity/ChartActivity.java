@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintSet;
 
@@ -38,7 +39,9 @@ import com.wk.view.tab.ChartTabLayout;
 import com.wk.view.tab.ChartTabListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -138,7 +141,9 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void startPush() {
-        EventBus.getDefault().register(this);
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
         Intent startIntent = new Intent(this, PushService.class);
         CandleEntry lastEntry = candleAdapter.getItem(candleAdapter.getLastPosition());
         startIntent.putExtra("scale", candleAdapter.getScale());
@@ -359,19 +364,20 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    public void onLoadCacheTypes(TimeType timeType, boolean isLoadData, List<com.wk.chart.entry.ChartCache.TypeEntry> types) {
+    public void onLoadCacheTypes(@Nullable TimeType timeType, boolean isNeedLoadData, HashMap<Integer, ChartCache.TypeEntry> typeMap) {
         int mainModuleType = ModuleType.CANDLE;
-        for (ChartCache.TypeEntry entry : types) {
-            if (entry.getModuleGroupType() == ModuleGroupType.MAIN) {
-                mainModuleType = entry.getModuleType();
+        for (Map.Entry<Integer, ChartCache.TypeEntry> types : typeMap.entrySet()) {
+            if (types.getKey() == ModuleGroupType.MAIN) {
+                mainModuleType = types.getValue().getModuleType();
             }
-            chartTabLayout.checkedDefaultIndexType(entry.getIndexType(), entry.getModuleGroupType());
+            chartTabLayout.checkedDefaultIndexType(types.getValue().getIndexType(), types.getKey());
             if (null != chartIndexTabLayout) {
-                chartIndexTabLayout.checkedDefaultIndexType(entry.getIndexType(), entry.getModuleGroupType());
+                chartIndexTabLayout.checkedDefaultIndexType(types.getValue().getIndexType(), types.getKey());
             }
         }
+        timeType = null == timeType ? TimeType.fifteenMinute : timeType;
         chartTabLayout.checkedDefaultTimeType(timeType, mainModuleType);
-        if (isLoadData) {
+        if (isNeedLoadData) {
             onTimeTypeChange(timeType, mainModuleType);
         }
     }
@@ -410,5 +416,4 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     private Boolean isLand() {
         return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
-
 }

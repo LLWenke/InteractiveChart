@@ -100,11 +100,7 @@ class MoreTabAdapter(private val chartTabListener: ChartTabListener?) : Recycler
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         recyclerView.setHasFixedSize(true)
-        if (null == recyclerView.itemAnimator) {
-            return
-        }
-        recyclerView.itemAnimator?.changeDuration = 0
-        (recyclerView.itemAnimator as SimpleItemAnimator?)?.supportsChangeAnimations = false
+        recyclerView.itemAnimator = null
     }
 
     inner class MoreTabHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
