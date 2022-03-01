@@ -116,7 +116,7 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, FloatModule> {
             case ModuleType.MUTATION:  // 指标
                 highlightPoint[1] = render.getHighlightPoint()[1];
                 render.invertMapPoints(chartModule.getMatrix(), highlightPoint);
-                markerText[0] = render.getAdapter().rateConversion(highlightPoint[1], entry.getScale().getQuoteScale(), false, false);
+                markerText[0] = render.getAdapter().rateConversion(highlightPoint[1], render.getAdapter().getScale().getQuoteScale(), false, false);
                 highlightPoint[1] = render.getHighlightPoint()[1];
                 isReverseMarker = true;
                 break;

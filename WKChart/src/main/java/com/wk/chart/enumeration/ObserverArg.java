@@ -16,7 +16,7 @@ public enum ObserverArg {
 
     ATTR_UPDATE(5),//配置属性更新
 
-    RATE_UPDATE(6);//比率更新
+    FORMAT_UPDATE(6);//格式更新
 
     ObserverArg(int nativeInt) {
         this.nativeInt = nativeInt;

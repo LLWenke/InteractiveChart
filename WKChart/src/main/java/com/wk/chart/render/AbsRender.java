@@ -752,9 +752,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         final float scaleX = adapter.getCount() / visibleCount;
         matrixTouch.reset();
         matrixTouch.postScale(scaleX, 1);
-        if (maxScrollOffset != 0) {
-            lastMaxScrollOffset = maxScrollOffset;
-        }
+        lastMaxScrollOffset = maxScrollOffset == 0 ? lastMaxScrollOffset : maxScrollOffset;
         computeScrollRange(width, scaleX);
         if (touchValues[Matrix.MTRANS_X] > 0) {
             // 左滑加载完成之后定位到之前滚动的位置
@@ -769,7 +767,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
             matrixTouch.postTranslate(touchValues[Matrix.MTRANS_X], 0);
 //            Log.e(TAG, "##d postMatrixTouch: currentOffset = " + touchValues[Matrix.MTRANS_X]
 //                    + ", rightScrollOffset = " + attribute.rightScrollOffset);
-        } else if (firstLoad) {
+        } else if (firstLoad && maxScrollOffset != 0) {
             this.firstLoad = false;
             float firstScrollOffset;
             if (firstLoadPosition < 0) { // 通常首次加载时定位到最末尾
@@ -778,6 +776,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
                 firstScrollOffset = getTransX(rect, attribute.visibleCount, firstLoadPosition) - 1f;
             }
             setCurrentTransX(firstScrollOffset);
+//            Log.e(TAG, "firstScrollOffset= " + firstScrollOffset + "   firstLoadPosition= " + firstLoadPosition);
         }
         //Log.e(TAG, "##d postMatrixTouch: currentOffset = " + touchValues[Matrix.MTRANS_X]
         //    + ", maxScrollOffset = " + -maxScrollOffset

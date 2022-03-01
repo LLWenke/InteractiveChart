@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.loadingTips.setVisibility(View.VISIBLE);
         this.realTimeDataBtn.setEnabled(false);
         this.historicalDataBtn.setEnabled(false);
-        DataUtils.loadData(new ScaleEntry(4, 4), this);
+        DataUtils.loadData(this);
     }
 
     @Override

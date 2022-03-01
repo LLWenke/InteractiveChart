@@ -1,5 +1,7 @@
 package com.wk.chart.entry;
 
+import androidx.annotation.Nullable;
+
 import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.ModuleGroupType;
 import com.wk.chart.enumeration.ModuleType;
@@ -9,8 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.HashMap;
-
-import androidx.annotation.Nullable;
 
 public class ChartCache implements Serializable {
     public @Nullable
@@ -23,7 +23,8 @@ public class ChartCache implements Serializable {
         this.types = new HashMap<>();
     }
 
-    public HashMap<Integer, TypeEntry> getTypes() {
+    public @NotNull
+    HashMap<Integer, TypeEntry> getTypes() {
         return types;
     }
 

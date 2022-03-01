@@ -276,7 +276,7 @@ public class ChartLayout extends ConstraintLayout {
      */
     public @Nullable
     ChartCache chartCache() {
-        if (null == candleRender) {
+        if (null == candleRender || null == candleChartView) {
             return null;
         }
         ChartCache chartCache = new ChartCache();
