@@ -34,15 +34,15 @@ public class DataUtils {
     public static List<DepthEntry> depthEntries;
 
     @SuppressLint("StaticFieldLeak")
-    public static void loadData(ScaleEntry scaleEntry, LoadingListener listener) {
+    public static void loadData(LoadingListener listener) {
         task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 if (Utils.listIsEmpty(candleEntries)) {
-                    candleEntries = DataUtils.getCandelData(scaleEntry);
+                    candleEntries = DataUtils.getCandelData();
                 }
                 if (Utils.listIsEmpty(depthEntries)) {
-                    depthEntries = DataUtils.getDepthData(scaleEntry);
+                    depthEntries = DataUtils.getDepthData();
                 }
                 return null;
             }
@@ -54,7 +54,7 @@ public class DataUtils {
         }.execute();
     }
 
-    private static List<CandleEntry> getCandelData(ScaleEntry scaleEntry) {
+    private static List<CandleEntry> getCandelData() {
         String kLineData;
         List<CandleEntry> dataList = new ArrayList<>();
         try {
@@ -67,15 +67,7 @@ public class DataUtils {
 
             for (String candleData : candleDatas) {
                 String[] v = candleData.split("[|]");
-
-                double open = Double.parseDouble(v[0]);
-                double high = Double.parseDouble(v[1]);
-                double low = Double.parseDouble(v[2]);
-                double close = Double.parseDouble(v[3]);
-                double volume = Double.parseDouble(v[4]);
-
-                dataList.add(
-                        new CandleEntry(scaleEntry, open, high, low, close, volume, new Date(Date.parse(v[5]))));
+                dataList.add(new CandleEntry(v[0], v[1], v[2], v[3], v[4], new Date(Date.parse(v[5]))));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,7 +78,7 @@ public class DataUtils {
         return dataList;
     }
 
-    private static List<DepthEntry> getDepthData(ScaleEntry scaleEntry) {
+    private static List<DepthEntry> getDepthData() {
         try {
             InputStream in = MyApp.context.getResources().getAssets().open("depth_data.json");
             int length = in.available();
@@ -107,15 +99,17 @@ public class DataUtils {
             for (int i = 0; i < data.getBids().size(); i++) {
                 DepthWrapper.Depth item = data.getBids().get(i);
                 totalAmount = totalAmount.add(item.getAmount());
-                depthData.add(new DepthEntry(scaleEntry,
-                        item.getPrice(), item.getAmount(), totalAmount, DepthAdapter.BID, null));
+                depthData.add(new DepthEntry(
+                        item.getPrice().toPlainString(), item.getAmount().toPlainString(),
+                        totalAmount.toPlainString(), DepthAdapter.BID, null));
             }
             totalAmount = BigDecimal.ZERO;
             for (int i = 0; i < data.getAsks().size(); i++) {
                 DepthWrapper.Depth item = data.getAsks().get(i);
                 totalAmount = totalAmount.add(item.getAmount());
-                depthData.add(new DepthEntry(scaleEntry,
-                        item.getPrice(), item.getAmount(), totalAmount, DepthAdapter.ASK, null));
+                depthData.add(new DepthEntry(
+                        item.getPrice().toPlainString(), item.getAmount().toPlainString(),
+                        totalAmount.toPlainString(), DepthAdapter.ASK, null));
             }
             return depthData;
         } catch (Exception e) {

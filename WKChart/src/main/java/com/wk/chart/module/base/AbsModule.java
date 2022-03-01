@@ -74,9 +74,9 @@ public abstract class AbsModule<T extends AbsEntry> {
         this.moduleType = moduleType;
         this.moduleGroup = moduleGroupType;
         this.attachIndexType = IndexType.NONE;
-        this.maxEntry = new ValueEntry(0);
-        this.minEntry = new ValueEntry(0);
-        this.zeroEntry = new ValueEntry(0);
+        this.maxEntry = new ValueEntry();
+        this.minEntry = new ValueEntry();
+        this.zeroEntry = new ValueEntry();
         this.maxEntry.result = -Long.MAX_VALUE;
         this.minEntry.result = Long.MAX_VALUE;
         this.drawingMargin = new float[4];

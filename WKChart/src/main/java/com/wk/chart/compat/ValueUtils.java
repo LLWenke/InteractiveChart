@@ -6,6 +6,8 @@ import com.wk.chart.entry.QuantizationEntry;
 import com.wk.chart.entry.RateEntry;
 import com.wk.chart.entry.ValueEntry;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigDecimal;
 
 public class ValueUtils {
@@ -33,34 +35,46 @@ public class ValueUtils {
     }
 
     /**
-     * 构建ValueEntry
+     * 构建精度值
      *
-     * @param result 传入的value值
-     * @param scale  精度
-     * @return 返回构建后的ValueEntry
+     * @param entry 源数据
+     * @param scale 精度
      */
-    public static ValueEntry buildEntry(BigDecimal result, int scale) {
-        ValueEntry value = new ValueEntry(scale);
-        result = result.setScale(scale, BigDecimal.ROUND_DOWN);
-        value.text = result.toPlainString();
-        value.value = result.floatValue();
-        value.result = result.unscaledValue().longValue();
-        return value;
+    public static void buildScaleValue(@NotNull ValueEntry entry, int scale) {
+        BigDecimal decimal = bigDecimal(entry.source);
+        decimal = decimal.setScale(scale, BigDecimal.ROUND_DOWN);
+        entry.scale = scale;
+        entry.text = decimal.toPlainString();
+        entry.value = decimal.floatValue();
+        entry.result = decimal.unscaledValue().longValue();
     }
 
     /**
-     * 构建ValueEntry
+     * 构建精度值
      *
-     * @param result 传入的result值
+     * @param entry  源数据
+     * @param result 整数值
      * @param scale  精度
-     * @return 返回构建后的ValueEntry
      */
-    public static ValueEntry buildEntry(long result, int scale) {
-        ValueEntry value = new ValueEntry(scale);
-        value.value = (float) buildValue(result, scale);
-        value.text = buildText(result, scale, false);
-        value.result = result;
-        return value;
+    public static void buildScaleValue(@NotNull ValueEntry entry, long result, int scale) {
+        entry.scale = scale;
+        entry.text = buildText(result, scale, false);
+        entry.value = (float) buildValue(result, scale);
+        entry.result = result;
+        entry.source = entry.text;
+    }
+
+    /**
+     * 构建精度值
+     *
+     * @param result 整数值
+     * @param scale  精度
+     * @return 精度值实例
+     */
+    public static ValueEntry buildScaleValue(long result, int scale) {
+        ValueEntry entry = new ValueEntry();
+        buildScaleValue(entry, result, scale);
+        return entry;
     }
 
     /**
@@ -182,6 +196,18 @@ public class ValueUtils {
         }
         //生成格式化后的字符串
         return sign.concat(buildText(result, valueScale, stripTrailingZeros)).concat(unit);
+    }
+
+    /**
+     * 字符串转BigDecimal
+     */
+    public static BigDecimal bigDecimal(String value) {
+        try {
+            return new BigDecimal(value);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return BigDecimal.ZERO;
+        }
     }
 
     /**

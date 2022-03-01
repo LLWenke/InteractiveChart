@@ -1,5 +1,8 @@
 package com.wk.chart.adapter;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.wk.chart.compat.DateUtil;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.ValueUtils;
@@ -13,9 +16,6 @@ import com.wk.chart.enumeration.TimeType;
 
 import java.util.Date;
 import java.util.List;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
 
@@ -76,6 +76,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
     @Override
     public void setBuildConfig(IndexBuildConfig buildConfig) {
         stopAnimator();
+        stopAsyTask();
         this.calculationCache.init();
         super.setBuildConfig(buildConfig);
     }
@@ -97,6 +98,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
             return;
         }
         stopAnimator();
+        stopAsyTask();
         this.calculationCache.init();
         if (type == timeType) {
             super.updateData(data);
@@ -116,6 +118,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         }
         if (!Utils.listIsEmpty(data)) {
             stopAnimator();
+            stopAsyTask();
             this.calculationCache.init();
         }
         super.addHeaderData(data);
@@ -131,6 +134,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         }
         if (!Utils.listIsEmpty(data)) {
             stopAnimator();
+            stopAsyTask();
             this.calculationCache.init();
         }
         super.addFooterData(data);
@@ -148,14 +152,14 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
             return PushType.ADD;
         }
         Date endDate = data.getTime();
-        if (isWorking() || null == endDate) {
+        if (null == endDate) {
             return PushType.INVALID;
         }
-        this.calculationCache.index = getCount() - 1;
+        this.calculationCache.index = getLastPosition();
         PushType pushType = getPushType(endDate);
         switch (pushType) {
             case UPDATE://修改
-                changeItem(getCount() - 1, data);
+                changeItem(getLastPosition(), data);
                 break;
             case ADD://添加
                 addFooterData(data);
@@ -216,6 +220,9 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
     @Override
     void buildData(@NonNull IndexBuildConfig buildConfig, @NonNull List<CandleEntry> data) {
         buildConfig.buildIndexFlags();
+        //构建数据属性值
+        buildScaleValue(data);
+        buildTimeText(data);
         //计算 MA MACD BOLL RSI KDJ MR 指标
         computeMA(data, buildConfig);
         computeMACD(data, buildConfig);
@@ -223,7 +230,15 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         computeRSI(data, buildConfig);
         computeKDJ(data, buildConfig);
         computeWR(data, buildConfig);
-        buildTimeText(data);
+    }
+
+    /**
+     * 构建精度值
+     */
+    private void buildScaleValue(@NonNull List<CandleEntry> data) {
+        for (int i = calculationCache.index, z = data.size(); i < z; i++) {
+            data.get(i).buildScaleValue(getScale());
+        }
     }
 
     /**
@@ -232,10 +247,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
     private void buildTimeText(@NonNull List<CandleEntry> data) {
         for (int i = calculationCache.index, z = data.size(); i < z; i++) {
             if (null == timeType) break;
-            CandleEntry entry = data.get(i);
-            entry.setShortTimeText(DateUtil.formatDateToString(entry.getTime(), timeType.pattern()));
-            entry.setTimeText(DateUtil.formatDateToString(entry.getTime(), timeType == TimeType.day
-                    ? DateUtil.DATE_FORMAT_YMD : DateUtil.DATE_FORMAT_YMDHM));
+            data.get(i).buildTimeText(timeType);
         }
     }
 
@@ -259,9 +271,9 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
                 int startIndex = flag - 1;
                 if (i > startIndex) {
                     candleMA[j] -= data.get(i - flag).getClose().result;
-                    candleValues[j] = entry.buildQuoteScaleValue(candleMA[j] / flag);
+                    candleValues[j] = entry.buildQuoteScaleValue(getScale(), candleMA[j] / flag);
                 } else if (i == startIndex) {
-                    candleValues[j] = entry.buildQuoteScaleValue(candleMA[j] / flag);
+                    candleValues[j] = entry.buildQuoteScaleValue(getScale(), candleMA[j] / flag);
                 }
             }
             //存储此次计算结果
@@ -274,9 +286,9 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
                 int startIndex = flag - 1;
                 if (i > startIndex) {
                     volumeMA[j] -= data.get(i - flag).getVolume().result;
-                    volumeValues[j] = entry.buildBaseScaleValue(volumeMA[j] / flag);
+                    volumeValues[j] = entry.buildBaseScaleValue(getScale(), volumeMA[j] / flag);
                 } else if (i == startIndex) {
-                    volumeValues[j] = entry.buildBaseScaleValue(volumeMA[j] / flag);
+                    volumeValues[j] = entry.buildBaseScaleValue(getScale(), volumeMA[j] / flag);
                 }
             }
             //存储此次计算结果
@@ -343,10 +355,10 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
             long macd = dif - dea;
             if (i >= startIndex) {
                 ValueEntry[] macdValues = new ValueEntry[3];
-                macdValues[0] = entry.buildQuoteScaleValue(dif);
+                macdValues[0] = entry.buildQuoteScaleValue(getScale(), dif);
                 if (i >= startIndex + m - 1) {
-                    macdValues[1] = entry.buildQuoteScaleValue(dea);
-                    macdValues[2] = entry.buildQuoteScaleValue(macd);
+                    macdValues[1] = entry.buildQuoteScaleValue(getScale(), dea);
+                    macdValues[2] = entry.buildQuoteScaleValue(getScale(), macd);
                 }
                 //存储此次计算结果
                 entry.putIndex(IndexType.MACD, macdValues);
@@ -406,9 +418,9 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
                 long dn = previousMaValue - p * md;//下轨线
                 //精度恢复运算
                 ValueEntry[] bollValues = new ValueEntry[3];
-                bollValues[0] = entry.buildQuoteScaleValue(up);
-                bollValues[1] = entry.buildQuoteScaleValue(previousMaValue);
-                bollValues[2] = entry.buildQuoteScaleValue(dn);
+                bollValues[0] = entry.buildQuoteScaleValue(getScale(), up);
+                bollValues[1] = entry.buildQuoteScaleValue(getScale(), previousMaValue);
+                bollValues[2] = entry.buildQuoteScaleValue(getScale(), dn);
                 //存储此次计算结果
                 entry.putLineIndex(IndexType.BOLL, bollValues);
             }
@@ -454,7 +466,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
                 rsiMaxEma[j] = (Rmax + (flag - 1) * rsiMaxEma[j]) / flag;
                 if (i >= flag - 1 && rsiABSEma[j] != 0) {
                     long value = (long) ValueUtils.pow10(getScale().getQuoteScale() + 2) * rsiMaxEma[j] / rsiABSEma[j];
-                    values[j] = entry.buildQuoteScaleValue(value);
+                    values[j] = entry.buildQuoteScaleValue(getScale(), value);
                 }
 
             }
@@ -511,9 +523,9 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
             if (i >= n) {
                 j = 3 * k - 2 * d;
                 ValueEntry[] values = new ValueEntry[3];
-                values[0] = entry.buildQuoteScaleValue(k);
-                values[1] = entry.buildQuoteScaleValue(d);
-                values[2] = entry.buildQuoteScaleValue(j);
+                values[0] = entry.buildQuoteScaleValue(getScale(), k);
+                values[1] = entry.buildQuoteScaleValue(getScale(), d);
+                values[2] = entry.buildQuoteScaleValue(getScale(), j);
                 entry.putLineIndex(IndexType.KDJ, values);
             }
             //将倒数第二次的计算结果缓存
@@ -549,7 +561,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
                 if (max != min) {
                     value = (long) ValueUtils.pow10(getScale().getQuoteScale() + 2) * (max - entry.getClose().result) / (max - min);
                 }
-                values[j] = entry.buildQuoteScaleValue(value);
+                values[j] = entry.buildQuoteScaleValue(getScale(), value);
             }
             entry.putLineIndex(IndexType.WR, values);
         }

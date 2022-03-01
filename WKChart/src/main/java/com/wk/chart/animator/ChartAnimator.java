@@ -1,7 +1,6 @@
 package com.wk.chart.animator;
 
 import android.animation.ValueAnimator;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -17,7 +16,6 @@ public class ChartAnimator<T extends AbsEntry> extends ValueAnimator
         implements ValueAnimator.AnimatorUpdateListener {
     private final List<Long> endResults;
     private final AnimationListener<T> animationListener;
-    private boolean buildState;//数据构建状态（true:代表新数据，需要构建数据，false：为旧数据，无需构建数据）
     private int position;
     private T beginDate;
     private T endData;
@@ -30,13 +28,12 @@ public class ChartAnimator<T extends AbsEntry> extends ValueAnimator
         addUpdateListener(this);
     }
 
-    public void startAnimator(T beginDate, T endData, int position, boolean buildState) {
+    public void startAnimator(T beginDate, T endData, int position) {
         this.position = position;
-        this.buildState = buildState;
         if (Utils.listIsEmpty(beginDate.getAnimatorEntry())
                 || Utils.listIsEmpty(endData.getAnimatorEntry())
                 || getDuration() == 0L) {
-            this.animationListener.onAnimation(position, endData, buildState);
+            this.animationListener.onAnimation(position, endData);
             return;
         }
 //        Log.e("新动画", "-------------------------------");
@@ -53,10 +50,6 @@ public class ChartAnimator<T extends AbsEntry> extends ValueAnimator
 
     @Override
     public void onAnimationUpdate(ValueAnimator animation) {
-        if (!buildState) {
-            this.animationListener.onAnimation(position, endData, false);
-            return;
-        }
         if (animation.getAnimatedFraction() == 0.0f) {
             return;
         }
@@ -72,18 +65,19 @@ public class ChartAnimator<T extends AbsEntry> extends ValueAnimator
 //                Log.e("动画执行进度", "begin.value == endValue--->continue");
                 continue;
             }
+            int endScale = null == end.scale ? 0 : end.scale;
             end.result = animation.getAnimatedFraction() == 1.0f ? endResult :
                     (long) (begin.result + ((endResult - begin.result) * animation.getAnimatedFraction()));
-            end.text = ValueUtils.buildText(end.result, end.getScale(), false);
-            end.value = (float) ValueUtils.buildValue(end.result, end.getScale());
+            end.text = ValueUtils.buildText(end.result, endScale, false);
+            end.value = (float) ValueUtils.buildValue(end.result, endScale);
 //            Log.e("动画执行进度", end.text + "     执行进度:" + animation.getAnimatedFraction() + "    beginScale:" + begin.getScale() + "    endScale:" + end.getScale());
 //            Log.e("动画执行进度", "result:" + end.result + "   value:" + end.value + "   text:" + end.text);
         }
 //        Log.e("动画数据：", endData.toString());
-        this.animationListener.onAnimation(position, endData, buildState);
+        this.animationListener.onAnimation(position, endData);
     }
 
     public interface AnimationListener<T extends AbsEntry> {
-        void onAnimation(int position, T updateData, boolean buildState);
+        void onAnimation(int position, T updateData);
     }
 }

@@ -141,7 +141,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void startPush() {
-        if (EventBus.getDefault().isRegistered(this)) {
+        if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
         Intent startIntent = new Intent(this, PushService.class);

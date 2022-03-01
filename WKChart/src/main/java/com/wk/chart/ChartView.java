@@ -88,7 +88,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 break;
             case ATTR_UPDATE:
                 onAttributeUpdate();
-            case RATE_UPDATE:
+            case FORMAT_UPDATE:
                 onViewInit();
                 callHighlight();
                 break;
@@ -386,7 +386,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        Log.e("height(onMeasure)：", MeasureSpec.getMode(heightMeasureSpec) + "");
+//        Log.e("height(onMeasure)：", MeasureSpec.getSize(heightMeasureSpec) + "");
         if (viewSizeEntry.isNotMeasure()) {
             setMeasuredDimension(viewSizeEntry.getWidth(), viewSizeEntry.getHeight());
         } else if (MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.EXACTLY) {
@@ -441,12 +441,12 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 float dx = overScrollOffset;
 
                 if (Math.abs(overScrollOffset) > OVER_SCROLL_THRESHOLD) {
-                    if (isEnableLeftRefresh() && overScrollOffset > 0) {
+                    if (enableLeftRefresh && !lockRefresh && overScrollOffset > 0) {
                         lastScrollDx = overScrollOffset - OVER_SCROLL_THRESHOLD;
                         dx = lastScrollDx;
                     }
 
-                    if (isEnableRightRefresh() && overScrollOffset < 0) {
+                    if (enableRightRefresh && !lockRefresh && overScrollOffset < 0) {
                         lastScrollDx = overScrollOffset + OVER_SCROLL_THRESHOLD;
                         dx = lastScrollDx;
                     }
@@ -491,20 +491,20 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         return chartState == LOADING;
     }
 
-    public boolean isEnableLeftRefresh() {
-        return enableLeftRefresh && !lockRefresh;
-    }
-
-    public boolean isEnableRightRefresh() {
-        return enableRightRefresh && !lockRefresh;
-    }
-
     public void setEnableLeftRefresh(boolean enableLeftRefresh) {
         this.enableLeftRefresh = enableLeftRefresh;
     }
 
     public void setEnableRightRefresh(boolean enableRightRefresh) {
         this.enableRightRefresh = enableRightRefresh;
+    }
+
+    public boolean isEnableLeftRefresh() {
+        return enableLeftRefresh;
+    }
+
+    public boolean isEnableRightRefresh() {
+        return enableRightRefresh;
     }
 
     public boolean isHighlighting() {

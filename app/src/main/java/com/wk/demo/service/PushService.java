@@ -56,13 +56,12 @@ public class PushService extends IntentService {
                     updateCount = 50;
                     pushType = ADD;
                 }
-                CandleEntry pushData =
-                        candlePushDataOperation(scaleEntry, open, high, low, close, volume, time, pushType);
-                open = pushData.getOpen().value;
-                high = pushData.getHigh().value;
-                low = pushData.getLow().value;
-                close = pushData.getClose().value;
-                volume = pushData.getVolume().value;
+                CandleEntry pushData = candlePushDataOperation(open, high, low, close, volume, time, pushType);
+                open = Double.parseDouble(pushData.getOpen().source);
+                high = Double.parseDouble(pushData.getHigh().source);
+                low = Double.parseDouble(pushData.getLow().source);
+                close = Double.parseDouble(pushData.getClose().source);
+                volume = Double.parseDouble(pushData.getVolume().source);
                 time = pushData.getTime();
                 ServiceMessage message = new ServiceMessage();
                 message.setWhat(CANDLE);
@@ -78,34 +77,33 @@ public class PushService extends IntentService {
     /**
      * 蜡烛图推送数据运算
      */
-    private CandleEntry candlePushDataOperation(ScaleEntry scaleEntry, double open, double high, double low,
+    private CandleEntry candlePushDataOperation(double open, double high, double low,
                                                 double close, double volume, Date time, int pushType) {
         double closeUpdate = (Math.random() - 0.5) * 10;
-        BigDecimal closeValue;
-        BigDecimal openValue;
-        BigDecimal highValue;
-        BigDecimal lowValue;
-        BigDecimal volumeValue;
+        double closeValue;
+        double openValue;
+        double highValue;
+        double lowValue;
+        double volumeValue;
         Date timeValue;
         if (pushType == UPDATE) {
-            closeValue = new BigDecimal(close + closeUpdate);
-            openValue = new BigDecimal(open);
-            highValue = new BigDecimal(high);
-            lowValue = new BigDecimal(low);
+            closeValue = close + closeUpdate;
+            openValue = open;
+            highValue = high;
+            lowValue = low;
 
-            highValue = closeValue.compareTo(highValue) > 0 ? closeValue : highValue;
-            lowValue = closeValue.compareTo(lowValue) < 0 ? closeValue : lowValue;
-            double volumeUpdate = volume + Math.random() * (volume > 1_000_000_000 ? 100_000 : 500_000);
-            volumeValue = new BigDecimal(volumeUpdate);
+            highValue = Math.max(closeValue, highValue);
+            lowValue = Math.min(closeValue, lowValue);
+            volumeValue = volume + Math.random() * (volume > 1_000_000_000 ? 100_000 : 500_000);
             timeValue = time;
         } else {
-            openValue = highValue = lowValue = closeValue = new BigDecimal(String.valueOf(close));
-            volumeValue = BigDecimal.ZERO;
+            openValue = highValue = lowValue = closeValue = close;
+            volumeValue = 0.0;
             timeValue = addDateMinut(time, 1);
         }
 
-        return new CandleEntry(scaleEntry, openValue, highValue, lowValue, closeValue, volumeValue,
-                timeValue);
+        return new CandleEntry(String.valueOf(openValue), String.valueOf(highValue), String.valueOf(lowValue),
+                String.valueOf(closeValue), String.valueOf(volumeValue), timeValue);
     }
 
     private Date addDateMinut(Date date, int day) {
