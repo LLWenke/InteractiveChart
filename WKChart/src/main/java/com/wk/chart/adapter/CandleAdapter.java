@@ -118,7 +118,6 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         }
         if (!Utils.listIsEmpty(data)) {
             stopAnimator();
-            stopAsyTask();
             this.calculationCache.init();
         }
         super.addHeaderData(data);
@@ -134,7 +133,6 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         }
         if (!Utils.listIsEmpty(data)) {
             stopAnimator();
-            stopAsyTask();
             this.calculationCache.init();
         }
         super.addFooterData(data);
@@ -144,12 +142,8 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
      * 数据推送
      */
     public PushType dataPush(CandleEntry data) {
-        if (null == data || null == timeType) {
+        if (null == data || null == timeType || getCount() == 0) {
             return PushType.INVALID;
-        }
-        if (getCount() == 0) {
-            addFooterData(data);
-            return PushType.ADD;
         }
         Date endDate = data.getTime();
         if (null == endDate) {
@@ -191,7 +185,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         //Log.e("endDate:", DisplayTypeUtils.selectorFormat(endDate,
         //    getInstance()));
         if (null == timeType || diff < 0) {
-            return PushType.INVALID;
+            return PushType.INVALID;//无效
         } else if (diff < timeType.value()) {
             return PushType.UPDATE;//修改
         } else if (diff == timeType.value()) {

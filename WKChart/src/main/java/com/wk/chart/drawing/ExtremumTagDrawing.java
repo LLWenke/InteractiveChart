@@ -57,7 +57,7 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> {
         extremumBuffer[2] = render.getAdapter().getMinYIndex() + 0.5f;
         extremumBuffer[1] = max.getHigh().value;
         extremumBuffer[3] = min.getLow().value;
-        render.mapPoints(extremumBuffer);
+        render.mapPoints(absChartModule.getMatrix(), extremumBuffer);
         // 绘制当前显示区域的最大文字（max）
         String maxValue = render.getAdapter().rateConversion(max.getHigh(), false, false);
         String text = "← ".concat(maxValue);

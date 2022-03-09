@@ -8,6 +8,7 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextPaint;
+import android.util.Log;
 
 import com.wk.chart.compat.FontStyle;
 import com.wk.chart.compat.Utils;
@@ -15,6 +16,7 @@ import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.CandleEntry;
+import com.wk.chart.entry.RateEntry;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
 
@@ -33,14 +35,16 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
     private final Paint spreadCursorBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);//展开时）游标值容器边框画笔
     private final Paint cursorBackgroundPaint = new Paint();//游标值容器背景画笔
     private final Path cursorPath = new Path();//游标绘制路径
-    private final Rect foldedTextRect = new Rect();//（折叠时）游标文字显示区域
-    private final Rect spreadTextRect = new Rect();//（展开时）游标文字显示区域
+    private final Rect foldedTextRect = new Rect();//（折叠时）游标单文字预显示区域
+    private final Rect spreadTextRect = new Rect();//（展开时）游标单文字预显示区域
     private final RectF cursorRect = new RectF();//游标显示区域(不包含游标线)
     private final Path path = new Path();//游标线路径
     private final float[] cursorPoint = new float[2];//存放游标坐标
     private boolean clickable = false;//是否可以点击
     private float foldedCharsWidth, foldedTextHalfHeight = 0;//（折叠时）用于计算的文字宽度和半高
     private float spreadCharsWidth, spreadTextHalfHeight = 0;//（展开时）用于计算的文字宽度和半高
+    private float foldedRateUnitWidth = 0;//（折叠时）比率符号宽度
+    private float spreadRateUnitWidth = 0;//（展开时）比率符号宽度
     private float triangleHalfHeight = 0;//（展开时）三角半高
 
     @Override
@@ -85,18 +89,25 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
     }
 
     @Override
+    public void onInitConfig() {
+        super.onInitConfig();
+        foldedRateUnitWidth = foldedCursorTextPaint.measureText(render.getAdapter().getRate().getSign());
+        spreadRateUnitWidth = spreadCursorTextPaint.measureText(render.getAdapter().getRate().getSign());
+    }
+
+    @Override
     public void drawOver(Canvas canvas) {
         CandleEntry last = render.getAdapter().getItem(render.getAdapter().getLastPosition());
         cursorPoint[0] = render.getAdapter().getLastPosition() + 1;
         cursorPoint[1] = last.getClose().value;
-        render.mapPoints(cursorPoint);
+        render.mapPoints(absChartModule.getMatrix(), cursorPoint);
         String value = render.getAdapter().rateConversion(last.getClose(), false, false);
         //防止文字抖动现象
-        float textWidth = foldedCharsWidth * (float) value.length() + spreadCharsWidth / 2f;
+        float textWidth = computationTextWidth(foldedCharsWidth, foldedRateUnitWidth, value);
         float cursorRight = viewRect.right - attribute.axisLabelMarginHorizontal;
         float textLeft = cursorRight - textWidth;
         float textY;
-        if (cursorPoint[0] < textLeft) {
+        if (cursorPoint[0] < textLeft) {//折叠
             clickable = false;
             textY = cursorPoint[1] + foldedTextHalfHeight;
             cursorRect.left = textLeft;
@@ -111,11 +122,10 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
             path.moveTo(cursorPoint[0], cursorPoint[1]);
             path.lineTo(textLeft, cursorPoint[1]);
             canvas.drawPath(path, foldedCursorLinePaint);
-        } else {
+        } else {//展开
             clickable = true;
-            //防止文字抖动现象
-            textWidth = spreadCharsWidth * (float) value.length() + spreadCharsWidth / 2f;
             //修正坐标，防止出界
+            textWidth = computationTextWidth(spreadCharsWidth, spreadRateUnitWidth, value);
             float spreadCursorHalfHeight = spreadTextHalfHeight + attribute.spreadCursorPaddingVertical + attribute.spreadCursorBorderWidth;
             float topLimit = viewRect.top + spreadCursorHalfHeight;
             float bottomLimit = viewRect.bottom - spreadCursorHalfHeight;
@@ -157,6 +167,15 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
             canvas.drawPath(path, spreadCursorLinePaint);
         }
         path.rewind();
+    }
+
+    private float computationTextWidth(float charWidth, float rateUnitWidth, String text) {
+        RateEntry rate = render.getAdapter().getRate();
+        float textWidth = charWidth * (float) text.length() + charWidth / 2f;
+        if (rate.isSet() && rateUnitWidth > 0) {
+            textWidth = textWidth - charWidth + rateUnitWidth;
+        }
+        return textWidth;
     }
 
     @Override

@@ -28,8 +28,6 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         ChartAnimator.AnimationListener<T> {
 
     private final DataSetObservable dataSetObservable;//数据状态监听器
-    private final List<T> renderData;//数据列表（渲染）
-    private final List<T> calculateData;//数据列表（计算）
     private final ScaleEntry scale;// 精度
     private final Handler uiHandler; //主线程Handler
     private final ChartAnimator<T> animator;//数据更新动画
@@ -37,6 +35,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     private WorkThread<BuildData<T, F>> workThread;//异步任务处理线程
     private RateEntry rate;// 比率
     private QuantizationEntry quantizationEntry;//量化
+    private List<T> renderData;//数据列表（渲染）
     protected float high;//Y 轴上entry的最高值
     protected float low;//Y 轴上entry的最低值
     protected int maxYIndex;// Y 轴上entry的最高值索引
@@ -48,7 +47,6 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     AbsAdapter(@NonNull F buildConfig) {
         this.buildConfig = buildConfig;
         this.renderData = new ArrayList<>();
-        this.calculateData = new ArrayList<>();
         this.uiHandler = new Handler(this);
         this.dataSetObservable = new DataSetObservable();
         this.animator = new ChartAnimator<>(this, 400);
@@ -60,7 +58,6 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     AbsAdapter(@NonNull AbsAdapter<T, F> absAdapter) {
         this(absAdapter.getBuildConfig());
         this.renderData.addAll(absAdapter.renderData);
-        this.calculateData.addAll(absAdapter.calculateData);
         this.high = absAdapter.high;
         this.low = absAdapter.low;
         this.maxYIndex = absAdapter.maxYIndex;
@@ -221,12 +218,10 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      */
     public void setBuildConfig(F buildConfig) {
         this.buildConfig = buildConfig;
-        if (calculateData.isEmpty()) {
-            return;
-        }
+        if (dataSize == 0) return;
         stopAnimator();
         stopAsyTask();
-        onAsyTask(buildConfig, calculateData, ObserverArg.INIT, false);
+        onAsyTask(buildConfig, cloneDataList(), ObserverArg.INIT, false);
     }
 
     /**
@@ -262,17 +257,30 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     }
 
     /**
+     * 克隆当前数据源
+     *
+     * @return 克隆数据源
+     */
+    private ArrayList<T> cloneDataList() {
+        try {
+            return (ArrayList<T>) ((ArrayList<T>) renderData).clone();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * 应用格式更新
      *
      * @param isCalculateData 是否需要计算数据
      */
     public synchronized void applyFormatUpdate(boolean isCalculateData) {
+        if (dataSize == 0) return;
         if (isCalculateData) {
             stopAnimator();
             stopAsyTask();
-            if (!Utils.listIsEmpty(calculateData)) {
-                onAsyTask(buildConfig, calculateData, ObserverArg.FORMAT_UPDATE, false);
-            }
+            onAsyTask(buildConfig, cloneDataList(), ObserverArg.FORMAT_UPDATE, false);
         } else {
             notifyDataSetChanged(ObserverArg.FORMAT_UPDATE);
         }
@@ -284,7 +292,6 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     public synchronized void clearData() {
         stopAnimator();
         stopAsyTask();
-        this.calculateData.clear();
         this.renderData.clear();
         this.dataSize = 0;
         notifyDataSetChanged(ObserverArg.RESET);
@@ -294,17 +301,12 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      * 重置数据
      */
     public synchronized void resetData(List<T> data) {
-        stopAnimator();
-        stopAsyTask();
-        ObserverArg observerArg = buildConfig.isInit() ? ObserverArg.RESET : ObserverArg.INIT;
         if (Utils.listIsEmpty(data)) {
-            this.calculateData.clear();
-            this.renderData.clear();
-            this.dataSize = 0;
-            notifyDataSetChanged(observerArg);
+            clearData();
         } else {
-            this.calculateData.addAll(data);
-            onAsyTask(buildConfig, calculateData, observerArg, false);
+            stopAnimator();
+            stopAsyTask();
+            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.RESET : ObserverArg.INIT, false);
         }
     }
 
@@ -312,17 +314,12 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      * 更新数据
      */
     public synchronized void updateData(List<T> data) {
-        stopAnimator();
-        stopAsyTask();
-        ObserverArg observerArg = buildConfig.isInit() ? ObserverArg.UPDATE : ObserverArg.INIT;
         if (Utils.listIsEmpty(data)) {
-            this.calculateData.clear();
-            this.renderData.clear();
-            this.dataSize = 0;
-            notifyDataSetChanged(observerArg);
+            clearData();
         } else {
-            this.calculateData.addAll(data);
-            onAsyTask(buildConfig, calculateData, observerArg, false);
+            stopAnimator();
+            stopAsyTask();
+            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.UPDATE : ObserverArg.INIT, false);
         }
     }
 
@@ -334,8 +331,8 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
             notifyDataSetChanged(ObserverArg.NORMAL);
         } else {
             stopAnimator();
-            this.calculateData.addAll(0, data);
-            onAsyTask(buildConfig, calculateData, ObserverArg.ADD, false);
+            data.addAll(renderData);
+            onAsyTask(buildConfig, data, ObserverArg.ADD, false);
         }
     }
 
@@ -347,8 +344,8 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
             notifyDataSetChanged(ObserverArg.NORMAL);
         } else {
             stopAnimator();
-            this.calculateData.addAll(data);
-            onAsyTask(buildConfig, calculateData, ObserverArg.ADD, false);
+            data.addAll(0, renderData);
+            onAsyTask(buildConfig, data, ObserverArg.ADD, false);
         }
     }
 
@@ -358,8 +355,9 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     public void addFooterData(T data) {
         if (null != data) {
             stopAnimator();
-            this.calculateData.add(data);
-            onAsyTask(buildConfig, calculateData, ObserverArg.UPDATE, false);
+            ArrayList<T> copyList = cloneDataList();
+            copyList.add(data);
+            onAsyTask(buildConfig, copyList, ObserverArg.UPDATE, false);
         }
     }
 
@@ -370,8 +368,9 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      */
     public void changeItem(int position, T data) {
         if (null != data && position >= 0 && position < getCount()) {
-            this.calculateData.set(position, data);
-            onAsyTask(buildConfig, calculateData, ObserverArg.UPDATE, true);
+            ArrayList<T> copyList = cloneDataList();
+            copyList.set(position, data);
+            onAsyTask(buildConfig, copyList, ObserverArg.UPDATE, true);
         }
     }
 
@@ -430,8 +429,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
                 this.animator.startAnimator(oldLastItem, newLastItem, position);
             } else {
                 this.buildConfig = buildData.getBuildConfig();
-                this.renderData.clear();
-                this.renderData.addAll(buildData.getData());
+                this.renderData = buildData.getData();
                 this.dataSize = renderData.size();
                 notifyDataSetChanged(buildData.getObserverArg());
             }
@@ -479,15 +477,6 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      */
     public void notifyDataSetChanged(ObserverArg observerArg) {
         this.dataSetObservable.notifyObservers(observerArg);
-    }
-
-    /**
-     * 获取当前动画进度
-     *
-     * @return 动画进度值(0.0和1.0之间)
-     */
-    public float getAnimatorFraction() {
-        return animator.getAnimatedFraction();
     }
 
     /**

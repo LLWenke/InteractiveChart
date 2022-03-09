@@ -68,7 +68,7 @@ public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeModule> {
         rectBuffer[1] = entry.getVolume().value;
         rectBuffer[2] = current + 1 - render.pointsSpace;
         rectBuffer[3] = extremum[1];
-        render.mapPoints(rectBuffer);
+        render.mapPoints(absChartModule.getMatrix(), rectBuffer);
         //边框偏移量修正
         if (isStroke) {
             rectBuffer[0] += borderOffset;

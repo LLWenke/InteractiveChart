@@ -83,7 +83,7 @@ public class IndexLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
             }
             pathPts[0] = current + 0.5f;
             pathPts[1] = entry.value;
-            render.mapPoints(pathPts);
+            render.mapPoints(absChartModule.getMatrix(), pathPts);
             Path path = paths[i];
             if (path.isEmpty()) {
                 path.moveTo(pathPts[0], pathPts[1]);
@@ -108,7 +108,7 @@ public class IndexLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
             case IndexType.KDJ:
                 gridBuffer[0] = 0;
                 gridBuffer[1] = (extremum[3] + extremum[1]) / 2;
-                render.mapPoints(gridBuffer);
+                render.mapPoints(absChartModule.getMatrix(), gridBuffer);
                 canvas.drawLine(viewRect.left, gridBuffer[1], viewRect.right, gridBuffer[1], centerLinePaint);
                 break;
             case IndexType.BOLL:

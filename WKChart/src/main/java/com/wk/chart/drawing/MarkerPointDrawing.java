@@ -168,7 +168,7 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
         pointBuffer[0] = current + 0.5f;
         pointBuffer[1] = iMarkerPoint.getHighPoint(entry);
         pointBuffer[3] = iMarkerPoint.getLowPoint(entry);
-        render.mapPoints(pointBuffer);
+        render.mapPoints(absChartModule.getMatrix(), pointBuffer);
         //计算顶部可用区域
         calculationAvailableAreas(begin, end, current);
         float topMarkerTop = availableAreas[5] - availableAreas[7];//标签上（方向：上）

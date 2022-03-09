@@ -105,7 +105,7 @@ public class MACDDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
         if (isComputationDeaPath) {
             pathPts[1] = values[1].value;
         }
-        render.mapPoints(pathPts);
+        render.mapPoints(absChartModule.getMatrix(), pathPts);
         if (isComputationDiffPath) {
             if (diffPath.isEmpty()) diffPath.moveTo(pathPts[2], pathPts[3]);
             else diffPath.lineTo(pathPts[2], pathPts[3]);
@@ -132,7 +132,7 @@ public class MACDDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
         }
         rectBuffer[0] = current + render.pointsSpace;
         rectBuffer[2] = current + 1 - render.pointsSpace;
-        render.mapPoints(rectBuffer);
+        render.mapPoints(absChartModule.getMatrix(), rectBuffer);
         //边框偏移量修正
         if (isStroke) {
             rectBuffer[0] += borderOffset;
@@ -161,7 +161,7 @@ public class MACDDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
         //绘制中线
         gridBuffer[0] = 0;
         gridBuffer[1] = 0;
-        render.mapPoints(gridBuffer);
+        render.mapPoints(absChartModule.getMatrix(), gridBuffer);
         canvas.drawLine(viewRect.left, gridBuffer[1], viewRect.right, gridBuffer[1], centerLinePaint);
         //绘制MACD矩形
         decreasingPath.close();

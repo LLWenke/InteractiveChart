@@ -7,6 +7,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -68,8 +69,22 @@ public class Utils {
      * @param rect         计算后的矩形（此矩形位文字的实际占用区域）
      */
     public static void measureTextArea(TextPaint measurePaint, Rect rect) {
-        String test = "9";
-        measurePaint.getTextBounds(test, 0, test.length(), rect);
+        measureTextArea(measurePaint, rect, "9");
+    }
+
+    /**
+     * 计算文字实际占用区域
+     *
+     * @param measurePaint 计算用文字的画笔
+     * @param rect         计算后的矩形（此矩形位文字的实际占用区域）
+     * @param text         文字
+     */
+    public static void measureTextArea(TextPaint measurePaint, Rect rect, String text) {
+        if (TextUtils.isEmpty(text)) {
+            rect.setEmpty();
+        } else {
+            measurePaint.getTextBounds(text, 0, text.length(), rect);
+        }
     }
 
     /**

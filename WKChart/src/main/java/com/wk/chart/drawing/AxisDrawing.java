@@ -115,7 +115,7 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
             String text;
             axisY = viewRect.top + i * regionHeight;
             pointCache[1] = axisY;
-            render.invertMapPoints(pointCache);
+            render.invertMapPoints(absChartModule.getMatrix(), pointCache);
             if (i == 0) {
                 centerOffset = textCenter;
                 text = getScaleLabel(extremum[3], absChartModule.getMaxY());

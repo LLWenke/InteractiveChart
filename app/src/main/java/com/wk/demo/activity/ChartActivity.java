@@ -97,7 +97,9 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
                 case RESET:
                     if (dataShowType == DataType.REAL_TIME.ordinal()) {
                         PushService.stopPush();
-                        startPush();
+                        new Handler().postDelayed(() -> {
+                            startPush();
+                        }, 1000);
                     }
                 case ADD:
                 case NORMAL:

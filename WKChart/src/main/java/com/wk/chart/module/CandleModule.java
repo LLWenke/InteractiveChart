@@ -95,7 +95,7 @@ public class CandleModule extends MainModule<CandleEntry> implements IMarkerPoin
             rectBuffer[5] = entry.getClose().value;
             rectBuffer[7] = entry.getOpen().value;
         }
-        render.mapPoints(rectBuffer);
+        render.mapPoints(getMatrix(), rectBuffer);
         return rectBuffer;
     }
 }
