@@ -37,7 +37,6 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     private static final String TAG = "AbsRender";
     private final MeasureUtils measureUtils;//计算工具类
     private final LinkedHashMap<Integer, List<AbsModule<AbsEntry>>> chartModules; //图表指标列表
-    private final Matrix matrixValue = new Matrix(); // 把值映射到屏幕像素的矩阵
     private final Matrix matrixTouch = new Matrix(); // 缩放和平移矩阵
     private final Matrix matrixOffset = new Matrix(); // 偏移矩阵
     private final Matrix matrixInvert = new Matrix(); // 用于缓存反转矩阵
@@ -430,7 +429,6 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      * 刷新Matrix
      */
     void resetMatrix() {
-        initMatrixValue(mainModule.getRect());
         postMatrixOffset(mainModule.getRect().left, viewRect.top);
         postMatrixTouch(mainModule.getRect(), mainModule.getRect().width(), attribute.visibleCount);
     }
@@ -491,12 +489,13 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      * @param entryIndex   entry 索引
      */
     protected float getTransX(RectF rect, float visibleCount, float entryIndex) {
+        final Matrix mainMatrix = getMainModule().getMatrix();
         final int entrySetSize = adapter.getCount();
         if (entrySetSize <= visibleCount) {
             return 0;
         }
-        float leftOffset = getPointX(0, null) - rect.left;
-        float rightOffset = rect.right - getPointX(entrySetSize, null);
+        float leftOffset = getPointX(mainMatrix, 0) - rect.left;
+        float rightOffset = rect.right - getPointX(mainMatrix, entrySetSize);
         rightOffset = rightOffset > 0 ? Math.min(rightOffset, attribute.rightScrollOffset) : 0;
         leftOffset = leftOffset > 0 ? Math.min(leftOffset, attribute.leftScrollOffset) : 0;
 
@@ -528,14 +527,10 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      *
      * @param entryIndex entry 索引
      */
-    public float getPointX(float entryIndex, Matrix matrix) {
+    public float getPointX(@NotNull Matrix matrix, float entryIndex) {
         points[0] = entryIndex;
         points[1] = 0;
-        if (null == matrix) {
-            mapPoints(points);
-        } else {
-            mapPoints(matrix, points);
-        }
+        mapPoints(matrix, points);
         return points[0];
     }
 
@@ -559,12 +554,13 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     /**
      * 缩放
      *
+     * @param matrix       当前矩阵
      * @param contentRect  当前显示区域
      * @param visibleCount 当前显示区域的 X 轴方向上需要显示多少个 entry 值
      * @param x            在点(x, y)上缩放
      * @param y            在点(x, y)上缩放。由于 K 线图只会进行水平滚动，因此 y 值被忽略
      */
-    protected void zoom(RectF contentRect, float visibleCount, float x, float y) {
+    protected void zoom(@NotNull Matrix matrix, RectF contentRect, float visibleCount, float x, float y) {
         if (x < contentRect.left) {
             x = contentRect.left;
         } else if (x > contentRect.right) {
@@ -578,7 +574,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
 
         touchPts[0] = x;
         touchPts[1] = 0;
-        invertMapPoints(touchPts);
+        invertMapPoints(matrix, touchPts);
 
         if (touchPts[0] <= toMinVisibleIndex) {
             minVisibleIndex = 0;
@@ -620,24 +616,13 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     }
 
     /**
-     * 利用矩阵将 entry 的值映射到屏幕像素上
+     * 按给定矩阵将 entry 的值映射到屏幕像素上
      *
-     * @param pts 浮点数序列 [x0, y0, x1, y1, ...]
+     * @param matrix 矩阵
+     * @param pts    浮点数序列 [x0, y0, x1, y1, ...]
      */
-    public void mapPoints(float[] pts, float xOffset, float yOffset) {
-        matrixValue.mapPoints(pts);
-        matrixTouch.mapPoints(pts);
-        matrixOffset.mapPoints(pts);
-        calibrationMapPoints(pts, xOffset, -yOffset);
-    }
-
-    /**
-     * 利用矩阵将 entry 的值映射到屏幕像素上
-     *
-     * @param pts 浮点数序列 [x0, y0, x1, y1, ...]
-     */
-    public void mapPoints(float[] pts) {
-        matrixValue.mapPoints(pts);
+    public void mapPoints(@NotNull Matrix matrix, float[] pts) {
+        matrix.mapPoints(pts);
         matrixTouch.mapPoints(pts);
         matrixOffset.mapPoints(pts);
     }
@@ -648,28 +633,8 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      * @param matrix 矩阵
      * @param pts    浮点数序列 [x0, y0, x1, y1, ...]
      */
-    public void mapPoints(Matrix matrix, float[] pts) {
-        if (matrix == null) {
-            matrixValue.mapPoints(pts);
-        } else {
-            matrix.mapPoints(pts);
-        }
-        matrixTouch.mapPoints(pts);
-        matrixOffset.mapPoints(pts);
-    }
-
-    /**
-     * 按给定矩阵将 entry 的值映射到屏幕像素上
-     *
-     * @param matrix 矩阵
-     * @param pts    浮点数序列 [x0, y0, x1, y1, ...]
-     */
-    public void mapPoints(Matrix matrix, float[] pts, float xOffset, float yOffset) {
-        if (matrix == null) {
-            matrixValue.mapPoints(pts);
-        } else {
-            matrix.mapPoints(pts);
-        }
+    public void mapPoints(@NotNull Matrix matrix, float[] pts, float xOffset, float yOffset) {
+        matrix.mapPoints(pts);
         matrixTouch.mapPoints(pts);
         matrixOffset.mapPoints(pts);
         calibrationMapPoints(pts, xOffset, -yOffset);
@@ -680,7 +645,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      *
      * @param pts 浮点数序列 [x0, y0, x1, y1, ...]
      */
-    public void invertMapPoints(float[] pts) {
+    public void invertMapPoints(@NotNull Matrix matrix, float[] pts) {
         matrixInvert.reset();
 
         matrixOffset.invert(matrixInvert);
@@ -689,24 +654,8 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         matrixTouch.invert(matrixInvert);
         matrixInvert.mapPoints(pts);
 
-        matrixValue.invert(matrixInvert);
+        matrix.invert(matrixInvert);
         matrixInvert.mapPoints(pts);
-    }
-
-    /**
-     * 将基于屏幕像素的坐标按给定矩阵反转到值
-     *
-     * @param matrix 矩阵
-     * @param pts    浮点数序列 [x0, y0, x1, y1, ...]
-     */
-    public void invertMapPoints(Matrix matrix, float[] pts) {
-        if (null == matrix) {
-            invertMapPoints(pts);
-        } else {
-            matrixInvert.reset();
-            matrix.invert(matrixInvert);
-            matrixInvert.mapPoints(pts);
-        }
     }
 
     /**
@@ -714,6 +663,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      */
     protected void postMatrixValue(AbsModule<AbsEntry> chartModule) {
         RectF rect = chartModule.getRect();//视图 rect
+        Matrix matrix = chartModule.getMatrix();//视图 matrix
         //计算 X,Y 轴的极值
         computeExtremumValue(extremum, chartModule);
         final float deltaX = extremum[2] - extremum[0];
@@ -726,19 +676,9 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         final float scaleY = (rect.height() - chartModule.getYCorrectedValue()) / deltaY;
         final float translateX = extremum[0] * scaleX;
         final float translateY = rect.top + extremum[3] / deltaY * rect.height();
-        matrixValue.reset();
-        matrixValue.postScale(scaleX, -scaleY);
-        matrixValue.postTranslate(-translateX, translateY);
-        //反向赋值
-        chartModule.getMatrix().set(matrixValue);
-    }
-
-    /**
-     * 初始化值矩阵
-     */
-    protected void initMatrixValue(RectF rect) {
-        matrixValue.reset();
-        matrixValue.postScale(rect.width() / adapter.getCount(), 1);
+        matrix.reset();
+        matrix.postScale(scaleX, -scaleY);
+        matrix.postTranslate(-translateX, translateY);
     }
 
     /**

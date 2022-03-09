@@ -2,6 +2,8 @@
 package com.wk.chart.render;
 
 import android.annotation.SuppressLint;
+import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.graphics.RectF;
 
 import com.wk.chart.adapter.CandleAdapter;
@@ -35,7 +37,9 @@ public class CandleRender extends AbsRender<CandleAdapter, CandleAttribute> {
         }
         resetPointsWidth();
         resetInterval();
-        zoom(getMainModule().getRect(), attribute.visibleCount, x, y);
+        zoom(getMainModule().getMatrix(),
+                getMainModule().getRect(),
+                attribute.visibleCount, x, y);
     }
 
     /**
@@ -77,12 +81,14 @@ public class CandleRender extends AbsRender<CandleAdapter, CandleAttribute> {
      */
     @Override
     protected void computeVisibleIndex() {
-        contentPts[0] = getMainModule().getRect().left;
-        invertMapPoints(contentPts);
+        RectF rectF = getMainModule().getRect();
+        Matrix matrix = getMainModule().getMatrix();
+        contentPts[0] = rectF.left;
+        invertMapPoints(matrix, contentPts);
         begin = Math.max((int) contentPts[0], 0);
         //根据maxVisibleIndex的显示位置修正maxVisibleIndex值
         end = (int) (begin + Math.ceil(attribute.visibleCount) + 1);
-        if (Math.ceil(getPointX(end, null) - pointsWidth) >= getMainModule().getRect().width()) {
+        if (Math.ceil(getPointX(matrix, end) - pointsWidth) >= rectF.width()) {
             end--;
             //Log.e(TAG, "getTransX---b: " +
             //    Math.ceil(getPointX(end) - candleWidth))

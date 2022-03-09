@@ -52,8 +52,8 @@ public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
     @Override
     public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
         highlightState = true;
-        beginX = render.getPointX(begin + 0.5f, null);
-        endX = render.getPointX(end - 0.5f, null);
+        beginX = render.getPointX(absChartModule.getMatrix(), begin + 0.5f);
+        endX = render.getPointX(absChartModule.getMatrix(), end - 0.5f);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
         CandleEntry entry = render.getAdapter().getItem(current);
         pathPts[0] = current + 0.5f;
         pathPts[1] = entry.getClose().value;
-        render.mapPoints(pathPts);
+        render.mapPoints(absChartModule.getMatrix(), pathPts);
         if (current == begin) {//开始点
             float beginX = begin == 0 ? pathPts[0] : viewRect.left;
             timelinePath.moveTo(beginX, pathPts[1]);
@@ -81,7 +81,7 @@ public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
         candleRectBuffer[2] = current + 1 - render.pointsSpace;
         candleRectBuffer[4] = current;
         candleRectBuffer[6] = current + 1;
-        render.mapPoints(candleRectBuffer);
+        render.mapPoints(absChartModule.getMatrix(),candleRectBuffer);
         // 计算高亮坐标
         if (render.isHighlight() && highlightState) {
             final float[] highlightPoint = render.getHighlightPoint();

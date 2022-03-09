@@ -70,7 +70,7 @@ public class TimeLineModule extends MainModule<CandleEntry> implements IMarkerPo
         rectBuffer[2] = current + 1 - render.pointsSpace;
         //y轴坐标
         rectBuffer[1] = rectBuffer[3] = entry.getClose().value;
-        render.mapPoints(rectBuffer);
+        render.mapPoints(getMatrix(), rectBuffer);
         return rectBuffer;
     }
 }

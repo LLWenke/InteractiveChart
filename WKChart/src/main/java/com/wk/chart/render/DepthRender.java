@@ -41,7 +41,6 @@ public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
     @Override
     protected void resetMatrix() {
         AbsModule<AbsEntry> module = getMainModule();
-        initMatrixValue(module.getRect());
         postMatrixOffset(module.getRect().left + module.getXOffset() * 2f, viewRect.top - module.getYOffset());
         postMatrixTouch(module.getRect(), module.getRect().width() - module.getXCorrectedValue(), getAdapter().getCount());
     }

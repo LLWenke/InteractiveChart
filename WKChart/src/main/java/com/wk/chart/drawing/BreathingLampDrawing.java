@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
-import android.os.Handler;
 
 import com.wk.chart.adapter.CandleAdapter;
 import com.wk.chart.compat.Utils;
@@ -19,23 +18,20 @@ import com.wk.chart.render.CandleRender;
  * <p>BreathingLampDrawing</p>
  * 呼吸灯组件
  */
-public class BreathingLampDrawing extends AbsDrawing<CandleRender, TimeLineModule> implements Runnable {
+public class BreathingLampDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
     private CandleAttribute attribute;//配置文件
     private final Paint lampPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final int[] lampShaderColor = new int[4];
     private final float[] lampShaderColorBuffer = new float[4];
     private final float[] points = new float[2];
-    private float animationCentre, shaderSize, breathingLampSize;
+    private float shaderSize, breathingLampSize;
     private long time = 0;
-    private final Handler handler = new Handler();
-    private float progress, oldFraction;
 
     @Override
     public void onInit(CandleRender render, TimeLineModule chartModule) {
         super.onInit(render, chartModule);
         this.attribute = render.getAttribute();
         lampPaint.setStyle(Paint.Style.FILL);
-        animationCentre = 0.5f;
         breathingLampSize = attribute.breathingLampRadius * 3f;
         shaderSize = breathingLampSize - attribute.breathingLampRadius;
         lampShaderColor[0] = attribute.breathingLampColor;
@@ -53,64 +49,37 @@ public class BreathingLampDrawing extends AbsDrawing<CandleRender, TimeLineModul
         CandleEntry entry = render.getAdapter().getItem(render.getAdapter().getLastPosition());
         points[0] = render.getAdapter().getLastPosition() + 0.5f;
         points[1] = entry.getClose().value;
-        render.mapPoints(points);
-        if (points[0] > viewRect.width()) {
-            handler.removeCallbacksAndMessages(null);
-            return;
-        }
+        render.mapPoints(absChartModule.getMatrix(), points);
+        if (points[0] > viewRect.width()) return;
         float size = attribute.breathingLampRadius;
-        float fraction = render.getAdapter().getAnimatorFraction();
-        if (fraction > progress) {//满足此种状态，说明动画在顺序执行
-            progress = fraction == 1f ? 0 : fraction;
-            oldFraction = 0;
-        } else if (fraction == progress) {
-            progress = fraction == 1f ? 0 : fraction;
-            oldFraction = 0;
-        } else if (fraction == 0) {
-            progress = progress == 1f ? 0 : progress;
-            oldFraction = 0;
-        } else if (progress < 1f) {//不满足此种状态，说明动画间断
-            progress = Math.min(progress + (fraction - oldFraction), 1f);
-            oldFraction = fraction;
+        float interval = attribute.breathingLampAutoTwinkleInterval;
+        long currentTime = System.currentTimeMillis();
+        float fraction = (currentTime - time) / interval;
+        if (fraction >= 1f) {
+            time = currentTime;
+            fraction = 0;
         }
-//        Log.e("onAnimation", "progress：" + progress + "     fraction：" + fraction);
+//        Log.e("onAnimation", "fraction：" + fraction);
         //区分动画执行区间计算出对应的阴影大小（前半部分/后半部分）
-        size += shaderSize * (progress > animationCentre ? ((1f - progress) * 2f) : (progress * 2f));
-        RadialGradient gradient = new RadialGradient(
+        size += shaderSize * (fraction > 0.5f ? ((1f - fraction) * 2f) : (fraction * 2f));
+        lampPaint.setShader(new RadialGradient(
                 points[0], points[1],
                 breathingLampSize,
                 lampShaderColor,
                 lampShaderColorBuffer,
                 Shader.TileMode.MIRROR
-        );
-        lampPaint.setShader(gradient);
+        ));
         canvas.drawCircle(points[0], points[1], size, lampPaint);
-        //判断是否需要启动自动闪烁功能
-        if (render.isReady() && attribute.breathingLampAutoTwinkleInterval > 0) {
-            startAutoTwinkle();
-        }
-
+        if (interval > 0) startAutoTwinkle();
     }
 
     /**
      * 启动自动闪烁
      */
     private void startAutoTwinkle() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - time > attribute.breathingLampAutoTwinkleInterval) {
-            time = currentTime;
-            handler.postDelayed(this, attribute.breathingLampAutoTwinkleInterval);
-        }
-    }
-
-    @Override
-    public void run() {
-//        Log.e("onAnimation", "发送动画刷新通知");
         CandleAdapter adapter = render.getAdapter();
         if (null != adapter && adapter.getLiveState()) {
-            render.getAdapter().animationRefresh();
-        } else {
-            handler.removeCallbacksAndMessages(null);
+            adapter.animationRefresh();
         }
     }
 }
