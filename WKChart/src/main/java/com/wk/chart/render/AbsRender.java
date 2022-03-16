@@ -17,8 +17,10 @@ import com.wk.chart.compat.config.AbsBuildConfig;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.AbsEntry;
+import com.wk.chart.enumeration.ClickDrawingID;
 import com.wk.chart.enumeration.ModuleGroupType;
 import com.wk.chart.enumeration.ModuleType;
+import com.wk.chart.interfaces.IDrawingClickListener;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.module.base.MainModule;
 
@@ -913,25 +915,21 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     }
 
     /**
-     * Drawing的Click
+     * Click事件判定
      *
-     * @return (返回响应事件的元素)
+     * @return (返回响应事件的元素ID)
      */
-    public @Nullable
-    AbsDrawing<?, ?> onDrawingClick(float x, float y) {
+    public int onClick(float x, float y) {
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
             for (AbsModule<AbsEntry> module : item.getValue()) {
-                if (module.isAttach() && module.getRect().contains(x, y)) {
-                    for (AbsDrawing<?, ?> drawing : module.getDrawingList()) {
-                        if (drawing.onDrawingClick(x, y)) {
-                            return drawing;
-                        }
-                    }
-                    return null;
+                int clickId = module.onClick(x, y);
+                if (clickId == ClickDrawingID.ID_NONE) {
+                    continue;
                 }
+                return clickId;
             }
         }
-        return null;
+        return ClickDrawingID.ID_NONE;
     }
 
     /**

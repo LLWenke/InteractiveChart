@@ -18,7 +18,7 @@ import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
 
 /**
- * >Grid轴绘制组件
+ * Grid轴绘制组件
  * <p>GridDrawing</p>
  */
 

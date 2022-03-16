@@ -17,6 +17,7 @@ import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.RateEntry;
+import com.wk.chart.interfaces.IDrawingClickListener;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
 
@@ -26,7 +27,7 @@ import com.wk.chart.render.CandleRender;
  * 游标指示器组件
  */
 
-public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
+public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> implements IDrawingClickListener {
     private CandleAttribute attribute;//配置文件
     private final Paint foldedCursorLinePaint = new Paint();//（折叠时）游标线画笔
     private final TextPaint foldedCursorTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);//（折叠时）游标值画笔
@@ -46,6 +47,10 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
     private float foldedRateUnitWidth = 0;//（折叠时）比率符号宽度
     private float spreadRateUnitWidth = 0;//（展开时）比率符号宽度
     private float triangleHalfHeight = 0;//（展开时）三角半高
+
+    public CursorDrawing(int id) {
+        super(id);
+    }
 
     @Override
     public void onInit(CandleRender render, AbsModule<AbsEntry> chartModule) {

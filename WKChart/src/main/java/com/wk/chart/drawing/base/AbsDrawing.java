@@ -4,6 +4,7 @@ package com.wk.chart.drawing.base;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 
+import com.wk.chart.enumeration.ClickDrawingID;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
 
@@ -16,14 +17,19 @@ import java.util.Arrays;
 
 public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<?>> {
     protected final float[] margin; //边距[left, top, right, bottom]
+    protected final int id;
     private boolean initState = false;//是否初始化
     protected RectF viewRect; // 绘制区域
     protected T render;//渲染工厂
     protected A absChartModule;//组件
 
+    public AbsDrawing(int id) {
+        this.id = id;
+        this.margin = new float[4];
+    }
 
     public AbsDrawing() {
-        this.margin = new float[4];
+        this(ClickDrawingID.ID_NONE);
     }
 
     /**
@@ -106,15 +112,6 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
     }
 
     /**
-     * Drawing的Click
-     *
-     * @return 是否响应该事件
-     */
-    public boolean onDrawingClick(float x, float y) {
-        return false;
-    }
-
-    /**
      * 初始化边距
      */
     public float[] onInitMargin() {
@@ -128,5 +125,14 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
      */
     public RectF getViewRect() {
         return viewRect;
+    }
+
+    /**
+     * 获取id
+     *
+     * @return id值
+     */
+    public int getId() {
+        return id;
     }
 }

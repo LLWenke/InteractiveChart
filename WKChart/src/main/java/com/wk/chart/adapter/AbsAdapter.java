@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Message;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.wk.chart.animator.ChartAnimator;
 import com.wk.chart.compat.DataSetObservable;
@@ -221,7 +222,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         if (dataSize == 0) return;
         stopAnimator();
         stopAsyTask();
-        onAsyTask(buildConfig, cloneDataList(), ObserverArg.INIT, false);
+        onAsyTask(buildConfig, cloneDataList(), ObserverArg.INIT, null);
     }
 
     /**
@@ -280,7 +281,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         if (isCalculateData) {
             stopAnimator();
             stopAsyTask();
-            onAsyTask(buildConfig, cloneDataList(), ObserverArg.FORMAT_UPDATE, false);
+            onAsyTask(buildConfig, cloneDataList(), ObserverArg.FORMAT_UPDATE, null);
         } else {
             notifyDataSetChanged(ObserverArg.FORMAT_UPDATE);
         }
@@ -306,7 +307,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             stopAnimator();
             stopAsyTask();
-            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.RESET : ObserverArg.INIT, false);
+            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.RESET : ObserverArg.INIT, null);
         }
     }
 
@@ -319,7 +320,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             stopAnimator();
             stopAsyTask();
-            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.UPDATE : ObserverArg.INIT, false);
+            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.UPDATE : ObserverArg.INIT, null);
         }
     }
 
@@ -332,7 +333,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             stopAnimator();
             data.addAll(renderData);
-            onAsyTask(buildConfig, data, ObserverArg.ADD, false);
+            onAsyTask(buildConfig, data, ObserverArg.ADD, null);
         }
     }
 
@@ -345,7 +346,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             stopAnimator();
             data.addAll(0, renderData);
-            onAsyTask(buildConfig, data, ObserverArg.ADD, false);
+            onAsyTask(buildConfig, data, ObserverArg.ADD, null);
         }
     }
 
@@ -357,7 +358,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
             stopAnimator();
             ArrayList<T> copyList = cloneDataList();
             copyList.add(data);
-            onAsyTask(buildConfig, copyList, ObserverArg.UPDATE, false);
+            onAsyTask(buildConfig, copyList, ObserverArg.UPDATE, null);
         }
     }
 
@@ -370,14 +371,18 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         if (null != data && position >= 0 && position < getCount()) {
             ArrayList<T> copyList = cloneDataList();
             copyList.set(position, data);
-            onAsyTask(buildConfig, copyList, ObserverArg.UPDATE, true);
+            onAsyTask(buildConfig, copyList, ObserverArg.UPDATE, position);
         }
     }
 
     @Override
     public void onAnimation(int position, T updateData) {
-        this.renderData.set(position, updateData);
-        notifyDataSetChanged(ObserverArg.UPDATE);
+        if (this.renderData.get(position).getTime().getTime() == updateData.getTime().getTime()) {
+            this.renderData.set(position, updateData);
+            notifyDataSetChanged(ObserverArg.UPDATE);
+        } else {
+            stopAnimator();
+        }
     }
 
     /**
@@ -422,16 +427,16 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     public boolean handleMessage(Message msg) {
         if (msg.obj instanceof BuildData) {
             BuildData<T, F> buildData = (BuildData<T, F>) msg.obj;
-            if (buildData.isAnimation() && dataSize == buildData.getData().size()) {
-                int position = getLastPosition();
-                T oldLastItem = getItem(position);
-                T newLastItem = buildData.getData().get(position);
-                this.animator.startAnimator(oldLastItem, newLastItem, position);
-            } else {
+            Integer animPosition = buildData.getAnimPosition();
+            if (null == animPosition) {
                 this.buildConfig = buildData.getBuildConfig();
                 this.renderData = buildData.getData();
                 this.dataSize = renderData.size();
                 notifyDataSetChanged(buildData.getObserverArg());
+            } else if (animPosition < dataSize && animPosition < buildData.getDataSize()) {
+                T oldItem = getItem(animPosition);
+                T newItem = buildData.getData().get(animPosition);
+                this.animator.startAnimator(oldItem, newItem, animPosition);
             }
         }
         return true;
@@ -440,11 +445,11 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     /**
      * 开启异步任务
      */
-    private void onAsyTask(@NonNull final F buildConfig, @NonNull final List<T> data, @NonNull final ObserverArg arg, boolean animation) {
+    private void onAsyTask(@NonNull final F buildConfig, @NonNull final List<T> data, @NonNull final ObserverArg arg, @Nullable Integer animPosition) {
         if (null == workThread) {
             this.workThread = new WorkThread<>();
         }
-        this.workThread.post(new BuildData<>(buildConfig, data, arg, animation), this);
+        this.workThread.post(new BuildData<>(buildConfig, data, arg, animPosition), this);
     }
 
     /**
@@ -453,6 +458,9 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     void stopAsyTask() {
         if (null != workThread) {
             this.workThread.removeAllMessage();
+        }
+        if (null != uiHandler) {
+            this.uiHandler.removeMessages(0);
         }
     }
 

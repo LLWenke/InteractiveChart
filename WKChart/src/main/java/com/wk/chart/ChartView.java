@@ -24,10 +24,10 @@ import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.compat.attribute.DepthAttribute;
 import com.wk.chart.compat.config.AbsBuildConfig;
-import com.wk.chart.drawing.CursorDrawing;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.ViewSizeEntry;
+import com.wk.chart.enumeration.ClickDrawingID;
 import com.wk.chart.enumeration.ModuleGroupType;
 import com.wk.chart.enumeration.ModuleType;
 import com.wk.chart.enumeration.ObserverArg;
@@ -191,28 +191,17 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 }
 
                 @Override
-                public boolean onDoubleTap(MotionEvent e) {
-                    if (interactiveHandler != null) {
-                        interactiveHandler.onDoubleTap(render.getFocusModule(e.getX(), e.getY()), e.getX(), e.getY());
-                    }
-                    return true;
-                }
-
-                @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
                     boolean consumed = false;
-                    if (interactiveHandler != null) {
-                        consumed = interactiveHandler.onSingleTap(render.getFocusModule(e.getX(), e.getY()), e.getX(), e.getY());
-                    }
-                    AbsDrawing<?, ?> absDrawing = getRender().onDrawingClick(e.getX(), e.getY());
-                    if (absDrawing instanceof CursorDrawing && !consumed) {
+                    int clickId = getRender().onClick(e.getX(), e.getY());
+                    if (clickId == ClickDrawingID.ID_CURSOR) {
                         scrollToEnd();
                         consumed = true;
                     }
-                    if (null != absDrawing && !consumed) {
-                        consumed = interactiveHandler.onSingleTap(absDrawing, e.getX(), e.getY());
+                    if (!consumed && null != interactiveHandler && clickId != ClickDrawingID.ID_NONE) {
+                        consumed = interactiveHandler.onSingleClick(clickId, e.getX(), e.getY());
                     }
-                    if (attribute.onSingleClickSelected && !consumed) {
+                    if (!consumed && attribute.onSingleClickSelected) {
                         highlight(e.getX(), e.getY());
                         DelayedHandler.getInstance().posOnlyDelayedWork(DELAYED_CANCEL_HIGHLIGHT, 10000);
                         consumed = true;

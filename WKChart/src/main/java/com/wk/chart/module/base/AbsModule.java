@@ -4,16 +4,22 @@ package com.wk.chart.module.base;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 
+import androidx.annotation.Nullable;
+
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.ValueEntry;
+import com.wk.chart.enumeration.ClickDrawingID;
 import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.ModuleGroupType;
 import com.wk.chart.enumeration.ModuleType;
+import com.wk.chart.interfaces.IDrawingClickListener;
 import com.wk.chart.render.AbsRender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>组件base类</p>
@@ -342,11 +348,33 @@ public abstract class AbsModule<T extends AbsEntry> {
         return rectBuffer;
     }
 
+    /**
+     * 布局完成
+     */
     public void onLayoutComplete() {
         for (AbsDrawing<AbsRender<?, ?>, AbsModule<?>> drawing : getDrawingList()) {
             if (drawing.isInit()) {
                 drawing.onLayoutComplete();
             }
         }
+    }
+
+    /**
+     * Click事件判定
+     *
+     * @return (返回响应事件的元素ID)
+     */
+    public int onClick(float x, float y) {
+        if (!isAttach() || !getRect().contains(x, y)) {
+            return ClickDrawingID.ID_NONE;
+        }
+        for (AbsDrawing<AbsRender<?, ?>, AbsModule<?>> drawing : getDrawingList()) {
+            if (drawing instanceof IDrawingClickListener) {
+                if (((IDrawingClickListener) drawing).onDrawingClick(x, y)) {
+                    return drawing.getId();
+                }
+            }
+        }
+        return ClickDrawingID.ID_NONE;
     }
 }
