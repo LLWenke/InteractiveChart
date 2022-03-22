@@ -13,6 +13,7 @@ import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.enumeration.ExtremumVisible;
+import com.wk.chart.interfaces.IDrawingClickListener;
 import com.wk.chart.module.CandleModule;
 import com.wk.chart.render.CandleRender;
 
@@ -21,7 +22,7 @@ import com.wk.chart.render.CandleRender;
  * 极值标签组件
  */
 
-public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> {
+public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> implements IDrawingClickListener {
     private static final String TAG = "ExtremumTagDrawing";
     private CandleAttribute attribute;//配置文件
     // 当前可见区域内的极值画笔
@@ -33,6 +34,10 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> {
     private final float[] extremumBuffer = new float[4]; // 用于计算极值坐标
     private float drawableWidth, drawableHeight, expandWidth;//drawable的宽高,扩展宽度
     private Bitmap bitmap;//极值标签drawable转换成的Bitmap
+
+    public ExtremumTagDrawing(int id) {
+        super(id);
+    }
 
     @Override
     public void onInit(CandleRender render, CandleModule chartModule) {

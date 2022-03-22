@@ -14,6 +14,7 @@ import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.SelectorItemEntry;
+import com.wk.chart.interfaces.IDrawingClickListener;
 import com.wk.chart.module.FloatModule;
 import com.wk.chart.render.CandleRender;
 
@@ -208,10 +209,5 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
                 .setLabelPaint(labelPaint)
                 .setValue(render.getAdapter().quantizationConversion(entry.getVolume(), true))
                 .setValuePaint(valuePaint);
-    }
-
-    @Override
-    public boolean onDrawingClick(float x, float y) {
-        return render.isHighlight() && Utils.contains(viewRectBuffer, x, y);
     }
 }

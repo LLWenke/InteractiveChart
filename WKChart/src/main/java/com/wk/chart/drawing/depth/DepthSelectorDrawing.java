@@ -16,6 +16,7 @@ import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.DepthEntry;
 import com.wk.chart.entry.SelectorItemEntry;
+import com.wk.chart.interfaces.IDrawingClickListener;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.DepthRender;
 
@@ -170,10 +171,5 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
                 .setValuePaint(valuePaint)
                 .setUnit(" ".concat(render.getAdapter().getRate().getSign()))
                 .setUnitPaint(unitPaint);
-    }
-
-    @Override
-    public boolean onDrawingClick(float x, float y) {
-        return render.isHighlight() && Utils.contains(viewRectBuffer, x, y);
     }
 }

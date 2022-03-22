@@ -1,18 +1,18 @@
 package com.wk.chart.enumeration;
 
 /**
- * <p>ScaleLineStyle</p>
- * 刻度线样式
+ * <p>LineStyle</p>
+ * 线条样式
  */
 
-public enum ScaleLineStyle {
+public enum LineStyle {
     NONE(0),//无(不显示)
     DOTTED(1),//虚线
     SOLID(2),//实线
-    SHORT_OUTSIDE(3),//短线（外向）
-    SHORT_INSIDE(4);//短线 (内向)
+    SCALE_OUTSIDE(3),//刻度线（外向）
+    SCALE_INSIDE(4);//刻度线 (内向)
 
-    ScaleLineStyle(int nativeInt) {
+    LineStyle(int nativeInt) {
         this.nativeInt = nativeInt;
     }
 

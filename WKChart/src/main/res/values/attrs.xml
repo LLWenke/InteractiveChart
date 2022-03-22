@@ -41,20 +41,20 @@
         <attr name="gridLabelMarginVertical" format="dimension" />
         <!-- grid 行数 -->
         <attr name="gridCount" format="integer" />
-        <!-- grid 刻度短线长度 -->
-        <attr name="gridScaleShortLineLength" format="dimension" />
-        <!-- grid 刻度样式-->
-        <attr name="gridScaleLineStyle">
+        <!-- grid 刻度线长度 -->
+        <attr name="gridScaleLineLength" format="dimension" />
+        <!-- grid 线条样式-->
+        <attr name="gridLineStyle">
             <!-- 无(不显示)-->
             <enum name="none" value="0" />
             <!-- 虚线-->
             <enum name="dotted" value="1" />
             <!-- 实线-->
             <enum name="solid" value="2" />
-            <!-- 短线（外向）-->
-            <enum name="short_outside" value="3" />
-            <!-- 短线 (内向)-->
-            <enum name="short_inside" value="4" />
+            <!-- 刻度线（外向）-->
+            <enum name="scale_outside" value="3" />
+            <!-- 刻度线 (内向)-->
+            <enum name="scale_inside" value="4" />
         </attr>
 
         <!-- 与 axis 标尺刻度有关属性 -->
@@ -62,22 +62,22 @@
         <attr name="axisLabelMarginHorizontal" format="dimension" />
         <!-- axis 标签垂直Margin -->
         <attr name="axisLabelMarginVertical" format="dimension" />
-        <!-- axis 刻度短线长度 -->
-        <attr name="axisScaleShortLineLength" format="dimension" />
+        <!-- axis 刻度线长度 -->
+        <attr name="axisScaleLineLength" format="dimension" />
         <!-- axis 是否显示第一条 -->
         <attr name="axisShowFirst" format="boolean" />
         <!-- axis 是否显示最后一条 -->
         <attr name="axisShowLast" format="boolean" />
-        <!-- axis 刻度样式-->
-        <attr name="axisScaleLineStyle">
+        <!-- axis 线条样式-->
+        <attr name="axisLineStyle">
             <!-- 无(不显示)-->
             <enum name="none" value="0" />
             <!-- 虚线-->
             <enum name="dotted" value="1" />
             <!-- 实线-->
             <enum name="solid" value="2" />
-            <!-- 短线 (内向)-->
-            <enum name="short_inside" value="4" />
+            <!-- 刻度线 (内向)-->
+            <enum name="scale_inside" value="4" />
         </attr>
         <!-- axis 标签显示位置 -->
         <attr name="axisLabelPosition">

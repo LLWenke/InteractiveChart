@@ -35,6 +35,7 @@ import com.wk.chart.drawing.depth.DepthSelectorDrawing;
 import com.wk.chart.drawing.timeLine.TimeLineDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.ChartCache;
+import com.wk.chart.enumeration.ClickDrawingID;
 import com.wk.chart.enumeration.DataType;
 import com.wk.chart.enumeration.ExtremumVisible;
 import com.wk.chart.enumeration.IndexType;
@@ -95,14 +96,14 @@ public class ChartLayout extends ConstraintLayout {
         render.resetChartModules();
         CandleModule candleModule = new CandleModule();
         candleModule.addDrawing(new WaterMarkingDrawing());//水印组件
+        candleModule.addDrawing(new AxisDrawing(5, false));//x轴组件
         candleModule.addDrawing(new CandleDrawing());//蜡烛图组件
         candleModule.addDrawing(new IndexLineDrawing(IndexType.CANDLE_MA));//MA组件
         candleModule.addDrawing(new IndexLabelDrawing(IndexType.CANDLE_MA));//MA指标文字标签组件
         candleModule.addDrawing(new IndexLineDrawing(IndexType.BOLL));//BOLL平均线组件
         candleModule.addDrawing(new IndexLabelDrawing(IndexType.BOLL));//BOLL指标文字标签组件
         candleModule.addDrawing(new MarkerPointDrawing());//标记点绘制组件
-        candleModule.addDrawing(new AxisDrawing(5, false));//x轴组件
-        candleModule.addDrawing(new ExtremumTagDrawing());//极值标签组件
+        candleModule.addDrawing(new ExtremumTagDrawing(ClickDrawingID.ID_EXTREMUM_TAG));//极值标签组件
         candleModule.addDrawing(new BorderDrawing(PositionType.BOTTOM));//边框组件
         candleModule.setAttachIndexType(IndexType.CANDLE_MA);
         candleModule.setEnable(true);
@@ -112,8 +113,8 @@ public class ChartLayout extends ConstraintLayout {
         timeLineModule.addDrawing(new WaterMarkingDrawing());//水印组件
         timeLineModule.addDrawing(new AxisDrawing(5, false));//x轴组件
         timeLineModule.addDrawing(new TimeLineDrawing());//分时图组件
-        timeLineModule.addDrawing(new MarkerPointDrawing());//标记点绘制组件
         timeLineModule.addDrawing(new BreathingLampDrawing());//呼吸灯组件
+        timeLineModule.addDrawing(new MarkerPointDrawing());//标记点绘制组件
         timeLineModule.addDrawing(new BorderDrawing(PositionType.BOTTOM));//边框组件
         render.addModule(timeLineModule);
 
@@ -343,8 +344,8 @@ public class ChartLayout extends ConstraintLayout {
                         if (reader.getAttribute().rightScrollOffset == 0) {
                             reader.getAttribute().rightScrollOffset = 250;
                         }
-                        chart.getRender().getModule(ModuleType.CANDLE, ModuleGroupType.MAIN).addDrawing(new CursorDrawing());
-                        chart.getRender().getModule(ModuleType.TIME, ModuleGroupType.MAIN).addDrawing(new CursorDrawing());
+                        chart.getRender().getModule(ModuleType.CANDLE, ModuleGroupType.MAIN).addDrawing(new CursorDrawing(ClickDrawingID.ID_CURSOR));
+                        chart.getRender().getModule(ModuleType.TIME, ModuleGroupType.MAIN).addDrawing(new CursorDrawing(ClickDrawingID.ID_CURSOR));
                     } else {
                         chart.setEnableRightRefresh(true);//启用右滑
                         reader.getAttribute().rightScrollOffset = 0;  //消除右固定偏移量

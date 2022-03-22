@@ -6,7 +6,7 @@ import android.graphics.Paint;
 import android.text.TextUtils;
 
 import com.wk.chart.R;
-import com.wk.chart.enumeration.ScaleLineStyle;
+import com.wk.chart.enumeration.LineStyle;
 
 /**
  * <p>AttributeRead</p>
@@ -71,11 +71,11 @@ public class AttributeRead {
         attribute.gridLabelMarginVertical = a.getDimension(R.styleable.ChartView_gridLabelMarginVertical,
                 attribute.gridLabelMarginVertical);//grid 标签下边距
 
-        attribute.gridScaleShortLineLength = a.getDimension(R.styleable.ChartView_gridScaleShortLineLength,
-                attribute.gridScaleShortLineLength);//grid 刻度短线长度
+        attribute.gridScaleLineLength = a.getDimension(R.styleable.ChartView_gridScaleLineLength,
+                attribute.gridScaleLineLength);//grid 刻度线长度
 
-        int style = a.getInteger(R.styleable.ChartView_gridScaleLineStyle, attribute.gridScaleLineStyle.ordinal());
-        attribute.gridScaleLineStyle = ScaleLineStyle.values()[style];//grid 线条样式
+        int style = a.getInteger(R.styleable.ChartView_gridLineStyle, attribute.gridLineStyle.ordinal());
+        attribute.gridLineStyle = LineStyle.values()[style];//grid 线条样式
 
         /*
          * 与 axis 标尺刻度有关属性
@@ -86,8 +86,8 @@ public class AttributeRead {
         attribute.axisLabelMarginVertical = a.getDimension(R.styleable.ChartView_axisLabelMarginVertical,
                 attribute.axisLabelMarginVertical);//axis 标签垂直Margin
 
-        attribute.axisScaleShortLineLength = a.getDimension(R.styleable.ChartView_axisScaleShortLineLength,
-                attribute.axisScaleShortLineLength);//axis 刻度短线长度
+        attribute.axisScaleLineLength = a.getDimension(R.styleable.ChartView_axisScaleLineLength,
+                attribute.axisScaleLineLength);//axis 刻度线长度
 
         attribute.axisShowFirst = a.getBoolean(R.styleable.ChartView_axisShowFirst,
                 attribute.axisShowFirst);//axis 是否显示第一条
@@ -95,8 +95,8 @@ public class AttributeRead {
         attribute.axisShowLast = a.getBoolean(R.styleable.ChartView_axisShowLast,
                 attribute.axisShowLast);//axis 是否显示最后一条
 
-        style = a.getInteger(R.styleable.ChartView_axisScaleLineStyle, attribute.axisScaleLineStyle.ordinal());
-        attribute.axisScaleLineStyle = ScaleLineStyle.values()[style];//axis 线条样式
+        style = a.getInt(R.styleable.ChartView_axisLineStyle, attribute.axisLineStyle.ordinal());
+        attribute.axisLineStyle = LineStyle.values()[style];//axis 线条样式
 
         attribute.axisLabelPosition = a.getInt(R.styleable.ChartView_axisLabelPosition, attribute.axisLabelPosition); //axis 标签位置
 
