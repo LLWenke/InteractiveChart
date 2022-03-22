@@ -13,7 +13,7 @@ import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
-import com.wk.chart.enumeration.ScaleLineStyle;
+import com.wk.chart.enumeration.LineStyle;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
 
@@ -53,7 +53,7 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
 
         Utils.measureTextArea(gridLabelPaint, rect);
 
-        if (attribute.gridScaleLineStyle == ScaleLineStyle.DOTTED) {
+        if (attribute.gridLineStyle == LineStyle.DOTTED) {
             gridLinePaint.setPathEffect(new DashPathEffect(new float[]{10f, 5f}, 0));
         }
     }
@@ -62,7 +62,7 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
     public float[] onInitMargin() {
         margin[3] = (float) Math.ceil(attribute.gridLabelMarginVertical * 2f
                 + rect.height()
-                + (attribute.gridScaleLineStyle == ScaleLineStyle.SHORT_OUTSIDE ? attribute.gridScaleShortLineLength : 0));
+                + (attribute.gridLineStyle == LineStyle.SCALE_OUTSIDE ? attribute.gridScaleLineLength : 0));
         return margin;
     }
 
@@ -97,19 +97,19 @@ public class GridDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
             }
             canvas.drawText(label[i], point[xIndex], gridLabelY, gridLabelPaint);
             // 跳过超出显示区域的线
-            if (attribute.gridScaleLineStyle == ScaleLineStyle.NONE) {
+            if (attribute.gridLineStyle == LineStyle.NONE) {
                 continue;
             }
             float x = point[xIndex];
             float y = render.getBottomModule().getRect().bottom;
-            if (attribute.gridScaleLineStyle == ScaleLineStyle.DOTTED
-                    || attribute.gridScaleLineStyle == ScaleLineStyle.SOLID) {
+            if (attribute.gridLineStyle == LineStyle.DOTTED
+                    || attribute.gridLineStyle == LineStyle.SOLID) {
                 canvas.drawLines(render.buildViewLRCoordinates(x, x), gridLinePaint);
-            } else if (attribute.gridScaleLineStyle == ScaleLineStyle.SHORT_INSIDE) {
-                canvas.drawLine(x, y, x, y - attribute.gridScaleShortLineLength, gridLinePaint);
-            } else if (attribute.gridScaleLineStyle == ScaleLineStyle.SHORT_OUTSIDE) {
+            } else if (attribute.gridLineStyle == LineStyle.SCALE_INSIDE) {
+                canvas.drawLine(x, y, x, y - attribute.gridScaleLineLength, gridLinePaint);
+            } else if (attribute.gridLineStyle == LineStyle.SCALE_OUTSIDE) {
                 y = y + attribute.borderWidth;
-                canvas.drawLine(x, y, x, y + attribute.gridScaleShortLineLength, gridLinePaint);
+                canvas.drawLine(x, y, x, y + attribute.gridScaleLineLength, gridLinePaint);
             }
         }
         canvas.restore();

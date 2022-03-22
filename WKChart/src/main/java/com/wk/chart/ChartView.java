@@ -194,12 +194,12 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 public boolean onSingleTapConfirmed(MotionEvent e) {
                     boolean consumed = false;
                     int clickId = getRender().onClick(e.getX(), e.getY());
-                    if (clickId == ClickDrawingID.ID_CURSOR) {
+                    if (null != interactiveHandler && clickId != ClickDrawingID.ID_NONE) {
+                        consumed = interactiveHandler.onSingleClick(clickId, e.getX(), e.getY());
+                    }
+                    if (!consumed && clickId == ClickDrawingID.ID_CURSOR) {
                         scrollToEnd();
                         consumed = true;
-                    }
-                    if (!consumed && null != interactiveHandler && clickId != ClickDrawingID.ID_NONE) {
-                        consumed = interactiveHandler.onSingleClick(clickId, e.getX(), e.getY());
                     }
                     if (!consumed && attribute.onSingleClickSelected) {
                         highlight(e.getX(), e.getY());

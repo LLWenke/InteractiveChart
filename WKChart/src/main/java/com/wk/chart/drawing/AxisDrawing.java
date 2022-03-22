@@ -13,9 +13,9 @@ import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.ValueEntry;
-import com.wk.chart.enumeration.PositionType;
+import com.wk.chart.enumeration.LineStyle;
 import com.wk.chart.enumeration.ModuleType;
-import com.wk.chart.enumeration.ScaleLineStyle;
+import com.wk.chart.enumeration.PositionType;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
 
@@ -80,7 +80,7 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
         lineHeightOffset = attribute.lineWidth / 2f;
         textHeight = rect.height();
         textCenter = textHeight / 2f;
-        switch (attribute.axisScaleLineStyle) {
+        switch (attribute.axisLineStyle) {
             case SOLID:
                 sortLineOffset = 0;
                 axisLinePaint.setPathEffect(null);
@@ -89,9 +89,9 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
                 sortLineOffset = 0;
                 axisLinePaint.setPathEffect(new DashPathEffect(new float[]{10f, 5f}, 0));
                 break;
-            case SHORT_INSIDE:
-            case SHORT_OUTSIDE:
-                sortLineOffset = attribute.axisScaleShortLineLength;
+            case SCALE_INSIDE:
+            case SCALE_OUTSIDE:
+                sortLineOffset = attribute.axisScaleLineLength;
                 break;
         }
     }
@@ -111,30 +111,33 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
     @Override
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
         for (int i = axisStart; i < axisEnd; i++) {
-            float centerOffset, axisY;
             String text;
+            float labelOffset, lineOffset, axisY;
             axisY = viewRect.top + i * regionHeight;
             pointCache[1] = axisY;
             render.invertMapPoints(absChartModule.getMatrix(), pointCache);
             if (i == 0) {
-                centerOffset = textCenter;
+                labelOffset = textHeight;
+                lineOffset = textCenter;
                 text = getScaleLabel(extremum[3], absChartModule.getMaxY());
             } else if (i == axisCount - 1) {
-                centerOffset = -textCenter;
+                labelOffset = 0;
+                lineOffset = -textCenter;
                 text = getScaleLabel(extremum[1], absChartModule.getMinY());
             } else {
-                centerOffset = 0;
+                labelOffset = textCenter;
+                lineOffset = 0;
                 text = getScaleLabel(pointCache[1], null);
             }
             //绘制刻度值
             if ((attribute.axisLabelPosition & PositionType.BOTTOM) != 0) {
                 labelBuffer[1] = axisY + textHeight + lineHeightOffset + attribute.axisLabelMarginVertical;
                 labelBuffer[3] = labelBuffer[1];
-            } else if ((attribute.axisLabelPosition & PositionType.CENTER_VERTICAL) != 0) {
-                labelBuffer[1] = axisY + centerOffset + attribute.axisLabelMarginVertical;
+            } else if ((attribute.axisLabelPosition & PositionType.TOP) != 0) {
+                labelBuffer[1] = axisY - lineHeightOffset - attribute.axisLabelMarginVertical;
                 labelBuffer[3] = labelBuffer[1];
             } else {
-                labelBuffer[1] = axisY - lineHeightOffset - attribute.axisLabelMarginVertical;
+                labelBuffer[1] = axisY + labelOffset + attribute.axisLabelMarginVertical;
                 labelBuffer[3] = labelBuffer[1];
             }
             if ((attribute.axisLabelPosition & PositionType.START_AND_END) != 0) {
@@ -150,17 +153,17 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
                 canvas.drawText(text, labelBuffer[0], labelBuffer[1], axisLabelPaintLeft);
             }
             // 绘制横刻度线
-            if (attribute.axisScaleLineStyle == ScaleLineStyle.SHORT_OUTSIDE
-                    || attribute.axisScaleLineStyle == ScaleLineStyle.SHORT_INSIDE) {
+            if (attribute.axisLineStyle == LineStyle.SCALE_OUTSIDE
+                    || attribute.axisLineStyle == LineStyle.SCALE_INSIDE) {
                 lineBuffer[1] = lineBuffer[5] = axisY;
-                lineBuffer[3] = lineBuffer[7] = axisY + centerOffset;
+                lineBuffer[3] = lineBuffer[7] = axisY + lineOffset;
                 lineBuffer[0] = viewRect.left;
                 lineBuffer[2] = viewRect.left + sortLineOffset;
                 lineBuffer[4] = viewRect.right;
                 lineBuffer[6] = viewRect.right - sortLineOffset;
                 canvas.drawLines(lineBuffer, axisLinePaint);
-            } else if (attribute.axisScaleLineStyle == ScaleLineStyle.DOTTED
-                    || attribute.axisScaleLineStyle == ScaleLineStyle.SOLID) {
+            } else if (attribute.axisLineStyle == LineStyle.DOTTED
+                    || attribute.axisLineStyle == LineStyle.SOLID) {
                 lineBuffer[1] = lineBuffer[3] = lineBuffer[5] = lineBuffer[7] = axisY;
                 lineBuffer[0] = viewRect.left;
                 lineBuffer[2] = viewRect.right;

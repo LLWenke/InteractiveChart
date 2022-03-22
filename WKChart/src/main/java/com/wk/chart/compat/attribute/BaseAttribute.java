@@ -8,9 +8,9 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 
 import com.wk.chart.enumeration.ExtremumVisible;
-import com.wk.chart.enumeration.PositionType;
-import com.wk.chart.enumeration.ScaleLineStyle;
 import com.wk.chart.enumeration.HighLightStyle;
+import com.wk.chart.enumeration.LineStyle;
+import com.wk.chart.enumeration.PositionType;
 
 /**
  * <p>视图属性配置基类</p>
@@ -53,19 +53,19 @@ public class BaseAttribute {
      */
     public int gridCount = 4; // grid 数量
     public float gridLabelMarginVertical = 0; // grid 标签垂直Margin
-    public float gridScaleShortLineLength = 10; // grid 刻度短线长度
-    public ScaleLineStyle gridScaleLineStyle = ScaleLineStyle.DOTTED;//grid 刻度样式
+    public float gridScaleLineLength = 10; // grid 刻度线长度
+    public LineStyle gridLineStyle = LineStyle.DOTTED;//grid 线条样式
 
     /**
      * 与 axis 标尺刻度有关属性
      */
     public float axisLabelMarginHorizontal = 16f;//axis 标签水平Margin
     public float axisLabelMarginVertical = 8f;//axis 标签垂直Margin
-    public float axisScaleShortLineLength = 10; //axis 刻度短线长度
+    public float axisScaleLineLength = 10; //axis 刻度线长度
     public boolean axisShowFirst = true;//axis 是否显示第一条
     public boolean axisShowLast = true;//axis 是否显示最后一条
     public int axisLabelPosition = PositionType.END | PositionType.TOP; //axis 标签位置
-    public ScaleLineStyle axisScaleLineStyle = ScaleLineStyle.SOLID;//axis 刻度样式
+    public LineStyle axisLineStyle = LineStyle.SOLID;//axis 线条样式
 
     /**
      * 与高亮线有关的属性
