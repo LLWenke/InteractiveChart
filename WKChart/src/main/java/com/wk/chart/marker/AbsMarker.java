@@ -12,16 +12,22 @@ import androidx.annotation.Size;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.render.AbsRender;
 
+import java.util.Arrays;
+
 
 /**
  * <p>AbsMarker</p>
  */
 
 public abstract class AbsMarker<T extends AbsRender<?, ?>> {
+    protected final float[] margin; //边距[left, top, right, bottom]
     public boolean isInit = false;
     protected BaseAttribute attribute;
     protected T render;
-    protected float[] margin; //边距[left, top, right, bottom]
+
+    public AbsMarker() {
+        this.margin = new float[4];
+    }
 
     /**
      * 初始化
@@ -32,7 +38,7 @@ public abstract class AbsMarker<T extends AbsRender<?, ?>> {
         this.isInit = true;
         this.render = render;
         this.attribute = render.getAttribute();
-        this.margin = new float[4];
+        Arrays.fill(margin, 0);
     }
 
     /**

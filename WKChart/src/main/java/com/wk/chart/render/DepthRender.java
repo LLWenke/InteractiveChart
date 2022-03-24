@@ -17,7 +17,6 @@ import com.wk.chart.module.base.AbsModule;
 
 public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
     private static final String TAG = "DepthRender";
-    private final float[] highlightPoints = new float[2];//高亮线坐标点
 
     public DepthRender(DepthAttribute attribute, RectF viewRect) {
         super(attribute, viewRect);
@@ -41,8 +40,9 @@ public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
     @Override
     protected void resetMatrix() {
         AbsModule<AbsEntry> module = getMainModule();
-        postMatrixOffset(module.getRect().left + module.getXOffset() * 2f, viewRect.top - module.getYOffset());
-        postMatrixTouch(module.getRect(), module.getRect().width() - module.getXCorrectedValue(), getAdapter().getCount());
+        postMatrixOffset(matrixOffset, module.getRect().left + module.getXOffset() * 2f, viewRect.top - module.getYOffset());
+        postMatrixTouch(matrixTouch, module.getRect(), module.getRect().width() - module.getXCorrectedValue(), getAdapter().getCount());
+        postMatrixScale(module.getMatrix(), 1f, 1f);
     }
 
     /**

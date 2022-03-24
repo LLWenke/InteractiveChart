@@ -72,7 +72,7 @@ public class GridTextMarker extends AbsMarker<AbsRender<?, ?>> {
         if (viewRect.left > highlightPointX || highlightPointX > viewRect.right) {
             return;
         }
-        markerTextPaint.getTextBounds(markerText[1], 0, markerText[1].length(), textRect);
+        Utils.measureTextArea(markerTextPaint, textRect, markerText[1]);
         float markerWidth = width + textRect.width();
         float top = render.getTopModule().getRect().top;
         float bottom = render.getBottomModule().getRect().bottom;

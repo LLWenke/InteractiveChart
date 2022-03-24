@@ -52,8 +52,8 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
      * @param isQuantization 是否量化数字
      */
     public AxisDrawing(int axisCount, boolean isQuantization) {
-        this.axisCount = axisCount;
         this.isQuantization = isQuantization;
+        this.axisCount = axisCount;
     }
 
     @Override

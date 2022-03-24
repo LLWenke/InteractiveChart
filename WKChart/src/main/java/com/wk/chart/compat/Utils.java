@@ -67,9 +67,10 @@ public class Utils {
      *
      * @param measurePaint 计算用文字的画笔
      * @param rect         计算后的矩形（此矩形位文字的实际占用区域）
+     * @return 占用区域
      */
-    public static void measureTextArea(TextPaint measurePaint, Rect rect) {
-        measureTextArea(measurePaint, rect, "9");
+    public static Rect measureTextArea(TextPaint measurePaint, Rect rect) {
+        return measureTextArea(measurePaint, rect, "9");
     }
 
     /**
@@ -78,13 +79,15 @@ public class Utils {
      * @param measurePaint 计算用文字的画笔
      * @param rect         计算后的矩形（此矩形位文字的实际占用区域）
      * @param text         文字
+     * @return 占用区域
      */
-    public static void measureTextArea(TextPaint measurePaint, Rect rect, String text) {
+    public static Rect measureTextArea(TextPaint measurePaint, Rect rect, String text) {
         if (TextUtils.isEmpty(text)) {
             rect.setEmpty();
         } else {
             measurePaint.getTextBounds(text, 0, text.length(), rect);
         }
+        return rect;
     }
 
     /**

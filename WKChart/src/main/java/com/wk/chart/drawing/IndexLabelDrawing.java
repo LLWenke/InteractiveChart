@@ -169,7 +169,7 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
     @Override
     public void onLayoutComplete() {
         //计算指标文字位置信息
-        float lineOffset = lines > 1 ? lineHeight * lines : 0;
+        float lineOffset = lines > 1 ? (lineHeight + attribute.indexTextMarginVertical) * (lines - 1) : 0;
         if ((attribute.indexLabelPosition & PositionType.END) != 0) {
             x = right;
         } else {

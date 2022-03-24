@@ -23,13 +23,13 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
     protected T render;//渲染工厂
     protected A absChartModule;//组件
 
+    public AbsDrawing() {
+        this(ClickDrawingID.ID_NONE);
+    }
+
     public AbsDrawing(int id) {
         this.id = id;
         this.margin = new float[4];
-    }
-
-    public AbsDrawing() {
-        this(ClickDrawingID.ID_NONE);
     }
 
     /**
@@ -135,4 +135,5 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
     public int getId() {
         return id;
     }
+
 }

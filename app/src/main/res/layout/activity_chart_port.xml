@@ -47,7 +47,7 @@
             app:gridScaleLineLength="3dp"
             app:increasingStyle="fill"
             app:indexTextMarginHorizontal="10dp"
-            app:indexTextMarginVertical="6dp"
+            app:indexTextMarginVertical="3dp"
             app:indexTextSize="10sp"
             app:indexViewHeight="80dp"
             app:labelSize="10sp"

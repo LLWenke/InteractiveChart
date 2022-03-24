@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.text.TextPaint;
 
+import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
@@ -86,7 +87,7 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
         markerPointsTextPaint.setTextAlign(Paint.Align.CENTER);
         markerPointsTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
-        markerPointsTextPaint.getTextBounds("S", 0, 1, textRect);
+        Utils.measureTextArea(markerPointsTextPaint, textRect, "S");
         pointRectHalfWidth = (int) ((textRect.width() + attribute.markerPointTextMarginHorizontal * 2) / 2);
         pointRectHeight = (textRect.height() + attribute.markerPointTextMarginVertical * 2);
         jointSize = (int) (attribute.markerPointJointRadius * 2);
