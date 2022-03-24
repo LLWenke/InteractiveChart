@@ -36,16 +36,12 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
     private final Paint spreadCursorBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);//展开时）游标值容器边框画笔
     private final Paint cursorBackgroundPaint = new Paint();//游标值容器背景画笔
     private final Path cursorPath = new Path();//游标绘制路径
-    private final Rect foldedTextRect = new Rect();//（折叠时）游标单文字预显示区域
-    private final Rect spreadTextRect = new Rect();//（展开时）游标单文字预显示区域
     private final RectF cursorRect = new RectF();//游标显示区域(不包含游标线)
     private final Path path = new Path();//游标线路径
     private final float[] cursorPoint = new float[2];//存放游标坐标
     private boolean clickable = false;//是否可以点击
-    private float foldedCharsWidth, foldedTextHalfHeight = 0;//（折叠时）用于计算的文字宽度和半高
-    private float spreadCharsWidth, spreadTextHalfHeight = 0;//（展开时）用于计算的文字宽度和半高
-    private float foldedRateUnitWidth = 0;//（折叠时）比率符号宽度
-    private float spreadRateUnitWidth = 0;//（展开时）比率符号宽度
+    private float foldedTextHeight;//（折叠时）游标单文字高度
+    private float spreadTextHeight;//（展开时）游标单文字高度
     private float triangleHalfHeight = 0;//（展开时）三角半高
 
     public CursorDrawing(int id) {
@@ -84,20 +80,10 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
 
         cursorBackgroundPaint.setStyle(Paint.Style.FILL);
         cursorBackgroundPaint.setColor(attribute.cursorBackgroundColor);
-        Utils.measureTextArea(foldedCursorTextPaint, foldedTextRect);
-        Utils.measureTextArea(spreadCursorTextPaint, spreadTextRect);
-        foldedCharsWidth = foldedTextRect.width();
-        spreadCharsWidth = spreadTextRect.width();
-        foldedTextHalfHeight = foldedTextRect.height() / 2f;
-        spreadTextHalfHeight = spreadTextRect.height() / 2f;
-        triangleHalfHeight = attribute.spreadTriangleHeight / 2f;
-    }
 
-    @Override
-    public void onInitConfig() {
-        super.onInitConfig();
-        foldedRateUnitWidth = foldedCursorTextPaint.measureText(render.getAdapter().getRate().getSign());
-        spreadRateUnitWidth = spreadCursorTextPaint.measureText(render.getAdapter().getRate().getSign());
+        triangleHalfHeight = attribute.spreadTriangleHeight / 2f;
+        foldedTextHeight = Utils.measureTextArea(foldedCursorTextPaint, new Rect()).height();
+        spreadTextHeight = Utils.measureTextArea(spreadCursorTextPaint, new Rect()).height();
     }
 
     @Override
@@ -108,15 +94,15 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
         render.mapPoints(absChartModule.getMatrix(), cursorPoint);
         String value = render.getAdapter().rateConversion(last.getClose(), false, false);
         //防止文字抖动现象
-        float textWidth = computationTextWidth(foldedCharsWidth, foldedRateUnitWidth, value);
+        float textWidth = foldedCursorTextPaint.measureText(value);
         float cursorRight = viewRect.right - attribute.axisLabelMarginHorizontal;
         float textLeft = cursorRight - textWidth;
         float textY;
         if (cursorPoint[0] < textLeft) {//折叠
             clickable = false;
-            textY = cursorPoint[1] + foldedTextHalfHeight;
+            textY = cursorPoint[1] + foldedTextHeight / 2f;
             cursorRect.left = textLeft;
-            cursorRect.top = textY - foldedTextRect.height();
+            cursorRect.top = textY - foldedTextHeight;
             cursorRect.right = cursorRight;
             cursorRect.bottom = textY;
             //绘制游标值区域背景
@@ -129,8 +115,9 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
             canvas.drawPath(path, foldedCursorLinePaint);
         } else {//展开
             clickable = true;
-            //修正坐标，防止出界
-            textWidth = computationTextWidth(spreadCharsWidth, spreadRateUnitWidth, value);
+            //防止文字抖动现象
+            textWidth = spreadCursorTextPaint.measureText(value);
+            float spreadTextHalfHeight = spreadTextHeight / 2f;
             float spreadCursorHalfHeight = spreadTextHalfHeight + attribute.spreadCursorPaddingVertical + attribute.spreadCursorBorderWidth;
             float topLimit = viewRect.top + spreadCursorHalfHeight;
             float bottomLimit = viewRect.bottom - spreadCursorHalfHeight;
@@ -172,15 +159,6 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
             canvas.drawPath(path, spreadCursorLinePaint);
         }
         path.rewind();
-    }
-
-    private float computationTextWidth(float charWidth, float rateUnitWidth, String text) {
-        RateEntry rate = render.getAdapter().getRate();
-        float textWidth = charWidth * (float) text.length() + charWidth / 2f;
-        if (rate.isSet() && rateUnitWidth > 0) {
-            textWidth = textWidth - charWidth + rateUnitWidth;
-        }
-        return textWidth;
     }
 
     @Override

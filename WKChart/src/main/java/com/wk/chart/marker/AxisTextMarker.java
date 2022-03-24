@@ -27,7 +27,7 @@ public class AxisTextMarker extends AbsMarker<AbsRender<?, ?>> {
 
     private final RectF markerInsets = new RectF(0, 0, 0, 0);
     private final Rect textRect = new Rect();
-    private float width, height, borderOffset, charsWidth = 0;
+    private float width, height, borderOffset;
 
     @Override
     public void onInit(AbsRender<?, ?> render) {
@@ -42,7 +42,6 @@ public class AxisTextMarker extends AbsMarker<AbsRender<?, ?>> {
 
         //用于计算的文字宽度
         Utils.measureTextArea(markerTextPaint, textRect);
-        charsWidth = textRect.width() + Utils.sp2px(attribute.context, 0.5f);
         borderOffset = attribute.markerBorderWidth / 2;
         width = (attribute.markerPaddingHorizontal + attribute.markerBorderWidth) * 2f;
         height = textRect.height() + (attribute.markerPaddingVertical + attribute.markerBorderWidth) * 2f;
@@ -56,9 +55,8 @@ public class AxisTextMarker extends AbsMarker<AbsRender<?, ?>> {
         if (viewRect.top > highlightPointY || highlightPointY > viewRect.bottom) {
             return;
         }
-        int length = markerText[0].length();
-        markerTextPaint.getTextBounds(markerText[0], 0, length, textRect);
-        float markerWidth = width + charsWidth * length + charsWidth / 2f;
+        Utils.measureTextArea(markerTextPaint, textRect, markerText[0]);
+        float markerWidth = width + textRect.width();
 
         highlightPointY = highlightPointY - height / 2;
         if (highlightPointY < viewRect.top) {

@@ -39,9 +39,9 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     private static final String TAG = "AbsRender";
     private final MeasureUtils measureUtils;//计算工具类
     private final LinkedHashMap<Integer, List<AbsModule<AbsEntry>>> chartModules; //图表指标列表
-    private final Matrix matrixTouch = new Matrix(); // 缩放和平移矩阵
-    private final Matrix matrixOffset = new Matrix(); // 偏移矩阵
-    private final Matrix matrixInvert = new Matrix(); // 用于缓存反转矩阵
+    protected final Matrix matrixTouch = new Matrix(); // 缩放和平移矩阵
+    protected final Matrix matrixOffset = new Matrix(); // 偏移矩阵
+    protected final Matrix matrixInvert = new Matrix(); // 用于缓存反转矩阵
     private final float[] points = new float[2];//储存某个点的坐标系信息
     private final float[] touchPts = new float[2];//存储交互位置
     private final float[] touchValues = new float[9]; // 存储缩放和平移信息
@@ -431,8 +431,9 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      * 刷新Matrix
      */
     void resetMatrix() {
-        postMatrixOffset(mainModule.getRect().left, viewRect.top);
-        postMatrixTouch(mainModule.getRect(), mainModule.getRect().width(), attribute.visibleCount);
+        postMatrixOffset(matrixOffset, mainModule.getRect().left, viewRect.top);
+        postMatrixTouch(matrixTouch, mainModule.getRect(), mainModule.getRect().width(), attribute.visibleCount);
+        postMatrixScale(mainModule.getMatrix(), mainModule.getRect().width() / adapter.getCount(), 1f);
     }
 
     /**
@@ -684,31 +685,40 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     }
 
     /**
+     * 偏移矩阵运算
+     *
+     * @param matrix  矩阵
+     * @param offsetX 偏移量 X
+     * @param offsetY 偏移量 Y
+     */
+    protected void postMatrixOffset(Matrix matrix, float offsetX, float offsetY) {
+        matrix.reset();
+        matrix.postTranslate(offsetX, offsetY);
+    }
+
+    /**
      * 手势滑动缩放矩阵运算
      *
+     * @param matrix       矩阵
      * @param rect         当前显示区域矩形
      * @param width        当前显示区域宽度
      * @param visibleCount 当前显示区域的 X 轴方向上需要显示多少个 entry 值
      */
-    protected void postMatrixTouch(RectF rect, float width, float visibleCount) {
+    protected void postMatrixTouch(Matrix matrix, RectF rect, float width, float visibleCount) {
         final float scaleX = adapter.getCount() / visibleCount;
-        matrixTouch.reset();
-        matrixTouch.postScale(scaleX, 1);
+        matrix.reset();
+        matrix.postScale(scaleX, 1);
         lastMaxScrollOffset = maxScrollOffset == 0 ? lastMaxScrollOffset : maxScrollOffset;
         computeScrollRange(width, scaleX);
         if (touchValues[Matrix.MTRANS_X] > 0) {
             // 左滑加载完成之后定位到之前滚动的位置
-            matrixTouch.postTranslate(
-                    touchValues[Matrix.MTRANS_X] - (maxScrollOffset - lastMaxScrollOffset), 0);
+            matrix.postTranslate(touchValues[Matrix.MTRANS_X] - (maxScrollOffset - lastMaxScrollOffset), 0);
         } else if (touchValues[Matrix.MTRANS_X] < 0) {
             if ((int) overScrollOffset == 0) {
                 // 转动屏幕方向导致矩形变化，定位到之前相同比例的滚动位置
-                touchValues[Matrix.MTRANS_X] =
-                        touchValues[Matrix.MTRANS_X] / lastMaxScrollOffset * maxScrollOffset;
+                touchValues[Matrix.MTRANS_X] = touchValues[Matrix.MTRANS_X] / lastMaxScrollOffset * maxScrollOffset;
             }
-            matrixTouch.postTranslate(touchValues[Matrix.MTRANS_X], 0);
-//            Log.e(TAG, "##d postMatrixTouch: currentOffset = " + touchValues[Matrix.MTRANS_X]
-//                    + ", rightScrollOffset = " + attribute.rightScrollOffset);
+            matrix.postTranslate(touchValues[Matrix.MTRANS_X], 0);
         } else if (firstLoad && maxScrollOffset != 0) {
             this.firstLoad = false;
             float firstScrollOffset;
@@ -720,21 +730,18 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
             setCurrentTransX(firstScrollOffset);
 //            Log.e(TAG, "firstScrollOffset= " + firstScrollOffset + "   firstLoadPosition= " + firstLoadPosition);
         }
-        //Log.e(TAG, "##d postMatrixTouch: currentOffset = " + touchValues[Matrix.MTRANS_X]
-        //    + ", maxScrollOffset = " + -maxScrollOffset
-        //    + ", minScrollOffset = " + minScrollOffset
-        //    + ", lastMaxScrollOffset = " + lastMaxScrollOffset
-        //    + ", overScrollOffset = " + overScrollOffset);
     }
 
     /**
-     * 偏移矩阵运算
+     * 矩阵缩放运算
      *
-     * @param offsetY 偏移量 Y
+     * @param matrix 矩阵
+     * @param sx     x轴倍率
+     * @param sy     y轴倍率
      */
-    protected void postMatrixOffset(float offsetX, float offsetY) {
-        matrixOffset.reset();
-        matrixOffset.postTranslate(offsetX, offsetY);
+    protected void postMatrixScale(Matrix matrix, float sx, float sy) {
+        matrix.reset();
+        matrix.postScale(sx, sy);
     }
 
     /**
