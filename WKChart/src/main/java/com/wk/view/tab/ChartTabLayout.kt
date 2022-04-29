@@ -5,7 +5,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.CompoundButton
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.wk.chart.R
 import com.wk.chart.enumeration.IndexType
@@ -26,7 +26,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
     private var mChartTabListener: ChartTabListener? = null
     private var mMorePopupWindow: MorePopupWindow? = null
     private var mIndexPopupWindow: IndexPopupWindow? = null
-    private val mBaseTabViews = ArrayList<CompoundButton>()
+    private val mBaseTabViews = ArrayList<TextView>()
     private val mBaseData = ArrayList<TabTimeBean>()
     private val mMoreData = ArrayList<TabTimeBean>()
     private var mTabType: Int = SPOT
@@ -58,43 +58,43 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
             }
         }
         LayoutInflater.from(context).inflate(R.layout.view_tab_layout, this, true)
-        rb_1.setOnClickListener(this)
-        rb_2.setOnClickListener(this)
-        rb_3.setOnClickListener(this)
-        rb_4.setOnClickListener(this)
-        rb_more.setOnClickListener(this)
-        rb_index.setOnClickListener(this)
+        tv_1.setOnClickListener(this)
+        tv_2.setOnClickListener(this)
+        tv_3.setOnClickListener(this)
+        tv_4.setOnClickListener(this)
+        tv_more.setOnClickListener(this)
+        tv_index.setOnClickListener(this)
         iv_orientation.setOnClickListener(this)
         if (mOrientation == VERTICAL) {
             iv_orientation.isSelected = false
             iv_orientation.visibility = View.VISIBLE
-            rb_index.visibility = View.VISIBLE
+            tv_index.visibility = View.VISIBLE
         } else {
             iv_orientation.isSelected = true
-            rb_index.visibility = View.GONE
+            tv_index.visibility = View.GONE
             iv_orientation.visibility = View.GONE
         }
         mBaseTabViews.clear()
-        mBaseTabViews.add(rb_1)
-        mBaseTabViews.add(rb_2)
-        mBaseTabViews.add(rb_3)
-        mBaseTabViews.add(rb_4)
+        mBaseTabViews.add(tv_1)
+        mBaseTabViews.add(tv_2)
+        mBaseTabViews.add(tv_3)
+        mBaseTabViews.add(tv_4)
     }
 
     private fun initPopWindow() {
         mMorePopupWindow = MorePopupWindow(context, this, mMoreData, this).also {
             it.setOnDismissListener {
-                rb_more?.let { more ->
+                tv_more?.let { more ->
                     more.isSelected = false
-//                    more.tag = false
+                    more.tag = false
                 }
             }
         }
         mIndexPopupWindow = IndexPopupWindow(context, this, this).also {
             it.setOnDismissListener {
-                rb_index?.let { index ->
+                tv_index?.let { index ->
                     index.isSelected = false
-//                    index.tag = false
+                    index.tag = false
                 }
             }
         }
@@ -107,11 +107,11 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
             val bean = mBaseData[i]
             tab.tag = i
             tab.text = bean.tabName
-            tab.isChecked = bean.isChecked
+            tab.isSelected = bean.isSelected
             i++
         }
-        rb_more.tag = true
-        rb_index.tag = true
+        tv_more.tag = true
+        tv_index.tag = true
     }
 
     private fun initData() {
@@ -154,19 +154,19 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.rb_1,
-            R.id.rb_2,
-            R.id.rb_3,
-            R.id.rb_4 -> {
+            R.id.tv_1,
+            R.id.tv_2,
+            R.id.tv_3,
+            R.id.tv_4 -> {
                 v.tag?.toString()?.toIntOrNull()?.let {
                     tabRecovery()
                     tabMoreRecovery()
-                    tabChecked(it)?.let { bean ->
+                    tabSelected(it)?.let { bean ->
                         onTimeTypeChange(bean.tabValue, bean.moduleType)
                     }
                 }
             }
-            R.id.rb_more -> {
+            R.id.tv_more -> {
                 if (v.tag == false) {
                     v.tag = true
                     return
@@ -178,7 +178,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     v.isSelected = showMorePopupWindow()
                 }
             }
-            R.id.rb_index -> {
+            R.id.tv_index -> {
                 if (v.tag == false) {
                     v.tag = true
                     return
@@ -206,27 +206,26 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
 
     private fun tabRecovery() {
         if (mRecoveryPosition >= 0 && mRecoveryPosition < mBaseData.size && mRecoveryPosition < mBaseTabViews.size) {
-            mBaseData[mRecoveryPosition].isChecked = false
-            mBaseTabViews[mRecoveryPosition].isChecked = false
+            mBaseData[mRecoveryPosition].isSelected = false
+            mBaseTabViews[mRecoveryPosition].isSelected = false
             mRecoveryPosition = -1
         }
     }
 
-    private fun tabChecked(checkedPosition: Int): TabTimeBean? {
-        if (checkedPosition >= 0 && checkedPosition < mBaseData.size && checkedPosition < mBaseTabViews.size) {
-            mBaseData[checkedPosition].isChecked = true
-            mBaseTabViews[checkedPosition].isChecked = true
-            mRecoveryPosition = checkedPosition
-            return mBaseData[checkedPosition]
+    private fun tabSelected(position: Int): TabTimeBean? {
+        if (position >= 0 && position < mBaseData.size && position < mBaseTabViews.size) {
+            mBaseData[position].isSelected = true
+            mBaseTabViews[position].isSelected = true
+            mRecoveryPosition = position
+            return mBaseData[position]
         }
         return null
     }
 
     private fun tabMoreRecovery() {
-        rb_more?.let { tab ->
-            if (tab.isChecked) {
+        tv_more?.let { tab ->
+            if (tab.isSelected) {
                 tab.setText(R.string.wk_more)
-                tab.isChecked = false
                 tab.isSelected = false
                 mMorePopupWindow?.recoveryItem()
                 mMorePopupWindow?.dismiss()
@@ -234,12 +233,11 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
         }
     }
 
-    private fun tabMoreChecked(bean: TabTimeBean) {
-        rb_more?.let { tab ->
+    private fun tabMoreSelected(bean: TabTimeBean) {
+        tv_more?.let { tab ->
             tabRecovery()
             tab.text = bean.tabName
-            tab.isChecked = true
-            tab.isSelected = false
+            tab.isSelected = true
             mMorePopupWindow?.dismiss()
         }
     }
@@ -250,7 +248,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
 
     override fun onTimeTypeChange(type: TimeType, @ModuleType moduleType: Int) {
         mMorePopupWindow?.getCheckedItem()?.let {
-            tabMoreChecked(it)
+            tabMoreSelected(it)
         }
         mChartTabListener?.onTimeTypeChange(type, moduleType)
     }
@@ -268,24 +266,24 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
         mChartTabListener?.onSetting()
     }
 
-    fun checkedDefaultTimeType(type: TimeType, @ModuleType moduleType: Int): TabTimeBean? {
-        getCheckedPosition(type, moduleType)?.let {
+    fun selectedDefaultTimeType(type: TimeType, @ModuleType moduleType: Int): TabTimeBean? {
+        getSelectedPosition(type, moduleType)?.let {
             tabRecovery()
             tabMoreRecovery()
-            return tabChecked(it)
+            return tabSelected(it)
         }
         mMorePopupWindow?.checkedDefaultTimeType(type, moduleType)?.let {
-            tabMoreChecked(it)
+            tabMoreSelected(it)
             return it
         }
         return null
     }
 
-    fun checkedDefaultIndexType(@IndexType indexType: Int, @ModuleGroupType moduleGroupType: Int) {
-        mIndexPopupWindow?.checkedDefaultIndexType(indexType, moduleGroupType)
+    fun selectedDefaultIndexType(@IndexType indexType: Int, @ModuleGroupType moduleGroupType: Int) {
+        mIndexPopupWindow?.selectedDefaultIndexType(indexType, moduleGroupType)
     }
 
-    private fun getCheckedPosition(type: TimeType, @ModuleType moduleType: Int): Int? {
+    private fun getSelectedPosition(type: TimeType, @ModuleType moduleType: Int): Int? {
         for (i in mBaseData.indices) {
             val item = mBaseData[i]
             if (item.moduleType == moduleType && item.tabValue == type) {

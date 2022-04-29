@@ -122,6 +122,7 @@ abstract class SuperPopWindow(var context: Context, private var anchor: View) : 
     }
 
     private fun setSystemUiVisibly(view: View) {
+
         view.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 // 隐藏导航栏
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION

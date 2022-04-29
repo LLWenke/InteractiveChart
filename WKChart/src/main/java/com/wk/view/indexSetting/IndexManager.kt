@@ -9,13 +9,11 @@ import com.wk.chart.enumeration.IndexType
 import com.wk.view.unit.Preferences
 import kotlinx.coroutines.*
 import java.lang.ref.SoftReference
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 object IndexManager {
-    private const val KEY_MAIN_INDEX = "main_chart_index"
-    private const val KEY_AUXILIARY_INDEX = "auxiliary_chart_index"
+    private const val KEY_MAIN_INDEX = "main_index"
+    private const val KEY_TREND_INDEX = "trend_index"
     private const val KEY_CHART_INDEX_CONFIG = "chart_index_config"
     private var mDefaultIndexConfigs: LinkedHashMap<Int, IndexConfigEntry>? = null
     private var mIndexConfigs: LinkedHashMap<Int, IndexConfigEntry>? = null
@@ -140,10 +138,10 @@ object IndexManager {
     }
 
     /**
-     * 缓存副图指标
+     * 缓存趋势指标
      */
-    fun cacheAuxiliaryIndex(context: Context, @IndexType indexType: Int) {
-        Preferences.saveInt(context, KEY_AUXILIARY_INDEX, indexType)
+    fun cacheTrendIndex(context: Context, @IndexType indexType: Int) {
+        Preferences.saveInt(context, KEY_TREND_INDEX, indexType)
     }
 
     /**
@@ -154,10 +152,10 @@ object IndexManager {
     }
 
     /**
-     * 获取缓存的副图指标
+     * 获取缓存趋势指标
      */
-    fun getCacheAuxiliaryIndex(context: Context): Int {
-        return Preferences.getInt(context, KEY_AUXILIARY_INDEX, IndexType.NONE)
+    fun getCacheTrendIndex(context: Context): Int {
+        return Preferences.getInt(context, KEY_TREND_INDEX, IndexType.NONE)
     }
 
     interface IndexConfigChangeListener {

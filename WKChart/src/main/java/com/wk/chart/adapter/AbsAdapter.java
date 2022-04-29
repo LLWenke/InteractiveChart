@@ -2,6 +2,7 @@ package com.wk.chart.adapter;
 
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -218,17 +219,17 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      * 设置指标配置信息
      */
     public void setBuildConfig(F buildConfig) {
-        this.buildConfig = buildConfig;
-        if (dataSize == 0) return;
         stopAnimator();
         stopAsyTask();
-        onAsyTask(buildConfig, cloneDataList(), ObserverArg.INIT, null);
+        this.buildConfig = buildConfig;
+        if (getCount() == 0) return;
+        onAsyTask(buildConfig, cloneDataList(), ObserverArg.INIT, 0, null);
     }
 
     /**
      * 构建数据
      */
-    abstract void buildData(@NonNull F buildConfig, @NonNull List<T> data);
+    abstract void buildData(@NonNull F buildConfig, @NonNull List<T> data, int startPosition);
 
     /**
      * 在给定的范围内，计算最大值和最小值
@@ -277,11 +278,11 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      * @param isCalculateData 是否需要计算数据
      */
     public synchronized void applyFormatUpdate(boolean isCalculateData) {
-        if (dataSize == 0) return;
+        if (getCount() == 0) return;
         if (isCalculateData) {
             stopAnimator();
             stopAsyTask();
-            onAsyTask(buildConfig, cloneDataList(), ObserverArg.FORMAT_UPDATE, null);
+            onAsyTask(buildConfig, cloneDataList(), ObserverArg.FORMAT_UPDATE, 0, null);
         } else {
             notifyDataSetChanged(ObserverArg.FORMAT_UPDATE);
         }
@@ -307,7 +308,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             stopAnimator();
             stopAsyTask();
-            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.RESET : ObserverArg.INIT, null);
+            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.RESET : ObserverArg.INIT, 0, null);
         }
     }
 
@@ -320,7 +321,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             stopAnimator();
             stopAsyTask();
-            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.UPDATE : ObserverArg.INIT, null);
+            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.UPDATE : ObserverArg.INIT, 0, null);
         }
     }
 
@@ -333,7 +334,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             stopAnimator();
             data.addAll(renderData);
-            onAsyTask(buildConfig, data, ObserverArg.ADD, null);
+            onAsyTask(buildConfig, data, ObserverArg.ADD, 0, null);
         }
     }
 
@@ -346,7 +347,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             stopAnimator();
             data.addAll(0, renderData);
-            onAsyTask(buildConfig, data, ObserverArg.ADD, null);
+            onAsyTask(buildConfig, data, ObserverArg.ADD, getLastPosition(), null);
         }
     }
 
@@ -358,7 +359,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
             stopAnimator();
             ArrayList<T> copyList = cloneDataList();
             copyList.add(data);
-            onAsyTask(buildConfig, copyList, ObserverArg.UPDATE, null);
+            onAsyTask(buildConfig, copyList, ObserverArg.UPDATE, getLastPosition(), null);
         }
     }
 
@@ -371,13 +372,19 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         if (null != data && position >= 0 && position < getCount()) {
             ArrayList<T> copyList = cloneDataList();
             copyList.set(position, data);
-            onAsyTask(buildConfig, copyList, ObserverArg.UPDATE, position);
+            onAsyTask(buildConfig, copyList, ObserverArg.UPDATE, position, position);
         }
     }
 
+    /**
+     * 动画执行中
+     *
+     * @param position   动画位置
+     * @param updateData 更行数据
+     */
     @Override
     public void onAnimation(int position, T updateData) {
-        if (this.renderData.get(position).getTime().getTime() == updateData.getTime().getTime()) {
+        if (getItem(position).getTime().getTime() == updateData.getTime().getTime()) {
             this.renderData.set(position, updateData);
             notifyDataSetChanged(ObserverArg.UPDATE);
         } else {
@@ -414,7 +421,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      */
     @Override
     public void onWork(BuildData<T, F> data) {
-        buildData(data.getBuildConfig(), data.getData());
+        buildData(data.getBuildConfig(), data.getData(), data.getStartPosition());
         Message message = Message.obtain();
         message.obj = data;
         this.uiHandler.sendMessage(message);
@@ -433,7 +440,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
                 this.renderData = buildData.getData();
                 this.dataSize = renderData.size();
                 notifyDataSetChanged(buildData.getObserverArg());
-            } else if (animPosition < dataSize && animPosition < buildData.getDataSize()) {
+            } else if (animPosition < getCount() && animPosition < buildData.getDataSize()) {
                 T oldItem = getItem(animPosition);
                 T newItem = buildData.getData().get(animPosition);
                 this.animator.startAnimator(oldItem, newItem, animPosition);
@@ -445,11 +452,15 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     /**
      * 开启异步任务
      */
-    private void onAsyTask(@NonNull final F buildConfig, @NonNull final List<T> data, @NonNull final ObserverArg arg, @Nullable Integer animPosition) {
+    private void onAsyTask(@NonNull final F buildConfig,
+                           @NonNull final List<T> data,
+                           @NonNull final ObserverArg arg,
+                           @NonNull Integer startPosition,
+                           @Nullable Integer animPosition) {
         if (null == workThread) {
             this.workThread = new WorkThread<>();
         }
-        this.workThread.post(new BuildData<>(buildConfig, data, arg, animPosition), this);
+        this.workThread.post(new BuildData<>(buildConfig, data, arg, startPosition, animPosition), this);
     }
 
     /**

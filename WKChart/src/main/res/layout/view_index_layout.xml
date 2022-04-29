@@ -15,39 +15,35 @@
         android:textColor="@color/colorTextImportant"
         android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/rb_ma"
+        app:layout_constraintBottom_toTopOf="@id/tv_ma"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="spread_inside" />
 
-    <com.wk.view.FontCheckBox
-        android:id="@+id/rb_ma"
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_ma"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:button="@null"
         android:gravity="center"
-        android:includeFontPadding="false"
-        android:padding="5dp"
+        android:padding="@dimen/five"
         android:text="@string/wk_ma"
         android:textColor="@color/color_tab_text_accent"
         android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/rb_boll"
+        app:layout_constraintBottom_toTopOf="@id/tv_boll"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_main_index_label" />
 
-    <com.wk.view.FontCheckBox
-        android:id="@+id/rb_boll"
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_boll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:button="@null"
         android:gravity="center"
-        android:includeFontPadding="false"
-        android:padding="5dp"
+        android:padding="@dimen/five"
         android:text="@string/wk_boll"
         android:textColor="@color/color_tab_text_accent"
         android:textSize="12sp"
@@ -55,7 +51,7 @@
         app:layout_constraintBottom_toTopOf="@id/tv_auxiliary_index_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rb_ma" />
+        app:layout_constraintTop_toBottomOf="@id/tv_ma" />
 
     <TextView
         android:id="@+id/tv_auxiliary_index_label"
@@ -65,74 +61,66 @@
         android:textColor="@color/colorTextImportant"
         android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/rb_macd"
+        app:layout_constraintBottom_toTopOf="@id/tv_macd"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rb_boll" />
+        app:layout_constraintTop_toBottomOf="@id/tv_boll" />
 
-    <com.wk.view.FontCheckBox
-        android:id="@+id/rb_macd"
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_macd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:button="@null"
         android:gravity="center"
-        android:includeFontPadding="false"
-        android:padding="5dp"
+        android:padding="@dimen/five"
         android:text="@string/wk_macd"
         android:textColor="@color/color_tab_text_accent"
         android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/rb_kdj"
+        app:layout_constraintBottom_toTopOf="@id/tv_kdj"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_auxiliary_index_label" />
 
-    <com.wk.view.FontCheckBox
-        android:id="@+id/rb_kdj"
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_kdj"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:button="@null"
         android:gravity="center"
-        android:includeFontPadding="false"
-        android:padding="5dp"
+        android:padding="@dimen/five"
         android:text="@string/wk_kdj"
         android:textColor="@color/color_tab_text_accent"
         android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/rb_rsi"
+        app:layout_constraintBottom_toTopOf="@id/tv_rsi"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rb_macd" />
+        app:layout_constraintTop_toBottomOf="@id/tv_macd" />
 
-    <com.wk.view.FontCheckBox
-        android:id="@+id/rb_rsi"
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_rsi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:button="@null"
         android:gravity="center"
-        android:includeFontPadding="false"
-        android:padding="5dp"
+        android:padding="@dimen/five"
         android:text="@string/wk_rsi"
         android:textColor="@color/color_tab_text_accent"
         android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/rb_wr"
+        app:layout_constraintBottom_toTopOf="@id/tv_wr"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rb_kdj" />
+        app:layout_constraintTop_toBottomOf="@id/tv_kdj" />
 
-    <com.wk.view.FontCheckBox
-        android:id="@+id/rb_wr"
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_wr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:button="@null"
         android:gravity="center"
-        android:includeFontPadding="false"
-        android:padding="5dp"
+        android:padding="@dimen/five"
         android:text="@string/wk_wr"
         android:textColor="@color/color_tab_text_accent"
         android:textSize="12sp"
@@ -140,17 +128,17 @@
         app:layout_constraintBottom_toTopOf="@id/iv_setting"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rb_rsi" />
+        app:layout_constraintTop_toBottomOf="@id/tv_rsi" />
 
     <ImageView
         android:id="@+id/iv_setting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="5dp"
+        android:padding="@dimen/five"
         android:src="@drawable/ic_index_setting"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rb_wr"
+        app:layout_constraintTop_toBottomOf="@id/tv_wr"
         tools:ignore="ContentDescription" />
 </androidx.constraintlayout.widget.ConstraintLayout>

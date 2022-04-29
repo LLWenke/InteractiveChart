@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -97,9 +98,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
                 case RESET:
                     if (dataShowType == DataType.REAL_TIME.ordinal()) {
                         PushService.stopPush();
-                        new Handler().postDelayed(() -> {
-                            startPush();
-                        }, 1000);
+                        new Handler().postDelayed(() -> startPush(), 1000);
                     }
                 case ADD:
                 case NORMAL:
@@ -146,9 +145,8 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
-        Intent startIntent = new Intent(this, PushService.class);
         CandleEntry lastEntry = candleAdapter.getItem(candleAdapter.getLastPosition());
-        startIntent.putExtra("scale", candleAdapter.getScale());
+        Intent startIntent = new Intent(this, PushService.class);
         startIntent.putExtra("open", lastEntry.getOpen().value);
         startIntent.putExtra("high", lastEntry.getHigh().value);
         startIntent.putExtra("low", lastEntry.getLow().value);
@@ -271,11 +269,11 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     private void recoveryChartState() {
         if (null == mChartCache) {
             TimeType timeType = TimeType.day;
-            chartTabLayout.checkedDefaultTimeType(timeType, ModuleType.CANDLE);
-            chartTabLayout.checkedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.MAIN), ModuleGroupType.MAIN);
-            chartTabLayout.checkedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.INDEX), ModuleGroupType.INDEX);
+            chartTabLayout.selectedDefaultTimeType(timeType, ModuleType.CANDLE);
+            chartTabLayout.selectedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.MAIN), ModuleGroupType.MAIN);
+            chartTabLayout.selectedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.INDEX), ModuleGroupType.INDEX);
             if (null != chartIndexTabLayout) {
-                chartIndexTabLayout.checkedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.INDEX), ModuleGroupType.INDEX);
+                chartIndexTabLayout.selectedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.INDEX), ModuleGroupType.INDEX);
             }
             switchTimeType(timeType, ModuleType.CANDLE);
         } else {
@@ -372,13 +370,13 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
             if (types.getKey() == ModuleGroupType.MAIN) {
                 mainModuleType = types.getValue().getModuleType();
             }
-            chartTabLayout.checkedDefaultIndexType(types.getValue().getIndexType(), types.getKey());
+            chartTabLayout.selectedDefaultIndexType(types.getValue().getIndexType(), types.getKey());
             if (null != chartIndexTabLayout) {
-                chartIndexTabLayout.checkedDefaultIndexType(types.getValue().getIndexType(), types.getKey());
+                chartIndexTabLayout.selectedDefaultIndexType(types.getValue().getIndexType(), types.getKey());
             }
         }
         timeType = null == timeType ? TimeType.fifteenMinute : timeType;
-        chartTabLayout.checkedDefaultTimeType(timeType, mainModuleType);
+        chartTabLayout.selectedDefaultTimeType(timeType, mainModuleType);
         if (isNeedLoadData) {
             onTimeTypeChange(timeType, mainModuleType);
         }

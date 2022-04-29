@@ -9,7 +9,7 @@
 
     <View
         android:layout_width="0dp"
-        android:layout_height="6dp"
+        android:layout_height="@dimen/six"
         android:background="@drawable/bg_pop_shadow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,55 +43,51 @@
         app:layout_constraintTop_toTopOf="@id/tv_main_index_label"
         tools:ignore="ContentDescription" />
 
-    <com.wk.view.FontRadioButton
-        android:id="@+id/rb_ma"
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_ma"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:background="@drawable/bg_tab_selector"
-        android:button="@null"
         android:gravity="center"
-        android:includeFontPadding="false"
         android:padding="6dp"
         android:text="@string/wk_ma"
         android:textColor="@color/color_tab_text"
         android:textSize="13sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/rb_boll"
+        app:layout_constraintEnd_toStartOf="@id/tv_boll"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="@id/tv_main_index_label"
         app:layout_constraintTop_toBottomOf="@id/tv_main_index_label" />
 
-    <com.wk.view.FontRadioButton
-        android:id="@+id/rb_boll"
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_boll"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:background="@drawable/bg_tab_selector"
-        android:button="@null"
         android:gravity="center"
-        android:includeFontPadding="false"
         android:padding="6dp"
         android:text="@string/wk_boll"
         android:textColor="@color/color_tab_text"
         android:textSize="13sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/rb_ma"
+        app:layout_constraintBottom_toBottomOf="@id/tv_ma"
         app:layout_constraintEnd_toStartOf="@id/empty_view"
         app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintStart_toEndOf="@id/rb_ma"
-        app:layout_constraintTop_toTopOf="@id/rb_ma" />
+        app:layout_constraintStart_toEndOf="@id/tv_ma"
+        app:layout_constraintTop_toTopOf="@id/tv_ma" />
 
     <View
         android:id="@+id/empty_view"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        app:layout_constraintBottom_toBottomOf="@id/rb_ma"
+        app:layout_constraintBottom_toBottomOf="@id/tv_ma"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_weight="2"
-        app:layout_constraintStart_toEndOf="@id/rb_boll"
-        app:layout_constraintTop_toTopOf="@id/rb_ma" />
+        app:layout_constraintStart_toEndOf="@id/tv_boll"
+        app:layout_constraintTop_toTopOf="@id/tv_ma" />
 
     <TextView
         android:id="@+id/tv_auxiliary_index_label"
@@ -104,10 +100,10 @@
         android:textSize="13sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@id/tv_main_index_label"
-        app:layout_constraintTop_toBottomOf="@id/rb_ma" />
+        app:layout_constraintTop_toBottomOf="@id/tv_ma" />
 
     <ImageView
-        android:id="@+id/iv_auxiliary_index_switch"
+        android:id="@+id/iv_trend_index_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:alpha="0.6"
@@ -119,81 +115,73 @@
         app:layout_constraintTop_toTopOf="@id/tv_auxiliary_index_label"
         tools:ignore="ContentDescription" />
 
-    <com.wk.view.FontRadioButton
-        android:id="@+id/rb_macd"
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_macd"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:background="@drawable/bg_tab_selector"
-        android:button="@null"
         android:gravity="center"
-        android:includeFontPadding="false"
         android:padding="6dp"
         android:text="@string/wk_macd"
         android:textColor="@color/color_tab_text"
         android:textSize="13sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/rb_kdj"
+        app:layout_constraintEnd_toStartOf="@id/tv_kdj"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="@id/tv_main_index_label"
         app:layout_constraintTop_toBottomOf="@id/tv_auxiliary_index_label" />
 
-    <com.wk.view.FontRadioButton
-        android:id="@+id/rb_kdj"
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_kdj"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:background="@drawable/bg_tab_selector"
-        android:button="@null"
         android:gravity="center"
-        android:includeFontPadding="false"
         android:padding="6dp"
         android:text="@string/wk_kdj"
         android:textColor="@color/color_tab_text"
         android:textSize="13sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/rb_macd"
-        app:layout_constraintEnd_toStartOf="@id/rb_rsi"
-        app:layout_constraintStart_toEndOf="@id/rb_macd"
-        app:layout_constraintTop_toTopOf="@id/rb_macd" />
+        app:layout_constraintBottom_toBottomOf="@id/tv_macd"
+        app:layout_constraintEnd_toStartOf="@id/tv_rsi"
+        app:layout_constraintStart_toEndOf="@id/tv_macd"
+        app:layout_constraintTop_toTopOf="@id/tv_macd" />
 
-    <com.wk.view.FontRadioButton
-        android:id="@+id/rb_rsi"
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_rsi"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:background="@drawable/bg_tab_selector"
-        android:button="@null"
         android:gravity="center"
-        android:includeFontPadding="false"
         android:padding="6dp"
         android:text="@string/wk_rsi"
         android:textColor="@color/color_tab_text"
         android:textSize="13sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/rb_macd"
-        app:layout_constraintEnd_toStartOf="@id/rb_wr"
-        app:layout_constraintStart_toEndOf="@id/rb_kdj"
-        app:layout_constraintTop_toTopOf="@id/rb_macd" />
+        app:layout_constraintBottom_toBottomOf="@id/tv_macd"
+        app:layout_constraintEnd_toStartOf="@id/tv_wr"
+        app:layout_constraintStart_toEndOf="@id/tv_kdj"
+        app:layout_constraintTop_toTopOf="@id/tv_macd" />
 
-    <com.wk.view.FontRadioButton
-        android:id="@+id/rb_wr"
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_wr"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:background="@drawable/bg_tab_selector"
-        android:button="@null"
         android:gravity="center"
-        android:includeFontPadding="false"
         android:padding="6dp"
         android:text="@string/wk_wr"
         android:textColor="@color/color_tab_text"
         android:textSize="13sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/rb_macd"
+        app:layout_constraintBottom_toBottomOf="@id/tv_macd"
         app:layout_constraintEnd_toEndOf="@id/iv_main_index_switch"
-        app:layout_constraintStart_toEndOf="@id/rb_rsi"
-        app:layout_constraintTop_toTopOf="@id/rb_macd" />
+        app:layout_constraintStart_toEndOf="@id/tv_rsi"
+        app:layout_constraintTop_toTopOf="@id/tv_macd" />
 
     <TextView
         android:id="@+id/tv_index_setting"
@@ -209,7 +197,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/iv_arrow"
         app:layout_constraintStart_toStartOf="@id/tv_main_index_label"
-        app:layout_constraintTop_toBottomOf="@id/rb_macd" />
+        app:layout_constraintTop_toBottomOf="@id/tv_macd" />
 
     <ImageView
         android:id="@+id/iv_arrow"

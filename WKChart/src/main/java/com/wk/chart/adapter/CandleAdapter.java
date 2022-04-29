@@ -73,14 +73,6 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         }
     }
 
-    @Override
-    public void setBuildConfig(IndexBuildConfig buildConfig) {
-        stopAnimator();
-        stopAsyTask();
-        this.calculationCache.init();
-        super.setBuildConfig(buildConfig);
-    }
-
     /**
      * 清空数据
      */
@@ -99,7 +91,6 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         }
         stopAnimator();
         stopAsyTask();
-        this.calculationCache.init();
         if (type == timeType) {
             super.updateData(data);
         } else {
@@ -118,7 +109,6 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         }
         if (!Utils.listIsEmpty(data)) {
             stopAnimator();
-            this.calculationCache.init();
         }
         super.addHeaderData(data);
     }
@@ -133,7 +123,6 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         }
         if (!Utils.listIsEmpty(data)) {
             stopAnimator();
-            this.calculationCache.init();
         }
         super.addFooterData(data);
     }
@@ -149,7 +138,6 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         if (null == endDate) {
             return PushType.INVALID;
         }
-        this.calculationCache.index = getLastPosition();
         PushType pushType = getPushType(endDate);
         switch (pushType) {
             case UPDATE://修改
@@ -212,25 +200,25 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
      * 构建数据
      */
     @Override
-    void buildData(@NonNull IndexBuildConfig buildConfig, @NonNull List<CandleEntry> data) {
+    void buildData(@NonNull IndexBuildConfig buildConfig, @NonNull List<CandleEntry> data, int startPosition) {
         buildConfig.buildIndexFlags();
         //构建数据属性值
-        buildScaleValue(data);
-        buildTimeText(data);
-        //计算 MA MACD BOLL RSI KDJ MR 指标
-        computeMA(data, buildConfig);
-        computeMACD(data, buildConfig);
-        computeBOLL(data, buildConfig);
-        computeRSI(data, buildConfig);
-        computeKDJ(data, buildConfig);
-        computeWR(data, buildConfig);
+        buildScaleValue(data, startPosition);
+        buildTimeText(data, startPosition);
+        //计算 MA MACD BOLL RSI KDJ WR 指标
+        computeMA(data, buildConfig, startPosition);
+        computeMACD(data, buildConfig, startPosition);
+        computeBOLL(data, buildConfig, startPosition);
+        computeRSI(data, buildConfig, startPosition);
+        computeKDJ(data, buildConfig, startPosition);
+        computeWR(data, buildConfig, startPosition);
     }
 
     /**
      * 构建精度值
      */
-    private void buildScaleValue(@NonNull List<CandleEntry> data) {
-        for (int i = calculationCache.index, z = data.size(); i < z; i++) {
+    private void buildScaleValue(@NonNull List<CandleEntry> data, int startPosition) {
+        for (int i = startPosition, z = data.size(); i < z; i++) {
             data.get(i).buildScaleValue(getScale());
         }
     }
@@ -238,8 +226,8 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
     /**
      * 构建时间显示文字
      */
-    private void buildTimeText(@NonNull List<CandleEntry> data) {
-        for (int i = calculationCache.index, z = data.size(); i < z; i++) {
+    private void buildTimeText(@NonNull List<CandleEntry> data, int startPosition) {
+        for (int i = startPosition, z = data.size(); i < z; i++) {
             if (null == timeType) break;
             data.get(i).buildTimeText(timeType);
         }
@@ -248,14 +236,20 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
     /**
      * 计算 MA
      */
-    private void computeMA(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig) {
+    private void computeMA(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig, int startPosition) {
         IndexConfigEntry candleIndicatorTag = indicatorConfig.getIndexTags(IndexType.CANDLE_MA);
         IndexConfigEntry volumeIndicatorTag = indicatorConfig.getIndexTags(IndexType.VOLUME_MA);
         int candleIndicatorCount = null == candleIndicatorTag ? 0 : candleIndicatorTag.getFlagEntries().length;
         int volumeIndicatorCount = null == volumeIndicatorTag ? 0 : volumeIndicatorTag.getFlagEntries().length;
-        long[] candleMA = null == calculationCache.candleMA ? new long[candleIndicatorCount] : calculationCache.candleMA.clone();
-        long[] volumeMA = null == calculationCache.volumeMA ? new long[volumeIndicatorCount] : calculationCache.volumeMA.clone();
-        for (int i = calculationCache.index, z = data.size(); i < z; i++) {
+        long[] candleMA, volumeMA;
+        if (startPosition == 0) {
+            candleMA = new long[candleIndicatorCount];
+            volumeMA = new long[volumeIndicatorCount];
+        } else {
+            candleMA = null == calculationCache.candleMA ? new long[candleIndicatorCount] : calculationCache.candleMA.clone();
+            volumeMA = null == calculationCache.volumeMA ? new long[volumeIndicatorCount] : calculationCache.volumeMA.clone();
+        }
+        for (int i = startPosition, z = data.size(); i < z; i++) {
             CandleEntry entry = data.get(i);
             //计算蜡烛图MA值
             ValueEntry[] candleValues = new ValueEntry[candleIndicatorCount];
@@ -299,13 +293,13 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
      * 计算 MACD
      * {12, 26, 9},
      */
-    private void computeMACD(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig) {
+    private void computeMACD(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig, int startPosition) {
         IndexConfigEntry indicatorTag = indicatorConfig.getIndexTags(IndexType.MACD);
         if (null == indicatorTag || indicatorTag.getFlagEntries().length < 3) {
             return;
         }
         calculateMACD(data, indicatorTag.getFlagEntries()[0].getFlag(), indicatorTag.getFlagEntries()[1].getFlag()
-                , indicatorTag.getFlagEntries()[2].getFlag());
+                , indicatorTag.getFlagEntries()[2].getFlag(), startPosition);
     }
 
     /**
@@ -322,12 +316,19 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
      * @param l    一般为26
      * @param m    一般为9
      */
-    private void calculateMACD(@NonNull List<CandleEntry> data, int s, int l, int m) {
-        long ema_s = calculationCache.ema_s;
-        long ema_l = calculationCache.ema_l;
-        long dea = calculationCache.dea;
+    private void calculateMACD(@NonNull List<CandleEntry> data, int s, int l, int m, int startPosition) {
+        long ema_s, ema_l, dea;
+        if (startPosition == 0) {
+            ema_s = 0;
+            ema_l = 0;
+            dea = 0;
+        } else {
+            ema_s = calculationCache.ema_s;
+            ema_l = calculationCache.ema_l;
+            dea = calculationCache.dea;
+        }
         int startIndex = l - 1;
-        for (int i = calculationCache.index, z = data.size(); i < z; i++) {
+        for (int i = startPosition, z = data.size(); i < z; i++) {
             CandleEntry entry = data.get(i);
             if (i == 0) {
                 ema_s = entry.getClose().result;
@@ -342,7 +343,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
             if (i == 0) {
                 dea = 0;
             } else {
-                dea = (dea * (m - 1) + dif * 2) / (m + 1);
+                dea = ((m - 1) * dea + 2 * dif) / (m + 1);
             }
             //计算macd
 //            long macd = 2 * (dif - dea);
@@ -371,7 +372,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
      * BOLL(n)计算公式：
      * MA=n日内的收盘价之和÷n。
      * MD=n日的平方根（C－MA）的两次方之和除以n
-     * MB=（n－1）日的MA
+     * MB=n日的MA
      * UP=MB+p×MD
      * DN=MB－p×MD
      * p为参数，可根据股票的特性来做相应的调整，一般默认为2
@@ -380,25 +381,18 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
      * @param n    周期，一般为26
      * @param p    参数，可根据股票的特性来做相应的调整，一般默认为2
      */
-    public void calculateBOLL(@NonNull List<CandleEntry> data, int n, int p) {
-        long bollMA = calculationCache.bollMA;
-        long bollPreviousMA = calculationCache.bollPreviousMA;
+    public void calculateBOLL(@NonNull List<CandleEntry> data, int n, int p, int startPosition) {
+        long bollMA = startPosition == 0 ? 0 : calculationCache.bollMA;
         int position = n - 1;
-        for (int i = calculationCache.index, z = data.size(); i < z; i++) {
+        for (int i = startPosition, z = data.size(); i < z; i++) {
             CandleEntry entry = data.get(i);
             bollMA += entry.getClose().result;
-            bollPreviousMA += entry.getClose().result;
             if (i >= position) {
                 if (i > position) {
                     bollMA -= data.get(i - n).getClose().result;
                 }
-                if (i > position - 1) {
-                    bollPreviousMA -= data.get(i - position).getClose().result;
-                }
                 //n日MA
                 long maValue = bollMA / n;
-                //n-1日MA
-                long previousMaValue = bollPreviousMA / position;
                 long md = 0;
                 for (int j = i - position; j <= i; j++) {
                     //n日
@@ -407,13 +401,12 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
                 }
                 md = md / n;
                 md = (long) Math.sqrt(md);
-                //(n－1）日的MA
-                long up = previousMaValue + p * md;//上轨线
-                long dn = previousMaValue - p * md;//下轨线
+                long up = maValue + p * md;//上轨线
+                long dn = maValue - p * md;//下轨线
                 //精度恢复运算
                 ValueEntry[] bollValues = new ValueEntry[3];
                 bollValues[0] = entry.buildQuoteScaleValue(getScale(), up);
-                bollValues[1] = entry.buildQuoteScaleValue(getScale(), previousMaValue);
+                bollValues[1] = entry.buildQuoteScaleValue(getScale(), maValue);
                 bollValues[2] = entry.buildQuoteScaleValue(getScale(), dn);
                 //存储此次计算结果
                 entry.putLineIndex(IndexType.BOLL, bollValues);
@@ -421,7 +414,6 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
             //将倒数第二次的计算结果缓存
             if (i == z - 2) {
                 this.calculationCache.bollMA = bollMA;
-                this.calculationCache.bollPreviousMA = bollPreviousMA;
             }
         }
     }
@@ -429,24 +421,29 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
     /**
      * 计算 BOLL
      */
-    private void computeBOLL(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig) {
+    private void computeBOLL(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig, int startPosition) {
         IndexConfigEntry indicatorTag = indicatorConfig.getIndexTags(IndexType.BOLL);
         if (null == indicatorTag || indicatorTag.getFlagEntries().length < 2) {
             return;
         }
-        calculateBOLL(data, indicatorTag.getFlagEntries()[0].getFlag(), indicatorTag.getFlagEntries()[1].getFlag());
+        calculateBOLL(data, indicatorTag.getFlagEntries()[0].getFlag(), indicatorTag.getFlagEntries()[1].getFlag(), startPosition);
     }
 
     /**
      * 计算 RSI
      */
-    private void computeRSI(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig) {
+    private void computeRSI(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig, int startPosition) {
         IndexConfigEntry indicatorTag = indicatorConfig.getIndexTags(IndexType.RSI);
         int indicatorCount = null == indicatorTag ? 0 : indicatorTag.getFlagEntries().length;
-        long[] rsiABSEma = null == calculationCache.rsiABSEma ? new long[indicatorCount] : calculationCache.rsiABSEma.clone();
-        long[] rsiMaxEma = null == calculationCache.rsiMaxEma ? new long[indicatorCount] : calculationCache.rsiMaxEma.clone();
-
-        for (int i = calculationCache.index, z = data.size(); i < z; i++) {
+        long[] rsiABSEma, rsiMaxEma;
+        if (startPosition == 0) {
+            rsiABSEma = new long[indicatorCount];
+            rsiMaxEma = new long[indicatorCount];
+        } else {
+            rsiABSEma = null == calculationCache.rsiABSEma ? new long[indicatorCount] : calculationCache.rsiABSEma.clone();
+            rsiMaxEma = null == calculationCache.rsiMaxEma ? new long[indicatorCount] : calculationCache.rsiMaxEma.clone();
+        }
+        for (int i = startPosition, z = data.size(); i < z; i++) {
             CandleEntry entry = data.get(i);
             ValueEntry[] values = new ValueEntry[indicatorCount];
             long Rmax = 0, RAbs = 0;
@@ -462,7 +459,6 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
                     long value = (long) ValueUtils.pow10(getScale().getQuoteScale() + 2) * rsiMaxEma[j] / rsiABSEma[j];
                     values[j] = entry.buildQuoteScaleValue(getScale(), value);
                 }
-
             }
             entry.putLineIndex(IndexType.RSI, values);
             //将倒数第二次的计算结果缓存
@@ -480,18 +476,23 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
      * D值=2/3×第8日D值+1/3×第9日K值 （简化公式为：（第9日K值+2×第8日D值）/M2  ）
      * J值=3*第9日K值-2*第9日D值
      */
-    private void computeKDJ(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig) {
+    private void computeKDJ(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig, int startPosition) {
         IndexConfigEntry indicatorTag = indicatorConfig.getIndexTags(IndexType.KDJ);
         if (null == indicatorTag || indicatorTag.getFlagEntries().length < 3) {
             return;
         }
-        long k = calculationCache.k;
-        long d = calculationCache.d;
-        long j;
+        long k, d, j;
         int n = Math.max(0, indicatorTag.getFlagEntries()[0].getFlag() - 1);
         int m1 = indicatorTag.getFlagEntries()[1].getFlag();
         int m2 = indicatorTag.getFlagEntries()[2].getFlag();
-        for (int i = calculationCache.index, z = data.size(); i < z; i++) {
+        if (startPosition == 0) {
+            k = 0;
+            d = 0;
+        } else {
+            k = calculationCache.k;
+            d = calculationCache.d;
+        }
+        for (int i = startPosition, z = data.size(); i < z; i++) {
             CandleEntry entry = data.get(i);
             int startIndex = i - n;
             if (startIndex < 0) {
@@ -533,10 +534,10 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
     /**
      * 计算 WR
      */
-    private void computeWR(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig) {
+    private void computeWR(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig, int startPosition) {
         IndexConfigEntry indicatorTag = indicatorConfig.getIndexTags(IndexType.WR);
         int indicatorCount = null == indicatorTag ? 0 : indicatorTag.getFlagEntries().length;
-        for (int i = calculationCache.index, z = data.size(); i < z; i++) {
+        for (int i = startPosition, z = data.size(); i < z; i++) {
             CandleEntry entry = data.get(i);
             ValueEntry[] values = new ValueEntry[indicatorCount];
             for (int j = 0; j < indicatorCount; j++) {
@@ -574,35 +575,11 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         long dea = 0;
         //BOLL
         long bollMA = 0;
-        long bollPreviousMA = 0;
         //RSI
         long[] rsiABSEma;
         long[] rsiMaxEma;
         //KDJ
         long k = 0;
         long d = 0;
-        //数据起始下标
-        int index = 0;
-
-        public void init() {
-            //平均线
-            candleMA = null;
-            volumeMA = null;
-            //macd
-            ema_s = 0;
-            ema_l = 0;
-            dea = 0;
-            //BOLL
-            bollMA = 0;
-            bollPreviousMA = 0;
-            //RSI
-            rsiABSEma = null;
-            rsiMaxEma = null;
-            //KDJ
-            k = 0;
-            d = 0;
-            //数据起始下标
-            index = 0;
-        }
     }
 }
