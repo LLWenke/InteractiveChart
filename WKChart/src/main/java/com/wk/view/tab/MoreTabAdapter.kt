@@ -1,11 +1,11 @@
 package com.wk.view.tab
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RadioButton
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.wk.chart.R
 import com.wk.chart.enumeration.ModuleType
 import com.wk.chart.enumeration.TimeType
@@ -25,8 +25,8 @@ class MoreTabAdapter(private val chartTabListener: ChartTabListener?) : Recycler
 
     override fun onBindViewHolder(holder: MoreTabHolder, position: Int) {
         getItem(position)?.let {
-            holder.mRadioButton?.let { rb ->
-                rb.isChecked = it.isChecked
+            holder.mItemType?.let { rb ->
+                rb.isSelected = it.isSelected
                 rb.tag = position
                 rb.text = it.tabName
                 rb.setOnClickListener(this)
@@ -36,7 +36,7 @@ class MoreTabAdapter(private val chartTabListener: ChartTabListener?) : Recycler
 
     fun itemRecovery() {
         getItem(mRecoveryPosition)?.let { recovery ->
-            recovery.isChecked = false
+            recovery.isSelected = false
             notifyItemChanged(mRecoveryPosition)
             mRecoveryPosition = -1
         }
@@ -44,7 +44,7 @@ class MoreTabAdapter(private val chartTabListener: ChartTabListener?) : Recycler
 
     private fun itemChecked(checkedPosition: Int): TabTimeBean? {
         getItem(checkedPosition)?.let { checked ->
-            checked.isChecked = true
+            checked.isSelected = true
             notifyItemChanged(checkedPosition)
             mRecoveryPosition = checkedPosition
             return checked
@@ -52,6 +52,7 @@ class MoreTabAdapter(private val chartTabListener: ChartTabListener?) : Recycler
         return null
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun setData(data: ArrayList<TabTimeBean>) {
         mData.clear()
         mData.addAll(data)
@@ -104,10 +105,10 @@ class MoreTabAdapter(private val chartTabListener: ChartTabListener?) : Recycler
     }
 
     inner class MoreTabHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var mRadioButton: RadioButton? = null
+        var mItemType: TextView? = null
 
         init {
-            mRadioButton = itemView.radio_button
+            mItemType = itemView.item_type
         }
     }
 }

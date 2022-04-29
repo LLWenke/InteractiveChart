@@ -39,7 +39,6 @@ public class PushService extends IntentService {
         if (null == intent) {
             return;
         }
-        ScaleEntry scaleEntry = (ScaleEntry) intent.getSerializableExtra("scale");
         double open = intent.getFloatExtra("open", 0);
         double high = intent.getFloatExtra("high", 0);
         double low = intent.getFloatExtra("low", 0);

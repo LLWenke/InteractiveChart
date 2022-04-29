@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="WKChart/src/main/res/layout/index_tab_layout.xml" value="0.3390625" />
         <entry key="app/src/main/res/layout/activity_chart_land.xml" value="0.3390625" />
         <entry key="app/src/main/res/layout/activity_chart_port.xml" value="0.3390625" />
       </map>

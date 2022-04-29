@@ -7,16 +7,17 @@ public class TabTimeBean {
     private String tabName;
     private TimeType tabValue;
     private int moduleType;
-    private boolean checked;
+    private boolean selected;
 
-    public TabTimeBean(String tabName, TimeType tabValue, @ModuleType int moduleType, boolean checked) {
+    public TabTimeBean(String tabName, TimeType tabValue, @ModuleType int moduleType, boolean selected) {
         this.tabName = tabName;
         this.tabValue = tabValue;
         this.moduleType = moduleType;
-        this.checked = checked;
+        this.selected = selected;
     }
 
-    public int getModuleType() {
+    public @ModuleType
+    int getModuleType() {
         return moduleType;
     }
 
@@ -40,11 +41,11 @@ public class TabTimeBean {
         this.tabValue = tabValue;
     }
 
-    public boolean isChecked() {
-        return checked;
+    public boolean isSelected() {
+        return selected;
     }
 
-    public void setChecked(boolean checked) {
-        this.checked = checked;
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

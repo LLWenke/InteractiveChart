@@ -19,10 +19,10 @@ public class DepthAdapter extends AbsAdapter<DepthEntry, NormalBuildConfig> {
     }
 
     @Override
-    void buildData(@NonNull NormalBuildConfig buildConfig, @NonNull List<DepthEntry> data) {
+    void buildData(@NonNull NormalBuildConfig buildConfig, @NonNull List<DepthEntry> data, int startPosition) {
         buildConfig.setInit(true);
-        buildScaleValue(data);
-        computeData(data);
+        buildScaleValue(data, startPosition);
+        computeData(data, startPosition);
     }
 
     /**
@@ -35,8 +35,8 @@ public class DepthAdapter extends AbsAdapter<DepthEntry, NormalBuildConfig> {
     /**
      * 构建精度值
      */
-    private void buildScaleValue(@NonNull List<DepthEntry> data) {
-        for (int i = 0, z = data.size(); i < z; i++) {
+    private void buildScaleValue(@NonNull List<DepthEntry> data, int startPosition) {
+        for (int i = startPosition, z = data.size(); i < z; i++) {
             data.get(i).buildScaleValue(getScale());
         }
     }
@@ -44,13 +44,13 @@ public class DepthAdapter extends AbsAdapter<DepthEntry, NormalBuildConfig> {
     /**
      * 数据计算
      */
-    private void computeData(@NonNull List<DepthEntry> data) {
+    private void computeData(@NonNull List<DepthEntry> data, int startPosition) {
         if (Utils.listIsEmpty(data)) {
             return;
         }
         List<DepthEntry> bids = new ArrayList<>();//买单数据
         List<DepthEntry> asks = new ArrayList<>();//卖单数据
-        for (int i = 0, z = data.size(); i < z; i++) {
+        for (int i = startPosition, z = data.size(); i < z; i++) {
             DepthEntry item = data.get(i);
             switch (item.getType()) {
                 case BID://买单

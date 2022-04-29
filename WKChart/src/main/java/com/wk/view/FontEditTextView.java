@@ -8,6 +8,7 @@ import androidx.appcompat.widget.AppCompatEditText;
 
 import com.wk.chart.compat.FontStyle;
 
+
 /**
  * 自定义字体库的EditTextView
  */
