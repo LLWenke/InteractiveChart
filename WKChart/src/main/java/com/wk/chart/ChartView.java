@@ -10,7 +10,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.widget.OverScroller;
 
 import androidx.annotation.NonNull;
@@ -30,6 +29,7 @@ import com.wk.chart.enumeration.ModuleGroupType;
 import com.wk.chart.enumeration.ModuleType;
 import com.wk.chart.enumeration.ObserverArg;
 import com.wk.chart.enumeration.RenderModel;
+import com.wk.chart.enumeration.TouchMoveType;
 import com.wk.chart.handler.DelayedHandler;
 import com.wk.chart.handler.InteractiveHandler;
 import com.wk.chart.module.base.AbsModule;
@@ -150,8 +150,6 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         this.renderModel = renderModel;
         this.attribute = render.getAttribute();
         this.gestureDetector.setIsLongpressEnabled(true);
-        int touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
-        this.gestureCompat.setTouchSlop(touchSlop);
         this.scroller = new OverScroller(getContext());
         this.scaleDetector.setQuickScaleEnabled(false);
         this.orientation = getResources().getConfiguration().orientation;
@@ -240,27 +238,17 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      */
     private final ScaleGestureDetector scaleDetector = new ScaleGestureDetector(getContext(),
             new ScaleGestureDetector.SimpleOnScaleGestureListener() {
-                float scaleFocusX = 0;
-                float oldScale = 1;
-
-                @Override
-                public boolean onScaleBegin(ScaleGestureDetector detector) {
-                    scaleFocusX = detector.getFocusX() * 2;
-                    return super.onScaleBegin(detector);
-                }
-
                 @Override
                 public boolean onScale(ScaleGestureDetector detector) {
-                    //Log.e(TAG, "onScale: " + attribute.currentScale);
-                    attribute.currentScale *= detector.getScaleFactor();
-                    if (attribute.currentScale < attribute.minScale) {
-                        attribute.currentScale = attribute.minScale;
-                    } else if (attribute.currentScale > attribute.maxScale) {
-                        attribute.currentScale = attribute.maxScale;
+                    float scale = attribute.currentScale * detector.getScaleFactor();
+                    if (scale < attribute.minScale) {
+                        scale = attribute.minScale;
+                    } else if (scale > attribute.maxScale) {
+                        scale = attribute.maxScale;
                     }
-                    if (attribute.currentScale != oldScale) {
-                        render.onZoom(scaleFocusX, detector.getFocusY());
-                        oldScale = attribute.currentScale;
+                    if (scale != attribute.currentScale) {
+                        attribute.currentScale = scale;
+                        render.onZoom(detector.getFocusX(), detector.getFocusY());
                         postInvalidateOnAnimation();
                         return true;
                     } else {
@@ -269,7 +257,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 }
             });
 
-    private final GestureMoveActionCompat gestureCompat = new GestureMoveActionCompat(null);
+    private final GestureMoveActionCompat gestureCompat = new GestureMoveActionCompat();
 
     /**
      * 回调高亮监听，用于图表初始化后，通知外部监听重新调整高亮选择器中的显示信息
@@ -501,12 +489,8 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (checkReadyState()) {
-            boolean onHorizontalMove = gestureCompat.onTouchEvent(event, event.getX(), event.getY());
-            if (onHorizontalMove
-                    || onLongPress
-                    || onDoubleFingerPress
-                    || gestureCompat.isDragging()
-                    || event.getPointerCount() == 2) {
+            int touchMoveType = gestureCompat.getTouchMoveType(event, event.getX(), event.getY());
+            if (onLongPress || onDoubleFingerPress || touchMoveType == TouchMoveType.HORIZONTAL) {
                 getParent().requestDisallowInterceptTouchEvent(true);
                 return super.dispatchTouchEvent(event);
             }

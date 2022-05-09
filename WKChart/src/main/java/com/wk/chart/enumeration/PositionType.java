@@ -2,7 +2,7 @@ package com.wk.chart.enumeration;
 
 /**
  * <p>PositionType</p>
- * 位置
+ * 位置类型
  */
 
 public interface PositionType {
