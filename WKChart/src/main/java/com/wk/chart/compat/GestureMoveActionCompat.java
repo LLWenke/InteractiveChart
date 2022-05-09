@@ -3,13 +3,13 @@ package com.wk.chart.compat;
 
 import android.view.MotionEvent;
 
+import com.wk.chart.enumeration.TouchMoveType;
+
 /**
  * <p>横向移动、垂直移动 识别，解决滑动冲突用的</p>
  */
 
 public class GestureMoveActionCompat {
-    private final OnGestureMoveListener gestureMoveListener;
-
     /**
      * 本次 ACTION_DOWN 事件的坐标 x
      */
@@ -21,108 +21,38 @@ public class GestureMoveActionCompat {
     private float lastMotionY;
 
     /**
-     * 当前滑动的方向。0 无滑动（视为点击）；1 垂直滑动；2 横向滑动
+     * 触摸移动方向
      */
-    private int interceptStatus = 0;
+    private int touchMoveType = TouchMoveType.NONE;
 
     /**
-     * 是否响应点击事件
-     * <p>
-     * 因为有手指抖动的影响，有时候会产生少量的 ACTION_MOVE 事件，造成程序识别错误。
+     * 如果之前是垂直滑动，即使现在是横向滑动，仍然认为它是垂直滑动的
+     * 如果之前是横向滑动，即使现在是垂直滑动，仍然认为它是横向滑动的
+     * 防止在一个方向上来回滑动时，发生垂直滑动和横向滑动的频繁切换，造成识别错误
+     *
+     * @return 触摸移动方向
      */
-    private boolean mEnableClick = true;
-
-    /**
-     * 避免程序识别错误的一个阀值。只有触摸移动的距离大于这个阀值时，才认为是一个有效的移动。
-     */
-    private int touchSlop = 30;
-
-    private boolean dragging = false;
-
-    public GestureMoveActionCompat(OnGestureMoveListener onGestureMoveListener) {
-        gestureMoveListener = onGestureMoveListener;
-    }
-
-    public void enableClick(boolean enableClick) {
-        mEnableClick = enableClick;
-    }
-
-    public void setTouchSlop(int touchSlop) {
-        this.touchSlop = touchSlop;
-    }
-
-    public boolean isDragging() {
-        return dragging;
-    }
-
-    /**
-     * @param e 事件 e
-     * @param x 本次事件的坐标 x。可以是 e.getRawX() 或是 e.getX()，具体看情况
-     * @param y 本次事件的坐标 y。可以是 e.getRawY() 或是 e.getY()，具体看情况
-     * @return 事件是否是横向滑动
-     */
-    public boolean onTouchEvent(MotionEvent e, float x, float y) {
+    public int getTouchMoveType(MotionEvent e, float x, float y) {
+        int touchSlop = 30;//避免程序识别错误的一个阀值。只有触摸移动的距离大于这个阀值时，才认为是一个有效的移动。
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 lastMotionY = y;
                 lastMotionX = x;
-                interceptStatus = 0;
-                dragging = false;
+                touchMoveType = TouchMoveType.NONE;
                 break;
-
             case MotionEvent.ACTION_MOVE:
                 float deltaY = Math.abs(y - lastMotionY);
                 float deltaX = Math.abs(x - lastMotionX);
-
-                /*
-                 * 如果之前是垂直滑动，即使现在是横向滑动，仍然认为它是垂直滑动的
-                 * 如果之前是横向滑动，即使现在是垂直滑动，仍然认为它是横向滑动的
-                 * 防止在一个方向上来回滑动时，发生垂直滑动和横向滑动的频繁切换，造成识别错误
-                 */
-                if (interceptStatus != 1 && (dragging || deltaX > deltaY && deltaX > touchSlop)) {
-                    interceptStatus = 2;
-                    dragging = true;
-
-                    if (gestureMoveListener != null) {
-                        gestureMoveListener.onHorizontalMove(e, x, y);
-                    }
-                } else if (interceptStatus != 2 && (dragging || deltaX < deltaY && deltaY > touchSlop)) {
-                    interceptStatus = 1;
-                    dragging = true;
-                    if (gestureMoveListener != null) {
-                        gestureMoveListener.onVerticalMove(e, x, y);
-                    }
+                if (touchMoveType != TouchMoveType.VERTICAL && deltaX > deltaY && deltaX > touchSlop) {// 横向移动
+                    touchMoveType = TouchMoveType.HORIZONTAL;
+                } else if (touchMoveType != TouchMoveType.HORIZONTAL && deltaX < deltaY && deltaY > touchSlop) {// 垂直移动
+                    touchMoveType = TouchMoveType.VERTICAL;
                 }
                 break;
-
             case MotionEvent.ACTION_UP:
-                if (interceptStatus == 0) {
-                    if (mEnableClick && gestureMoveListener != null) {
-                        gestureMoveListener.onClick(e, x, y);
-                    }
-                }
-                interceptStatus = 0;
-                dragging = false;
+                touchMoveType = TouchMoveType.NONE;
                 break;
         }
-        return interceptStatus == 2;
-    }
-
-    public interface OnGestureMoveListener {
-
-        /**
-         * 横向移动
-         */
-        void onHorizontalMove(MotionEvent e, float x, float y);
-
-        /**
-         * 垂直移动
-         */
-        void onVerticalMove(MotionEvent e, float x, float y);
-
-        /**
-         * 点击事件
-         */
-        void onClick(MotionEvent e, float x, float y);
+        return touchMoveType;
     }
 }
