@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintSet;
@@ -364,7 +365,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    public void onLoadCacheTypes(@Nullable TimeType timeType, boolean isNeedLoadData, HashMap<Integer, ChartCache.TypeEntry> typeMap) {
+    public void onLoadCacheTypes(@Nullable TimeType timeType, boolean isNeedLoadData, @NonNull HashMap<Integer, ChartCache.TypeEntry> typeMap) {
         int mainModuleType = ModuleType.CANDLE;
         for (Map.Entry<Integer, ChartCache.TypeEntry> types : typeMap.entrySet()) {
             if (types.getKey() == ModuleGroupType.MAIN) {

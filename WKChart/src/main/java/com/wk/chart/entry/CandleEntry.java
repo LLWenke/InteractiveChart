@@ -13,6 +13,7 @@ import com.wk.chart.enumeration.MarkerPointType;
 import com.wk.chart.enumeration.TimeType;
 
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * <p>CandleEntry</p>
@@ -26,9 +27,8 @@ public class CandleEntry extends AbsEntry {
     private final ValueEntry changeAmount; // 涨跌额
     private final ValueEntry changeProportion; // 涨跌幅
     //通用属性
-    private final ArrayMap<Integer, ValueEntry[]> index; // 指标
-    private final ArrayMap<Integer, ValueEntry[]> lineIndex; // 折线指标
-    private final Rect markerPointRect;//标记点位置区域矩形
+    private final HashMap<Integer, ValueEntry[]> index; // 指标
+    private final HashMap<Integer, ValueEntry[]> lineIndex; // 折线指标
     private @MarkerPointType
     int markerPointType = MarkerPointType.NORMAL; // 标记点类型
     private TimeType timeType = null;//时间类型
@@ -45,7 +45,7 @@ public class CandleEntry extends AbsEntry {
      * @param volume 量
      * @param time   时间
      */
-    public CandleEntry(String open, String high, String low, String close, String volume, Date time) {
+    public CandleEntry(String open, String high, String low, String close, String volume,@NonNull Date time) {
         super(time);
         this.open = new ValueEntry(open);
         this.high = new ValueEntry(high);
@@ -54,9 +54,8 @@ public class CandleEntry extends AbsEntry {
         this.volume = new ValueEntry(volume);
         this.changeAmount = new ValueEntry();
         this.changeProportion = new ValueEntry();
-        this.markerPointRect = new Rect();
-        this.index = new ArrayMap<>();
-        this.lineIndex = new ArrayMap<>();
+        this.index = new HashMap<>();
+        this.lineIndex = new HashMap<>();
         addAnimatorEntry(this.close, this.high, this.low, this.volume);
     }
 
@@ -157,17 +156,6 @@ public class CandleEntry extends AbsEntry {
 
     public void setMarkerPointType(@MarkerPointType int markerPointType) {
         this.markerPointType = markerPointType;
-    }
-
-    /**
-     * 重置标记点位置区域坐标
-     */
-    public void updateMarkerRect(float left, float top, float right, float bottom) {
-        this.markerPointRect.set((int) left, (int) top, (int) right, (int) bottom);
-    }
-
-    public Rect getMarkerPointRect() {
-        return markerPointRect;
     }
 
     public String getShortTimeText() {
