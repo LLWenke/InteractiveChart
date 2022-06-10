@@ -17,7 +17,7 @@ import java.util.Arrays;
 
 public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<?>> {
     protected final float[] margin; //边距[left, top, right, bottom]
-    protected final int id;
+    protected final int id;//组件ID值
     private boolean initState = false;//是否初始化
     protected RectF viewRect; // 绘制区域
     protected T render;//渲染工厂

@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import com.wk.chart.entry.IndexConfigEntry;
 import com.wk.chart.enumeration.IndexType;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ import java.util.Map;
  */
 public class IndexBuildConfig extends AbsBuildConfig {
     private final LinkedHashMap<Integer, IndexConfigEntry> defaultIndexFlagConfig;
-    private final ArrayMap<Integer, IndexConfigEntry> indexFlags;//指标标志位信息
+    private final HashMap<Integer, IndexConfigEntry> indexFlags;//指标标志位信息
     private final int defaultIndexColor;//指标线条默认颜色
     private final int[] defaultIndexColors;//指标线条默认颜色数组
 
@@ -27,7 +28,7 @@ public class IndexBuildConfig extends AbsBuildConfig {
 
     public IndexBuildConfig(LinkedHashMap<Integer, IndexConfigEntry> defaultIndexFlagConfig) {
         this.defaultIndexFlagConfig = null == defaultIndexFlagConfig ? new LinkedHashMap<>() : defaultIndexFlagConfig;
-        this.indexFlags = new ArrayMap<>();
+        this.indexFlags = new HashMap<>();
         this.defaultIndexColor = 0xff6a879d;
         this.defaultIndexColors = new int[]{0xffff9f00, 0xffe840b5, 0xff8b68c4, 0xff00abff, 0xff489659, 0xfffe0d5e};
     }

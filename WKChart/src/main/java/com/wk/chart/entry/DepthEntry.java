@@ -25,7 +25,7 @@ public class DepthEntry extends AbsEntry {
      * @param type        类型
      * @param time        时间
      */
-    public DepthEntry(String price, String amount, String totalAmount, int type, Date time) {
+    public DepthEntry(String price, String amount, String totalAmount, int type,@NonNull Date time) {
         super(time);
         this.price = new ValueEntry(price);
         this.amount = new ValueEntry(amount);
@@ -42,7 +42,7 @@ public class DepthEntry extends AbsEntry {
      * @param time              时间
      */
     public DepthEntry(@NonNull ScaleEntry scale, Long priceResult, Long amountResult,
-                      Long totalAmountResult, int type, Date time) {
+                      Long totalAmountResult, int type,@NonNull Date time) {
         super(time);
         this.price = new ValueEntry();
         this.amount = new ValueEntry();

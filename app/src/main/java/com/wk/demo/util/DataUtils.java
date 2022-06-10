@@ -3,16 +3,13 @@ package com.wk.demo.util;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.gson.Gson;
-import com.wk.chart.adapter.AbsAdapter;
-import com.wk.chart.adapter.CandleAdapter;
 import com.wk.chart.adapter.DepthAdapter;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.DepthEntry;
-import com.wk.chart.entry.ScaleEntry;
+import com.wk.chart.enumeration.MarkerPointType;
 import com.wk.demo.MyApp;
 import com.wk.demo.model.DepthWrapper;
 
@@ -22,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * <p>股票测试数据</p>
@@ -39,7 +37,7 @@ public class DataUtils {
             @Override
             protected Void doInBackground(Void... params) {
                 if (Utils.listIsEmpty(candleEntries)) {
-                    candleEntries = DataUtils.getCandelData();
+                    candleEntries = DataUtils.getCandleData();
                 }
                 if (Utils.listIsEmpty(depthEntries)) {
                     depthEntries = DataUtils.getDepthData();
@@ -54,7 +52,7 @@ public class DataUtils {
         }.execute();
     }
 
-    private static List<CandleEntry> getCandelData() {
+    private static List<CandleEntry> getCandleData() {
         String kLineData;
         List<CandleEntry> dataList = new ArrayList<>();
         try {
@@ -67,7 +65,10 @@ public class DataUtils {
 
             for (String candleData : candleDatas) {
                 String[] v = candleData.split("[|]");
-                dataList.add(new CandleEntry(v[0], v[1], v[2], v[3], v[4], new Date(Date.parse(v[5]))));
+                int type = (new Random()).nextInt(10);
+                CandleEntry entry = new CandleEntry(v[0], v[1], v[2], v[3], v[4], new Date(Date.parse(v[5])));
+                entry.setMarkerPointType(type > 3 ? MarkerPointType.NORMAL : type);
+                dataList.add(entry);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -101,7 +102,7 @@ public class DataUtils {
                 totalAmount = totalAmount.add(item.getAmount());
                 depthData.add(new DepthEntry(
                         item.getPrice().toPlainString(), item.getAmount().toPlainString(),
-                        totalAmount.toPlainString(), DepthAdapter.BID, null));
+                        totalAmount.toPlainString(), DepthAdapter.BID, new Date()));
             }
             totalAmount = BigDecimal.ZERO;
             for (int i = 0; i < data.getAsks().size(); i++) {
@@ -109,7 +110,7 @@ public class DataUtils {
                 totalAmount = totalAmount.add(item.getAmount());
                 depthData.add(new DepthEntry(
                         item.getPrice().toPlainString(), item.getAmount().toPlainString(),
-                        totalAmount.toPlainString(), DepthAdapter.ASK, null));
+                        totalAmount.toPlainString(), DepthAdapter.ASK, new Date()));
             }
             return depthData;
         } catch (Exception e) {
