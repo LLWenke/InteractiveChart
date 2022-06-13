@@ -65,7 +65,7 @@ public class AttributeRead {
         /*
          * 与 grid 标尺刻度有关属性
          */
-        attribute.gridCount = a.getInteger(R.styleable.ChartView_gridCount,
+        attribute.gridCount = a.getInt(R.styleable.ChartView_gridCount,
                 attribute.gridCount);//grid 数量
 
         attribute.gridLabelMarginVertical = a.getDimension(R.styleable.ChartView_gridLabelMarginVertical,
@@ -74,7 +74,7 @@ public class AttributeRead {
         attribute.gridScaleLineLength = a.getDimension(R.styleable.ChartView_gridScaleLineLength,
                 attribute.gridScaleLineLength);//grid 刻度线长度
 
-        int style = a.getInteger(R.styleable.ChartView_gridLineStyle, attribute.gridLineStyle.ordinal());
+        int style = a.getInt(R.styleable.ChartView_gridLineStyle, attribute.gridLineStyle.ordinal());
         attribute.gridLineStyle = LineStyle.values()[style];//grid 线条样式
 
         /*
@@ -151,7 +151,7 @@ public class AttributeRead {
         attribute.axisMarkerPosition = a.getInt(R.styleable.ChartView_axisMarkerPosition,
                 attribute.axisMarkerPosition);// axis 轴 MarkerView 位置
 
-        style = a.getInteger(R.styleable.ChartView_markerStyle, attribute.markerStyle.ordinal());
+        style = a.getInt(R.styleable.ChartView_markerStyle, attribute.markerStyle.ordinal());
         attribute.markerStyle = Paint.Style.values()[style];//  MarkerView 的style（边框/边框和填充）
 
         /*
@@ -310,10 +310,10 @@ public class AttributeRead {
         attribute.darkColorAlpha = getAlpha(a.getFloat(R.styleable.ChartView_darkColorAlpha,
                 attribute.darkColorAlpha));//（暗色）透明度（基于涨跌色配合透明度来实现暗色）
 
-        style = a.getInteger(R.styleable.ChartView_increasingStyle, attribute.increasingStyle.ordinal());
+        style = a.getInt(R.styleable.ChartView_increasingStyle, attribute.increasingStyle.ordinal());
         attribute.increasingStyle = Paint.Style.values()[style];// 上涨蜡烛图填充样式。默认实心
 
-        style = a.getInteger(R.styleable.ChartView_decreasingStyle, attribute.decreasingStyle.ordinal());
+        style = a.getInt(R.styleable.ChartView_decreasingStyle, attribute.decreasingStyle.ordinal());
         attribute.decreasingStyle = Paint.Style.values()[style];// 下跌蜡烛图填充样式，默认空心
 
         /*
@@ -336,8 +336,7 @@ public class AttributeRead {
         float minScale = 1f - a.getFloat(R.styleable.ChartView_minScale, attribute.minScale) / 10f;// 最多缩小倍数
         attribute.minScale = minScale > 0 ? minScale : 0.1f;
 
-        attribute.currentScale =
-                a.getFloat(R.styleable.ChartView_currentScale, attribute.currentScale);// 当前缩放倍数
+        attribute.currentScale = a.getFloat(R.styleable.ChartView_currentScale, attribute.currentScale);// 当前缩放倍数
 
         /*
          * 与股票指标有关的属性
@@ -472,7 +471,7 @@ public class AttributeRead {
             depthAttribute.circleSize = a.getDimension(R.styleable.ChartView_circleSize,
                     depthAttribute.circleSize);// 圆点大小
 
-            depthAttribute.depthGridStyle = a.getInteger(R.styleable.ChartView_depthGridStyle,
+            depthAttribute.depthGridStyle = a.getInt(R.styleable.ChartView_depthGridStyle,
                     depthAttribute.depthGridStyle);// 深度图grid样式
         }
     }
