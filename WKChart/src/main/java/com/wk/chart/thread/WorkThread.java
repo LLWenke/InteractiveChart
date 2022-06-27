@@ -3,10 +3,6 @@ package com.wk.chart.thread;
 import android.os.Handler;
 import android.os.HandlerThread;
 
-import androidx.annotation.NonNull;
-
-import com.wk.chart.enumeration.ObserverArg;
-
 
 public class WorkThread<T> extends HandlerThread {
     private Handler mHandler;

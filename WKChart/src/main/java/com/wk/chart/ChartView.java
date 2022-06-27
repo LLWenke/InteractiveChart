@@ -85,14 +85,16 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 lockRefresh = true;
                 break;
             case ATTR_UPDATE:
-                onAttributeUpdate();
-            case FORMAT_UPDATE:
-                onViewInit();
                 callHighlight();
+                onAttributeUpdate();
+                break;
+            case FORMAT_UPDATE:
+                callHighlight();
+                onViewInit();
                 break;
             case INIT:
-                onViewInit();
                 callHighlight();
+                onViewInit();
             case RESET:
                 resetChartState();
                 lockRefresh = false;
@@ -100,6 +102,9 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 loadingComplete();
             case UPDATE:
                 onDataUpdate();
+                break;
+            case REFRESH:
+                postInvalidateOnAnimation();
                 break;
         }
     };
@@ -365,10 +370,10 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         if (viewSizeEntry.isNotMeasure()) {
             setMeasuredDimension(viewSizeEntry.getWidth(), viewSizeEntry.getHeight());
         } else if (MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.EXACTLY) {
-            render.setProrate(true);
+            this.render.setProrate(true);
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         } else {
-            render.setProrate(false);
+            this.render.setProrate(false);
             int widthSize = MeasureSpec.getSize(widthMeasureSpec);
             int heightSize = render.measureEstimateOccupyHeight();
             heightSize = heightSize + getPaddingTop() + getPaddingBottom();
@@ -381,7 +386,10 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
 //        Log.e("高度(onMeasure)：", h+"(onSizeChanged)");
         this.viewSizeEntry.setWidth(w);
         this.viewSizeEntry.setHeight(h);
-        this.viewRect.set(getPaddingLeft(), getPaddingTop(), w - getPaddingRight(), h - getPaddingBottom());
+        this.viewRect.set(getPaddingLeft(),
+                getPaddingTop(),
+                w - getPaddingRight(),
+                h - getPaddingBottom());
     }
 
     @Override
@@ -581,6 +589,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      */
     public void onAttributeUpdate() {
         this.render.onAttributeChange();
+        this.onViewInit();
     }
 
     /**

@@ -9,7 +9,6 @@ import android.graphics.RectF;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.helper.widget.Layer;
 
 import com.wk.chart.adapter.AbsAdapter;
 import com.wk.chart.compat.MeasureUtils;
@@ -21,7 +20,6 @@ import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.enumeration.ClickDrawingID;
 import com.wk.chart.enumeration.ModuleGroupType;
 import com.wk.chart.enumeration.ModuleType;
-import com.wk.chart.interfaces.IDrawingClickListener;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.module.base.MainModule;
 
