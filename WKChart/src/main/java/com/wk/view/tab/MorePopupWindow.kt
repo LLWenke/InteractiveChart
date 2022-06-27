@@ -31,12 +31,12 @@ class MorePopupWindow(context: Context, anchor: View, private val mData: ArrayLi
         }
     }
 
-    fun checkedDefaultTimeType(type: TimeType, @ModuleType moduleType: Int): TabTimeBean? {
-        return mAdapter?.checkedItem(type, moduleType)
+    fun selectedDefaultTimeType(type: TimeType, @ModuleType moduleType: Int): TabTimeBean? {
+        return mAdapter?.selectedItem(type, moduleType)
     }
 
-    fun getCheckedItem(): TabTimeBean? {
-        return mAdapter?.getCheckedItem()
+    fun getSelectedItem(): TabTimeBean? {
+        return mAdapter?.getSelectedItem()
     }
 
     fun recoveryItem() {
