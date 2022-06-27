@@ -42,7 +42,7 @@ class MoreTabAdapter(private val chartTabListener: ChartTabListener?) : Recycler
         }
     }
 
-    private fun itemChecked(checkedPosition: Int): TabTimeBean? {
+    private fun itemSelected(checkedPosition: Int): TabTimeBean? {
         getItem(checkedPosition)?.let { checked ->
             checked.isSelected = true
             notifyItemChanged(checkedPosition)
@@ -71,16 +71,16 @@ class MoreTabAdapter(private val chartTabListener: ChartTabListener?) : Recycler
         return mData.size
     }
 
-    fun getCheckedItem(): TabTimeBean? {
+    fun getSelectedItem(): TabTimeBean? {
         return getItem(mRecoveryPosition)
     }
 
-    fun checkedItem(type: TimeType, @ModuleType moduleType: Int): TabTimeBean? {
+    fun selectedItem(type: TimeType, @ModuleType moduleType: Int): TabTimeBean? {
         for (i in mData.indices) {
             val item = mData[i]
             if (item.moduleType == moduleType && item.tabValue == type) {
                 itemRecovery()
-                itemChecked(i)?.let {
+                itemSelected(i)?.let {
                     return it
                 }
                 return null
@@ -92,7 +92,7 @@ class MoreTabAdapter(private val chartTabListener: ChartTabListener?) : Recycler
     override fun onClick(v: View?) {
         v?.tag?.let {
             itemRecovery()
-            itemChecked(it as Int)?.let { bean ->
+            itemSelected(it as Int)?.let { bean ->
                 chartTabListener?.onTimeTypeChange(bean.tabValue, bean.moduleType)
             }
         }

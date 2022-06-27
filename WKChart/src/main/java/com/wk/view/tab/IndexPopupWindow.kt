@@ -94,8 +94,8 @@ class IndexPopupWindow(context: Context, anchor: View, private val mChartTabList
     /**
      * 获取选中的指标类型
      */
-    private fun getSelectedIndexType(checkedView: View?): Int {
-        return when (checkedView?.id) {
+    private fun getSelectedIndexType(selectedView: View?): Int {
+        return when (selectedView?.id) {
             R.id.tv_ma -> IndexType.CANDLE_MA
             R.id.tv_boll -> IndexType.BOLL
             R.id.tv_macd -> IndexType.MACD
