@@ -3,7 +3,6 @@ package com.wk.chart.compat;
 
 import android.annotation.SuppressLint;
 import android.graphics.RectF;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -12,8 +11,6 @@ import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.enumeration.ModuleGroupType;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
-import com.wk.chart.render.CandleRender;
-import com.wk.chart.render.DepthRender;
 
 import java.util.List;
 import java.util.Map;

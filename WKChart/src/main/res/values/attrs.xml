@@ -472,8 +472,12 @@
         <attr name="tabType">
             <!-- 币币 -->
             <enum name="spot" value="111" />
+            <!-- 币币交易 -->
+            <enum name="spotTrading" value="112" />
             <!-- 合约 -->
-            <enum name="contract" value="112" />
+            <enum name="contract" value="113" />
+            <!-- 合约交易 -->
+            <enum name="contract_trading" value="114" />
         </attr>
         <!-- 选项卡子菜单对齐方向 -->
         <attr name="tabAlign">

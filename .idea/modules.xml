@@ -3,7 +3,13 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/WKChart/InteractiveChart.WKChart.iml" filepath="$PROJECT_DIR$/.idea/modules/WKChart/InteractiveChart.WKChart.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/WKChart/InteractiveChart.WKChart.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/WKChart/InteractiveChart.WKChart.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/WKChart/InteractiveChart.WKChart.main.iml" filepath="$PROJECT_DIR$/.idea/modules/WKChart/InteractiveChart.WKChart.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/WKChart/InteractiveChart.WKChart.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/WKChart/InteractiveChart.WKChart.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/InteractiveChart.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/InteractiveChart.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/InteractiveChart.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/InteractiveChart.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/InteractiveChart.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/InteractiveChart.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/InteractiveChart.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/InteractiveChart.app.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/project.InteractiveChart.iml" filepath="$PROJECT_DIR$/.idea/modules/project.InteractiveChart.iml" />
     </modules>
   </component>

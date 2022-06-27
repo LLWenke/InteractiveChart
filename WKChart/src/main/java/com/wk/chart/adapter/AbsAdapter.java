@@ -2,7 +2,6 @@ package com.wk.chart.adapter;
 
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -273,7 +272,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     }
 
     /**
-     * 应用格式更新
+     * 格式更新
      *
      * @param isCalculateData 是否需要计算数据
      */
@@ -286,6 +285,13 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             notifyDataSetChanged(ObserverArg.FORMAT_UPDATE);
         }
+    }
+
+    /**
+     * 配置属性更新
+     */
+    public synchronized void applyAttrUpdate() {
+        notifyDataSetChanged(ObserverArg.ATTR_UPDATE);
     }
 
     /**
@@ -372,7 +378,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         if (null != data && position >= 0 && position < getCount()) {
             ArrayList<T> copyList = cloneDataList();
             copyList.set(position, data);
-            onAsyTask(buildConfig, copyList, ObserverArg.UPDATE, position, position);
+            onAsyTask(buildConfig, copyList, ObserverArg.REFRESH, position, position);
         }
     }
 
@@ -386,7 +392,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     public void onAnimation(int position, T updateData) {
         if (getItem(position).getTime().getTime() == updateData.getTime().getTime()) {
             this.renderData.set(position, updateData);
-            notifyDataSetChanged(ObserverArg.UPDATE);
+            notifyDataSetChanged(ObserverArg.REFRESH);
         } else {
             stopAnimator();
         }
@@ -399,7 +405,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         if (getCount() == 0) {
             return;
         }
-        notifyDataSetChanged(ObserverArg.UPDATE);
+        notifyDataSetChanged(ObserverArg.REFRESH);
     }
 
     /**

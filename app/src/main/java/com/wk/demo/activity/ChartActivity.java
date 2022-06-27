@@ -1,11 +1,18 @@
 package com.wk.demo.activity;
 
+import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+import static android.widget.Toast.LENGTH_SHORT;
+import static com.wk.chart.enumeration.LoadingType.LEFT_LOADING;
+import static com.wk.chart.enumeration.LoadingType.REFRESH_LOADING;
+import static com.wk.chart.enumeration.LoadingType.RIGHT_LOADING;
+import static com.wk.demo.util.DataUtils.candleEntries;
+import static com.wk.demo.util.DataUtils.depthEntries;
+
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -13,13 +20,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintSet;
 
 import com.wk.chart.ChartLayout;
 import com.wk.chart.ChartView;
 import com.wk.chart.adapter.CandleAdapter;
 import com.wk.chart.adapter.DepthAdapter;
-import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.config.IndexBuildConfig;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.CandleEntry;
@@ -40,26 +45,17 @@ import com.wk.view.tab.ChartIndexTabLayout;
 import com.wk.view.tab.ChartTabLayout;
 import com.wk.view.tab.ChartTabListener;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-import org.jetbrains.annotations.NotNull;
-
-import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-import static android.view.View.VISIBLE;
-import static android.widget.Toast.LENGTH_SHORT;
-import static com.wk.chart.enumeration.LoadingType.LEFT_LOADING;
-import static com.wk.chart.enumeration.LoadingType.REFRESH_LOADING;
-import static com.wk.chart.enumeration.LoadingType.RIGHT_LOADING;
-import static com.wk.demo.util.DataUtils.candleEntries;
-import static com.wk.demo.util.DataUtils.depthEntries;
 
 /**
  * <p>MainActivity</p>

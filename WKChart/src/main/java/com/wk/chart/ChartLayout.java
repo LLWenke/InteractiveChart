@@ -92,7 +92,7 @@ public class ChartLayout extends ConstraintLayout {
     /**
      * 构建蜡烛图组件
      */
-    private void initCandleChartModules(AbsRender<?, ?> render) {
+    protected void initCandleChartModules(AbsRender<?, ?> render) {
         render.resetChartModules();
         CandleModule candleModule = new CandleModule();
         candleModule.addDrawing(new WaterMarkingDrawing());//水印组件
@@ -155,7 +155,7 @@ public class ChartLayout extends ConstraintLayout {
     /**
      * 构建深度图组件
      */
-    private void initDepthChartModules(AbsRender<?, ?> render) {
+    protected void initDepthChartModules(AbsRender<?, ?> render) {
         DepthModule depthModule = new DepthModule();
         depthModule.addDrawing(new AxisDrawing(5, true));//x轴组件
         depthModule.addDrawing(new DepthDrawing());//深度图组件
