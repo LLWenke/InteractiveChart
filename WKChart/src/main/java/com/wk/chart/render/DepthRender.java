@@ -3,12 +3,9 @@ package com.wk.chart.render;
 
 import android.graphics.RectF;
 
-import androidx.annotation.NonNull;
-
 import com.wk.chart.adapter.DepthAdapter;
 import com.wk.chart.compat.attribute.DepthAttribute;
 import com.wk.chart.entry.AbsEntry;
-import com.wk.chart.entry.DepthEntry;
 import com.wk.chart.module.base.AbsModule;
 
 /**
@@ -40,9 +37,9 @@ public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
     @Override
     protected void resetMatrix() {
         AbsModule<AbsEntry> module = getMainModule();
+        postMatrixScale(module.getMatrix(), 1f, 1f);
         postMatrixOffset(matrixOffset, module.getRect().left + module.getXOffset() * 2f, viewRect.top - module.getYOffset());
         postMatrixTouch(matrixTouch, module.getRect(), module.getRect().width() - module.getXCorrectedValue(), getAdapter().getCount());
-        postMatrixScale(module.getMatrix(), 1f, 1f);
     }
 
     /**

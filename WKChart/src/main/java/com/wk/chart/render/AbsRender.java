@@ -430,9 +430,9 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      * 刷新Matrix
      */
     void resetMatrix() {
+        postMatrixScale(mainModule.getMatrix(), mainModule.getRect().width() / adapter.getCount(), 1f);
         postMatrixOffset(matrixOffset, mainModule.getRect().left, viewRect.top);
         postMatrixTouch(matrixTouch, mainModule.getRect(), mainModule.getRect().width(), attribute.visibleCount);
-        postMatrixScale(mainModule.getMatrix(), mainModule.getRect().width() / adapter.getCount(), 1f);
     }
 
     /**
@@ -492,17 +492,17 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      */
     protected float getTransX(RectF rect, float visibleCount, float entryIndex) {
         final Matrix mainMatrix = getMainModule().getMatrix();
-        final int entrySetSize = adapter.getCount();
-        if (entrySetSize <= visibleCount) {
-            return 0;
+        final int dataSize = adapter.getCount();
+        if (dataSize <= visibleCount) {
+            return attribute.rightScrollOffset - attribute.leftScrollOffset;
         }
         float leftOffset = getPointX(mainMatrix, 0) - rect.left;
-        float rightOffset = rect.right - getPointX(mainMatrix, entrySetSize);
-        rightOffset = rightOffset > 0 ? Math.min(rightOffset, attribute.rightScrollOffset) : 0;
-        leftOffset = leftOffset > 0 ? Math.min(leftOffset, attribute.leftScrollOffset) : 0;
+        float rightOffset = rect.right - getPointX(mainMatrix, dataSize);
+        rightOffset = Math.max(rightOffset, attribute.rightScrollOffset);
+        leftOffset = Math.max(leftOffset, attribute.leftScrollOffset);
 
-        float scrollOffset = maxScrollOffset - (attribute.rightScrollOffset - rightOffset);
-        float result = scrollOffset * entryIndex / (entrySetSize - visibleCount) - leftOffset;
+        float scrollOffset = maxScrollOffset - rightOffset;
+        float result = scrollOffset * entryIndex / (dataSize - visibleCount) - leftOffset;
         result = Math.min(scrollOffset, result);
         //Log.e("valuehaha", "scrollOffset"+scrollOffset+"     result:" + (-result));
         return -result;
@@ -519,8 +519,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         if (scaleX > 1f) {
             maxScrollOffset = width * (scaleX - 1f) + attribute.rightScrollOffset;
         } else {
-            lastMaxScrollOffset = 0;
-            maxScrollOffset = 0;
+            maxScrollOffset = attribute.rightScrollOffset;
         }
     }
 
