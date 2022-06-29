@@ -79,7 +79,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
 
     private int loadStartPos = 0;
     private int loadEndPos = 0;
-    private int loadCount = 200;
+    private int loadCount = 300;
     private CandleAdapter candleAdapter;
     private DepthAdapter depthAdapter;
 
@@ -293,7 +293,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     private void switchTimeType(TimeType timeType, @ModuleType int moduleType) {
         chartLayout.loadBegin(REFRESH_LOADING, candleProgressBar, candleChart);
         candleAdapter.setData(timeType, dataShowType == DataType.REAL_TIME.ordinal() ?
-                getNewestData(500) : getInit());
+                getNewestData(loadCount) : getInit());
         if (depthAdapter.getCount() == 0) {
             depthAdapter.resetData(depthEntries);
         }
