@@ -334,10 +334,11 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     }
 
     /**
-     * 初始化图标
+     * 初始化图表
      */
     public void resetChart() {
         firstLoad = true;
+        cacheCurrentTransX = 0;
         cacheMaxScrollOffset = 0;
         setOverScrollOffset(0);
         setCurrentTransX(0);

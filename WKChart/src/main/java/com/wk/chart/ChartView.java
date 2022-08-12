@@ -6,7 +6,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -126,10 +125,6 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 public boolean onSingleTapConfirmed(MotionEvent e) {
                     boolean consumed = false;
                     int clickId = getRender().onClick(e.getX(), e.getY());
-
-                    render.onZoom(e.getX(), e.getY());
-                    postInvalidateOnAnimation();
-
                     if (null != interactiveHandler && clickId != ClickDrawingID.ID_NONE) {
                         consumed = interactiveHandler.onSingleClick(clickId, e.getX(), e.getY());
                     }
@@ -398,7 +393,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        Log.e("高度(onSizeChanged)：", "left:" + left + "   top:" + top + "   right:" + right + "   bottom:" + bottom);
+//        Log.e("高度(onSizeChanged)：", "left:" + left + "   top:" + top + "   right:" + right + "   bottom:" + bottom);
         if (changed) {
             this.onViewInit();
         } else {
