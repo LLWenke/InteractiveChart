@@ -51,7 +51,7 @@ public class CandleDrawing extends AbsDrawing<CandleRender, CandleModule> {
     public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
         //获取蜡烛图绘制的实际收首尾X轴坐标点（从首尾两根蜡烛图的中心点算起）
         this.beginX = render.getPointX(absChartModule.getMatrix(), begin + 0.5f);
-        this.endX = render.getPointX(absChartModule.getMatrix(), end - 0.5f);
+        this.endX = render.getPointX(absChartModule.getMatrix(), end - 1 + 0.5f);
         this.highlightState = true;
     }
 
@@ -114,7 +114,7 @@ public class CandleDrawing extends AbsDrawing<CandleRender, CandleModule> {
                 highlightState = false;
             } else if (highlightPoint[0] >= endX) {
                 highlightPoint[0] = endX;
-                render.getAdapter().setHighlightIndex(end);
+                render.getAdapter().setHighlightIndex(end - 1);
                 highlightState = false;
             }
         }

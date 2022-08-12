@@ -2,12 +2,11 @@ package com.wk.chart.module;
 
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.ValueEntry;
-import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.ModuleType;
 import com.wk.chart.module.base.AuxiliaryModule;
 
 /**
- * <p>交易量组件</p>
+ * <p>交易量模块</p>
  */
 
 public class VolumeModule extends AuxiliaryModule<CandleEntry> {

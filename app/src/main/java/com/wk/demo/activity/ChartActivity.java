@@ -178,8 +178,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     private void initUI() {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setContentView(R.layout.activity_chart_land);
-        } else if (getResources().getConfiguration().orientation
-                == Configuration.ORIENTATION_PORTRAIT) {
+        } else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             setContentView(R.layout.activity_chart_port);
         }
         this.chartTabLayout = findViewById(R.id.chart_tab_view);

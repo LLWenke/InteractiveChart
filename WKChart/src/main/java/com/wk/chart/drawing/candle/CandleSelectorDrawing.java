@@ -4,27 +4,23 @@ package com.wk.chart.drawing.candle;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.Build;
 import android.text.TextPaint;
 
 import com.wk.chart.R;
 import com.wk.chart.compat.FontStyle;
-import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.SelectorItemEntry;
-import com.wk.chart.interfaces.IDrawingClickListener;
-import com.wk.chart.module.FloatModule;
+import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
-
-import androidx.annotation.RequiresApi;
 
 /**
  * <p>CandleSelectorDrawing</p>
  */
 
-public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule> {
+public class CandleSelectorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
     private static final String TAG = "CandleSelectorDrawing";
 
     private CandleAttribute attribute;//配置文件
@@ -38,6 +34,7 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
 
     private Paint.FontMetrics metrics;
     private final float[] viewRectBuffer = new float[4]; // 计算选择器矩形坐标用的
+    private float[] drawingNonOverlapMargin;//非重叠边距
 
     private float selectedWidth;//信息选择框的宽度
     private float selectedHeight;//信息选择框的高度
@@ -46,7 +43,7 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
     private final int itemCount = 8;//选择器中的条目数
 
     @Override
-    public void onInit(CandleRender render, FloatModule chartModule) {
+    public void onInit(CandleRender render, AbsModule<AbsEntry> chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
 
@@ -83,7 +80,6 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void drawOver(Canvas canvas) {
         if (!render.isHighlight()) {
@@ -92,7 +88,7 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         //初始信息
         float textHeight = metrics.descent - metrics.ascent;
         float left;
-        float top = viewRect.top + attribute.selectorMarginVertical + attribute.borderWidth;
+        float top = viewRect.top + attribute.selectorMarginVertical + drawingNonOverlapMargin[1];
 
         //添加选择器内容
         loadSelectorInfo();
@@ -110,9 +106,9 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
         //负责选择器左右漂浮
         float x = render.getHighlightPoint()[0];
         if (x > viewRect.width() / 2) {
-            left = viewRect.left + attribute.selectorMarginHorizontal + attribute.borderWidth;
+            left = viewRect.left + attribute.selectorMarginHorizontal + drawingNonOverlapMargin[0];
         } else {
-            left = viewRect.right - selectedWidth - attribute.selectorMarginHorizontal - attribute.borderWidth;
+            left = viewRect.right - selectedWidth - attribute.selectorMarginHorizontal - drawingNonOverlapMargin[2];
         }
 
         //计算选择器坐标位置
@@ -209,5 +205,11 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, FloatModule>
                 .setLabelPaint(labelPaint)
                 .setValue(render.getAdapter().quantizationConversion(entry.getVolume(), true))
                 .setValuePaint(valuePaint);
+    }
+
+    @Override
+    public void onLayoutComplete() {
+        super.onLayoutComplete();
+        drawingNonOverlapMargin = absChartModule.getDrawingNonOverlapMargin();
     }
 }

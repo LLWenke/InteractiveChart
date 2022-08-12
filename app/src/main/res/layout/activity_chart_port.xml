@@ -57,7 +57,7 @@
             app:lineWidth="1dp"
             app:mainViewHeight="200dp"
             app:markerPaddingHorizontal="5dp"
-            app:markerPaddingVertical="2dp"
+            app:markerPaddingVertical="4dp"
             app:markerPointJointMargin="1dp"
             app:markerPointJointRadius="2dp"
             app:markerPointLineDefaultLength="4dp"

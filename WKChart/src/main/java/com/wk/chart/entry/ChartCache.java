@@ -15,7 +15,8 @@ import java.util.HashMap;
 public class ChartCache implements Serializable {
     public @Nullable
     TimeType timeType;
-    public int beginPosition = 0;
+    public float cacheMaxScrollOffset = 0f;
+    public float cacheCurrentTransX = 0f;
     public float scale = 1;
     private final HashMap<Integer, TypeEntry> types;
 

@@ -29,7 +29,7 @@ public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeModule> {
 
     private final float[] rectBuffer = new float[4];
 
-    private float borderOffset;//边框偏移量
+    private float pointBorderOffset;//数据点矩形边框线偏移量
 
     @Override
     public void onInit(CandleRender render, VolumeModule chartModule) {
@@ -46,7 +46,7 @@ public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeModule> {
         decreasingPaint.setColor(Utils.getColorWithAlpha(attribute.decreasingColor
                 , attribute.darkColorAlpha));
 
-        borderOffset = attribute.pointBorderWidth / 2;
+        pointBorderOffset = attribute.pointBorderWidth / 2;
     }
 
     @Override
@@ -71,10 +71,10 @@ public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeModule> {
         render.mapPoints(absChartModule.getMatrix(), rectBuffer);
         //边框偏移量修正
         if (isStroke) {
-            rectBuffer[0] += borderOffset;
-            rectBuffer[2] -= borderOffset;
-            rectBuffer[1] += borderOffset;
-            rectBuffer[3] -= borderOffset;
+            rectBuffer[0] += pointBorderOffset;
+            rectBuffer[2] -= pointBorderOffset;
+            rectBuffer[1] += pointBorderOffset;
+            rectBuffer[3] -= pointBorderOffset;
         }
         //无成交量的一字板
         if (rectBuffer[3] - rectBuffer[1] < attribute.pointBorderWidth) {

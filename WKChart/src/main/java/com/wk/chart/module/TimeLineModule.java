@@ -10,7 +10,7 @@ import com.wk.chart.module.base.MainModule;
 import com.wk.chart.render.AbsRender;
 
 /**
- * <p>分时图组件</p>
+ * <p>分时图模块</p>
  */
 
 public class TimeLineModule extends MainModule<CandleEntry> implements IMarkerPoint {

@@ -68,14 +68,14 @@ public class ExtremumLabelDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<
     }
 
     @Override
-    public float[] onInitMargin() {
+    public float[] onInitMargin(float viewWidth, float viewHeight) {
         if ((attribute.extremumLabelPosition & PositionType.OUTSIDE_VERTICAL) != 0) {
-            float height = (float) Math.ceil(textHeight + attribute.extremumLabelMarginVertical * 2f);
+            float labelHeight = (float) Math.ceil(textHeight + attribute.extremumLabelMarginVertical * 2f);
             if (showMaxLabel) {//上标签可见
-                margin[1] = height;
+                margin[1] = labelHeight;
             }
             if (showMinLabel) {//下标签可见
-                margin[3] = height;
+                margin[3] = labelHeight;
             }
         }
         return margin;
@@ -120,6 +120,8 @@ public class ExtremumLabelDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<
     @SuppressLint("SwitchIntDef")
     @Override
     public void onLayoutComplete() {
+        super.onLayoutComplete();
+        float[] drawingNonOverlapMargin = absChartModule.getDrawingNonOverlapMargin();//非重叠边距
         if ((attribute.extremumLabelPosition & PositionType.START_AND_END) != 0) {
             labelBuffer[0] = labelBuffer[2] = viewRect.left + attribute.extremumLabelMarginHorizontal;
             labelBuffer[4] = labelBuffer[6] = viewRect.right - attribute.extremumLabelMarginHorizontal;
@@ -129,8 +131,8 @@ public class ExtremumLabelDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<
             labelBuffer[4] = labelBuffer[6] = viewRect.right - attribute.extremumLabelMarginHorizontal;
         }
         if ((attribute.extremumLabelPosition & PositionType.OUTSIDE_VERTICAL) != 0) {
-            labelBuffer[1] = labelBuffer[5] = viewRect.top - attribute.borderWidth - attribute.extremumLabelMarginVertical;
-            labelBuffer[3] = labelBuffer[7] = viewRect.bottom + textHeight + attribute.borderWidth + attribute.extremumLabelMarginVertical;
+            labelBuffer[1] = labelBuffer[5] = viewRect.top - drawingNonOverlapMargin[1] - attribute.extremumLabelMarginVertical;
+            labelBuffer[3] = labelBuffer[7] = viewRect.bottom + textHeight + drawingNonOverlapMargin[3] + attribute.extremumLabelMarginVertical;
         } else {
             labelBuffer[1] = labelBuffer[5] = viewRect.top + textHeight + attribute.extremumLabelMarginVertical;
             labelBuffer[3] = labelBuffer[7] = viewRect.bottom - attribute.extremumLabelMarginVertical;

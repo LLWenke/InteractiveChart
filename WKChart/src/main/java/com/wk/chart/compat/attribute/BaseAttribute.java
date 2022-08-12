@@ -83,11 +83,11 @@ public class BaseAttribute {
     public float markerRadius = 0; // MarkerView 边框圆角
     public float markerPaddingVertical = 5f; // MarkerView 垂直padding
     public float markerPaddingHorizontal = 10f; // MarkerView 水平padding
-    public float markerBorderWidth = 3f; // MarkerView 边框宽度
+    public float markerBorderWidth = 10f; // MarkerView 边框宽度
     public int markerBorderColor = 0xff4d6370; // MarkerView 边框颜色
     public float markerTextSize = 26; // MarkerView 字符大小
     public int markerTextColor = 0xffffffff; // MarkerView 字符颜色
-    public Paint.Style markerStyle = Paint.Style.STROKE; //  MarkerView 的style（边框/边框和填充）
+    public Paint.Style markerStyle = Paint.Style.FILL_AND_STROKE; //  MarkerView 的style（边框/边框和填充）
     public int axisMarkerPosition = PositionType.AUTO; // axis 轴 MarkerView 位置
     public int gridMarkerPosition = PositionType.BOTTOM | PositionType.OUTSIDE_VERTICAL; // grid 轴 MarkerView 位置
 

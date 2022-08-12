@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -57,6 +58,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private BaseAttribute attribute = null;
     private final RectF viewRect = new RectF();
     private final ViewSizeEntry viewSizeEntry = new ViewSizeEntry();
+    private final GestureMoveActionCompat gestureCompat = new GestureMoveActionCompat();
     // 渲染相关的属性
     private AbsRender<? extends AbsAdapter<?, ?>, ? extends BaseAttribute> render;
     private InteractiveHandler interactiveHandler;
@@ -75,7 +77,6 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private float lastScrollDx = 0;
     private int chartState = IDLE;//图表状态
     private int lastHighlightIndex = -1; // 上一次高亮的 entry 索引，用于减少回调
-    private int orientation;//屏幕方向
 
     //数据监视器
     private final Observer dataSetObserver = (o, arg) -> {
@@ -108,81 +109,11 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 break;
         }
     };
-
-    public ChartView(Context context) {
-        this(context, null, 0);
-    }
-
-    public ChartView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public ChartView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        setPadding(0, 0, 0, 0);
-        final TypedArray a = context.getTheme().obtainStyledAttributes(
-                attrs, R.styleable.ChartView, defStyleAttr, defStyleAttr);
-        try {
-            int type = a.getInteger(R.styleable.ChartView_renderModel, RenderModel.CANDLE.ordinal());
-            init(a, RenderModel.values()[type]);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            a.recycle();
-        }
-    }
-
     /**
-     * 图表初始化
-     *
-     * @param renderModel 渲染类型
-     *                    根据渲染类型来构建相应的渲染工厂和配置文件
+     * 手势检测器
      */
-    private void init(TypedArray array, RenderModel renderModel) {
-        AttributeRead attributeRead = new AttributeRead();
-        switch (renderModel) {
-            case CANDLE://蜡烛图
-                CandleAttribute candleAttribute = new CandleAttribute(getContext());
-                attributeRead.initAttribute(array, candleAttribute);
-                render = new CandleRender(candleAttribute, viewRect);
-                break;
-            case DEPTH://深度图
-                DepthAttribute depthAttribute = new DepthAttribute(getContext());
-                attributeRead.initAttribute(array, depthAttribute);
-                render = new DepthRender(depthAttribute, viewRect);
-                break;
-        }
-        this.renderModel = renderModel;
-        this.attribute = render.getAttribute();
-        this.gestureDetector.setIsLongpressEnabled(true);
-        this.scroller = new OverScroller(getContext());
-        this.scaleDetector.setQuickScaleEnabled(false);
-        this.orientation = getResources().getConfiguration().orientation;
-        DelayedHandler.getInstance().setListener(this);
-    }
-
-    /**
-     * 设置数据适配器
-     */
-    public void setAdapter(@NonNull AbsAdapter<? extends AbsEntry, ? extends AbsBuildConfig> adapter) {
-        adapter.registerDataSetObserver(dataSetObserver);
-        ((AbsRender<AbsAdapter<?, ?>, BaseAttribute>) render).setAdapter(adapter);
-    }
-
-    public AbsRender<? extends AbsAdapter<?, ?>, ? extends BaseAttribute> getRender() {
-        return render;
-    }
-
-    public void setInteractiveHandler(InteractiveHandler handler) {
-        this.interactiveHandler = handler;
-    }
-
-    public InteractiveHandler getInteractiveHandler() {
-        return interactiveHandler;
-    }
-
-    private final GestureDetector gestureDetector =
-            new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
+    private final GestureDetector gestureDetector = new GestureDetector(getContext(),
+            new GestureDetector.SimpleOnGestureListener() {
                 @Override
                 public void onLongPress(MotionEvent e) {
                     if (onTouch) {
@@ -195,6 +126,10 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 public boolean onSingleTapConfirmed(MotionEvent e) {
                     boolean consumed = false;
                     int clickId = getRender().onClick(e.getX(), e.getY());
+
+                    render.onZoom(e.getX(), e.getY());
+                    postInvalidateOnAnimation();
+
                     if (null != interactiveHandler && clickId != ClickDrawingID.ID_NONE) {
                         consumed = interactiveHandler.onSingleClick(clickId, e.getX(), e.getY());
                     }
@@ -262,7 +197,76 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 }
             });
 
-    private final GestureMoveActionCompat gestureCompat = new GestureMoveActionCompat();
+
+    public ChartView(Context context) {
+        this(context, null, 0);
+    }
+
+    public ChartView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public ChartView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        final TypedArray a = context.getTheme().obtainStyledAttributes(
+                attrs, R.styleable.ChartView, defStyleAttr, defStyleAttr);
+        try {
+            int type = a.getInteger(R.styleable.ChartView_renderModel, RenderModel.CANDLE.ordinal());
+            init(a, RenderModel.values()[type]);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            a.recycle();
+        }
+    }
+
+    /**
+     * 图表初始化
+     *
+     * @param renderModel 渲染类型
+     *                    根据渲染类型来构建相应的渲染工厂和配置文件
+     */
+    private void init(TypedArray array, RenderModel renderModel) {
+        AttributeRead attributeRead = new AttributeRead();
+        switch (renderModel) {
+            case CANDLE://蜡烛图
+                CandleAttribute candleAttribute = new CandleAttribute(getContext());
+                attributeRead.initAttribute(array, candleAttribute);
+                render = new CandleRender(candleAttribute, viewRect);
+                break;
+            case DEPTH://深度图
+                DepthAttribute depthAttribute = new DepthAttribute(getContext());
+                attributeRead.initAttribute(array, depthAttribute);
+                render = new DepthRender(depthAttribute, viewRect);
+                break;
+        }
+        this.renderModel = renderModel;
+        this.attribute = render.getAttribute();
+        this.gestureDetector.setIsLongpressEnabled(true);
+        this.scroller = new OverScroller(getContext());
+        this.scaleDetector.setQuickScaleEnabled(false);
+        DelayedHandler.getInstance().setListener(this);
+    }
+
+    /**
+     * 设置数据适配器
+     */
+    public void setAdapter(@NonNull AbsAdapter<? extends AbsEntry, ? extends AbsBuildConfig> adapter) {
+        adapter.registerDataSetObserver(dataSetObserver);
+        ((AbsRender<AbsAdapter<?, ?>, ? extends BaseAttribute>) render).setAdapter(adapter);
+    }
+
+    public AbsRender<? extends AbsAdapter<?, ?>, ? extends BaseAttribute> getRender() {
+        return render;
+    }
+
+    public void setInteractiveHandler(InteractiveHandler handler) {
+        this.interactiveHandler = handler;
+    }
+
+    public InteractiveHandler getInteractiveHandler() {
+        return interactiveHandler;
+    }
 
     /**
      * 回调高亮监听，用于图表初始化后，通知外部监听重新调整高亮选择器中的显示信息
@@ -318,7 +322,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      */
     public void scrollToEnd() {
         lastFlingX = 0;
-        float scrollX = Math.abs(render.getMaxScrollOffset()) - Math.abs(render.getCurrentTransX());
+        float scrollX = render.getMaxScrollOffset() - Math.abs(render.getCurrentTransX());
         scroller.startScroll(0, 0, (int) scrollX, 0, 2000);
         postInvalidateOnAnimation();
     }
@@ -375,7 +379,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         } else {
             this.render.setProrate(false);
             int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-            int heightSize = render.measureEstimateOccupyHeight();
+            int heightSize = render.measureViewHeight();
             heightSize = heightSize + getPaddingTop() + getPaddingBottom();
             setMeasuredDimension(widthSize, heightSize);
         }
@@ -383,17 +387,18 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-//        Log.e("高度(onMeasure)：", h+"(onSizeChanged)");
+        float left = getPaddingLeft();
+        float top = getPaddingTop();
+        float tight = left + w - getPaddingRight();
+        float bottom = top + h - getPaddingBottom();
         this.viewSizeEntry.setWidth(w);
         this.viewSizeEntry.setHeight(h);
-        this.viewRect.set(getPaddingLeft(),
-                getPaddingTop(),
-                w - getPaddingRight(),
-                h - getPaddingBottom());
+        this.viewRect.set(left, top, tight, bottom);
     }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        Log.e("高度(onSizeChanged)：", "left:" + left + "   top:" + top + "   right:" + right + "   bottom:" + bottom);
         if (changed) {
             this.onViewInit();
         } else {
@@ -560,11 +565,9 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (null != render.getAdapter() && getResources().getConfiguration().orientation == orientation) {
+        if (null != render.getAdapter()) {
             this.render.getAdapter().onDestroy();
             DelayedHandler.getInstance().onDestroy();
-        } else {
-            this.orientation = getResources().getConfiguration().orientation;
         }
     }
 
@@ -614,10 +617,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      * 检查图表准备状态
      */
     private boolean checkReadyState() {
-        return null != render
-                && null != render.getAdapter()
-                && null != render.getMainModule()
-                && render.getAdapter().getCount() > 0;
+        return null != render && render.isReady();
     }
 
     /**

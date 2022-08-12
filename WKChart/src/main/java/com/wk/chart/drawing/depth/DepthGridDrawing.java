@@ -59,7 +59,7 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
     }
 
     @Override
-    public float[] onInitMargin() {
+    public float[] onInitMargin(float viewWidth, float viewHeight) {
         margin[3] = (float) Math.ceil(attribute.axisLabelMarginVertical * 2f + rect.height());
         return margin;
     }
@@ -120,8 +120,11 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
 
     @Override
     public void onLayoutComplete() {
+        super.onLayoutComplete();
+        //非重叠边距
+        float[] drawingNonOverlapMargin = absChartModule.getDrawingNonOverlapMargin();
         regionWidth = viewRect.width() / (float) (attribute.gridCount - 1);
-        gridLabelY = viewRect.bottom - attribute.axisLabelMarginVertical;
+        gridLabelY = viewRect.bottom + rect.height() + drawingNonOverlapMargin[3] + attribute.axisLabelMarginVertical;
     }
 
 }

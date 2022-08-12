@@ -4,8 +4,6 @@ package com.wk.chart.module.base;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 
-import androidx.annotation.Nullable;
-
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.ValueEntry;
@@ -18,8 +16,6 @@ import com.wk.chart.render.AbsRender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 /**
  * <p>组件base类</p>
@@ -38,22 +34,16 @@ public abstract class AbsModule<T extends AbsEntry> {
 
     private final RectF rect = new RectF();
 
-    private final float[] drawingMargin; //边距[left, top, right, bottom]
+    protected final float[] drawingMargin; //边距[left, top, right, bottom]
+
+    protected final float[] drawingNonOverlapMargin; //非重叠边距[left, top, right, bottom]
 
     protected float[] rectBuffer;//数据点的矩形坐标点
-
-    private int paddingTop = 0;
-
-    private int paddingBottom = 0;
-
-    private int paddingLeft = 0;
-
-    private int paddingRight = 0;
 
     private boolean enable = false;
 
     private @ModuleType
-    final int moduleType;//模型类型
+    final int moduleType;//模块类型
 
     private @IndexType
     int attachIndexType;//附加指标类型
@@ -75,6 +65,7 @@ public abstract class AbsModule<T extends AbsEntry> {
 
     private float xCorrectedValue, yCorrectedValue;// X,Y 轴校正值（这里多用于line的宽度修正）
     private float xOffset, yOffset;// X,Y 轴实际偏移数值（用于修正折线偏移后被影响的数值）
+    private float width = 0f, height = 0f;// 宽，高
 
     public AbsModule(@ModuleType int moduleType, @ModuleGroupType int moduleGroupType) {
         this.moduleType = moduleType;
@@ -85,11 +76,17 @@ public abstract class AbsModule<T extends AbsEntry> {
         this.zeroEntry = new ValueEntry();
         this.maxEntry.result = -Long.MAX_VALUE;
         this.minEntry.result = Long.MAX_VALUE;
-        this.drawingMargin = new float[4];
         this.rectBuffer = new float[8];
+        this.drawingMargin = new float[4];
+        this.drawingNonOverlapMargin = new float[4];
     }
 
     public abstract void computeMinMax(T entry);
+
+    public void onSizeChanged(float width, float height) {
+        this.width = width;
+        this.height = height;
+    }
 
     public void resetMinMax() {
         this.minX = minEntry;
@@ -119,6 +116,7 @@ public abstract class AbsModule<T extends AbsEntry> {
      */
     public void resetDrawing() {
         Arrays.fill(drawingMargin, 0);
+        Arrays.fill(drawingNonOverlapMargin, 0);
         for (AbsDrawing<?, ?> drawing : getDrawingList()) {
             drawing.resetInit();
         }
@@ -141,26 +139,38 @@ public abstract class AbsModule<T extends AbsEntry> {
     /**
      * 初始化组件的边距
      */
-    public void initDrawingMargin() {
+    public void initDrawingMargin(float viewWidth, float viewHeight) {
         Arrays.fill(drawingMargin, 0);
-        for (AbsDrawing<AbsRender<?, ?>, AbsModule<?>> drawing : getDrawingList()) {
+        Arrays.fill(drawingNonOverlapMargin, 0);
+        for (AbsDrawing<?, ?> drawing : getDrawingList()) {
             if (!drawing.isInit()) {
                 continue;
             }
-            float[] margins = drawing.onInitMargin();
-            if (margins[0] > drawingMargin[0]) {
-                drawingMargin[0] = margins[0];
-            }
-            if (margins[1] > drawingMargin[1]) {
-                drawingMargin[1] = margins[1];
-            }
-            if (margins[2] > drawingMargin[2]) {
-                drawingMargin[2] = margins[2];
-            }
-            if (margins[3] > drawingMargin[3]) {
-                drawingMargin[3] = margins[3];
+            float[] margins = drawing.onInitMargin(viewWidth, viewHeight);
+            if (drawing.marginOverlap()) {
+                if (margins[0] > drawingMargin[0]) {
+                    drawingMargin[0] = margins[0];
+                }
+                if (margins[1] > drawingMargin[1]) {
+                    drawingMargin[1] = margins[1];
+                }
+                if (margins[2] > drawingMargin[2]) {
+                    drawingMargin[2] = margins[2];
+                }
+                if (margins[3] > drawingMargin[3]) {
+                    drawingMargin[3] = margins[3];
+                }
+            } else {
+                drawingNonOverlapMargin[0] += margins[0];
+                drawingNonOverlapMargin[1] += margins[1];
+                drawingNonOverlapMargin[2] += margins[2];
+                drawingNonOverlapMargin[3] += margins[3];
             }
         }
+        drawingMargin[0] += drawingNonOverlapMargin[0];
+        drawingMargin[1] += drawingNonOverlapMargin[1];
+        drawingMargin[2] += drawingNonOverlapMargin[2];
+        drawingMargin[3] += drawingNonOverlapMargin[3];
     }
 
     public ArrayList<AbsDrawing<AbsRender<?, ?>, AbsModule<?>>> getDrawingList() {
@@ -180,46 +190,6 @@ public abstract class AbsModule<T extends AbsEntry> {
             }
         }
         return false;
-    }
-
-
-    public int getPaddingTop() {
-        return paddingTop;
-    }
-
-    public void setPaddingTop(int paddingTop) {
-        this.paddingTop = paddingTop;
-    }
-
-    public int getPaddingBottom() {
-        return paddingBottom;
-    }
-
-    public void setPaddingBottom(int paddingBottom) {
-        this.paddingBottom = paddingBottom;
-    }
-
-    public int getPaddingLeft() {
-        return paddingLeft;
-    }
-
-    public void setPaddingLeft(int paddingLeft) {
-        this.paddingLeft = paddingLeft;
-    }
-
-    public int getPaddingRight() {
-        return paddingRight;
-    }
-
-    public void setPaddingRight(int paddingRight) {
-        this.paddingRight = paddingRight;
-    }
-
-    public void setPadding(int paddingLeft, int paddingTop, int paddingRight, int paddingBottom) {
-        this.paddingLeft = paddingLeft;
-        this.paddingTop = paddingTop;
-        this.paddingRight = paddingRight;
-        this.paddingBottom = paddingBottom;
     }
 
     public boolean isEnable() {
@@ -340,8 +310,20 @@ public abstract class AbsModule<T extends AbsEntry> {
         return yOffset;
     }
 
+    public float getWidth() {
+        return width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
     public float[] getDrawingMargin() {
         return drawingMargin;
+    }
+
+    public float[] getDrawingNonOverlapMargin() {
+        return drawingNonOverlapMargin;
     }
 
     public float[] getPointRect(AbsRender<?, ?> render, T entry, int current) {

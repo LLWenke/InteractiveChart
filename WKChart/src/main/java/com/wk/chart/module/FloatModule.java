@@ -6,7 +6,7 @@ import com.wk.chart.enumeration.ModuleType;
 import com.wk.chart.module.base.AbsModule;
 
 /**
- * <p>浮动组件</p>
+ * <p>浮动模块</p>
  */
 
 public class FloatModule extends AbsModule<AbsEntry> {

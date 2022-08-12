@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.ValueEntry;
-import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.MarkerPointType;
 import com.wk.chart.enumeration.ModuleType;
 import com.wk.chart.interfaces.IMarkerPoint;
@@ -12,7 +11,7 @@ import com.wk.chart.module.base.MainModule;
 import com.wk.chart.render.AbsRender;
 
 /**
- * <p>蜡烛图组件</p>
+ * <p>蜡烛图模块</p>
  */
 
 public class CandleModule extends MainModule<CandleEntry> implements IMarkerPoint {
