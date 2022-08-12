@@ -6,7 +6,7 @@ import com.wk.chart.enumeration.ModuleGroupType;
 import com.wk.chart.enumeration.ModuleType;
 
 /**
- * <p>指标 组件</p>
+ * <p>指标 模块</p>
  */
 
 public abstract class IndexModule<T extends AbsEntry> extends AbsModule<T> {

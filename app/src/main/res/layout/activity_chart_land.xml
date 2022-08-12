@@ -61,11 +61,11 @@
             app:selectorLabelSize="8sp"
             app:selectorMarginVertical="30dp"
             app:selectorValueSize="8sp"
-            app:spreadCursorBorderWidth="3dp"
+            app:spreadCursorBorderWidth="1dp"
             app:spreadCursorPaddingHorizontal="4dp"
             app:spreadCursorPaddingVertical="2dp"
             app:spreadTriangleHeight="5dp"
-            app:spreadTriangleWidth="4dp"
+            app:spreadTriangleWidth="1dp"
             app:timeLineWidth="1dp"
             app:waterMarkingMarginHorizontal="24dp"
             app:waterMarkingMarginVertical="10dp" />

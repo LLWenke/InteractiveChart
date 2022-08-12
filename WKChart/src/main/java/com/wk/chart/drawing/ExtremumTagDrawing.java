@@ -129,9 +129,8 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> i
 
     @Override
     public void onLayoutComplete() {
-        if (null == bitmap) {
-            return;
-        }
+        super.onLayoutComplete();
+        if (null == bitmap) return;
         drawableWidth = attribute.extremumTagDrawableWidth == 0 ? bitmap.getWidth() : attribute.extremumTagDrawableWidth;
         drawableHeight = attribute.extremumTagDrawableHeight == 0 ? bitmap.getHeight() : attribute.extremumTagDrawableHeight;
         expandWidth = drawableWidth + attribute.extremumTagDrawableMarginHorizontal * 2f;

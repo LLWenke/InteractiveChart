@@ -5,7 +5,7 @@ import com.wk.chart.enumeration.ModuleType;
 import com.wk.chart.module.base.MainModule;
 
 /**
- * <p>深度图组件</p>
+ * <p>深度图模块</p>
  */
 
 public class DepthModule extends MainModule<DepthEntry> {

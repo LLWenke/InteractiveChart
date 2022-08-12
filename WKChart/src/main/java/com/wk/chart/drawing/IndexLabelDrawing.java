@@ -31,7 +31,7 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
     private final Rect rect = new Rect(); //用于测量文字的实际占用区域
     private TextPaint tagPaint;//tips画笔
     private IndexConfigEntry tagEntry;//指标配置
-    private float x, y, left, right, lineHeight;
+    private float x, y, lineHeight;
     private int lines = 1, lineItemCount = 0;//行数,行item数量
 
     public IndexLabelDrawing(int indexType) {
@@ -49,8 +49,6 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
         tagPaint.setTextAlign(getTextAlign());
 
         Utils.measureTextArea(tagPaint, rect);
-        left = viewRect.left + attribute.indexTextMarginHorizontal;
-        right = viewRect.right - attribute.indexTextMarginHorizontal;
         lineHeight = rect.height();
     }
 
@@ -76,15 +74,16 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
     }
 
     @Override
-    public float[] onInitMargin() {
+    public float[] onInitMargin(float viewWidth, float viewHeight) {
         CandleEntry entry = render.getAdapter().getItem(render.getAdapter().getLastPosition());
         if (null == entry || null == labelPaints) {
-            return super.onInitMargin();
+            return margin;
         }
         ValueEntry[] values = getIndexValue(entry);
         if (null == values) {
-            return super.onInitMargin();
+            return margin;
         }
+        viewWidth -= (margin[0] + margin[2]);
         lineItemCount = 0;
         String tag = getTag(tagEntry.getTagText(), entry);
         float currentX = tagPaint.measureText(tag) + attribute.indexTextInterval * 2f;
@@ -103,11 +102,11 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
                 position = i;
             }
             currentX += (labelPaints[position].measureText(label) + attribute.indexTextInterval);
-            if (currentX > viewRect.width() && lineItemCount == 0) {
+            if (currentX > viewWidth && lineItemCount == 0) {
                 lineItemCount = i;
             }
         }
-        lines = (int) Math.ceil(currentX / viewRect.width());
+        lines = (int) Math.ceil(currentX / viewWidth);
         float height = 0;
         if ((attribute.indexLabelPosition & PositionType.OUTSIDE_VERTICAL) != 0) {
             height = attribute.indexTextMarginVertical + (attribute.indexTextMarginVertical + lineHeight) * lines;
@@ -168,24 +167,26 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
 
     @Override
     public void onLayoutComplete() {
+        super.onLayoutComplete();
         //计算指标文字位置信息
+        float[] drawingNonOverlapMargin = absChartModule.getDrawingNonOverlapMargin();//非重叠边距
         float lineOffset = lines > 1 ? (lineHeight + attribute.indexTextMarginVertical) * (lines - 1) : 0;
         if ((attribute.indexLabelPosition & PositionType.END) != 0) {
-            x = right;
+            x = viewRect.right - attribute.indexTextMarginHorizontal;
         } else {
-            x = left;
+            x = viewRect.left + attribute.indexTextMarginHorizontal;
         }
         if ((attribute.indexLabelPosition & PositionType.OUTSIDE_VERTICAL) != 0) {
             if ((attribute.indexLabelPosition & PositionType.BOTTOM) != 0) {
-                y = viewRect.bottom + attribute.borderWidth + attribute.indexTextMarginVertical + lineHeight;
+                y = viewRect.bottom + drawingNonOverlapMargin[3] + attribute.indexTextMarginVertical;
             } else {
-                y = viewRect.top - attribute.borderWidth - attribute.indexTextMarginVertical - lineOffset;
+                y = viewRect.top - drawingNonOverlapMargin[1] - attribute.indexTextMarginVertical - lineOffset;
             }
         } else {
             if ((attribute.indexLabelPosition & PositionType.BOTTOM) != 0) {
-                y = viewRect.bottom - attribute.borderWidth - attribute.indexTextMarginVertical - lineOffset;
+                y = viewRect.bottom - attribute.indexTextMarginVertical - lineOffset;
             } else {
-                y = viewRect.top + attribute.borderWidth + attribute.indexTextMarginVertical + lineHeight;
+                y = viewRect.top + attribute.indexTextMarginVertical;
             }
         }
     }

@@ -53,7 +53,7 @@ public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
     public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
         highlightState = true;
         beginX = render.getPointX(absChartModule.getMatrix(), begin + 0.5f);
-        endX = render.getPointX(absChartModule.getMatrix(), end - 0.5f);
+        endX = render.getPointX(absChartModule.getMatrix(), end - 1 + 0.5f);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
         candleRectBuffer[2] = current + 1 - render.pointsSpace;
         candleRectBuffer[4] = current;
         candleRectBuffer[6] = current + 1;
-        render.mapPoints(absChartModule.getMatrix(),candleRectBuffer);
+        render.mapPoints(absChartModule.getMatrix(), candleRectBuffer);
         // 计算高亮坐标
         if (render.isHighlight() && highlightState) {
             final float[] highlightPoint = render.getHighlightPoint();
@@ -95,7 +95,7 @@ public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
                 highlightState = false;
             } else if (highlightPoint[0] >= endX) {
                 highlightPoint[0] = endX;
-                render.getAdapter().setHighlightIndex(end);
+                render.getAdapter().setHighlightIndex(end - 1);
                 highlightState = false;
             }
         }
@@ -114,6 +114,7 @@ public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
 
     @Override
     public void onLayoutComplete() {
+        super.onLayoutComplete();
         timeShaderPaint.setShader(
                 new LinearGradient(0, viewRect.top, 0, viewRect.bottom,
                         new int[]{Utils.getColorWithAlpha(attribute.timeLineColor, attribute.shaderBeginColorAlpha)

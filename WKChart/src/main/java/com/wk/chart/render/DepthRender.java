@@ -22,13 +22,11 @@ public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
     @Override
     void layoutModule() {
         super.layoutModule();
-        if (null == getMainModule()) {
-            return;
-        }
+        if (null == mainModule) return;
         //这里要修正X轴2倍的折线宽度（因为X轴分买单，卖单2个折线图，所以为2倍）
-        getMainModule().setXCorrectedValue(attribute.polylineWidth, 2f);
+        mainModule.setXCorrectedValue(attribute.polylineWidth, 2f);
         //这里要修正Y轴1倍的折线宽度（因为Y轴买单，卖单2个折线图都基于View的Bottom，所以为1倍）
-        getMainModule().setYCorrectedValue(attribute.polylineWidth, 1f);
+        mainModule.setYCorrectedValue(attribute.polylineWidth, 1f);
     }
 
     /**
@@ -36,10 +34,12 @@ public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
      */
     @Override
     protected void resetMatrix() {
-        AbsModule<AbsEntry> module = getMainModule();
-        postMatrixScale(module.getMatrix(), 1f, 1f);
-        postMatrixOffset(matrixOffset, module.getRect().left + module.getXOffset() * 2f, viewRect.top - module.getYOffset());
-        postMatrixTouch(matrixTouch, module.getRect(), module.getRect().width() - module.getXCorrectedValue(), getAdapter().getCount());
+        computeScrollRange(mainModule.getRect(), 1f);
+        postMatrixScale(mainModule.getMatrix(), 1f, 1f);
+        postMatrixScale(matrixTouch, 1f, 1f);
+        postMatrixOffset(matrixOffset,
+                mainModule.getRect().left + mainModule.getXOffset() * 2f,
+                viewRect.top - mainModule.getYOffset());
     }
 
     /**

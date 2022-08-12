@@ -22,7 +22,6 @@ import com.wk.chart.render.CandleRender;
 
 public class IndexLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
     private CandleAttribute attribute;//配置文件
-    private final Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG); //边框画笔
     private final Paint centerLinePaint = new Paint(); //中心线画笔
     private final float[] pathPts = new float[2]; // 折线路径位置信息
     private final float[] gridBuffer = new float[2]; //grid轴坐标
@@ -41,10 +40,6 @@ public class IndexLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
         centerLinePaint.setColor(attribute.centerLineColor);
         centerLinePaint.setStrokeWidth(attribute.lineWidth);
         centerLinePaint.setStyle(Paint.Style.FILL);
-
-        borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setStrokeWidth(attribute.borderWidth);
-        borderPaint.setColor(attribute.borderColor);
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 模型类型
+ * 模块类型
  */
 @IntDef({
         ModuleType.MUTATION,
@@ -19,7 +19,7 @@ import java.lang.annotation.RetentionPolicy;
 })
 @Retention(RetentionPolicy.SOURCE)
 public @interface ModuleType {
-    int MUTATION = 0;//突变模型（未指定主类型）
+    int MUTATION = 0;//突变模块（未指定主类型）
 
     int FLOAT = 1;//浮动/跨区域 指标
 

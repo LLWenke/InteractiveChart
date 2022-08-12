@@ -42,9 +42,8 @@ public class WaterMarkingDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?
 
     @Override
     public void onLayoutComplete() {
-        if (null == bitmap) {
-            return;
-        }
+        super.onLayoutComplete();
+        if (null == bitmap) return;
         float width = attribute.waterMarkingWidth == 0 ? bitmap.getWidth() : attribute.waterMarkingWidth;
         float height = attribute.waterMarkingHeight == 0 ? bitmap.getHeight() : attribute.waterMarkingHeight;
         matrix.reset();

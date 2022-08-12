@@ -3,20 +3,15 @@ package com.wk.chart.drawing.depth;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.Build;
 import android.text.TextPaint;
-
-import androidx.annotation.RequiresApi;
 
 import com.wk.chart.R;
 import com.wk.chart.compat.FontStyle;
-import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.DepthAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.DepthEntry;
 import com.wk.chart.entry.SelectorItemEntry;
-import com.wk.chart.interfaces.IDrawingClickListener;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.DepthRender;
 
@@ -36,6 +31,7 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
 
     private Paint.FontMetrics metrics;
     private final float[] viewRectBuffer = new float[4]; // 计算选择器矩形坐标用的
+    private float[] drawingNonOverlapMargin;//非重叠边距
 
     private float selectedWidth;//信息选择框的宽度
     private float selectedHeight;//信息选择框的高度
@@ -77,7 +73,6 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void drawOver(Canvas canvas) {
         if (!render.isHighlight()) {
@@ -86,7 +81,7 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
         //初始信息
         float textHeight = metrics.descent - metrics.ascent;
         float left;
-        float top = viewRect.top + attribute.selectorMarginVertical + attribute.borderWidth;
+        float top = viewRect.top + attribute.selectorMarginVertical + drawingNonOverlapMargin[1];
 
         //添加选择器内容
         loadSelectorInfo();
@@ -97,15 +92,15 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
             float textWidth = item.getLabelPaint().measureText(item.getLabel())
                     + item.getValuePaint().measureText(item.getValue())
                     + item.getUnitPaint().measureText(item.getUnit());
-            width = width < textWidth ? textWidth : width;
+            width = Math.max(width, textWidth);
         }
         width += (attribute.selectorPadding * 2 + attribute.selectorIntervalHorizontal);
-        this.selectedWidth = selectedWidth < width ? width : selectedWidth;
+        this.selectedWidth = Math.max(selectedWidth, width);
         this.selectedHeight = selectedHeight > 0 ? selectedHeight : attribute.selectorIntervalVertical *
                 (selectorInfo.length + 1) + textHeight * selectorInfo.length;
 
         //负责选择器显示位置
-        left = viewRect.width() / 2 - selectedWidth / 2 - attribute.borderWidth;
+        left = viewRect.width() / 2 - selectedWidth / 2 - drawingNonOverlapMargin[0];
 
         //计算选择器坐标位置
         viewRectBuffer[0] = left;
@@ -171,5 +166,11 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
                 .setValuePaint(valuePaint)
                 .setUnit(" ".concat(render.getAdapter().getRate().getSign()))
                 .setUnitPaint(unitPaint);
+    }
+
+    @Override
+    public void onLayoutComplete() {
+        super.onLayoutComplete();
+        drawingNonOverlapMargin = absChartModule.getDrawingNonOverlapMargin();
     }
 }

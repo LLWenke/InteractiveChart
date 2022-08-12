@@ -102,7 +102,13 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     }
 
     public void setHighlightIndex(int highlightIndex) {
-        this.highlightIndex = highlightIndex;
+        if (highlightIndex < 0) {
+            this.highlightIndex = 0;
+        } else if (highlightIndex >= getCount()) {
+            this.highlightIndex = getLastPosition();
+        } else {
+            this.highlightIndex = highlightIndex;
+        }
     }
 
     public T getHighlightEntry() {
@@ -393,8 +399,6 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         if (getItem(position).getTime().getTime() == updateData.getTime().getTime()) {
             this.renderData.set(position, updateData);
             notifyDataSetChanged(ObserverArg.REFRESH);
-        } else {
-            stopAnimator();
         }
     }
 

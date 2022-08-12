@@ -127,21 +127,18 @@ public class DepthDrawing extends AbsDrawing<DepthRender, DepthModule> {
 
     @Override
     public void onLayoutComplete() {
+        super.onLayoutComplete();
         offset = absChartModule.getXOffset();
         left = viewRect.left - attribute.polylineWidth;
         right = viewRect.right + attribute.polylineWidth;
 
-        bidShaderPaint.setShader(
-                new LinearGradient(0, viewRect.top, 0, viewRect.bottom,
-                        new int[]{Utils.getColorWithAlpha(attribute.increasingColor, attribute.shaderBeginColorAlpha)
-                                , Utils.getColorWithAlpha(attribute.increasingColor, attribute.shaderEndColorAlpha)},
-                        null, Shader.TileMode.REPEAT));
-        askShaderPaint.setShader(
-                new LinearGradient(0, viewRect.top, 0, viewRect.bottom,
-                        new int[]{Utils.getColorWithAlpha(attribute.decreasingColor, attribute.shaderBeginColorAlpha)
-                                , Utils.getColorWithAlpha(attribute.decreasingColor, attribute.shaderEndColorAlpha)},
-                        null, Shader.TileMode.REPEAT));
+        bidShaderPaint.setShader(new LinearGradient(0, viewRect.top, 0, viewRect.bottom,
+                new int[]{Utils.getColorWithAlpha(attribute.increasingColor, attribute.shaderBeginColorAlpha)
+                        , Utils.getColorWithAlpha(attribute.increasingColor, attribute.shaderEndColorAlpha)},
+                null, Shader.TileMode.REPEAT));
+        askShaderPaint.setShader(new LinearGradient(0, viewRect.top, 0, viewRect.bottom,
+                new int[]{Utils.getColorWithAlpha(attribute.decreasingColor, attribute.shaderBeginColorAlpha)
+                        , Utils.getColorWithAlpha(attribute.decreasingColor, attribute.shaderEndColorAlpha)},
+                null, Shader.TileMode.REPEAT));
     }
-
-
 }

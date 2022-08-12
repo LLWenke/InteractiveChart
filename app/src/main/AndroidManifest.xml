@@ -12,19 +12,20 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".activity.MainActivity"
+            android:exported="true"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait">
+            android:screenOrientation="unspecified">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activity.ChartActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="unspecified" />
 
-        <service android:name=".service.PushService"/>
+        <service android:name=".service.PushService" />
     </application>
 </manifest>

@@ -21,7 +21,7 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
     private boolean initState = false;//是否初始化
     protected RectF viewRect; // 绘制区域
     protected T render;//渲染工厂
-    protected A absChartModule;//组件
+    protected A absChartModule;//模块
 
     public AbsDrawing() {
         this(ClickDrawingID.ID_NONE);
@@ -30,19 +30,20 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
     public AbsDrawing(int id) {
         this.id = id;
         this.margin = new float[4];
+        this.viewRect = new RectF();
     }
 
     /**
      * 初始化
      *
      * @param render      渲染工厂
-     * @param chartModule 组件
+     * @param chartModule 模块
      */
     public void onInit(T render, A chartModule) {
         this.initState = true;
         this.render = render;
         this.absChartModule = chartModule;
-        this.viewRect = chartModule.getRect();
+        this.viewRect.set(chartModule.getRect());
         Arrays.fill(margin, 0);
     }
 
@@ -92,9 +93,11 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
     }
 
     /**
-     * 当视图布局完成后调用此方法，将依赖于视图的大小和位置的属进行重置和运算
+     * 视图布局完成，更新绘制区域
      */
     public void onLayoutComplete() {
+        if (null == absChartModule) return;
+        viewRect.set(absChartModule.getRect());
     }
 
     /**
@@ -114,8 +117,17 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
     /**
      * 初始化边距
      */
-    public float[] onInitMargin() {
+    public float[] onInitMargin(float viewWidth, float viewHeight) {
         return margin;
+    }
+
+    /**
+     * 边距重叠
+     *
+     * @return 是否可重叠(默认 : true)
+     */
+    public boolean marginOverlap() {
+        return true;
     }
 
     /**

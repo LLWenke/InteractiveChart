@@ -97,7 +97,7 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
     }
 
     @Override
-    public float[] onInitMargin() {
+    public float[] onInitMargin(float viewWidth, float viewHeight) {
         float height = (float) Math.ceil(textHeight + attribute.axisLabelMarginVertical * 2f);
         if (attribute.axisShowFirst && (attribute.axisLabelPosition & PositionType.TOP) != 0) {//第一条可见
             margin[1] = height;
@@ -176,6 +176,7 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
 
     @Override
     public void onLayoutComplete() {
+        super.onLayoutComplete();
         regionHeight = viewRect.height() / (float) (axisCount - 1);
         Arrays.fill(lineBuffer, 0f);
         Arrays.fill(labelBuffer, 0f);

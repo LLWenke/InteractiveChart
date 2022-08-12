@@ -3,12 +3,11 @@ package com.wk.chart.module;
 
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.ValueEntry;
-import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.ModuleType;
 import com.wk.chart.module.base.IndexModule;
 
 /**
- * <p>蜡烛图的指标组件</p>
+ * <p>蜡烛图的指标模块</p>
  */
 
 public class CandleIndexModule extends IndexModule<CandleEntry> {
