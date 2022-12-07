@@ -5,14 +5,11 @@ import android.content.Intent;
 
 import androidx.annotation.Nullable;
 
-import com.wk.chart.adapter.AbsAdapter;
 import com.wk.chart.entry.CandleEntry;
-import com.wk.chart.entry.ScaleEntry;
 import com.wk.demo.model.ServiceMessage;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -66,7 +63,7 @@ public class PushService extends IntentService {
                 message.setWhat(CANDLE);
                 message.setEntry(pushData);
                 EventBus.getDefault().post(message);
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

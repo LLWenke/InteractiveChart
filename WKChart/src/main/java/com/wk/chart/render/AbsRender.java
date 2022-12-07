@@ -178,8 +178,9 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      * 是否可以滚动
      */
     public boolean canScroll(float dx) {
-        return (touchValues[Matrix.MTRANS_X] < minScrollOffset) &&
-                (touchValues[Matrix.MTRANS_X] > -maxScrollOffset);
+        final float offset = touchValues[Matrix.MTRANS_X] - dx;
+        return (offset >= -maxScrollOffset || touchValues[Matrix.MTRANS_X] > -maxScrollOffset)
+                && (offset <= minScrollOffset || touchValues[Matrix.MTRANS_X] < minScrollOffset);
     }
 
     /**
