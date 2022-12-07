@@ -41,11 +41,11 @@ import com.wk.chart.render.DepthRender;
 import java.util.Observer;
 
 /**
- * <p>交互式 K 线图</p>
+ * <p>交互式图标</p>
  */
 
 public class ChartView extends View implements DelayedHandler.DelayedWorkListener {
-    private static final String TAG = "Chart";
+    private static final String TAG = "ChartView";
     // 与滚动控制、滑动加载数据相关的属性
     private final int OVER_SCROLL_DURATION = 500; // dragging 松手之后回中的时间，单位：毫秒
     private final int STATE_LEFT_LOADING = 1; // 加载中（左）
@@ -70,9 +70,9 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private boolean leftEnableLoadMore = true;
     private boolean rightEnableLoadMore = true;
     private boolean scrollIdle = true;
+    private int loadState = 0;//加载状态
     private float lastFlingX = 0;
     private long lastFlingTime = 0L;
-    private int loadState = 0;//加载状态
     private int lastHighlightIndex = -1; // 上一次高亮的 entry 索引，用于减少回调
 
     //数据监视器
