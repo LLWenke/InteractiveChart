@@ -40,7 +40,7 @@ public class DelayedHandler extends Handler {
      * @param what  延时任务标识
      * @param delay 延时时间（ms）
      */
-    public void posOnlyDelayedWork(final int what, final long delay) {
+    public void postOnlyDelayedWork(final int what, final long delay) {
         cancelDelayedWork(what);
         postDelayedWork(what, delay);
     }

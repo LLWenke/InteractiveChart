@@ -25,6 +25,7 @@ import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.ViewSizeEntry;
 import com.wk.chart.enumeration.ClickDrawingID;
+import com.wk.chart.enumeration.DelayedTaskID;
 import com.wk.chart.enumeration.ModuleGroupType;
 import com.wk.chart.enumeration.ModuleType;
 import com.wk.chart.enumeration.ObserverArg;
@@ -47,12 +48,8 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private static final String TAG = "Chart";
     // 与滚动控制、滑动加载数据相关的属性
     private final int OVER_SCROLL_DURATION = 500; // dragging 松手之后回中的时间，单位：毫秒
-    private final int OVER_SCROLL_THRESHOLD = 220; // dragging 的偏移量大于此值时即是一个有效的滑动加载
-    private final int IDLE = 0; // 空闲
-    private final int RELEASE_BACK = 1; // 放手，回弹到 loading 位置
-    private final int LOADING = 2; // 加载中
-    private final int SPRING_BACK = 3; // 加载结束，回弹到初始位置
-    private final int DELAYED_CANCEL_HIGHLIGHT = 301;//延时取消高亮标识
+    private final int STATE_LEFT_LOADING = 1; // 加载中（左）
+    private final int STATE_RIGHT_LOADING = 2; // 加载中（右）
     // 视图区域
     private BaseAttribute attribute = null;
     private final RectF viewRect = new RectF();
@@ -65,24 +62,24 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private RenderModel renderModel;
     // 与手势控制相关的属性
     private boolean onTouch = false;
+    private boolean onDragging = false;
     private boolean onLongPress = false;
     private boolean onDoubleFingerPress = false;
-    private boolean onDragging = false;
-    private boolean lockRefresh = false;
-    private boolean enableLeftRefresh = true;
-    private boolean enableRightRefresh = true;
-    private boolean loadingComplete = true;
+    private boolean leftHasLoadMore = false;
+    private boolean rightHasLoadMore = false;
+    private boolean leftEnableLoadMore = true;
+    private boolean rightEnableLoadMore = true;
+    private boolean scrollIdle = true;
     private float lastFlingX = 0;
-    private float lastScrollDx = 0;
-    private int chartState = IDLE;//图表状态
+    private long lastFlingTime = 0L;
+    private int loadState = 0;//加载状态
     private int lastHighlightIndex = -1; // 上一次高亮的 entry 索引，用于减少回调
 
     //数据监视器
     private final Observer dataSetObserver = (o, arg) -> {
         switch ((ObserverArg) arg) {
             case NORMAL:
-                loadingComplete();
-                lockRefresh = true;
+                loadingComplete(false);
                 break;
             case ATTR_UPDATE:
                 callHighlight();
@@ -97,9 +94,8 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 onViewInit();
             case RESET:
                 resetChartState();
-                lockRefresh = false;
             case ADD:
-                loadingComplete();
+                loadingComplete(true);
             case UPDATE:
                 onDataUpdate();
                 break;
@@ -134,7 +130,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                     }
                     if (!consumed && attribute.onSingleClickSelected) {
                         highlight(e.getX(), e.getY());
-                        DelayedHandler.getInstance().posOnlyDelayedWork(DELAYED_CANCEL_HIGHLIGHT, 10000);
+                        postOnlyDelayedWork(DelayedTaskID.ID_CANCEL_HIGHLIGHT, 10000);
                         consumed = true;
                     }
                     return consumed;
@@ -146,7 +142,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                         cancelHighlight();
                         if (render.canScroll(distanceX)) {
                             scroll(distanceX);
-                        } else if (onDragging && render.canDragging()) {
+                        } else if (render.canDragging(distanceX)) {
                             dragging(distanceX);
                         }
                         return true;
@@ -158,9 +154,11 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 @Override
                 public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                     lastFlingX = 0;
-                    if (!onLongPress && !onDoubleFingerPress && render.canScroll(0)) {
-                        scroller.fling(0, 0, (int) -velocityX, 0,
-                                Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    int flingX = (int) -velocityX / 2;
+                    if (!onLongPress && !onDoubleFingerPress && render.canScroll(flingX)) {
+                        lastFlingTime = System.currentTimeMillis();
+                        scroller.fling(0, 0, flingX, 0, Integer.MIN_VALUE,
+                                Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
                         return true;
                     } else {
                         return false;
@@ -248,7 +246,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      */
     public void setAdapter(@NonNull AbsAdapter<? extends AbsEntry, ? extends AbsBuildConfig> adapter) {
         adapter.registerDataSetObserver(dataSetObserver);
-        ((AbsRender<AbsAdapter<?, ?>, ? extends BaseAttribute>) render).setAdapter(adapter);
+        ((AbsRender) render).setAdapter(adapter);
     }
 
     public AbsRender<? extends AbsAdapter<?, ?>, ? extends BaseAttribute> getRender() {
@@ -309,7 +307,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
             interactiveHandler.onCancelHighlight();
         }
         lastHighlightIndex = -1;
-        DelayedHandler.getInstance().cancelDelayedWork(DELAYED_CANCEL_HIGHLIGHT);
+        cancelOnlyDelayedWork(DelayedTaskID.ID_CANCEL_HIGHLIGHT);
     }
 
     /**
@@ -340,15 +338,11 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private void dragging(float dx) {
         //添加阻尼效果
         float overScrollOffset = Math.abs(render.getOverScrollOffset());
-        float restriction = viewRect.width() / 2;
-        float value = overScrollOffset < restriction ? 1 - overScrollOffset / restriction : 0;
-        //Log.e(TAG, "     value:" + value);
-        dx *= value;
-        if (dx == 0) {
-            return;
-        }
-        render.updateCurrentTransX(dx);
-        render.updateOverScrollOffset(dx);
+        float restriction = viewRect.width() / 2f;
+        float rate = overScrollOffset < restriction ? 1f - overScrollOffset / restriction : 0f;
+        float draggingDX = dx * rate;
+        render.updateCurrentTransX(draggingDX);
+        render.updateOverScrollOffset(draggingDX);
         postInvalidateOnAnimation();
     }
 
@@ -403,91 +397,99 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
 
     @Override
     public void computeScroll() {
-        if (onLongPress) {
-            return;
-        }
+        if (onLongPress) return;
         if (scroller.computeScrollOffset()) {
-            final float x = scroller.getCurrX();
-            final float dx = x - lastFlingX;
-            lastFlingX = x;
+            final float scrollX = scroller.getCurrX();
+            final float dx = scrollX - lastFlingX;
+            lastFlingX = scrollX;
             if (onTouch) {
+                lastFlingTime = 0;
                 scroller.abortAnimation();
-            } else if (chartState == RELEASE_BACK || chartState == SPRING_BACK) {
+                return;
+            } else if (!scrollIdle) {
                 releaseBack(dx);
-            } else {
+                return;
+            } else if (render.canScroll(dx)) {
                 scroll(dx);
-            }
-        } else {
-            final float overScrollOffset = render.getOverScrollOffset();
-            if (!onTouch && (int) overScrollOffset != 0 && chartState == IDLE) {
-                lastScrollDx = 0;
-                float dx = overScrollOffset;
-
-                if (Math.abs(overScrollOffset) > OVER_SCROLL_THRESHOLD) {
-                    if (enableLeftRefresh && !lockRefresh && overScrollOffset > 0) {
-                        lastScrollDx = overScrollOffset - OVER_SCROLL_THRESHOLD;
-                        dx = lastScrollDx;
-                    }
-
-                    if (enableRightRefresh && !lockRefresh && overScrollOffset < 0) {
-                        lastScrollDx = overScrollOffset + OVER_SCROLL_THRESHOLD;
-                        dx = lastScrollDx;
-                    }
-                }
-                chartState = RELEASE_BACK;
-                lastFlingX = 0;
-                scroller.startScroll(0, 0, (int) dx, 0, OVER_SCROLL_DURATION);
-                postInvalidateOnAnimation();
-            } else if (chartState == RELEASE_BACK && loadingComplete) {
-                chartState = LOADING;
-                if (interactiveHandler == null) {
-                    loadingComplete();
+                return;
+            } else {
+                int draggingDX = (int) (dx / 10f);
+                long currentTime = System.currentTimeMillis();
+                if (render.canDragging(draggingDX) && currentTime - lastFlingTime < 300) {
+                    dragging(draggingDX);
                     return;
                 }
-                if (lastScrollDx > 0) {
-                    loadingComplete = false;
-                    interactiveHandler.onLeftRefresh(render.getAdapter().getItem(0));
-                } else if (lastScrollDx < 0) {
-                    loadingComplete = false;
-                    interactiveHandler.onRightRefresh(render.getAdapter().getItem(render.getAdapter().getLastPosition()));
-                }
-            } else {
-                chartState = IDLE;
+                lastFlingTime = 0;
+                scroller.abortAnimation();
             }
+        }
+        AbsAdapter<?, ?> adapter = render.getAdapter();
+        float eventThreshold = viewRect.width() / 4f;
+        float overScrollOffset = render.getOverScrollOffset();
+        if (!onTouch && scrollIdle && (int) overScrollOffset != 0) {
+            lastFlingX = 0;
+            scrollIdle = false;
+            // dragging 的偏移量大于阀值时即是一个有效的滑动加载
+            if (null != interactiveHandler && Math.abs(overScrollOffset) > eventThreshold) {
+                if (leftCanLoadMore() && overScrollOffset > 0) {
+                    overScrollOffset -= eventThreshold;
+                    if (loadState != STATE_LEFT_LOADING) {
+                        loadState = STATE_LEFT_LOADING;
+                        interactiveHandler.onLeftRefresh(adapter.getItem(0));
+                    }
+                } else if (rightCanLoadMore() && overScrollOffset < 0) {
+                    overScrollOffset += eventThreshold;
+                    if (loadState != STATE_RIGHT_LOADING) {
+                        loadState = STATE_RIGHT_LOADING;
+                        interactiveHandler.onRightRefresh(adapter.getItem(adapter.getLastPosition()));
+                    }
+                }
+            }
+            scroller.startScroll(0, 0, (int) overScrollOffset, 0, OVER_SCROLL_DURATION);
+            postInvalidateOnAnimation();
+        } else {
+            scrollIdle = true;
         }
     }
 
     /**
      * 加载完成
      */
-    public void loadingComplete() {
-        loadingComplete = true;
-        chartState = SPRING_BACK;
-        lastFlingX = 0;
-        final int overScrollOffset = (int) render.getOverScrollOffset();
+    public void loadingComplete(boolean hasMore) {
+        int overScrollOffset = (int) render.getOverScrollOffset();
+        int state = loadState;
+        this.loadState = 0;
+        this.lastFlingX = 0;
+        this.scrollIdle = false;
+        if (state == STATE_LEFT_LOADING) {
+            leftHasLoadMore = hasMore;
+        } else if (state == STATE_RIGHT_LOADING) {
+            rightHasLoadMore = hasMore;
+        }
         if (overScrollOffset != 0) {
             scroller.startScroll(0, 0, overScrollOffset, 0, OVER_SCROLL_DURATION);
+            postInvalidateOnAnimation();
         }
     }
 
     public boolean isRefreshing() {
-        return chartState == LOADING;
+        return loadState == STATE_LEFT_LOADING || loadState == STATE_RIGHT_LOADING;
     }
 
-    public void setEnableLeftRefresh(boolean enableLeftRefresh) {
-        this.enableLeftRefresh = enableLeftRefresh;
+    public void setLeftEnableLoadMore(boolean leftEnableLoadMore) {
+        this.leftEnableLoadMore = leftEnableLoadMore;
     }
 
-    public void setEnableRightRefresh(boolean enableRightRefresh) {
-        this.enableRightRefresh = enableRightRefresh;
+    public void setRightEnableLoadMore(boolean rightEnableLoadMore) {
+        this.rightEnableLoadMore = rightEnableLoadMore;
     }
 
-    public boolean isEnableLeftRefresh() {
-        return enableLeftRefresh;
+    public boolean leftCanLoadMore() {
+        return leftEnableLoadMore && leftHasLoadMore;
     }
 
-    public boolean isEnableRightRefresh() {
-        return enableRightRefresh;
+    public boolean rightCanLoadMore() {
+        return rightEnableLoadMore && rightHasLoadMore;
     }
 
     public boolean isHighlighting() {
@@ -511,16 +513,15 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        final boolean state = gestureDetector.onTouchEvent(e) | scaleDetector.onTouchEvent(e);
-        final int action = e.getAction();
-        switch (action) {
+        boolean state = gestureDetector.onTouchEvent(e) | scaleDetector.onTouchEvent(e);
+        switch (e.getAction()) {
+            case MotionEvent.ACTION_POINTER_DOWN:
+                onDoubleFingerPress = true;
+                break;
             case MotionEvent.ACTION_DOWN:
                 onTouch = true;
                 onDragging = false;
                 onLongPress = false;
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                onDoubleFingerPress = true;
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (onLongPress) {
@@ -531,15 +532,17 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                onDoubleFingerPress = false;
                 onTouch = false;
+                onDoubleFingerPress = false;
                 if (onLongPress) {
                     onLongPress = false;
-                    DelayedHandler.getInstance().posOnlyDelayedWork(DELAYED_CANCEL_HIGHLIGHT, 10000);
+                    postOnlyDelayedWork(DelayedTaskID.ID_CANCEL_HIGHLIGHT, 10000);
                 } else if (onDragging) {
                     onDragging = false;
                     computeScroll();
                 }
+                break;
+            default:
                 break;
         }
         return state;
@@ -602,10 +605,12 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      * 重置图表状态
      */
     private void resetChartState() {
-        this.scroller.forceFinished(true);
-        this.chartState = IDLE;
         this.lastFlingX = 0;
+        this.scrollIdle = true;
+        this.leftHasLoadMore = true;
+        this.rightHasLoadMore = true;
         this.render.resetChart();
+        this.scroller.forceFinished(true);
     }
 
     /**
@@ -646,13 +651,33 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     }
 
     /**
+     * 发送唯一性延时任务
+     *
+     * @param what  延时任务标识
+     * @param delay 延时时间（ms）
+     */
+    public void postOnlyDelayedWork(@DelayedTaskID final int what, final long delay) {
+        DelayedHandler.getInstance().postOnlyDelayedWork(what, delay);
+    }
+
+    /**
+     * 取消唯一性延时任务
+     *
+     * @param what 延时任务标识
+     */
+    public void cancelOnlyDelayedWork(@DelayedTaskID final int what) {
+        DelayedHandler.getInstance().cancelDelayedWork(what);
+    }
+
+    /**
      * 延时执行的任务回调
      *
      * @param what 延时任务唯一标识
      */
     @Override
+
     public void onDelayedWork(int what) {
-        if (what == DELAYED_CANCEL_HIGHLIGHT) {//延时取消高亮标识
+        if (what == DelayedTaskID.ID_CANCEL_HIGHLIGHT) {//延时取消高亮标识
             cancelHighlight();
         }
     }

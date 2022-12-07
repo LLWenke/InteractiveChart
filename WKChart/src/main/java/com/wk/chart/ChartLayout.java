@@ -191,8 +191,8 @@ public class ChartLayout extends ConstraintLayout {
                     break;
                 case DEPTH://深度图
                     initDepthChartModules(render);
-                    chartView.setEnableRightRefresh(false);
-                    chartView.setEnableLeftRefresh(false);
+                    chartView.setRightEnableLoadMore(false);
+                    chartView.setLeftEnableLoadMore(false);
                     break;
             }
         }
@@ -339,7 +339,7 @@ public class ChartLayout extends ConstraintLayout {
                 if (chart.getRenderModel() == RenderModel.CANDLE) {
                     AbsRender<?, ?> reader = chart.getRender();
                     if (type == DataType.REAL_TIME) {
-                        chart.setEnableRightRefresh(false);//禁用右滑
+                        chart.setRightEnableLoadMore(false);//禁用右滑
                         //添加右固定偏移量
                         if (reader.getAttribute().rightScrollOffset == 0) {
                             reader.getAttribute().rightScrollOffset = 250;
@@ -347,7 +347,7 @@ public class ChartLayout extends ConstraintLayout {
                         chart.getRender().getModule(ModuleType.CANDLE, ModuleGroupType.MAIN).addDrawing(new CursorDrawing(ClickDrawingID.ID_CURSOR));
                         chart.getRender().getModule(ModuleType.TIME, ModuleGroupType.MAIN).addDrawing(new CursorDrawing(ClickDrawingID.ID_CURSOR));
                     } else {
-                        chart.setEnableRightRefresh(true);//启用右滑
+                        chart.setRightEnableLoadMore(true);//启用右滑
                         reader.getAttribute().rightScrollOffset = 0;  //消除右固定偏移量
                         chart.getRender().getModule(ModuleType.CANDLE, ModuleGroupType.MAIN).removeDrawing(CursorDrawing.class);
                         chart.getRender().getModule(ModuleType.TIME, ModuleGroupType.MAIN).removeDrawing(CursorDrawing.class);
