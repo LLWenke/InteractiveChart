@@ -178,16 +178,15 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      * 是否可以滚动
      */
     public boolean canScroll(float dx) {
-        final float offset = touchValues[Matrix.MTRANS_X] - dx;
-        return (!(offset < -maxScrollOffset) || !(touchValues[Matrix.MTRANS_X] <= -maxScrollOffset))
-                && (!(offset > minScrollOffset) || !(touchValues[Matrix.MTRANS_X] >= minScrollOffset));
+        return (touchValues[Matrix.MTRANS_X] < minScrollOffset) &&
+                (touchValues[Matrix.MTRANS_X] > -maxScrollOffset);
     }
 
     /**
      * 是否可以拖动
      */
-    public boolean canDragging() {
-        return true;
+    public boolean canDragging(float dx) {
+        return dx != 0;
     }
 
     /**
@@ -474,11 +473,8 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         overScrollOffset = 0;
         matrixTouch.getValues(touchValues);
         touchValues[Matrix.MTRANS_X] -= dx;
-        if (touchValues[Matrix.MTRANS_X] < -maxScrollOffset) {
-            touchValues[Matrix.MTRANS_X] = -maxScrollOffset;
-        } else if (touchValues[Matrix.MTRANS_X] > minScrollOffset) {
-            touchValues[Matrix.MTRANS_X] = minScrollOffset;
-        }
+        touchValues[Matrix.MTRANS_X] = touchValues[Matrix.MTRANS_X] > minScrollOffset ?
+                minScrollOffset : Math.max(touchValues[Matrix.MTRANS_X], -maxScrollOffset);
         matrixTouch.setValues(touchValues);
     }
 
@@ -636,7 +632,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         } else if (touchValues[Matrix.MTRANS_X] < 0) {// 右滑加载完成之后定位到之前滚动的位置
             if ((int) overScrollOffset == 0) {
                 // 转动屏幕方向导致矩形变化，定位到之前相同比例的滚动位置
-                translate = touchValues[Matrix.MTRANS_X] + (lastMaxScrollOffset - maxScrollOffset);
+                translate = touchValues[Matrix.MTRANS_X];
             } else {
                 translate = touchValues[Matrix.MTRANS_X] + attribute.rightScrollOffset;
             }

@@ -95,7 +95,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
                 case RESET:
                     if (dataShowType == DataType.REAL_TIME.ordinal()) {
                         PushService.stopPush();
-                        new Handler().postDelayed(() -> startPush(), 1000);
+                        new Handler().postDelayed(ChartActivity.this::startPush, 1000);
                     }
                 case ADD:
                 case NORMAL:
@@ -225,7 +225,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
                         Toast.makeText(ChartActivity.this, "已经到达最左边了", LENGTH_SHORT).show();
                     }
                     chartLayout.loadComplete(candleProgressBar);
-                }, 1000);
+                }, 2000);
             }
 
             @Override
@@ -239,7 +239,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
                         Toast.makeText(ChartActivity.this, "已经到达最右边了", LENGTH_SHORT).show();
                     }
                     chartLayout.loadComplete(candleProgressBar);
-                }, 1000);
+                }, 2000);
             }
         });
     }

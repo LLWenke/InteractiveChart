@@ -58,7 +58,7 @@ public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
     }
 
     @Override
-    public boolean canDragging() {
+    public boolean canDragging(float dx) {
         return false;
     }
 
