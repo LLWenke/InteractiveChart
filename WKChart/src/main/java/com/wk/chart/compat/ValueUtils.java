@@ -9,11 +9,15 @@ import com.wk.chart.entry.ValueEntry;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class ValueUtils {
     private static final Long[] values;
     private static final String[] units;
     private static final String[] zeros;
+
+    private ValueUtils() {
+    }
 
     static {
         values = new Long[]{1000L, 1000000L, 1000000000L, 1000000000000L};
@@ -42,7 +46,7 @@ public class ValueUtils {
      */
     public static void buildScaleValue(@NotNull ValueEntry entry, int scale) {
         BigDecimal decimal = bigDecimal(entry.source);
-        decimal = decimal.setScale(scale, BigDecimal.ROUND_DOWN);
+        decimal = decimal.setScale(scale, RoundingMode.DOWN);
         entry.scale = scale;
         entry.text = decimal.toPlainString();
         entry.value = decimal.floatValue();
@@ -86,39 +90,39 @@ public class ValueUtils {
      * @return 返回构建后ValueEntry中的Text属性值
      */
     public static String buildText(long result, int scale, boolean stripTrailingZeros) {
+        if (scale <= 0) return String.valueOf(result);
         StringBuilder text = new StringBuilder(String.valueOf(result));
-        if (scale > 0) {
-            int length;
-            int offset;
-            if (result < 0) {
-                length = text.length() - 1;
-                offset = 1;
+        int length;
+        int offset;
+        if (result < 0) {
+            length = text.length() - 1;
+            offset = 1;
+        } else {
+            length = text.length();
+            offset = 0;
+        }
+        if (scale < length) {
+            text.insert(length - scale + offset, '.');
+        } else {
+            int zeroCount = scale - length;
+            text.insert(offset, zeroCount < zeros.length ? zeros[zeroCount] : zeros[zeros.length - 1]);
+        }
+        if (!stripTrailingZeros) return text.toString();
+        length = text.length();
+        offset = length;
+        for (int i = length - 1; i > 0; i--) {
+            char cr = text.charAt(i);
+            if ('0' == cr) {
+                offset = i;
+            } else if ('.' == cr) {
+                offset = i;
+                break;
             } else {
-                length = text.length();
-                offset = 0;
+                break;
             }
-            if (scale < length) {
-                text.insert(length - scale + offset, ".");
-            } else {
-                int zeroCount = scale - length;
-                text.insert(offset, zeroCount < zeros.length ? zeros[zeroCount] : zeros[zeros.length - 1]);
-            }
-            if (stripTrailingZeros) {
-                Integer deleteIndex = null;
-                for (int i = text.length() - 1; i > 0; i--) {
-                    if ('0' == text.charAt(i)) {
-                        deleteIndex = i;
-                    } else if ('.' == text.charAt(i)) {
-                        deleteIndex = i;
-                        break;
-                    } else {
-                        break;
-                    }
-                }
-                if (null != deleteIndex) {
-                    text.delete(deleteIndex, text.length());
-                }
-            }
+        }
+        if (offset < length) {
+            text.delete(offset, length);
         }
         return text.toString();
     }
@@ -132,7 +136,7 @@ public class ValueUtils {
      */
     public static double buildValue(long result, int scale) {
         if (scale > 0) {
-            return (double) result / pow10(scale);
+            return result / pow10(scale);
         }
         return result;
     }

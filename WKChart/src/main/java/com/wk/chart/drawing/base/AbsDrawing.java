@@ -23,11 +23,11 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
     protected T render;//渲染工厂
     protected A absChartModule;//模块
 
-    public AbsDrawing() {
+    protected AbsDrawing() {
         this(ClickDrawingID.ID_NONE);
     }
 
-    public AbsDrawing(int id) {
+    protected AbsDrawing(int id) {
         this.id = id;
         this.margin = new float[4];
         this.viewRect = new RectF();

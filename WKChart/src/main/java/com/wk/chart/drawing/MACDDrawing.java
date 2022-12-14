@@ -97,7 +97,9 @@ public class MACDDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
             return;
         }
         Path path;
-        boolean isStroke, isComputationDiffPath = null != values[0], isComputationDeaPath = null != values[1];
+        boolean isStroke;
+        boolean isComputationDiffPath = null != values[0];
+        boolean isComputationDeaPath = null != values[1];
         pathPts[0] = pathPts[2] = current + 0.5f;
         if (isComputationDiffPath) {
             pathPts[3] = values[0].value;

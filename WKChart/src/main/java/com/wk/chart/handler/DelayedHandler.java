@@ -1,6 +1,7 @@
 package com.wk.chart.handler;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 import org.jetbrains.annotations.NotNull;
@@ -13,10 +14,10 @@ public class DelayedHandler extends Handler {
     private DelayedWorkListener listener;
 
     private DelayedHandler() {
-        super();
+        super(Looper.myLooper(), null);
     }
 
-    public synchronized static DelayedHandler getInstance() {
+    public static synchronized DelayedHandler getInstance() {
         if (null == handler) {
             handler = new DelayedHandler();
         }
@@ -63,7 +64,7 @@ public class DelayedHandler extends Handler {
     }
 
     public void onDestroy() {
-        handler = null;
+        handler.removeCallbacksAndMessages(null);
     }
 
     public interface DelayedWorkListener {

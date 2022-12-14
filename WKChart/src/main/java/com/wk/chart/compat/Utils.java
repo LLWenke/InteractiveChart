@@ -3,7 +3,6 @@ package com.wk.chart.compat;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
@@ -18,6 +17,9 @@ import com.wk.chart.entry.IndexConfigEntry;
 import java.util.Collection;
 
 public class Utils {
+
+    private Utils() {
+    }
 
     /**
      * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
@@ -47,7 +49,7 @@ public class Utils {
      * 检查集合是否为null或者Empty
      */
     public static boolean listIsEmpty(Collection<?> data) {
-        return null == data || data.size() == 0;
+        return null == data || data.isEmpty();
     }
 
     /**
@@ -132,11 +134,9 @@ public class Utils {
      */
     public static @Nullable
     Bitmap drawableToBitmap(Drawable drawable) {
-        if (null == drawable) {
-            return null;
-        }
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
-                drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
+        if (null == drawable) return null;
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         drawable.draw(canvas);

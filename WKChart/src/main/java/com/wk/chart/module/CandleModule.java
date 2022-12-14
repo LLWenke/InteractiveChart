@@ -75,7 +75,7 @@ public class CandleModule extends MainModule<CandleEntry> implements IMarkerPoin
      * @return 矩形坐标点（0-3:影线和矩形的区域,不包含间隔，4-7：间隔加矩形的区域，不包含影线）
      */
     @Override
-    public float[] getPointRect(AbsRender render, CandleEntry entry, int current) {
+    public float[] getPointRect(AbsRender<?, ?> render, CandleEntry entry, int current) {
         if (null == entry) {
             return rectBuffer;
         }

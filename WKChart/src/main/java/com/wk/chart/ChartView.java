@@ -48,8 +48,8 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private static final String TAG = "ChartView";
     // 与滚动控制、滑动加载数据相关的属性
     private final int OVER_SCROLL_DURATION = 500; // dragging 松手之后回中的时间，单位：毫秒
-    private final int STATE_LEFT_LOADING = 1; // 加载中（左）
-    private final int STATE_RIGHT_LOADING = 2; // 加载中（右）
+    private final int LEFT_LOADING = -1; // 加载中（左）
+    private final int RIGHT_LOADING = 1; // 加载中（右）
     // 视图区域
     private BaseAttribute attribute = null;
     private final RectF viewRect = new RectF();
@@ -65,10 +65,10 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private boolean onDragging = false;
     private boolean onLongPress = false;
     private boolean onDoubleFingerPress = false;
-    private boolean leftHasLoadMore = false;
-    private boolean rightHasLoadMore = false;
-    private boolean leftEnableLoadMore = true;
-    private boolean rightEnableLoadMore = true;
+    private boolean hasLeftLoad = false;
+    private boolean hasRightLoad = false;
+    private boolean enableLeftLoad = true;
+    private boolean enableRightLoad = true;
     private boolean scrollIdle = true;
     private int loadState = 0;//加载状态
     private float lastFlingX = 0;
@@ -104,6 +104,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 break;
         }
     };
+
     /**
      * 手势检测器
      */
@@ -249,14 +250,23 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         ((AbsRender) render).setAdapter(adapter);
     }
 
+    /**
+     * 获取渲染器
+     */
     public AbsRender<? extends AbsAdapter<?, ?>, ? extends BaseAttribute> getRender() {
         return render;
     }
 
+    /**
+     * 设置交互Handler
+     */
     public void setInteractiveHandler(InteractiveHandler handler) {
         this.interactiveHandler = handler;
     }
 
+    /**
+     * 获取交互Handler
+     */
     public InteractiveHandler getInteractiveHandler() {
         return interactiveHandler;
     }
@@ -357,6 +367,9 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         postInvalidateOnAnimation();
     }
 
+    /**
+     * 视图计算
+     */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 //        Log.e("height(onMeasure)：", MeasureSpec.getSize(heightMeasureSpec) + "");
@@ -374,6 +387,9 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         }
     }
 
+    /**
+     * 视图大小改变
+     */
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         float left = getPaddingLeft();
@@ -385,6 +401,9 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         this.viewRect.set(left, top, tight, bottom);
     }
 
+    /**
+     * 视图布局
+     */
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
 //        Log.e("高度(onSizeChanged)：", "left:" + left + "   top:" + top + "   right:" + right + "   bottom:" + bottom);
@@ -395,6 +414,9 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         }
     }
 
+    /**
+     * 滚动回调
+     */
     @Override
     public void computeScroll() {
         if (onLongPress) return;
@@ -431,17 +453,17 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
             scrollIdle = false;
             // dragging 的偏移量大于阀值时即是一个有效的滑动加载
             if (null != interactiveHandler && Math.abs(overScrollOffset) > eventThreshold) {
-                if (leftCanLoadMore() && overScrollOffset > 0) {
+                if (canLeftLoad() && overScrollOffset > 0) {
                     overScrollOffset -= eventThreshold;
-                    if (loadState != STATE_LEFT_LOADING) {
-                        loadState = STATE_LEFT_LOADING;
-                        interactiveHandler.onLeftRefresh(adapter.getItem(0));
+                    if (loadState != LEFT_LOADING) {
+                        loadState = LEFT_LOADING;
+                        interactiveHandler.onLeftLoad(adapter.getItem(0));
                     }
-                } else if (rightCanLoadMore() && overScrollOffset < 0) {
+                } else if (rightCanLoad() && overScrollOffset < 0) {
                     overScrollOffset += eventThreshold;
-                    if (loadState != STATE_RIGHT_LOADING) {
-                        loadState = STATE_RIGHT_LOADING;
-                        interactiveHandler.onRightRefresh(adapter.getItem(adapter.getLastPosition()));
+                    if (loadState != RIGHT_LOADING) {
+                        loadState = RIGHT_LOADING;
+                        interactiveHandler.onRightLoad(adapter.getItem(adapter.getLastPosition()));
                     }
                 }
             }
@@ -461,10 +483,10 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         this.loadState = 0;
         this.lastFlingX = 0;
         this.scrollIdle = false;
-        if (state == STATE_LEFT_LOADING) {
-            leftHasLoadMore = hasMore;
-        } else if (state == STATE_RIGHT_LOADING) {
-            rightHasLoadMore = hasMore;
+        if (state == LEFT_LOADING) {
+            hasLeftLoad = hasMore;
+        } else if (state == RIGHT_LOADING) {
+            hasRightLoad = hasMore;
         }
         if (overScrollOffset != 0) {
             scroller.startScroll(0, 0, overScrollOffset, 0, OVER_SCROLL_DURATION);
@@ -472,30 +494,51 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         }
     }
 
-    public boolean isRefreshing() {
-        return loadState == STATE_LEFT_LOADING || loadState == STATE_RIGHT_LOADING;
+    /**
+     * 是否加载中
+     */
+    public boolean isLoading() {
+        return loadState == LEFT_LOADING || loadState == RIGHT_LOADING;
     }
 
-    public void setLeftEnableLoadMore(boolean leftEnableLoadMore) {
-        this.leftEnableLoadMore = leftEnableLoadMore;
+    /**
+     * 设置是否启用左滑加载
+     */
+    public void setEnableLeftLoad(boolean enableLeftLoad) {
+        this.enableLeftLoad = enableLeftLoad;
     }
 
-    public void setRightEnableLoadMore(boolean rightEnableLoadMore) {
-        this.rightEnableLoadMore = rightEnableLoadMore;
+    /**
+     * 设置是否启用右滑加载
+     */
+    public void setEnableRightLoad(boolean enableRightLoad) {
+        this.enableRightLoad = enableRightLoad;
     }
 
-    public boolean leftCanLoadMore() {
-        return leftEnableLoadMore && leftHasLoadMore;
+    /**
+     * 是否可以左滑加载
+     */
+    public boolean canLeftLoad() {
+        return enableLeftLoad && hasLeftLoad;
     }
 
-    public boolean rightCanLoadMore() {
-        return rightEnableLoadMore && rightHasLoadMore;
+    /**
+     * 是否可以右滑加载
+     */
+    public boolean rightCanLoad() {
+        return enableRightLoad && hasRightLoad;
     }
 
+    /**
+     * 是否高亮
+     */
     public boolean isHighlighting() {
         return render.isHighlight();
     }
 
+    /**
+     * 事件分发
+     */
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (checkReadyState()) {
@@ -510,6 +553,9 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         return false;
     }
 
+    /**
+     * 事件处理
+     */
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent e) {
@@ -560,6 +606,9 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         }
     }
 
+    /**
+     * 从窗口分离
+     */
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -607,8 +656,8 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private void resetChartState() {
         this.lastFlingX = 0;
         this.scrollIdle = true;
-        this.leftHasLoadMore = true;
-        this.rightHasLoadMore = true;
+        this.hasLeftLoad = true;
+        this.hasRightLoad = true;
         this.render.resetChart();
         this.scroller.forceFinished(true);
     }

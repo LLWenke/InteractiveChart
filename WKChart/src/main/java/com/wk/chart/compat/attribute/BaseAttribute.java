@@ -17,7 +17,7 @@ import com.wk.chart.enumeration.PositionType;
  */
 
 public class BaseAttribute {
-    public Context context;
+    public final Context context;
 
     public BaseAttribute(@NonNull Context context) {
         this.context = context;

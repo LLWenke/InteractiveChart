@@ -13,7 +13,7 @@ public abstract class IndexDrawing<T extends AbsRender<?, ?>, A extends AbsModul
     protected @IndexType
     int indexType;//指标类型
 
-    public IndexDrawing(@IndexType int indexType) {
+    protected IndexDrawing(@IndexType int indexType) {
         this.indexType = indexType;
     }
 

@@ -2,10 +2,7 @@
 
 package com.wk.chart.handler;
 
-import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
-import com.wk.chart.enumeration.ClickDrawingID;
-import com.wk.chart.module.base.AbsModule;
 
 /**
  * <p>InteractiveHandler</p>
@@ -13,10 +10,10 @@ import com.wk.chart.module.base.AbsModule;
 
 public abstract class InteractiveHandler {
 
-    public void onLeftRefresh(AbsEntry firstData) {
+    public void onLeftLoad(AbsEntry firstData) {
     }
 
-    public void onRightRefresh(AbsEntry lastData) {
+    public void onRightLoad(AbsEntry lastData) {
     }
 
     public boolean onSingleClick(int clickId, float x, float y) {

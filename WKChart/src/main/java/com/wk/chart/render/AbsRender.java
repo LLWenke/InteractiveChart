@@ -63,7 +63,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     protected int begin;//开始位置索引
     protected int end;//结束位置索引
 
-    public AbsRender(A attribute, RectF viewRect) {
+    protected AbsRender(A attribute, RectF viewRect) {
         this.attribute = attribute;
         this.viewRect = viewRect;
         this.measureUtils = new MeasureUtils();
@@ -93,6 +93,9 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         this.adapter = adapter;
     }
 
+    /**
+     * 是否可滚动
+     */
     public boolean canScroll() {
         return attribute.canScroll;
     }
@@ -187,7 +190,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      * 是否可以拖动
      */
     public boolean canDragging(float dx) {
-        return dx != 0;
+        return 0 != dx;
     }
 
     /**
@@ -289,7 +292,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     /**
      * 布局组件
      */
-    void layoutModule() {
+    protected void layoutModule() {
         float left = viewRect.left, top = viewRect.top, maxMarginLeft = 0f;
         //浮动模块布局
         List<AbsModule<AbsEntry>> viewModules = chartModules.get(ModuleGroupType.FLOAT);
@@ -516,17 +519,17 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      * @param pts 浮点数序列 [x0, y0, x1, y1, ...]
      */
     private void calibrationMapPoints(float[] pts, float xOffset, float yOffset) {
-        int begin;
+        int index;
         int increase = 1;
         if (xOffset != 0) {
-            begin = 0;
+            index = 0;
         } else if (yOffset != 0) {
-            begin = 1;
+            index = 1;
             increase += 1;
         } else {
             return;
         }
-        for (int i = begin; i < pts.length; i += increase) {
+        for (int i = index; i < pts.length; i += increase) {
             if ((i & 1) == 1) {
                 pts[i] += yOffset;
             } else {

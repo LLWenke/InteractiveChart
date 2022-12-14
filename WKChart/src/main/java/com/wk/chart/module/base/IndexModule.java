@@ -11,7 +11,7 @@ import com.wk.chart.enumeration.ModuleType;
 
 public abstract class IndexModule<T extends AbsEntry> extends AbsModule<T> {
 
-    public IndexModule(@ModuleType int type) {
+    protected IndexModule(@ModuleType int type) {
         super(type, ModuleGroupType.INDEX);
     }
 }

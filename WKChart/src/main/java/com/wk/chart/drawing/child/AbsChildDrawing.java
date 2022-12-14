@@ -18,12 +18,11 @@ import java.util.Arrays;
 
 public abstract class AbsChildDrawing<T extends AbsRender<?, ?>, A extends AbsModule<?>> {
     protected final float[] margin; //边距[left, top, right, bottom]
-    public boolean isInit = false;
     protected BaseAttribute attribute;
     protected T render;
     protected A absChartModule;//模块
 
-    public AbsChildDrawing() {
+    protected AbsChildDrawing() {
         this.margin = new float[4];
     }
 
@@ -33,7 +32,6 @@ public abstract class AbsChildDrawing<T extends AbsRender<?, ?>, A extends AbsMo
      * @param render render
      */
     public void onInit(T render, A chartModule) {
-        this.isInit = true;
         this.render = render;
         this.attribute = render.getAttribute();
         this.absChartModule = chartModule;

@@ -1,30 +1,30 @@
 package com.wk.chart.compat;
 
-import android.annotation.SuppressLint;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * 时间工具类
  */
 public class DateUtil {
+
+    private DateUtil() {
+    }
+
     /**
      * 常用变量
      */
-    @SuppressLint("SimpleDateFormat")
-    private static final SimpleDateFormat format = new SimpleDateFormat();
     public static final String DATE_FORMAT_YMD = "yyyy-MM-dd";
-    public static final String DATE_FORMAT_YMDHM = "yyyy-MM-dd HH:mm";
+    public static final String DATE_FORMAT_YMD_HM = "yyyy-MM-dd HH:mm";
 
     /**
      * 日期转换为制定格式字符串
      */
     public static String formatDateToString(Date time, String pattern) {
         try {
-            format.applyPattern(pattern);
-            return format.format(time);
+            return (new SimpleDateFormat(pattern, Locale.getDefault())).format(time);
         } catch (Exception e) {
             return "";
         }

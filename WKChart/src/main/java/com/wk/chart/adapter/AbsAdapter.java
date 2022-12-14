@@ -1,6 +1,7 @@
 package com.wk.chart.adapter;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 import androidx.annotation.NonNull;
@@ -48,7 +49,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     AbsAdapter(@NonNull F buildConfig) {
         this.buildConfig = buildConfig;
         this.renderData = new ArrayList<>();
-        this.uiHandler = new Handler(this);
+        this.uiHandler = new Handler(Looper.getMainLooper(), this);
         this.dataSetObservable = new DataSetObservable();
         this.animator = new ChartAnimator<>(this, 400);
         this.scale = new ScaleEntry(0, 0, "", "");
@@ -516,8 +517,8 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      * @param stripTrailingZeros 去除无用的0（如：2.4560->2.456）
      */
     public String rateConversion(ValueEntry entry, boolean isQuantization, boolean stripTrailingZeros) {
-        int scale = null == entry.scale ? 0 : entry.scale;
-        return rateConversion(entry.result, scale, isQuantization, stripTrailingZeros);
+        return rateConversion(entry.result, null == entry.scale ? 0 : entry.scale,
+                isQuantization, stripTrailingZeros);
     }
 
     /**
@@ -555,8 +556,8 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
      * @param stripTrailingZeros 去除无用的0（如：2.4560->2.456）
      */
     public String quantizationConversion(ValueEntry entry, boolean stripTrailingZeros) {
-        int scale = null == entry.scale ? 0 : entry.scale;
-        return ValueUtils.rateFormat(entry.result, scale, null, getQuantizationEntry(), stripTrailingZeros);
+        return ValueUtils.rateFormat(entry.result, null == entry.scale ? 0 : entry.scale,
+                null, getQuantizationEntry(), stripTrailingZeros);
     }
 
     /**

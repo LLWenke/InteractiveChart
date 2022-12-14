@@ -6,7 +6,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextPaint;
-import android.util.Log;
 
 import com.wk.chart.compat.Utils;
 import com.wk.chart.enumeration.PositionType;
@@ -56,7 +55,7 @@ public class GridTextMarker extends AbsChildDrawing<AbsRender<?, ?>, AbsModule<?
         } else {
             setMargin(0, marketMargin, 0, marketMargin);
         }
-        Log.e("margin", TAG + String.valueOf(margin[3]));
+//        Log.e("margin", TAG + String.valueOf(margin[3]));
         return margin;
     }
 

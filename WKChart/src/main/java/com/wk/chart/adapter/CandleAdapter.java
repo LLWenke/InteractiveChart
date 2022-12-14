@@ -168,10 +168,6 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
      */
     private PushType getPushType(Date endDate) {
         long diff = getDateDiff(getItem(getLastPosition()).getTime(), endDate);
-        //Log.e("lastTime:", DisplayTypeUtils.selectorFormat(getItem(getLastPosition()).getTime(),
-        //    getInstance()));
-        //Log.e("endDate:", DisplayTypeUtils.selectorFormat(endDate,
-        //    getInstance()));
         if (null == timeType || diff < 0) {
             return PushType.INVALID;//无效
         } else if (diff < timeType.value()) {
@@ -189,7 +185,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
     private long getDateDiff(Date startDate, Date endDate) {
         if (null == timeType) {
             return -1;
-        } else if (timeType == TimeType.month) {//月
+        } else if (timeType == TimeType.MONTH) {//月
             return DateUtil.getMonthDiff(startDate, endDate);
         } else {
             return DateUtil.getDateDiff(startDate, endDate, timeType.msec());
@@ -323,8 +319,8 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
             ema_l = 0;
             dea = 0;
         } else {
-            ema_s = calculationCache.ema_s;
-            ema_l = calculationCache.ema_l;
+            ema_s = calculationCache.emaS;
+            ema_l = calculationCache.emaL;
             dea = calculationCache.dea;
         }
         int startIndex = l - 1;
@@ -360,8 +356,8 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
             }
             //将倒数第二次的计算结果缓存
             if (i == z - 2) {
-                this.calculationCache.ema_s = ema_s;
-                this.calculationCache.ema_l = ema_l;
+                this.calculationCache.emaS = ema_s;
+                this.calculationCache.emaL = ema_l;
                 this.calculationCache.dea = dea;
             }
         }
@@ -570,8 +566,8 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         long[] candleMA;
         long[] volumeMA;
         //macd
-        long ema_s = 0;
-        long ema_l = 0;
+        long emaS = 0;
+        long emaL = 0;
         long dea = 0;
         //BOLL
         long bollMA = 0;

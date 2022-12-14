@@ -1,8 +1,5 @@
 package com.wk.chart.entry;
 
-import android.graphics.Rect;
-import android.util.ArrayMap;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -106,8 +103,8 @@ public class CandleEntry extends AbsEntry {
         if (this.timeType == timeType) return;
         this.timeType = timeType;
         shortTimeText = DateUtil.formatDateToString(getTime(), timeType.pattern());
-        timeText = DateUtil.formatDateToString(getTime(), timeType == TimeType.day
-                ? DateUtil.DATE_FORMAT_YMD : DateUtil.DATE_FORMAT_YMDHM);
+        timeText = DateUtil.formatDateToString(getTime(), timeType == TimeType.DAY
+                ? DateUtil.DATE_FORMAT_YMD : DateUtil.DATE_FORMAT_YMD_HM);
     }
 
 
