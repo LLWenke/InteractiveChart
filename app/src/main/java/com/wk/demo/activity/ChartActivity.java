@@ -1,6 +1,5 @@
 package com.wk.demo.activity;
 
-import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 import static android.widget.Toast.LENGTH_SHORT;
 import static com.wk.chart.enumeration.LoadingType.LEFT_LOADING;
 import static com.wk.chart.enumeration.LoadingType.REFRESH_LOADING;
@@ -13,7 +12,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
+import android.os.Looper;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -51,7 +50,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -61,8 +59,8 @@ import java.util.Observer;
  * <p>MainActivity</p>
  */
 
-public class ChartActivity extends AppCompatActivity implements View.OnClickListener,
-        ChartTabListener, ICacheLoadListener, IndexManager.IndexConfigChangeListener {
+public class ChartActivity extends AppCompatActivity implements ChartTabListener,
+        ICacheLoadListener, IndexManager.IndexConfigChangeListener {
     public static final String DATA_SHOW_KEY = "DATA_SHOW_KEY";//数据展示类型KEY
 
     private ChartIndexTabLayout chartIndexTabLayout;
@@ -95,7 +93,8 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
                 case RESET:
                     if (dataShowType == DataType.REAL_TIME.ordinal()) {
                         PushService.stopPush();
-                        new Handler().postDelayed(ChartActivity.this::startPush, 1000);
+                        new Handler(Looper.getMainLooper())
+                                .postDelayed(ChartActivity.this::startPush, 1000);
                     }
                 case ADD:
                 case NORMAL:
@@ -215,7 +214,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
 
         this.candleChart.setInteractiveHandler(new InteractiveHandler() {
             @Override
-            public void onLeftRefresh(AbsEntry firstData) {
+            public void onLeftLoad(AbsEntry firstData) {
                 chartLayout.loadBegin(LEFT_LOADING, candleProgressBar, candleChart);
                 // 模拟耗时
                 candleChart.postDelayed(() -> {
@@ -229,7 +228,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
             }
 
             @Override
-            public void onRightRefresh(AbsEntry lastData) {
+            public void onRightLoad(AbsEntry lastData) {
                 chartLayout.loadBegin(RIGHT_LOADING, candleProgressBar, candleChart);
                 // 模拟耗时
                 candleChart.postDelayed(() -> {
@@ -245,15 +244,9 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-        }
-    }
-
-    @Override
     public void onBackPressed() {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            setRequestedOrientation(SCREEN_ORIENTATION_PORTRAIT);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         } else {
             finish();
         }
@@ -264,7 +257,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
      */
     private void recoveryChartState() {
         if (null == mChartCache) {
-            TimeType timeType = TimeType.day;
+            TimeType timeType = TimeType.DAY;
             chartTabLayout.selectedDefaultTimeType(timeType, ModuleType.CANDLE);
             chartTabLayout.selectedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.MAIN), ModuleGroupType.MAIN);
             chartTabLayout.selectedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.INDEX), ModuleGroupType.INDEX);
@@ -360,7 +353,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    public void onLoadCacheTypes(@Nullable TimeType timeType, boolean isNeedLoadData, @NonNull HashMap<Integer, ChartCache.TypeEntry> typeMap) {
+    public void onLoadCacheTypes(@Nullable TimeType timeType, boolean isNeedLoadData, @NonNull Map<Integer, ChartCache.TypeEntry> typeMap) {
         int mainModuleType = ModuleType.CANDLE;
         for (Map.Entry<Integer, ChartCache.TypeEntry> types : typeMap.entrySet()) {
             if (types.getKey() == ModuleGroupType.MAIN) {
@@ -371,7 +364,7 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
                 chartIndexTabLayout.selectedDefaultIndexType(types.getValue().getIndexType(), types.getKey());
             }
         }
-        timeType = null == timeType ? TimeType.fifteenMinute : timeType;
+        timeType = null == timeType ? TimeType.FIFTEEN_MINUTE : timeType;
         chartTabLayout.selectedDefaultTimeType(timeType, mainModuleType);
         if (isNeedLoadData) {
             onTimeTypeChange(timeType, mainModuleType);
@@ -396,8 +389,8 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onOrientationChange() {
-        if (isLand()) {
-            setRequestedOrientation(SCREEN_ORIENTATION_PORTRAIT);//强制为竖屏
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);//强制为竖屏
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);//强制为横屏
         }
@@ -407,9 +400,5 @@ public class ChartActivity extends AppCompatActivity implements View.OnClickList
     public void onSetting() {
         IndexManager.INSTANCE.setIndexBuildConfig(candleAdapter.getBuildConfig().getDefaultIndexConfig());
         startActivityForResult(new Intent(this, IndexSettingActivity.class), 999);
-    }
-
-    private Boolean isLand() {
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 }

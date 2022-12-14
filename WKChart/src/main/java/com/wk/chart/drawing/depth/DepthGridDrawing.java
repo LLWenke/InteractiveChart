@@ -105,7 +105,6 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
             value = absChartModule.getMaxX().text;
             pointCache[0] = viewRect.right - gridLabelPaint.measureText(value) / 2f;
             canvas.drawText(value, pointCache[0], gridLabelY, gridLabelPaint);
-
             for (int i = 1; i < attribute.gridCount; i++) {
                 float x = viewRect.left + i * regionWidth;
                 pointCache[0] = x - (i > (attribute.gridCount / 2) ? absChartModule.getXOffset() :

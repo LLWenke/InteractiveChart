@@ -59,7 +59,6 @@ public class BreathingLampDrawing extends AbsDrawing<CandleRender, TimeLineModul
             time = currentTime;
             fraction = 0;
         }
-//        Log.e("onAnimation", "fraction：" + fraction);
         //区分动画执行区间计算出对应的阴影大小（前半部分/后半部分）
         size += shaderSize * (fraction > 0.5f ? ((1f - fraction) * 2f) : (fraction * 2f));
         lampPaint.setShader(new RadialGradient(

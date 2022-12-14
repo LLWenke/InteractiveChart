@@ -84,7 +84,7 @@ public class ExtremumLabelDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<
     @SuppressLint("SwitchIntDef")
     @Override
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
-        String topLabel = null, bottomLabel = null;
+        String topLabel = "", bottomLabel = "";
         if (showMaxLabel) {//最大值标签可见
             topLabel = getLabelText(absChartModule.getMaxY());
         }

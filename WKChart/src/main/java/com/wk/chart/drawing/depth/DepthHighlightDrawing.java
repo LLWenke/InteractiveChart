@@ -107,7 +107,6 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<Abs
         String axisMarkerText, gridMarkerText;
         float[] axisMarkerBuffer, gridMarkerBuffer;
         float highlightX = render.getHighlightPoint()[0];
-        float highlightY = render.getHighlightPoint()[1];
         DepthEntry entry = render.getAdapter().getItem(render.getAdapter().getHighlightIndex());
         //获取当前焦点区域内的图表模型
         AbsModule<AbsEntry> focusModule = attribute.axisHighlightLabelAutoSelect ? render.getFocusModule() : render.getMainModule();

@@ -20,7 +20,7 @@ public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
     }
 
     @Override
-    void layoutModule() {
+    protected void layoutModule() {
         super.layoutModule();
         if (null == mainModule) return;
         //这里要修正X轴2倍的折线宽度（因为X轴分买单，卖单2个折线图，所以为2倍）

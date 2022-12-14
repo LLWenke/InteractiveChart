@@ -53,7 +53,7 @@ public class ChartAnimator<T extends AbsEntry> extends ValueAnimator
         if (animation.getAnimatedFraction() == 0.0f) {
             return;
         }
-        boolean isInit = endResults.size() == 0;
+        boolean isInit = endResults.isEmpty();
         for (int i = 0, z = beginDate.getAnimatorEntry().size(); i < z; i++) {
             ValueEntry begin = beginDate.getAnimatorEntry().get(i);
             ValueEntry end = endData.getAnimatorEntry().get(i);

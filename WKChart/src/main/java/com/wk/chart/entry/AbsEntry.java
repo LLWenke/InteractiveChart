@@ -10,12 +10,12 @@ import java.util.List;
 public abstract class AbsEntry {
     private final Long id; // id
     private final Date time; // 时间
-    private final List<ValueEntry> AnimatorEntry;//用于动画的属性列表
+    private final List<ValueEntry> animatorEntry;//用于动画的属性列表
 
-    public AbsEntry(@NotNull Date time) {
+    protected AbsEntry(@NotNull Date time) {
         this.id = time.getTime();
         this.time = time;
-        this.AnimatorEntry = new ArrayList<>();
+        this.animatorEntry = new ArrayList<>();
     }
 
     /**
@@ -39,15 +39,15 @@ public abstract class AbsEntry {
     /**
      * 添加用于动画的属性
      */
-    public void addAnimatorEntry(ValueEntry... AnimatorEntry) {
-        this.AnimatorEntry.addAll(Arrays.asList(AnimatorEntry));
+    public void addAnimatorEntry(ValueEntry... animatorEntry) {
+        this.animatorEntry.addAll(Arrays.asList(animatorEntry));
     }
 
     /**
      * 清空用于动画的属性
      */
     public void clearAnimatorEntry() {
-        this.AnimatorEntry.clear();
+        this.animatorEntry.clear();
     }
 
     /**
@@ -56,6 +56,6 @@ public abstract class AbsEntry {
      * @return 用于动画的属性列表
      */
     public List<ValueEntry> getAnimatorEntry() {
-        return AnimatorEntry;
+        return animatorEntry;
     }
 }

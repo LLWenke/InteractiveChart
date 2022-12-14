@@ -42,14 +42,14 @@ public abstract class AbsModule<T extends AbsEntry> {
 
     private boolean enable = false;
 
-    private @ModuleType
-    final int moduleType;//模块类型
+    @ModuleType
+    private final int moduleType;//模块类型
 
-    private @IndexType
-    int attachIndexType;//附加指标类型
+    @IndexType
+    private int attachIndexType;//附加指标类型
 
-    private @ModuleGroupType
-    int moduleGroup;//指标类型分组
+    @ModuleGroupType
+    private int moduleGroup;//指标类型分组
 
     private ValueEntry maxY;// Y 轴上指标的最大值
 
@@ -67,7 +67,7 @@ public abstract class AbsModule<T extends AbsEntry> {
     private float xOffset, yOffset;// X,Y 轴实际偏移数值（用于修正折线偏移后被影响的数值）
     private float width = 0f, height = 0f;// 宽，高
 
-    public AbsModule(@ModuleType int moduleType, @ModuleGroupType int moduleGroupType) {
+    protected AbsModule(@ModuleType int moduleType, @ModuleGroupType int moduleGroupType) {
         this.moduleType = moduleType;
         this.moduleGroup = moduleGroupType;
         this.attachIndexType = IndexType.NONE;
@@ -200,23 +200,22 @@ public abstract class AbsModule<T extends AbsEntry> {
         return enable && (moduleType != ModuleType.MUTATION || attachIndexType != IndexType.NONE);
     }
 
-    public @IndexType
-    int getAttachIndexType() {
+    @IndexType
+    public int getAttachIndexType() {
         return attachIndexType;
     }
 
     public void setAttachIndexType(@IndexType int attachIndexType) {
         this.attachIndexType = attachIndexType;
-
     }
 
-    public @ModuleType
-    int getModuleType() {
+    @ModuleType
+    public int getModuleType() {
         return moduleType;
     }
 
-    public @ModuleGroupType
-    int getModuleGroup() {
+    @ModuleGroupType
+    public int getModuleGroup() {
         return moduleGroup;
     }
 
@@ -288,8 +287,8 @@ public abstract class AbsModule<T extends AbsEntry> {
         return xCorrectedValue;
     }
 
-    public void setXCorrectedValue(float xCorrectedValue, float Multiple) {
-        this.xCorrectedValue = xCorrectedValue * Multiple;
+    public void setXCorrectedValue(float xCorrectedValue, float multiple) {
+        this.xCorrectedValue = xCorrectedValue * multiple;
         this.xOffset = xCorrectedValue / 2f;
     }
 
@@ -297,8 +296,8 @@ public abstract class AbsModule<T extends AbsEntry> {
         return yCorrectedValue;
     }
 
-    public void setYCorrectedValue(float yCorrectedValue, float Multiple) {
-        this.yCorrectedValue = yCorrectedValue * Multiple;
+    public void setYCorrectedValue(float yCorrectedValue, float multiple) {
+        this.yCorrectedValue = yCorrectedValue * multiple;
         this.yOffset = yCorrectedValue / 2f;
     }
 
@@ -351,10 +350,9 @@ public abstract class AbsModule<T extends AbsEntry> {
             return ClickDrawingID.ID_NONE;
         }
         for (AbsDrawing<AbsRender<?, ?>, AbsModule<?>> drawing : getDrawingList()) {
-            if (drawing instanceof IDrawingClickListener) {
-                if (((IDrawingClickListener) drawing).onDrawingClick(x, y)) {
-                    return drawing.getId();
-                }
+            if (drawing instanceof IDrawingClickListener
+                    && ((IDrawingClickListener) drawing).onDrawingClick(x, y)) {
+                return drawing.getId();
             }
         }
         return ClickDrawingID.ID_NONE;

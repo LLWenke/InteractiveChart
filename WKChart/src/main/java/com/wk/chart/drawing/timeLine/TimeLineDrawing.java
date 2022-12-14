@@ -63,16 +63,16 @@ public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
         pathPts[1] = entry.getClose().value;
         render.mapPoints(absChartModule.getMatrix(), pathPts);
         if (current == begin) {//开始点
-            float beginX = begin == 0 ? pathPts[0] : viewRect.left;
-            timelinePath.moveTo(beginX, pathPts[1]);
-            timeShaderPath.moveTo(beginX, viewRect.bottom);
-            timeShaderPath.lineTo(beginX, pathPts[1]);
+            float left = begin == 0 ? pathPts[0] : viewRect.left;
+            timelinePath.moveTo(left, pathPts[1]);
+            timeShaderPath.moveTo(left, viewRect.bottom);
+            timeShaderPath.lineTo(left, pathPts[1]);
         }
         if (current == end - 1) {//结束点
-            float endX = end == render.getAdapter().getCount() ? pathPts[0] : viewRect.right;
-            timelinePath.lineTo(endX, pathPts[1]);
-            timeShaderPath.lineTo(endX, pathPts[1]);
-            timeShaderPath.lineTo(endX, viewRect.bottom);
+            float right = end == render.getAdapter().getCount() ? pathPts[0] : viewRect.right;
+            timelinePath.lineTo(right, pathPts[1]);
+            timeShaderPath.lineTo(right, pathPts[1]);
+            timeShaderPath.lineTo(right, viewRect.bottom);
         } else {
             timelinePath.lineTo(pathPts[0], pathPts[1]);
             timeShaderPath.lineTo(pathPts[0], pathPts[1]);

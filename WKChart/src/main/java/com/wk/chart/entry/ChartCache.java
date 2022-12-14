@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ChartCache implements Serializable {
     public @Nullable
@@ -18,14 +19,14 @@ public class ChartCache implements Serializable {
     public float cacheMaxScrollOffset = 0f;
     public float cacheCurrentTransX = 0f;
     public float scale = 1;
-    private final HashMap<Integer, TypeEntry> types;
+    private final Map<Integer, TypeEntry> types;
 
     public ChartCache() {
         this.types = new HashMap<>();
     }
 
     public @NotNull
-    HashMap<Integer, TypeEntry> getTypes() {
+    Map<Integer, TypeEntry> getTypes() {
         return types;
     }
 

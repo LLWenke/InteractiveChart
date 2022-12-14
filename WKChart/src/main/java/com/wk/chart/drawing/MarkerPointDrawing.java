@@ -11,7 +11,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.text.TextPaint;
-import android.util.Log;
 
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
@@ -196,21 +195,18 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
             y -= (high - y < attribute.markerPointLineDefaultLength ? Math.min(attribute.markerPointLineDefaultLength, topMarkerBottom - totalRectHeight) : 0);
             markerRect.top = y - pointRectHeight;
             markerRect.bottom = y;
-//            Log.e(TAG, entry.getTimeText() + "上-》topMarkerBottom：" + topMarkerBottom);
             return;
         } else if (topMarkerMiddle >= totalRectHeight) {
             y = topAvailableArea[3] - triangleHeight;
             y -= (high - y < attribute.markerPointLineDefaultLength ? Math.min(attribute.markerPointLineDefaultLength, topMarkerMiddle - totalRectHeight) : 0);
             markerRect.top = y - pointRectHeight;
             markerRect.bottom = y;
-//            Log.e(TAG, entry.getTimeText() + "上-》topMarkerMiddle：" + topMarkerMiddle);
             return;
         } else if (topMarkerTop >= totalRectHeight) {
             y = topAvailableArea[5] - triangleHeight;
             y -= (high - y < attribute.markerPointLineDefaultLength ? Math.min(attribute.markerPointLineDefaultLength, topMarkerTop - totalRectHeight) : 0);
             markerRect.top = y - pointRectHeight;
             markerRect.bottom = y;
-//            Log.e(TAG, entry.getTimeText() + "上-》topMarkerTop：" + topMarkerTop);
             return;
         }
         //计算下方可用区域
@@ -222,29 +218,24 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
             y += (y - low < attribute.markerPointLineDefaultLength ? Math.min(attribute.markerPointLineDefaultLength, bottomMarkerTop - totalRectHeight) : 0);
             markerRect.top = y;
             markerRect.bottom = y + pointRectHeight;
-//            Log.e(TAG, entry.getTimeText() + "下-》bottomMarkerTop：" + bottomMarkerTop);
         } else if (bottomMarkerMiddle >= totalRectHeight) {
             y = bottomAvailableArea[3] + triangleHeight;
             y += (y - low < attribute.markerPointLineDefaultLength ? Math.min(attribute.markerPointLineDefaultLength, bottomMarkerBottom - totalRectHeight) : 0);
             markerRect.top = y;
             markerRect.bottom = y + pointRectHeight;
-//            Log.e(TAG, entry.getTimeText() + "下-》bottomMarkerMiddle：" + bottomMarkerMiddle);
         } else if (bottomMarkerBottom >= totalRectHeight) {
             y = bottomAvailableArea[5] + triangleHeight;
             y += (y - low < attribute.markerPointLineDefaultLength ? Math.min(attribute.markerPointLineDefaultLength, bottomMarkerBottom - totalRectHeight) : 0);
             markerRect.top = y;
             markerRect.bottom = y + pointRectHeight;
-//            Log.e(TAG, entry.getTimeText() + "下-》bottomMarkerBottom：" + bottomMarkerBottom);
         } else if (bottomMarkerBottom >= topMarkerTop) {
             y = bottomAvailableArea[5] + triangleHeight;
             markerRect.top = y;
             markerRect.bottom = y + pointRectHeight;
-//            Log.e(TAG, entry.getTimeText() + "下-》bottomMarkerBottom：" + bottomMarkerBottom);
         } else {
             y = topAvailableArea[5] - triangleHeight;
             markerRect.top = y - pointRectHeight;
             markerRect.bottom = y;
-//            Log.e(TAG, entry.getTimeText() + "超出上-》topMarkerTop：" + topMarkerTop);
         }
     }
 

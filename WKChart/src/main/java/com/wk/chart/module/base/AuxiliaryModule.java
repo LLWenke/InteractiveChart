@@ -11,8 +11,7 @@ import com.wk.chart.enumeration.ModuleType;
 
 public abstract class AuxiliaryModule<T extends AbsEntry> extends AbsModule<T> {
 
-    public AuxiliaryModule(@ModuleType int type) {
+    protected AuxiliaryModule(@ModuleType int type) {
         super(type, ModuleGroupType.AUXILIARY);
     }
-
 }
