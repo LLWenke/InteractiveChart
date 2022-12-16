@@ -318,7 +318,7 @@ public class ChartLayout extends ConstraintLayout {
             switchModuleType(types.getValue().getModuleType(), types.getKey());
             switchIndexType(types.getValue().getIndexType(), types.getKey());
         }
-        this.candleChartView.post(() -> candleChartView.onViewInit());
+        this.candleChartView.post(candleChartView::onViewInit);
         if (null != iCacheLoadListener) {
             this.iCacheLoadListener.onLoadCacheTypes(chartCache.timeType, isNeedLoadData, chartCache.getTypes());
         }

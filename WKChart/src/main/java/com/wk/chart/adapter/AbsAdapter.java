@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.wk.chart.animator.ChartAnimator;
-import com.wk.chart.compat.DataSetObservable;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.ValueUtils;
 import com.wk.chart.compat.config.AbsBuildConfig;
@@ -21,15 +20,15 @@ import com.wk.chart.entry.ValueEntry;
 import com.wk.chart.enumeration.ObserverArg;
 import com.wk.chart.thread.WorkThread;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observer;
 
 public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         implements Handler.Callback, WorkThread.WorkCallBack<BuildData<T, F>>,
         ChartAnimator.AnimationListener<T> {
-
-    private final DataSetObservable dataSetObservable;//数据状态监听器
+    private final PropertyChangeSupport dataChangeSupport;//数据状态监听器
     private final ScaleEntry scale;// 精度
     private final Handler uiHandler; //主线程Handler
     private final ChartAnimator<T> animator;//数据更新动画
@@ -49,8 +48,8 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     AbsAdapter(@NonNull F buildConfig) {
         this.buildConfig = buildConfig;
         this.renderData = new ArrayList<>();
+        this.dataChangeSupport = new PropertyChangeSupport(this);
         this.uiHandler = new Handler(Looper.getMainLooper(), this);
-        this.dataSetObservable = new DataSetObservable();
         this.animator = new ChartAnimator<>(this, 400);
         this.scale = new ScaleEntry(0, 0, "", "");
         this.rate = new RateEntry(1.0, scale.getQuoteUnit(), scale.getQuoteScale());
@@ -414,17 +413,17 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     }
 
     /**
-     * 注册数据状态监听器
+     * 添加数据状态监听器
      */
-    public void registerDataSetObserver(Observer observer) {
-        this.dataSetObservable.addObserver(observer);
+    public void addDataChangeSupport(PropertyChangeListener listener) {
+        this.dataChangeSupport.addPropertyChangeListener(listener);
     }
 
     /**
-     * 解绑数据状态监听器
+     * 删除数据状态监听器
      */
-    public void unregisterDataSetObserver(Observer observer) {
-        this.dataSetObservable.deleteObserver(observer);
+    public void removeDataChangeSupport(PropertyChangeListener listener) {
+        this.dataChangeSupport.removePropertyChangeListener(listener);
     }
 
     /**
@@ -496,17 +495,10 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     }
 
     /**
-     * 解绑监听
-     */
-    public void unRegisterListener() {
-        this.dataSetObservable.deleteObservers();
-    }
-
-    /**
      * 数据刷新
      */
     public void notifyDataSetChanged(ObserverArg observerArg) {
-        this.dataSetObservable.notifyObservers(observerArg);
+        this.dataChangeSupport.firePropertyChange(observerArg.name(), null, observerArg);
     }
 
     /**

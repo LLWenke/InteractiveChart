@@ -329,9 +329,6 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
                 top += margin[1];
                 module.setRect(left, top, left + module.getWidth(), top + module.getHeight());
                 top = module.getRect().bottom + margin[3] + attribute.viewInterval;
-//                if (this instanceof CandleRender) {
-//                    Log.e(TAG, "moduleRect:" + module.getRect().toString());
-//                }
             }
         }
     }

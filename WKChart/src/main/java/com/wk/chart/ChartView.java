@@ -38,7 +38,7 @@ import com.wk.chart.render.AbsRender;
 import com.wk.chart.render.CandleRender;
 import com.wk.chart.render.DepthRender;
 
-import java.util.Observer;
+import java.beans.PropertyChangeListener;
 
 /**
  * <p>交互式图标</p>
@@ -76,8 +76,8 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private int lastHighlightIndex = -1; // 上一次高亮的 entry 索引，用于减少回调
 
     //数据监视器
-    private final Observer dataSetObserver = (o, arg) -> {
-        switch ((ObserverArg) arg) {
+    private final PropertyChangeListener propertyChangeListener = evt -> {
+        switch ((ObserverArg) evt.getNewValue()) {
             case NORMAL:
                 loadingComplete(false);
                 break;
@@ -155,7 +155,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 @Override
                 public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                     lastFlingX = 0;
-                    int flingX = (int) -velocityX / 2;
+                    int flingX = (int) (-velocityX / 1.5f);
                     if (!onLongPress && !onDoubleFingerPress && render.canScroll(flingX)) {
                         lastFlingTime = System.currentTimeMillis();
                         scroller.fling(0, 0, flingX, 0, Integer.MIN_VALUE,
@@ -246,7 +246,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      * 设置数据适配器
      */
     public void setAdapter(@NonNull AbsAdapter<? extends AbsEntry, ? extends AbsBuildConfig> adapter) {
-        adapter.registerDataSetObserver(dataSetObserver);
+        adapter.addDataChangeSupport(propertyChangeListener);
         ((AbsRender) render).setAdapter(adapter);
     }
 
@@ -372,7 +372,6 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        Log.e("height(onMeasure)：", MeasureSpec.getSize(heightMeasureSpec) + "");
         if (viewSizeEntry.isNotMeasure()) {
             setMeasuredDimension(viewSizeEntry.getWidth(), viewSizeEntry.getHeight());
         } else if (MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.EXACTLY) {
@@ -406,7 +405,6 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      */
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-//        Log.e("高度(onSizeChanged)：", "left:" + left + "   top:" + top + "   right:" + right + "   bottom:" + bottom);
         if (changed) {
             this.onViewInit();
         } else {
@@ -435,7 +433,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 scroll(dx);
                 return;
             } else {
-                int draggingDX = (int) (dx / 10f);
+                int draggingDX = (int) (dx / 5f);
                 long currentTime = System.currentTimeMillis();
                 if (render.canDragging(draggingDX) && currentTime - lastFlingTime < 300) {
                     dragging(draggingDX);

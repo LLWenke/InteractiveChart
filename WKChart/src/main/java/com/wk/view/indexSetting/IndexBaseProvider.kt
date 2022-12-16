@@ -25,7 +25,7 @@ class IndexBaseProvider : BaseNodeProvider() {
     override val layoutId: Int
         get() = R.layout.item_index_base
 
-    fun getNext(position: Int): IndexBaseNode? {
+    private fun getNext(position: Int): IndexBaseNode? {
         val node = getAdapter()?.getItemOrNull(position + 1) ?: return null
         return if (node is IndexBaseNode) {
             node
@@ -34,7 +34,7 @@ class IndexBaseProvider : BaseNodeProvider() {
 
     override fun convert(helper: BaseViewHolder, item: BaseNode) {
         val entity = item as IndexBaseNode
-        val next = getNext(helper.adapterPosition)
+        val next = getNext(helper.bindingAdapterPosition)
         helper.setGone(R.id.v_index_title_interval, !entity.isShowInterval)
         helper.setGone(R.id.v_index_title_dividing_line, entity.isExpanded || next == null || next.isShowInterval)
         if (TextUtils.isEmpty(entity.title)) {
