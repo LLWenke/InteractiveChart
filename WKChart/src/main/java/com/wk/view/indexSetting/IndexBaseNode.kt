@@ -19,7 +19,7 @@ class IndexBaseNode(
         isExpanded = false
     }
 
-    override val childNode: MutableList<BaseNode>?
+    override val childNode: MutableList<BaseNode>
         get() = nodes
 
     override val footerNode: BaseNode?

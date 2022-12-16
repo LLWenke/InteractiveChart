@@ -49,11 +49,10 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
 
 /**
  * <p>MainActivity</p>
@@ -84,27 +83,24 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
     private int dataShowType;//数据展示类型
 
     //数据监视器
-    private final Observer dataSetObserver = new Observer() {
-        @Override
-        public void update(Observable o, Object arg) {
-            switch ((ObserverArg) arg) {
-                case INIT:
-                case ATTR_UPDATE:
-                case RESET:
-                    if (dataShowType == DataType.REAL_TIME.ordinal()) {
-                        PushService.stopPush();
-                        new Handler(Looper.getMainLooper())
-                                .postDelayed(ChartActivity.this::startPush, 1000);
-                    }
-                case ADD:
-                case NORMAL:
-                    if (null == candleAdapter || candleAdapter.getCount() == 0) {
-                        return;
-                    }
-                    chartLayout.loadComplete(candleProgressBar);
-                    chartLayout.loadComplete(depthProgressBar);
-                    break;
-            }
+    private final PropertyChangeListener propertyChangeListener = evt -> {
+        switch ((ObserverArg) evt.getNewValue()) {
+            case INIT:
+            case ATTR_UPDATE:
+            case RESET:
+                if (dataShowType == DataType.REAL_TIME.ordinal()) {
+                    PushService.stopPush();
+                    new Handler(Looper.getMainLooper())
+                            .postDelayed(ChartActivity.this::startPush, 1000);
+                }
+            case ADD:
+            case NORMAL:
+                if (null == candleAdapter || candleAdapter.getCount() == 0) {
+                    return;
+                }
+                chartLayout.loadComplete(candleProgressBar);
+                chartLayout.loadComplete(depthProgressBar);
+                break;
         }
     };
 
@@ -117,7 +113,7 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
         chartLayout.loadBegin(REFRESH_LOADING, candleProgressBar, candleChart);
         chartLayout.loadBegin(REFRESH_LOADING, depthProgressBar, depthChart);
         //延时执行，因为adapter中的异步任务可能与adapter的setBuildConfig中的异步任务冲突而出现无数据的情况，所以暂时使用延时避免，后期再做优化，（如果接入的是网络数据，则没有问题，因为网络请求自带延迟）
-        new Handler().postDelayed(() -> {
+        new Handler(getMainLooper()).postDelayed(() -> {
             if (isFinishing()) {
                 return;
             }
@@ -209,7 +205,7 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
         if (dataShowType == DataType.REAL_TIME.ordinal()) {
             this.chartLayout.setDataDisplayType(DataType.REAL_TIME);
         }
-        this.candleAdapter.registerDataSetObserver(dataSetObserver);
+        this.candleAdapter.addDataChangeSupport(propertyChangeListener);
         this.candleChart.setAdapter(candleAdapter);
 
         this.candleChart.setInteractiveHandler(new InteractiveHandler() {
