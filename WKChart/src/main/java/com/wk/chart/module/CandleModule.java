@@ -21,6 +21,10 @@ public class CandleModule extends MainModule<CandleEntry> implements IMarkerPoin
         super(ModuleType.CANDLE);
     }
 
+    public CandleModule(@ModuleType int moduleType) {
+        super(moduleType);
+    }
+
     @Override
     public void computeMinMax(CandleEntry entry) {
         //计算最小值
