@@ -19,6 +19,7 @@
     <string name="wk_kdj">KDJ</string>
     <string name="wk_wr">WR</string>
     <string name="wk_boll">BOLL</string>
+    <string name="wk_sar">SAR</string>
     <string name="wk_ma">MA</string>
 
     <string name="wk_time_line">分时</string>
@@ -47,6 +48,7 @@
     <string name="wk_tips_label">简介</string>
     <string name="wk_ma_tips">移动平均线简称MA，也叫均线，MA指标由一段时间内的收盘价之和算数平均数后的连线，可抚平短期波动描述币价走势，反映出长期趋势或周期。</string>
     <string name="wk_boll_tips">BOLL指标又叫布林带，其基本的形态是由三条轨道线组成的带状通道（上轨、下轨和中轨），中轨为价格的平均时间成本，上轨和下轨可分别视为一个价格的压力线和支撑线）。</string>
+    <string name="wk_sar_tips">SAR指标又叫抛物线指标或停损转向操作点指标，其全称叫“Stop and Reverse，缩写SAR”，是由美国技术分析大师威尔斯-威尔德（Wells Wilder）所创造的，是一种简单易学、比较准确的中短期技术分析工具。</string>
     <string name="wk_macd_tips">MACD指标由一组曲线与圆形组成，通过收盘时价格或指数的快变及慢变的指数移动平均值（EMA）之间的差计算出来。“S”指更短时间段的EMA,而“L“则指较长时段的EMA,最常用的是12及26日EMA.</string>
     <string name="wk_kdj_tips">KDJ指标通过一个特定的周期（常为9日、9周等）内出现过的最高价、最低价及最后一个计算周期的收盘价及这三者之间的比例关系，来计算最后一个计算周期的未成熟随机值，然后根据平滑移动平均线的方法来计算K值、D值与J值，并绘成曲线来判断价格走势。</string>
     <string name="wk_rsi_tips">RSI指标是比较价格升降运动以表达价格强度的技术分析工具，是根据一定时期内上涨和下跌幅度之和的比率制作出的一种技术曲线。</string>

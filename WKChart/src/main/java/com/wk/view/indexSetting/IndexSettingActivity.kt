@@ -7,45 +7,52 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.wk.chart.R
+import com.wk.chart.databinding.ActivityIndexSettingBinding
 import com.wk.chart.entry.IndexConfigEntry
 import com.wk.chart.enumeration.IndexType
-import kotlinx.android.synthetic.main.activity_index_setting.*
-import kotlinx.coroutines.*
-import java.util.*
-import kotlin.collections.ArrayList
+import com.wk.view.ext.binding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class IndexSettingActivity : AppCompatActivity(), IndexManager.IndexConfigChangeListener {
+    private val mBinding by binding<ActivityIndexSettingBinding>()
     private var mData: List<IndexBaseNode>? = null
     private var mAdapter: IndexAdapter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_index_setting)
         initView()
         initData()
     }
 
     private fun initView() {
-        val manager = GridLayoutManager(this, 2)
-        recyclerview.layoutManager = manager
-        mAdapter = IndexAdapter()
-        recyclerview.adapter = mAdapter
-        IndexManager.addIndexBuildConfigChangeListener(this)
+        mBinding.runCatching {
+            val manager = GridLayoutManager(this@IndexSettingActivity, 2)
+            recyclerview.layoutManager = manager
+            mAdapter = IndexAdapter()
+            recyclerview.adapter = mAdapter
+            IndexManager.addIndexBuildConfigChangeListener(this@IndexSettingActivity)
+        }
     }
 
     private fun initData() {
-        IndexManager.getIndexConfigs(this)?.let {
-            lv_loading.visibility = View.VISIBLE
-            MainScope().launch {
-                val data = async(context = Dispatchers.IO) {
-                    buildData(it)
+        mBinding.runCatching {
+            IndexManager.getIndexConfigs(this@IndexSettingActivity)?.let {
+                lvLoading.visibility = View.VISIBLE
+                MainScope().launch {
+                    val data = async(context = Dispatchers.IO) {
+                        buildData(it)
+                    }
+                    withContext(context = Dispatchers.Main) {
+                        mData = data.await()
+                        mAdapter?.setList(mData)
+                        lvLoading.visibility = View.INVISIBLE
+                    }
                 }
-                withContext(context = Dispatchers.Main) {
-                    mData = data.await()
-                    mAdapter?.setList(mData)
-                    lv_loading.visibility = View.INVISIBLE
-                }
+                return
             }
-            return
         }
     }
 
@@ -69,9 +76,29 @@ class IndexSettingActivity : AppCompatActivity(), IndexManager.IndexConfigChange
                     continue
                 }
                 if (item.key == IndexType.CANDLE_MA || item.key == IndexType.RSI || item.key == IndexType.WR) {
-                    nodes.add(IndexChildNode(item.key, index.term, index.flag, index.color, getImageRes(i), unCheckedImageRes, index.isEnable))
+                    nodes.add(
+                        IndexChildNode(
+                            item.key,
+                            index.term,
+                            index.flag,
+                            index.color,
+                            getImageRes(i),
+                            unCheckedImageRes,
+                            index.isEnable
+                        )
+                    )
                 } else {
-                    nodes.add(IndexChildNode(item.key, index.term, index.flag, 0, null, null, index.isEnable))
+                    nodes.add(
+                        IndexChildNode(
+                            item.key,
+                            index.term,
+                            index.flag,
+                            0,
+                            null,
+                            null,
+                            index.isEnable
+                        )
+                    )
                 }
             }
             var footerTips: String? = null
@@ -84,9 +111,15 @@ class IndexSettingActivity : AppCompatActivity(), IndexManager.IndexConfigChange
                     baseTitle = getString(R.string.wk_main_index)
                     baseName = getString(R.string.wk_ma)
                 }
+
                 IndexType.BOLL -> {
                     footerTips = getString(R.string.wk_boll_tips)
                     baseName = getString(R.string.wk_boll)
+                }
+
+                IndexType.SAR -> {
+                    footerTips = getString(R.string.wk_sar_tips)
+                    baseName = getString(R.string.wk_sar)
                 }
 
                 IndexType.MACD -> {
@@ -111,7 +144,16 @@ class IndexSettingActivity : AppCompatActivity(), IndexManager.IndexConfigChange
                     baseName = getString(R.string.wk_wr)
                 }
             }
-            data.add(IndexBaseNode(item.key, nodes, baseName, baseTitle, isShowInterval, IndexFooterNode(item.key, footerTips)))
+            data.add(
+                IndexBaseNode(
+                    item.key,
+                    nodes,
+                    baseName,
+                    baseTitle,
+                    isShowInterval,
+                    IndexFooterNode(item.key, footerTips)
+                )
+            )
         }
         return data
     }
@@ -121,21 +163,27 @@ class IndexSettingActivity : AppCompatActivity(), IndexManager.IndexConfigChange
             0 -> {
                 R.drawable.ic_check_p_index0
             }
+
             1 -> {
                 R.drawable.ic_check_p_index1
             }
+
             2 -> {
                 R.drawable.ic_check_p_index2
             }
+
             3 -> {
                 R.drawable.ic_check_p_index3
             }
+
             4 -> {
                 R.drawable.ic_check_p_index4
             }
+
             5 -> {
                 R.drawable.ic_check_p_index5
             }
+
             else -> {
                 null
             }

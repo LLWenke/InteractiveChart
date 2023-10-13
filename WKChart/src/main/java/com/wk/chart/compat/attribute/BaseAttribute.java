@@ -36,6 +36,7 @@ public class BaseAttribute {
     /**
      * 共用的有关属性
      */
+    public float pointSize = 6f; //数据点大小
     public float lineWidth = 3f; //线条宽度
     public int lineColor = 0x1Affffff; // 线条颜色
     public float labelSize = 26; // 标签字符大小

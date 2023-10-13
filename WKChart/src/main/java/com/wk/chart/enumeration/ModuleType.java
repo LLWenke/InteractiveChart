@@ -15,7 +15,8 @@ import java.lang.annotation.RetentionPolicy;
         ModuleType.CANDLE,
         ModuleType.TIME,
         ModuleType.DEPTH,
-        ModuleType.VOLUME
+        ModuleType.VOLUME,
+        ModuleType.BOARD
 })
 @Retention(RetentionPolicy.SOURCE)
 public @interface ModuleType {
@@ -30,6 +31,8 @@ public @interface ModuleType {
     int DEPTH = 4;//深度图 指标
 
     int VOLUME = 5;//交易量 指标
+
+    int BOARD = 6;//画板
 }
 
 

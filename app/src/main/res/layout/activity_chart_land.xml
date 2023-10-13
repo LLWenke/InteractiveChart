@@ -8,7 +8,6 @@
         android:id="@+id/chart_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="start|center"
         android:layout_marginEnd="65.5dp"
         android:layout_marginBottom="40dp">
 

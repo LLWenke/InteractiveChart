@@ -27,17 +27,12 @@ abstract class SuperPopWindow(var context: Context, private var anchor: View) : 
     private var windowManager: WindowManager? = null
     private var anchorLocation: IntArray = IntArray(2)
 
-    init {
-        //根布局
-        windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        contentView = initContentView()
-    }
-
     private fun initCommonContentView() {
         if (isInit) {
             return
         }
-        contentView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        this.windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        this.contentView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
         this.width = getWindowWidth() - margin * 2
 //        this.height = contentView.measuredHeight
         this.height = ViewGroup.LayoutParams.WRAP_CONTENT
@@ -60,13 +55,19 @@ abstract class SuperPopWindow(var context: Context, private var anchor: View) : 
         if (System.currentTimeMillis() - lastShowTime < 500) {
             return false
         }
+        this.contentView = initContentView()
         this.align = align
         this.initCommonContentView()
         this.addMask(align)
         if (align == TOP) {
             this.hideNavigationBar(contentView)
             this.contentView.setBackgroundResource(R.drawable.bg_card_top_radius)
-            this.showAsDropDown(anchor, margin, -(contentView.measuredHeight + margin + anchor.height), Gravity.TOP or Gravity.START)
+            this.showAsDropDown(
+                anchor,
+                margin,
+                -(contentView.measuredHeight + margin + anchor.height),
+                Gravity.TOP or Gravity.START
+            )
         } else {
             this.contentView.setBackgroundResource(R.drawable.bg_card_bottom_radius)
             this.showAsDropDown(anchor, margin, margin)
@@ -187,7 +188,8 @@ abstract class SuperPopWindow(var context: Context, private var anchor: View) : 
     open fun getStatusBarHeight(): Int {
         var result = 0
         //获取状态栏高度的资源id
-        val resourceId: Int = context.resources.getIdentifier("status_bar_height", "dimen", "android")
+        val resourceId: Int =
+            context.resources.getIdentifier("status_bar_height", "dimen", "android")
         if (resourceId > 0) {
             result = context.resources.getDimensionPixelSize(resourceId)
         }

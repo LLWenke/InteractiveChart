@@ -25,6 +25,7 @@ import com.wk.chart.drawing.IndexLabelDrawing;
 import com.wk.chart.drawing.IndexLineDrawing;
 import com.wk.chart.drawing.MACDDrawing;
 import com.wk.chart.drawing.MarkerPointDrawing;
+import com.wk.chart.drawing.SARDrawing;
 import com.wk.chart.drawing.VolumeDrawing;
 import com.wk.chart.drawing.WaterMarkingDrawing;
 import com.wk.chart.drawing.candle.CandleDrawing;
@@ -102,8 +103,10 @@ public class ChartLayout extends ConstraintLayout {
         candleModule.addDrawing(new CandleDrawing());//蜡烛图组件
         candleModule.addDrawing(new IndexLineDrawing(IndexType.CANDLE_MA));//MA组件
         candleModule.addDrawing(new IndexLabelDrawing(IndexType.CANDLE_MA));//MA指标文字标签组件
-        candleModule.addDrawing(new IndexLineDrawing(IndexType.BOLL));//BOLL平均线组件
+        candleModule.addDrawing(new IndexLineDrawing(IndexType.BOLL));//BOLL指标组件
         candleModule.addDrawing(new IndexLabelDrawing(IndexType.BOLL));//BOLL指标文字标签组件
+        candleModule.addDrawing(new SARDrawing());//SAR指标组件
+        candleModule.addDrawing(new IndexLabelDrawing(IndexType.SAR));//SAR指标文字标签组件
         candleModule.addDrawing(new MarkerPointDrawing());//标记点绘制组件
         candleModule.addDrawing(new ExtremumTagDrawing(ClickDrawingID.ID_EXTREMUM_TAG));//极值标签组件
         candleModule.addDrawing(new BorderDrawing(PositionType.BOTTOM));//边框组件

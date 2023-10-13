@@ -201,10 +201,11 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         //构建数据属性值
         buildScaleValue(data, startPosition);
         buildTimeText(data, startPosition);
-        //计算 MA MACD BOLL RSI KDJ WR 指标
+        //计算 MA MACD BOLL SAR RSI KDJ WR 指标
         computeMA(data, buildConfig, startPosition);
         computeMACD(data, buildConfig, startPosition);
         computeBOLL(data, buildConfig, startPosition);
+        computeSAR(data, buildConfig, startPosition);
         computeRSI(data, buildConfig, startPosition);
         computeKDJ(data, buildConfig, startPosition);
         computeWR(data, buildConfig, startPosition);
@@ -286,6 +287,171 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
     }
 
     /**
+     * BOLL(n)计算公式：
+     * MA=n日内的收盘价之和÷n。
+     * MD=n日的平方根（C－MA）的两次方之和除以n
+     * MB=n日的MA
+     * UP=MB+p×MD
+     * DN=MB－p×MD
+     * p为参数，可根据股票的特性来做相应的调整，一般默认为2
+     *
+     * @param data 数据集合
+     * @param n    周期，一般为26
+     * @param p    参数，可根据股票的特性来做相应的调整，一般默认为2
+     */
+    public void calculateBOLL(@NonNull List<CandleEntry> data, int n, int p, int startPosition) {
+        long bollMA = startPosition == 0 ? 0 : calculationCache.bollMA;
+        int position = n - 1;
+        for (int i = startPosition, z = data.size(); i < z; i++) {
+            CandleEntry entry = data.get(i);
+            bollMA += entry.getClose().result;
+            if (i >= position) {
+                if (i > position) {
+                    bollMA -= data.get(i - n).getClose().result;
+                }
+                //n日MA
+                long maValue = bollMA / n;
+                long md = 0;
+                for (int j = i - position; j <= i; j++) {
+                    //n日
+                    long value = data.get(j).getClose().result - maValue;
+                    md += value * value;
+                }
+                md = md / n;
+                md = (long) Math.sqrt(md);
+                long up = maValue + p * md;//上轨线
+                long dn = maValue - p * md;//下轨线
+                //精度恢复运算
+                ValueEntry[] bollValues = new ValueEntry[3];
+                bollValues[0] = entry.buildQuoteScaleValue(getScale(), up);
+                bollValues[1] = entry.buildQuoteScaleValue(getScale(), maValue);
+                bollValues[2] = entry.buildQuoteScaleValue(getScale(), dn);
+                //存储此次计算结果
+                entry.putLineIndex(IndexType.BOLL, bollValues);
+            }
+            //将倒数第二次的计算结果缓存
+            if (i == z - 2) {
+                this.calculationCache.bollMA = bollMA;
+            }
+        }
+    }
+
+    /**
+     * 计算 BOLL
+     */
+    private void computeBOLL(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig, int startPosition) {
+        IndexConfigEntry indicatorTag = indicatorConfig.getIndexTags(IndexType.BOLL);
+        if (null == indicatorTag || indicatorTag.getFlagEntries().length < 2) {
+            return;
+        }
+        calculateBOLL(data, indicatorTag.getFlagEntries()[0].getFlag(), indicatorTag.getFlagEntries()[1].getFlag(), startPosition);
+    }
+
+    /**
+     * 计算 SAR
+     * SAR（i）= SAR（i-1）+（EP（i-1）- SAR（i-1））× AF（i）
+     * SAR(N,S,M),N为计算周期,S为步长,M为极值
+     * SAR(4,0.02,0.2)表示计算4日抛物转向，步长为2%，极限值为20%
+     *
+     * @param data 数据集合
+     * @param n    周期 一般为4
+     * @param s    步长 一般为2
+     * @param m    极限值 一般为20
+     */
+    private void calculateSAR(@NonNull List<CandleEntry> data, int n, int s, int m, int startPosition) {
+        long ep, af, sar, prevHigh, prevLow;
+        if (startPosition == 0) {
+            ep = 0;
+            af = 0;
+            sar = 0;
+            prevHigh = 0;
+            prevLow = 0;
+        } else {
+            ep = calculationCache.ep;
+            af = calculationCache.af;
+            sar = calculationCache.sar;
+            prevHigh = calculationCache.prevHigh;
+            prevLow = calculationCache.prevLow;
+        }
+        int position = n - 1;
+        double scale = ValueUtils.pow10(2);
+        for (int i = startPosition, z = data.size(); i < z; i++) {
+            if (i >= position) {
+                boolean isRise;
+                int firstIndex = i - position;
+                long high = Long.MIN_VALUE, low = Long.MAX_VALUE;
+                CandleEntry entry = data.get(i);
+                //计算周期内最高价和最低价
+                for (int j = firstIndex; j <= i; j++) {
+                    CandleEntry item = data.get(j);
+                    high = Math.max(item.getHigh().result, high);
+                    low = Math.min(item.getLow().result, low);
+                }
+                if (i == position) {//若是看涨，则第一天的SAR值必须是周期内的最低价；若是看跌，则第一天的SAR须是周期的最高价。
+                    isRise = entry.getClose().result >= data.get(firstIndex).getClose().result;
+                    sar = isRise ? low : high;
+                } else {//第二天的SAR，则为前一天的最高价（看涨时）或是最低价（看跌时）与前一天的SAR的差距乘上加速因子，再加上前一天的SAR就可求得。
+                    isRise = entry.getClose().result >= sar;
+                    if (isRise) {
+                        af += entry.getHigh().result > prevHigh ? s : 0;
+                    } else {
+                        af += entry.getLow().result < prevLow ? s : 0;
+                    }
+                    af = af > m ? s : af;
+                    sar = (long) (sar + (ep - sar) * (af / scale));
+                }
+                //SAR反转点判断
+                if (isRise) {
+                    if (entry.getLow().result <= sar) {//如果是上涨趋势，当前最低价小于等于SAR，表明SAR触碰了当前最低点，反转
+                        //上涨反转到下跌：SAR=周期内最高价，EP=周期内最低价，AF=0
+                        sar = high;
+                        ep = low;
+                        af = 0;
+                    } else {
+                        ep = high;
+                    }
+                } else {
+                    if (entry.getHigh().result >= sar) {//如果是下跌趋势，当前最高价大于等于SAR，表明SAR触碰了当前最高点，反转
+                        //下跌反转到上涨：SAR=周期内最低价，EP=周期内最高价，AF=0
+                        sar = low;
+                        ep = high;
+                        af = 0;
+                    } else {
+                        ep = low;
+                    }
+                }
+                prevHigh = high;
+                prevLow = low;
+                //精度恢复运算
+                ValueEntry[] sarValues = new ValueEntry[1];
+                sarValues[0] = entry.buildQuoteScaleValue(getScale(), sar);
+                //存储此次计算结果
+                entry.putIndex(IndexType.SAR, sarValues);
+            }
+            //将倒数第二次的计算结果缓存
+            if (i == z - 2) {
+                calculationCache.ep = ep;
+                calculationCache.af = af;
+                calculationCache.sar = sar;
+                calculationCache.prevHigh = prevHigh;
+                calculationCache.prevLow = prevLow;
+            }
+        }
+    }
+
+    /**
+     * 计算 SAR
+     */
+    private void computeSAR(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig, int startPosition) {
+        IndexConfigEntry indicatorTag = indicatorConfig.getIndexTags(IndexType.SAR);
+        if (null == indicatorTag || indicatorTag.getFlagEntries().length < 3) {
+            return;
+        }
+        calculateSAR(data, indicatorTag.getFlagEntries()[0].getFlag(), indicatorTag.getFlagEntries()[1].getFlag()
+                , indicatorTag.getFlagEntries()[2].getFlag(), startPosition);
+    }
+
+    /**
      * 计算 MACD
      * {12, 26, 9},
      */
@@ -361,68 +527,6 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
                 this.calculationCache.dea = dea;
             }
         }
-    }
-
-
-    /**
-     * BOLL(n)计算公式：
-     * MA=n日内的收盘价之和÷n。
-     * MD=n日的平方根（C－MA）的两次方之和除以n
-     * MB=n日的MA
-     * UP=MB+p×MD
-     * DN=MB－p×MD
-     * p为参数，可根据股票的特性来做相应的调整，一般默认为2
-     *
-     * @param data 数据集合
-     * @param n    周期，一般为26
-     * @param p    参数，可根据股票的特性来做相应的调整，一般默认为2
-     */
-    public void calculateBOLL(@NonNull List<CandleEntry> data, int n, int p, int startPosition) {
-        long bollMA = startPosition == 0 ? 0 : calculationCache.bollMA;
-        int position = n - 1;
-        for (int i = startPosition, z = data.size(); i < z; i++) {
-            CandleEntry entry = data.get(i);
-            bollMA += entry.getClose().result;
-            if (i >= position) {
-                if (i > position) {
-                    bollMA -= data.get(i - n).getClose().result;
-                }
-                //n日MA
-                long maValue = bollMA / n;
-                long md = 0;
-                for (int j = i - position; j <= i; j++) {
-                    //n日
-                    long value = data.get(j).getClose().result - maValue;
-                    md += value * value;
-                }
-                md = md / n;
-                md = (long) Math.sqrt(md);
-                long up = maValue + p * md;//上轨线
-                long dn = maValue - p * md;//下轨线
-                //精度恢复运算
-                ValueEntry[] bollValues = new ValueEntry[3];
-                bollValues[0] = entry.buildQuoteScaleValue(getScale(), up);
-                bollValues[1] = entry.buildQuoteScaleValue(getScale(), maValue);
-                bollValues[2] = entry.buildQuoteScaleValue(getScale(), dn);
-                //存储此次计算结果
-                entry.putLineIndex(IndexType.BOLL, bollValues);
-            }
-            //将倒数第二次的计算结果缓存
-            if (i == z - 2) {
-                this.calculationCache.bollMA = bollMA;
-            }
-        }
-    }
-
-    /**
-     * 计算 BOLL
-     */
-    private void computeBOLL(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig, int startPosition) {
-        IndexConfigEntry indicatorTag = indicatorConfig.getIndexTags(IndexType.BOLL);
-        if (null == indicatorTag || indicatorTag.getFlagEntries().length < 2) {
-            return;
-        }
-        calculateBOLL(data, indicatorTag.getFlagEntries()[0].getFlag(), indicatorTag.getFlagEntries()[1].getFlag(), startPosition);
     }
 
     /**
@@ -577,5 +681,11 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         //KDJ
         long k = 0;
         long d = 0;
+        //SAR
+        long ep = 0;
+        long af = 0;
+        long sar = 0;
+        public long prevLow = 0;
+        public long prevHigh = 0;
     }
 }

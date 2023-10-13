@@ -2,35 +2,42 @@ package com.wk.view.tab
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.wk.chart.R
+import com.wk.chart.databinding.ViewIndexLayoutBinding
 import com.wk.chart.enumeration.IndexType
 import com.wk.chart.enumeration.ModuleGroupType
-import kotlinx.android.synthetic.main.view_index_layout.view.*
-
+import com.wk.view.ext.binding
 
 class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
+    private val mBinding by binding<ViewIndexLayoutBinding>(true)
     private var mMainIndexSelectedView: View? = null
     private var mTrendIndexSelectedView: View? = null
     private var mChartTabListener: ChartTabListener? = null
 
     constructor(context: Context) : this(context, null, 0)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         initView()
     }
 
-    fun initView() {
-        LayoutInflater.from(context).inflate(R.layout.view_index_layout, this, true)
-        tv_ma.setOnClickListener(this)
-        tv_boll.setOnClickListener(this)
-        tv_macd.setOnClickListener(this)
-        tv_kdj.setOnClickListener(this)
-        tv_rsi.setOnClickListener(this)
-        tv_wr.setOnClickListener(this)
-        iv_setting.setOnClickListener(this)
+    private fun initView() {
+        mBinding.runCatching {
+            setPadding(0, 20, 0, 16)
+            tvMa.setOnClickListener(this@ChartIndexTabLayout)
+            tvBoll.setOnClickListener(this@ChartIndexTabLayout)
+            tvSar.setOnClickListener(this@ChartIndexTabLayout)
+            tvMacd.setOnClickListener(this@ChartIndexTabLayout)
+            tvKdj.setOnClickListener(this@ChartIndexTabLayout)
+            tvRsi.setOnClickListener(this@ChartIndexTabLayout)
+            tvWr.setOnClickListener(this@ChartIndexTabLayout)
+            ivSetting.setOnClickListener(this@ChartIndexTabLayout)
+        }
     }
 
     fun setChartTabListener(chartTabListener: ChartTabListener) {
@@ -42,21 +49,31 @@ class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
             R.id.tv_ma -> {
                 mainIndexViewToggle(v, IndexType.CANDLE_MA)
             }
+
             R.id.tv_boll -> {
                 mainIndexViewToggle(v, IndexType.BOLL)
             }
+
+            R.id.tv_sar -> {
+                mainIndexViewToggle(v, IndexType.SAR)
+            }
+
             R.id.tv_macd -> {
                 trendIndexViewToggle(v, IndexType.MACD)
             }
+
             R.id.tv_kdj -> {
                 trendIndexViewToggle(v, IndexType.KDJ)
             }
+
             R.id.tv_rsi -> {
                 trendIndexViewToggle(v, IndexType.RSI)
             }
+
             R.id.tv_wr -> {
                 trendIndexViewToggle(v, IndexType.WR)
             }
+
             R.id.iv_setting -> {
                 mChartTabListener?.onSetting()
             }
@@ -77,23 +94,33 @@ class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
     private fun getSelectedView(@IndexType indexType: Int): View? {
         return when (indexType) {
             IndexType.CANDLE_MA -> {
-                tv_ma
+                mBinding.tvMa
             }
+
             IndexType.BOLL -> {
-                tv_boll
+                mBinding.tvBoll
             }
+
+            IndexType.SAR -> {
+                mBinding.tvSar
+            }
+
             IndexType.MACD -> {
-                tv_macd
+                mBinding.tvMacd
             }
+
             IndexType.KDJ -> {
-                tv_kdj
+                mBinding.tvKdj
             }
+
             IndexType.RSI -> {
-                tv_rsi
+                mBinding.tvRsi
             }
+
             IndexType.WR -> {
-                tv_wr
+                mBinding.tvWr
             }
+
             else -> {
                 null
             }
