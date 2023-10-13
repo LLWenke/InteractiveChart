@@ -1,37 +1,40 @@
 package com.wk.view.tab
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
 import com.wk.chart.R
+import com.wk.chart.databinding.IndexTabLayoutBinding
 import com.wk.chart.enumeration.IndexType
 import com.wk.chart.enumeration.ModuleGroupType
+import com.wk.view.ext.binding
 import com.wk.view.indexSetting.IndexManager
-import kotlinx.android.synthetic.main.index_tab_layout.view.*
 
 
-class IndexPopupWindow(context: Context, anchor: View, private val mChartTabListener: ChartTabListener) : SuperPopWindow(context, anchor),
-        View.OnClickListener {
+class IndexPopupWindow(
+    context: Context,
+    anchor: View,
+    private val mChartTabListener: ChartTabListener
+) : SuperPopWindow(context, anchor),
+    View.OnClickListener {
+    private val mBinding by binding<IndexTabLayoutBinding>(context)
     private var mMainIndexSelectedView: View? = null
     private var mTrendIndexSelectedView: View? = null
 
-    @SuppressLint("InflateParams")
     override fun initContentView(): View {
-        return LayoutInflater.from(context).inflate(R.layout.index_tab_layout, null)
-    }
-
-    init {
-        contentView.tv_ma.setOnClickListener(this)
-        contentView.tv_boll.setOnClickListener(this)
-        contentView.tv_macd.setOnClickListener(this)
-        contentView.tv_kdj.setOnClickListener(this)
-        contentView.tv_rsi.setOnClickListener(this)
-        contentView.tv_wr.setOnClickListener(this)
-        contentView.iv_arrow.setOnClickListener(this)
-        contentView.tv_index_setting.setOnClickListener(this)
-        contentView.iv_main_index_switch.setOnClickListener(this)
-        contentView.iv_trend_index_switch.setOnClickListener(this)
+        mBinding.runCatching {
+            tvMa.setOnClickListener(this@IndexPopupWindow)
+            tvBoll.setOnClickListener(this@IndexPopupWindow)
+            tvSar.setOnClickListener(this@IndexPopupWindow)
+            tvMacd.setOnClickListener(this@IndexPopupWindow)
+            tvKdj.setOnClickListener(this@IndexPopupWindow)
+            tvRsi.setOnClickListener(this@IndexPopupWindow)
+            tvWr.setOnClickListener(this@IndexPopupWindow)
+            ivArrow.setOnClickListener(this@IndexPopupWindow)
+            tvIndexSetting.setOnClickListener(this@IndexPopupWindow)
+            ivMainIndexSwitch.setOnClickListener(this@IndexPopupWindow)
+            ivTrendIndexSwitch.setOnClickListener(this@IndexPopupWindow)
+        }
+        return mBinding.root
     }
 
     override fun onClick(v: View) {
@@ -39,9 +42,15 @@ class IndexPopupWindow(context: Context, anchor: View, private val mChartTabList
             R.id.tv_ma -> {
                 mainIndexViewToggle(v, IndexType.CANDLE_MA)
             }
+
             R.id.tv_boll -> {
                 mainIndexViewToggle(v, IndexType.BOLL)
             }
+
+            R.id.tv_sar -> {
+                mainIndexViewToggle(v, IndexType.SAR)
+            }
+
             R.id.iv_main_index_switch -> {
                 if (v.isSelected) {
                     val indexType = IndexManager.getCacheMainIndex(context)
@@ -49,22 +58,30 @@ class IndexPopupWindow(context: Context, anchor: View, private val mChartTabList
                         mainIndexViewToggle(it, indexType)
                     }
                 } else {
-                    IndexManager.cacheMainIndex(context, getSelectedIndexType(mMainIndexSelectedView))
+                    IndexManager.cacheMainIndex(
+                        context,
+                        getSelectedIndexType(mMainIndexSelectedView)
+                    )
                     mainIndexViewToggle(v, IndexType.NONE)
                 }
             }
+
             R.id.tv_macd -> {
                 trendIndexViewToggle(v, IndexType.MACD)
             }
+
             R.id.tv_kdj -> {
                 trendIndexViewToggle(v, IndexType.KDJ)
             }
+
             R.id.tv_rsi -> {
                 trendIndexViewToggle(v, IndexType.RSI)
             }
+
             R.id.tv_wr -> {
                 trendIndexViewToggle(v, IndexType.WR)
             }
+
             R.id.iv_trend_index_switch -> {
                 if (v.isSelected) {
                     val indexType = IndexManager.getCacheTrendIndex(context)
@@ -72,10 +89,14 @@ class IndexPopupWindow(context: Context, anchor: View, private val mChartTabList
                         trendIndexViewToggle(it, indexType)
                     }
                 } else {
-                    IndexManager.cacheTrendIndex(context, getSelectedIndexType(mTrendIndexSelectedView))
+                    IndexManager.cacheTrendIndex(
+                        context,
+                        getSelectedIndexType(mTrendIndexSelectedView)
+                    )
                     trendIndexViewToggle(v, IndexType.NONE)
                 }
             }
+
             R.id.iv_arrow,
             R.id.tv_index_setting -> {
                 mChartTabListener.onSetting()
@@ -98,6 +119,7 @@ class IndexPopupWindow(context: Context, anchor: View, private val mChartTabList
         return when (selectedView?.id) {
             R.id.tv_ma -> IndexType.CANDLE_MA
             R.id.tv_boll -> IndexType.BOLL
+            R.id.tv_sar -> IndexType.SAR
             R.id.tv_macd -> IndexType.MACD
             R.id.tv_kdj -> IndexType.KDJ
             R.id.tv_rsi -> IndexType.RSI
@@ -105,6 +127,7 @@ class IndexPopupWindow(context: Context, anchor: View, private val mChartTabList
             R.id.iv_main_index_switch,
             R.id.iv_trend_index_switch,
             -> IndexType.NONE
+
             else -> IndexType.NONE
         }
     }
@@ -112,39 +135,55 @@ class IndexPopupWindow(context: Context, anchor: View, private val mChartTabList
     /**
      * 获取选中指标对应的View
      */
-    private fun getSelectedView(@IndexType indexType: Int, @ModuleGroupType moduleGroupType: Int): View? {
+    private fun getSelectedView(
+        @IndexType indexType: Int,
+        @ModuleGroupType moduleGroupType: Int
+    ): View? {
         return when (indexType) {
             IndexType.CANDLE_MA -> {
-                contentView.tv_ma
+                mBinding.tvMa
             }
+
             IndexType.BOLL -> {
-                contentView.tv_boll
+                mBinding.tvBoll
             }
+
+            IndexType.SAR -> {
+                mBinding.tvSar
+            }
+
             IndexType.MACD -> {
-                contentView.tv_macd
+                mBinding.tvMacd
             }
+
             IndexType.KDJ -> {
-                contentView.tv_kdj
+                mBinding.tvKdj
             }
+
             IndexType.RSI -> {
-                contentView.tv_rsi
+                mBinding.tvRsi
             }
+
             IndexType.WR -> {
-                contentView.tv_wr
+                mBinding.tvWr
             }
+
             IndexType.NONE -> {
                 when (moduleGroupType) {
                     ModuleGroupType.MAIN -> {
-                        contentView.iv_main_index_switch
+                        mBinding.ivMainIndexSwitch
                     }
+
                     ModuleGroupType.INDEX -> {
-                        contentView.iv_trend_index_switch
+                        mBinding.ivTrendIndexSwitch
                     }
+
                     else -> {
                         null
                     }
                 }
             }
+
             else -> {
                 null
             }

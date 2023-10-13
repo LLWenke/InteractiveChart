@@ -74,10 +74,28 @@
         android:textSize="13sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/tv_ma"
-        app:layout_constraintEnd_toStartOf="@id/empty_view"
+        app:layout_constraintEnd_toStartOf="@id/tv_sar"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toEndOf="@id/tv_ma"
         app:layout_constraintTop_toTopOf="@id/tv_ma" />
+
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_sar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_tab_selector"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="@string/wk_sar"
+        android:textColor="@color/color_tab_text"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/tv_boll"
+        app:layout_constraintEnd_toStartOf="@id/empty_view"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@id/tv_boll"
+        app:layout_constraintTop_toTopOf="@id/tv_boll" />
 
     <View
         android:id="@+id/empty_view"
@@ -86,7 +104,7 @@
         app:layout_constraintBottom_toBottomOf="@id/tv_ma"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_weight="2"
-        app:layout_constraintStart_toEndOf="@id/tv_boll"
+        app:layout_constraintStart_toEndOf="@id/tv_sar"
         app:layout_constraintTop_toTopOf="@id/tv_ma" />
 
     <TextView

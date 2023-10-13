@@ -1,7 +1,5 @@
 package com.wk.chart.compat.config;
 
-import android.util.ArrayMap;
-
 import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 
@@ -73,6 +71,14 @@ public class IndexBuildConfig extends AbsBuildConfig {
                 new String[]{"UP:", "MB:", "DN:"},
                 new String[]{"N", "P"},
                 new int[]{20, 2},
+                new boolean[]{true, true, true},
+                defaultIndexColors));
+        //配置BOLL
+        this.defaultIndexFlagConfig.put(IndexType.SAR, buildIndexTagEntry(
+                "SAR(#,#,#)",
+                new String[]{"SAR:", "SAR:", "SAR:"},
+                new String[]{"N:", "S:", "M:"},
+                new int[]{4, 2, 20},
                 new boolean[]{true, true, true},
                 defaultIndexColors));
         //配置MACD

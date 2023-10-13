@@ -1,26 +1,26 @@
 package com.wk.view.tab
 
 import android.annotation.SuppressLint
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.wk.chart.R
+import com.wk.chart.databinding.ItemMoreTabBinding
 import com.wk.chart.enumeration.ModuleType
 import com.wk.chart.enumeration.TimeType
-import kotlinx.android.synthetic.main.item_more_tab.view.*
+import com.wk.view.ext.binding
 
 /**
  * 更多子tab中的adapter
  */
-class MoreTabAdapter(private val chartTabListener: ChartTabListener?) : RecyclerView.Adapter<MoreTabAdapter.MoreTabHolder>(), View.OnClickListener {
+class MoreTabAdapter(private val chartTabListener: ChartTabListener?) :
+    RecyclerView.Adapter<MoreTabAdapter.MoreTabHolder>(), View.OnClickListener {
 
     private val mData: ArrayList<TabTimeBean> = ArrayList()
     private var mRecoveryPosition = -1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoreTabHolder {
-        return MoreTabHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_more_tab, parent, false))
+        return MoreTabHolder(parent.binding<ItemMoreTabBinding>().value)
     }
 
     override fun onBindViewHolder(holder: MoreTabHolder, position: Int) {
@@ -104,11 +104,12 @@ class MoreTabAdapter(private val chartTabListener: ChartTabListener?) : Recycler
         recyclerView.itemAnimator = null
     }
 
-    inner class MoreTabHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class MoreTabHolder(mBinding: ItemMoreTabBinding) :
+        RecyclerView.ViewHolder(mBinding.root) {
         var mItemType: TextView? = null
 
         init {
-            mItemType = itemView.item_type
+            mItemType = mBinding.itemType
         }
     }
 }

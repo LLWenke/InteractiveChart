@@ -19,7 +19,8 @@ import java.lang.annotation.RetentionPolicy;
         IndexType.VOLUME_MA,
         IndexType.EMA,
         IndexType.DMI,
-        IndexType.WR
+        IndexType.WR,
+        IndexType.SAR
 })
 @Retention(RetentionPolicy.SOURCE)
 public @interface IndexType {
@@ -42,6 +43,8 @@ public @interface IndexType {
     int DMI = 12;//DMI 指标
 
     int WR = 13; //WR 指标
+
+    int SAR = 14; //SAR 指标
 }
 
 

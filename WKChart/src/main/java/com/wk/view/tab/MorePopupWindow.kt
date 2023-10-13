@@ -1,34 +1,29 @@
 package com.wk.view.tab
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.wk.chart.R
+import com.wk.chart.databinding.MoreTabLayoutBinding
 import com.wk.chart.enumeration.ModuleType
 import com.wk.chart.enumeration.TimeType
-import kotlinx.android.synthetic.main.more_tab_layout.view.*
+import com.wk.view.ext.binding
 
-class MorePopupWindow(context: Context, anchor: View, private val mData: ArrayList<TabTimeBean>, chartTabListener: ChartTabListener)
-    : SuperPopWindow(context, anchor) {
-    private var mRecyclerView: RecyclerView? = null
+class MorePopupWindow(
+    context: Context,
+    anchor: View,
+    private val mData: ArrayList<TabTimeBean>,
+    private val chartTabListener: ChartTabListener
+) : SuperPopWindow(context, anchor) {
+    private val mBinding by binding<MoreTabLayoutBinding>(context)
     private var mAdapter: MoreTabAdapter? = null
 
-    @SuppressLint("InflateParams")
     override fun initContentView(): View {
-        return LayoutInflater.from(context).inflate(R.layout.more_tab_layout, null).also {
-            it.recyclerView.layoutManager = GridLayoutManager(context, 5)
-            mRecyclerView = it.recyclerView
-        }
-    }
-
-    init {
+        mBinding.recyclerView.layoutManager = GridLayoutManager(context, 5)
         mAdapter = MoreTabAdapter(chartTabListener).also {
-            mRecyclerView?.adapter = it
+            mBinding.recyclerView.adapter = it
             it.setData(mData)
         }
+        return mBinding.root
     }
 
     fun selectedDefaultTimeType(type: TimeType, @ModuleType moduleType: Int): TabTimeBean? {
@@ -45,11 +40,11 @@ class MorePopupWindow(context: Context, anchor: View, private val mData: ArrayLi
 
     override fun show(align: Int): Boolean {
         if (align == TOP) {
-            contentView.top_shadow.visibility = View.INVISIBLE
-            contentView.bottom_shadow.visibility = View.VISIBLE
+            mBinding.topShadow.visibility = View.INVISIBLE
+            mBinding.bottomShadow.visibility = View.VISIBLE
         } else {
-            contentView.top_shadow.visibility = View.VISIBLE
-            contentView.bottom_shadow.visibility = View.INVISIBLE
+            mBinding.topShadow.visibility = View.VISIBLE
+            mBinding.bottomShadow.visibility = View.INVISIBLE
         }
         return super.show(align)
     }

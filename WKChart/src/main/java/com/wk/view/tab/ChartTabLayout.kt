@@ -3,16 +3,16 @@ package com.wk.view.tab
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.wk.chart.R
+import com.wk.chart.databinding.ViewTabLayoutBinding
 import com.wk.chart.enumeration.IndexType
 import com.wk.chart.enumeration.ModuleGroupType
 import com.wk.chart.enumeration.ModuleType
 import com.wk.chart.enumeration.TimeType
-import kotlinx.android.synthetic.main.view_tab_layout.view.*
+import com.wk.view.ext.binding
 
 class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener {
     companion object {
@@ -24,6 +24,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
         const val HORIZONTAL = 122
     }
 
+    private val mBinding by binding<ViewTabLayoutBinding>(true)
     private var mRecoveryPosition = -1
     private var mChartTabListener: ChartTabListener? = null
     private var mMorePopupWindow: MorePopupWindow? = null
@@ -37,7 +38,11 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
 
     constructor(context: Context) : this(context, null, 0)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         initView(attrs)
         initData()
         initTab()
@@ -48,7 +53,8 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
     private fun initView(attrs: AttributeSet?) {
         attrs?.let {
             val a = context.theme.obtainStyledAttributes(
-                    it, R.styleable.chartTabAttr, 0, 0)
+                it, R.styleable.chartTabAttr, 0, 0
+            )
             try {
                 mTabType = a.getInteger(R.styleable.chartTabAttr_tabType, mTabType)
                 mTabAlign = a.getInteger(R.styleable.chartTabAttr_tabAlign, mTabAlign)
@@ -59,28 +65,29 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                 a.recycle()
             }
         }
-        LayoutInflater.from(context).inflate(R.layout.view_tab_layout, this, true)
-        tv_1.setOnClickListener(this)
-        tv_2.setOnClickListener(this)
-        tv_3.setOnClickListener(this)
-        tv_4.setOnClickListener(this)
-        tv_more.setOnClickListener(this)
-        tv_index.setOnClickListener(this)
-        iv_orientation.setOnClickListener(this)
-        if (mOrientation == VERTICAL) {
-            iv_orientation.isSelected = false
-            iv_orientation.visibility = View.VISIBLE
-            tv_index.visibility = View.VISIBLE
-        } else {
-            iv_orientation.isSelected = true
-            tv_index.visibility = View.GONE
-            iv_orientation.visibility = View.GONE
+        mBinding.runCatching {
+            tv1.setOnClickListener(this@ChartTabLayout)
+            tv2.setOnClickListener(this@ChartTabLayout)
+            tv3.setOnClickListener(this@ChartTabLayout)
+            tv4.setOnClickListener(this@ChartTabLayout)
+            tvMore.setOnClickListener(this@ChartTabLayout)
+            tvIndex.setOnClickListener(this@ChartTabLayout)
+            ivOrientation.setOnClickListener(this@ChartTabLayout)
+            if (mOrientation == VERTICAL) {
+                ivOrientation.isSelected = false
+                ivOrientation.visibility = View.VISIBLE
+                tvIndex.visibility = View.VISIBLE
+            } else {
+                ivOrientation.isSelected = true
+                ivOrientation.visibility = View.GONE
+                tvIndex.visibility = View.GONE
+            }
+            mBaseTabViews.clear()
+            mBaseTabViews.add(tv1)
+            mBaseTabViews.add(tv2)
+            mBaseTabViews.add(tv3)
+            mBaseTabViews.add(tv4)
         }
-        mBaseTabViews.clear()
-        mBaseTabViews.add(tv_1)
-        mBaseTabViews.add(tv_2)
-        mBaseTabViews.add(tv_3)
-        mBaseTabViews.add(tv_4)
     }
 
     private fun initPopWindow() {
@@ -113,78 +120,417 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
             SPOT -> {
                 //初始化币币基本Tab数据
                 mBaseData.clear()
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_time_line), TimeType.ONE_MINUTE, ModuleType.TIME, false))
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_15m), TimeType.FIFTEEN_MINUTE, ModuleType.CANDLE, false))
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_4h), TimeType.FOUR_HOUR, ModuleType.CANDLE, false))
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_day), TimeType.DAY, ModuleType.CANDLE, false))
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_time_line),
+                        TimeType.ONE_MINUTE,
+                        ModuleType.TIME,
+                        false
+                    )
+                )
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_15m),
+                        TimeType.FIFTEEN_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_4h),
+                        TimeType.FOUR_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_day),
+                        TimeType.DAY,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
                 //初始化币币更多Tab数据
                 mMoreData.clear()
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_1m), TimeType.ONE_MINUTE, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_5m), TimeType.FIVE_MINUTE, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_30m), TimeType.THIRTY_MINUTE, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_1h), TimeType.ONE_HOUR, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_2h), TimeType.TWO_HOUR, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_8h), TimeType.EIGHT_HOUR, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_week), TimeType.WEEK, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_month), TimeType.MONTH, ModuleType.CANDLE, false))
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_1m),
+                        TimeType.ONE_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_5m),
+                        TimeType.FIVE_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_30m),
+                        TimeType.THIRTY_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_1h),
+                        TimeType.ONE_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_2h),
+                        TimeType.TWO_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_8h),
+                        TimeType.EIGHT_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_week),
+                        TimeType.WEEK,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_month),
+                        TimeType.MONTH,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
             }
+
             SPOT_TRADING -> {
                 //初始化币币基本Tab数据
                 mBaseData.clear()
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_time_line), TimeType.ONE_MINUTE, ModuleType.TIME, false))
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_15m), TimeType.FIFTEEN_MINUTE, ModuleType.CANDLE, false))
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_4h), TimeType.FOUR_HOUR, ModuleType.CANDLE, false))
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_day), TimeType.DAY, ModuleType.CANDLE, false))
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_time_line),
+                        TimeType.ONE_MINUTE,
+                        ModuleType.TIME,
+                        false
+                    )
+                )
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_15m),
+                        TimeType.FIFTEEN_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_4h),
+                        TimeType.FOUR_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_day),
+                        TimeType.DAY,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
                 //初始化币币更多Tab数据
                 mMoreData.clear()
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_1m), TimeType.ONE_MINUTE, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_5m), TimeType.FIVE_MINUTE, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_30m), TimeType.THIRTY_MINUTE, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_1h), TimeType.ONE_HOUR, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_2h), TimeType.TWO_HOUR, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_8h), TimeType.EIGHT_HOUR, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_week), TimeType.WEEK, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_month), TimeType.MONTH, ModuleType.CANDLE, false))
-                tv_index.visibility = View.GONE
-                iv_orientation.visibility = View.GONE
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_1m),
+                        TimeType.ONE_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_5m),
+                        TimeType.FIVE_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_30m),
+                        TimeType.THIRTY_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_1h),
+                        TimeType.ONE_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_2h),
+                        TimeType.TWO_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_8h),
+                        TimeType.EIGHT_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_week),
+                        TimeType.WEEK,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_month),
+                        TimeType.MONTH,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mBinding.tvIndex.visibility = View.GONE
+                mBinding.ivOrientation.visibility = View.GONE
             }
+
             CONTRACT -> {
                 //初始化合约基本Tab数据
                 mBaseData.clear()
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_time_line), TimeType.ONE_MINUTE, ModuleType.TIME, false))
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_15m), TimeType.FIFTEEN_MINUTE, ModuleType.CANDLE, false))
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_4h), TimeType.FOUR_HOUR, ModuleType.CANDLE, false))
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_day), TimeType.DAY, ModuleType.CANDLE, false))
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_time_line),
+                        TimeType.ONE_MINUTE,
+                        ModuleType.TIME,
+                        false
+                    )
+                )
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_15m),
+                        TimeType.FIFTEEN_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_4h),
+                        TimeType.FOUR_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_day),
+                        TimeType.DAY,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
                 //初始化合约更多Tab数据
                 mMoreData.clear()
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_1m), TimeType.ONE_MINUTE, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_5m), TimeType.FIVE_MINUTE, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_30m), TimeType.THIRTY_MINUTE, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_1h), TimeType.ONE_HOUR, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_2h), TimeType.TWO_HOUR, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_6h), TimeType.SIX_HOUR, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_12h), TimeType.TWELVE_HOUR, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_week), TimeType.WEEK, ModuleType.CANDLE, false))
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_1m),
+                        TimeType.ONE_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_5m),
+                        TimeType.FIVE_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_30m),
+                        TimeType.THIRTY_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_1h),
+                        TimeType.ONE_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_2h),
+                        TimeType.TWO_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_6h),
+                        TimeType.SIX_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_12h),
+                        TimeType.TWELVE_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_week),
+                        TimeType.WEEK,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
             }
+
             CONTRACT_TRADING -> {
                 //初始化币币基本Tab数据
                 mBaseData.clear()
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_time_line), TimeType.ONE_MINUTE, ModuleType.TIME, false))
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_15m), TimeType.FIFTEEN_MINUTE, ModuleType.CANDLE, false))
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_4h), TimeType.FOUR_HOUR, ModuleType.CANDLE, false))
-                mBaseData.add(TabTimeBean(context.getString(R.string.wk_day), TimeType.DAY, ModuleType.CANDLE, false))
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_time_line),
+                        TimeType.ONE_MINUTE,
+                        ModuleType.TIME,
+                        false
+                    )
+                )
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_15m),
+                        TimeType.FIFTEEN_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_4h),
+                        TimeType.FOUR_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mBaseData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_day),
+                        TimeType.DAY,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
                 //初始化币币更多Tab数据
                 mMoreData.clear()
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_1m), TimeType.ONE_MINUTE, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_5m), TimeType.FIVE_MINUTE, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_30m), TimeType.THIRTY_MINUTE, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_1h), TimeType.ONE_HOUR, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_2h), TimeType.TWO_HOUR, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_8h), TimeType.EIGHT_HOUR, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_week), TimeType.WEEK, ModuleType.CANDLE, false))
-                mMoreData.add(TabTimeBean(context.getString(R.string.wk_month), TimeType.MONTH, ModuleType.CANDLE, false))
-                tv_index.visibility = View.GONE
-                iv_orientation.visibility = View.GONE
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_1m),
+                        TimeType.ONE_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_5m),
+                        TimeType.FIVE_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_30m),
+                        TimeType.THIRTY_MINUTE,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_1h),
+                        TimeType.ONE_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_2h),
+                        TimeType.TWO_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_8h),
+                        TimeType.EIGHT_HOUR,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_week),
+                        TimeType.WEEK,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mMoreData.add(
+                    TabTimeBean(
+                        context.getString(R.string.wk_month),
+                        TimeType.MONTH,
+                        ModuleType.CANDLE,
+                        false
+                    )
+                )
+                mBinding.tvIndex.visibility = View.GONE
+                mBinding.ivOrientation.visibility = View.GONE
             }
         }
     }
@@ -203,6 +549,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     }
                 }
             }
+
             R.id.tv_more -> {
                 if (morePopupWindowShowing()) {
                     dismissMorePopupWindow()
@@ -210,6 +557,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     showMorePopupWindow()
                 }
             }
+
             R.id.tv_index -> {
                 if (indexPopupWindowShowing()) {
                     dismissIndexPopupWindow()
@@ -217,6 +565,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     showIndexPopupWindow()
                 }
             }
+
             R.id.iv_orientation -> {
                 onOrientationChange()
             }
@@ -225,12 +574,22 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
 
     private fun showMorePopupWindow() {
         if (mMorePopupWindow?.show(mTabAlign) == true) {
-            tv_more.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_spinner_open, 0)
+            mBinding.tvMore.setCompoundDrawablesWithIntrinsicBounds(
+                0,
+                0,
+                R.drawable.ic_spinner_open,
+                0
+            )
         }
     }
 
     private fun dismissMorePopupWindow() {
-        tv_more.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_spinner_close, 0)
+        mBinding.tvMore.setCompoundDrawablesWithIntrinsicBounds(
+            0,
+            0,
+            R.drawable.ic_spinner_close,
+            0
+        )
         mMorePopupWindow?.dismiss()
     }
 
@@ -240,12 +599,22 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
 
     private fun showIndexPopupWindow() {
         if (mIndexPopupWindow?.show(mTabAlign) == true) {
-            tv_index.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_spinner_open, 0)
+            mBinding.tvIndex.setCompoundDrawablesWithIntrinsicBounds(
+                0,
+                0,
+                R.drawable.ic_spinner_open,
+                0
+            )
         }
     }
 
     private fun dismissIndexPopupWindow() {
-        tv_index.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_spinner_close, 0)
+        mBinding.tvIndex.setCompoundDrawablesWithIntrinsicBounds(
+            0,
+            0,
+            R.drawable.ic_spinner_close,
+            0
+        )
         mIndexPopupWindow?.dismiss()
     }
 
@@ -272,7 +641,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
     }
 
     private fun tabMoreRecovery() {
-        tv_more?.let { tab ->
+        mBinding.tvMore.let { tab ->
             if (tab.isSelected) {
                 tab.setText(R.string.wk_more)
                 tab.isSelected = false
@@ -283,7 +652,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
     }
 
     private fun tabMoreSelected(bean: TabTimeBean) {
-        tv_more?.let { tab ->
+        mBinding.tvMore.let { tab ->
             tabRecovery()
             tab.text = bean.tabName
             tab.isSelected = true
@@ -302,7 +671,10 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
         mChartTabListener?.onTimeTypeChange(type, moduleType)
     }
 
-    override fun onIndexTypeChange(@IndexType indexType: Int, @ModuleGroupType moduleGroupType: Int) {
+    override fun onIndexTypeChange(
+        @IndexType indexType: Int,
+        @ModuleGroupType moduleGroupType: Int
+    ) {
         mChartTabListener?.onIndexTypeChange(indexType, moduleGroupType)
     }
 

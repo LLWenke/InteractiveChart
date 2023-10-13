@@ -21,10 +21,12 @@ public class VolumeModule extends AuxiliaryModule<CandleEntry> {
         setMinY(entry.getVolume());
         //计算最大值
         setMaxY(entry.getVolume());
-        ValueEntry[] values = entry.getLineIndex(getAttachIndexType());
-        if (null == values) {
-            return;
-        }
+        computeIndexMinMax(entry.getIndex(getAttachIndexType()));
+        computeIndexMinMax(entry.getLineIndex(getAttachIndexType()));
+    }
+
+    private void computeIndexMinMax(ValueEntry[] values) {
+        if (null == values) return;
         for (ValueEntry item : values) {
             if (null == item) {
                 continue;

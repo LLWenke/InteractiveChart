@@ -31,10 +31,16 @@ public class CandleModule extends MainModule<CandleEntry> implements IMarkerPoin
         setMinY(entry.getLow());
         //计算最大值
         setMaxY(entry.getHigh());
-        ValueEntry[] values = entry.getLineIndex(getAttachIndexType());
-        if (null == values) {
-            return;
+        computeIndexMinMax(entry.getIndex(getAttachIndexType()));
+        computeIndexMinMax(entry.getLineIndex(getAttachIndexType()));
+        //计算标签数量
+        if (entry.getMarkerPointType() != MarkerPointType.NORMAL) {
+            this.markerPointCount++;
         }
+    }
+
+    private void computeIndexMinMax(ValueEntry[] values) {
+        if (null == values) return;
         for (ValueEntry item : values) {
             if (null == item) {
                 continue;
@@ -43,10 +49,6 @@ public class CandleModule extends MainModule<CandleEntry> implements IMarkerPoin
             setMinY(item);
             //计算最大值
             setMaxY(item);
-        }
-        //计算标签数量
-        if (entry.getMarkerPointType() != MarkerPointType.NORMAL) {
-            this.markerPointCount++;
         }
     }
 

@@ -205,6 +205,7 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
         switch (indexType) {
             case IndexType.CANDLE_MA:
             case IndexType.BOLL:
+            case IndexType.SAR:
                 label = name.concat(render.getAdapter().rateConversion(value, false, false));
                 break;
             case IndexType.VOLUME_MA:
@@ -219,7 +220,7 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
 
     private ValueEntry[] getIndexValue(CandleEntry entry) {
         int type = indexType;
-        if (type == IndexType.MACD) {
+        if (type == IndexType.MACD || type == IndexType.SAR) {
             return entry.getIndex(type);
         } else {
             return entry.getLineIndex(type);

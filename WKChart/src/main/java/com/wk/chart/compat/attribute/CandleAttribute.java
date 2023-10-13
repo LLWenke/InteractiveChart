@@ -25,4 +25,5 @@ public class CandleAttribute extends BaseAttribute {
      */
     public float timeLineWidth = 3f; // 分时线宽度
     public int timeLineColor = 0xFF52649C; // 分时线颜色
+
 }
