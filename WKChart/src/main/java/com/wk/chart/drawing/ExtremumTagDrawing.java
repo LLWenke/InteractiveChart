@@ -18,8 +18,7 @@ import com.wk.chart.module.CandleModule;
 import com.wk.chart.render.CandleRender;
 
 /**
- * <p>ExtremumTagDrawing</p>
- * 极值标签组件
+ * <p>极值标签组件</p>
  */
 
 public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> implements IDrawingClickListener {
@@ -62,7 +61,7 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> i
         extremumBuffer[2] = render.getAdapter().getMinYIndex() + 0.5f;
         extremumBuffer[1] = max.getHigh().value;
         extremumBuffer[3] = min.getLow().value;
-        render.mapPoints(absChartModule.getMatrix(), extremumBuffer);
+        render.mapPoints(chartModule.getMatrix(), extremumBuffer);
         // 绘制当前显示区域的最大文字（max）
         String maxValue = render.getAdapter().rateConversion(max.getHigh(), false, false);
         String text = "← ".concat(maxValue);

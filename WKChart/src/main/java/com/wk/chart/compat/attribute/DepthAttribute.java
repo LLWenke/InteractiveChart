@@ -22,7 +22,6 @@ public class DepthAttribute extends BaseAttribute {
     public float polylineWidth = 6f; // 折线宽度
     public float circleSize = 12f;// 圆点大小
 
-
     /**
      * 与 grid 标尺刻度有关属性
      */

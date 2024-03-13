@@ -19,8 +19,7 @@ import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
 
 /**
- * <p>AxisTagDrawing</p>
- * Axis tag组件
+ * <p>Axis轴标签组件</p>
  */
 
 public class ExtremumLabelDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<AbsEntry>> {
@@ -86,10 +85,10 @@ public class ExtremumLabelDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
         String topLabel = "", bottomLabel = "";
         if (showMaxLabel) {//最大值标签可见
-            topLabel = getLabelText(absChartModule.getMaxY());
+            topLabel = getLabelText(chartModule.getMaxY());
         }
         if (showMinLabel) {//最小值标签可见
-            bottomLabel = getLabelText(absChartModule.getMinY());
+            bottomLabel = getLabelText(chartModule.getMinY());
         }
         if ((attribute.extremumLabelPosition & PositionType.START_AND_END) != 0) {
             if (showMaxLabel) {
@@ -121,7 +120,7 @@ public class ExtremumLabelDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<
     @Override
     public void onLayoutComplete() {
         super.onLayoutComplete();
-        float[] drawingNonOverlapMargin = absChartModule.getDrawingNonOverlapMargin();//非重叠边距
+        float[] drawingNonOverlapMargin = chartModule.getDrawingNonOverlapMargin();//非重叠边距
         if ((attribute.extremumLabelPosition & PositionType.START_AND_END) != 0) {
             labelBuffer[0] = labelBuffer[2] = viewRect.left + attribute.extremumLabelMarginHorizontal;
             labelBuffer[4] = labelBuffer[6] = viewRect.right - attribute.extremumLabelMarginHorizontal;

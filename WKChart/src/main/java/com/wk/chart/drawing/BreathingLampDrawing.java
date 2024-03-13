@@ -15,8 +15,7 @@ import com.wk.chart.module.TimeLineModule;
 import com.wk.chart.render.CandleRender;
 
 /**
- * <p>BreathingLampDrawing</p>
- * 呼吸灯组件
+ * <p>呼吸灯组件</p>
  */
 public class BreathingLampDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
     private CandleAttribute attribute;//配置文件
@@ -49,7 +48,7 @@ public class BreathingLampDrawing extends AbsDrawing<CandleRender, TimeLineModul
         CandleEntry entry = render.getAdapter().getItem(render.getAdapter().getLastPosition());
         points[0] = render.getAdapter().getLastPosition() + 0.5f;
         points[1] = entry.getClose().value;
-        render.mapPoints(absChartModule.getMatrix(), points);
+        render.mapPoints(chartModule.getMatrix(), points);
         if (points[0] > viewRect.width()) return;
         float size = attribute.breathingLampRadius;
         float interval = attribute.breathingLampAutoTwinkleInterval;

@@ -21,7 +21,7 @@ import com.wk.chart.render.CandleRender;
 
 
 /**
- * <p>IndexLabelDrawing</p>
+ * <p>指标文字标签组件</p>
  */
 
 public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
@@ -169,7 +169,7 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
     public void onLayoutComplete() {
         super.onLayoutComplete();
         //计算指标文字位置信息
-        float[] drawingNonOverlapMargin = absChartModule.getDrawingNonOverlapMargin();//非重叠边距
+        float[] drawingNonOverlapMargin = chartModule.getDrawingNonOverlapMargin();//非重叠边距
         float lineOffset = lines > 1 ? (lineHeight + attribute.indexTextMarginVertical) * (lines - 1) : 0;
         if ((attribute.indexLabelPosition & PositionType.END) != 0) {
             x = viewRect.right - attribute.indexTextMarginHorizontal;

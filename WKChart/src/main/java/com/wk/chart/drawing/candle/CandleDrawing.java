@@ -13,7 +13,7 @@ import com.wk.chart.render.CandleRender;
 
 
 /**
- * <p>CandleDrawing</p>
+ * <p>蜡烛图组件</p>
  */
 public class CandleDrawing extends AbsDrawing<CandleRender, CandleModule> {
     private static final String TAG = "CandleDrawing";
@@ -50,8 +50,8 @@ public class CandleDrawing extends AbsDrawing<CandleRender, CandleModule> {
     @Override
     public void readyComputation(Canvas canvas, int begin, int end, float[] extremum) {
         //获取蜡烛图绘制的实际收首尾X轴坐标点（从首尾两根蜡烛图的中心点算起）
-        this.beginX = render.getPointX(absChartModule.getMatrix(), begin + 0.5f);
-        this.endX = render.getPointX(absChartModule.getMatrix(), end - 1 + 0.5f);
+        this.beginX = render.getPointX(chartModule.getMatrix(), begin + 0.5f);
+        this.endX = render.getPointX(chartModule.getMatrix(), end - 1 + 0.5f);
         this.highlightState = true;
     }
 
@@ -68,7 +68,7 @@ public class CandleDrawing extends AbsDrawing<CandleRender, CandleModule> {
             path = increasingPath;//上涨或者不涨不跌路径
             isStroke = attribute.increasingStyle == Paint.Style.STROKE;
         }
-        float[] rectBuffer = absChartModule.getPointRect(render, entry, current);
+        float[] rectBuffer = chartModule.getPointRect(render, entry, current);
         //边框偏移量修正
         if (isStroke) {
             rectBuffer[0] += pointBorderOffset;

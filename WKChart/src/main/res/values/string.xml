@@ -40,6 +40,9 @@
     <string name="wk_main">主图</string>
     <string name="wk_secondary">副图</string>
 
+    <string name="wk_bid">买</string>
+    <string name="wk_ask">卖</string>
+
     <string name="wk_more">更多</string>
     <string name="wk_index">指标</string>
     <string name="wk_main_index">主图指标</string>

@@ -13,8 +13,7 @@ import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
 
 /**
- * 边框线绘制组件
- * <p>BorderDrawing</p>
+ * <p>边框组件</p>
  */
 
 public class BorderDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<AbsEntry>> {

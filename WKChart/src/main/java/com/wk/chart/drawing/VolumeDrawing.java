@@ -12,7 +12,7 @@ import com.wk.chart.module.VolumeModule;
 import com.wk.chart.render.CandleRender;
 
 /**
- * <p>VolumeDrawing K线成交量的绘制</p>
+ * <p>交易量组件</p>
  */
 
 public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeModule> {
@@ -68,7 +68,7 @@ public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeModule> {
         rectBuffer[1] = entry.getVolume().value;
         rectBuffer[2] = current + 1 - render.pointsSpace;
         rectBuffer[3] = extremum[1];
-        render.mapPoints(absChartModule.getMatrix(), rectBuffer);
+        render.mapPoints(chartModule.getMatrix(), rectBuffer);
         //边框偏移量修正
         if (isStroke) {
             rectBuffer[0] += pointBorderOffset;

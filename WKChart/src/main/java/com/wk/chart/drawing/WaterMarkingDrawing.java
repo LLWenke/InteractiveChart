@@ -14,8 +14,7 @@ import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.AbsRender;
 
 /**
- * 水印组件
- * <p>WaterMarkingDrawing</p>
+ * <p>水印组件</p>
  */
 
 public class WaterMarkingDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {

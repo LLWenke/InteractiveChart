@@ -82,7 +82,6 @@ public class CandleRender extends AbsRender<CandleAdapter, CandleAttribute> {
         contentPts[0] = rectF.left;
         invertMapPoints(matrix, contentPts);
         begin = Math.max((int) contentPts[0], 0);
-        //根据maxVisibleIndex的显示位置修正maxVisibleIndex值
         end = (int) (begin + Math.ceil(attribute.visibleCount) + 1);
         if (Math.ceil(getPointX(matrix, end) - pointsWidth) >= rectF.width()) end--;
         end = Math.min(end, getAdapter().getCount());

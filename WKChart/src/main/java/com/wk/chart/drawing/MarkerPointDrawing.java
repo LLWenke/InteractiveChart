@@ -25,8 +25,7 @@ import com.wk.chart.render.CandleRender;
 import java.util.HashMap;
 
 /**
- * <p>MarkerPointDrawing</p>
- * 标记点绘制组件
+ * <p>标记点绘制组件</p>
  */
 
 public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
@@ -179,7 +178,7 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
         pointBuffer[0] = current + 0.5f;
         pointBuffer[1] = iMarkerPoint.getHighPoint(entry);
         pointBuffer[3] = iMarkerPoint.getLowPoint(entry);
-        render.mapPoints(absChartModule.getMatrix(), pointBuffer);
+        render.mapPoints(chartModule.getMatrix(), pointBuffer);
         markerRect.left = pointBuffer[0] - pointRectHalfWidth;//标签左
         markerRect.right = pointBuffer[0] + pointRectHalfWidth;//标签右
         //计算上方可用区域
@@ -192,19 +191,25 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
         float y;
         if (topMarkerBottom >= totalRectHeight) {
             y = topAvailableArea[1] - triangleHeight;
-            y -= (high - y < attribute.markerPointLineDefaultLength ? Math.min(attribute.markerPointLineDefaultLength, topMarkerBottom - totalRectHeight) : 0);
+            y -= (high - y < attribute.markerPointLineDefaultLength ?
+                    Math.min(attribute.markerPointLineDefaultLength,
+                            topMarkerBottom - totalRectHeight) : 0);
             markerRect.top = y - pointRectHeight;
             markerRect.bottom = y;
             return;
         } else if (topMarkerMiddle >= totalRectHeight) {
             y = topAvailableArea[3] - triangleHeight;
-            y -= (high - y < attribute.markerPointLineDefaultLength ? Math.min(attribute.markerPointLineDefaultLength, topMarkerMiddle - totalRectHeight) : 0);
+            y -= (high - y < attribute.markerPointLineDefaultLength ?
+                    Math.min(attribute.markerPointLineDefaultLength,
+                            topMarkerMiddle - totalRectHeight) : 0);
             markerRect.top = y - pointRectHeight;
             markerRect.bottom = y;
             return;
         } else if (topMarkerTop >= totalRectHeight) {
             y = topAvailableArea[5] - triangleHeight;
-            y -= (high - y < attribute.markerPointLineDefaultLength ? Math.min(attribute.markerPointLineDefaultLength, topMarkerTop - totalRectHeight) : 0);
+            y -= (high - y < attribute.markerPointLineDefaultLength ?
+                    Math.min(attribute.markerPointLineDefaultLength,
+                            topMarkerTop - totalRectHeight) : 0);
             markerRect.top = y - pointRectHeight;
             markerRect.bottom = y;
             return;
@@ -215,17 +220,23 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
         float bottomMarkerBottom = bottomAvailableArea[4] - bottomAvailableArea[5];//标签下方区域
         if (bottomMarkerTop >= totalRectHeight) {
             y = bottomAvailableArea[1] + triangleHeight;
-            y += (y - low < attribute.markerPointLineDefaultLength ? Math.min(attribute.markerPointLineDefaultLength, bottomMarkerTop - totalRectHeight) : 0);
+            y += (y - low < attribute.markerPointLineDefaultLength ?
+                    Math.min(attribute.markerPointLineDefaultLength,
+                            bottomMarkerTop - totalRectHeight) : 0);
             markerRect.top = y;
             markerRect.bottom = y + pointRectHeight;
         } else if (bottomMarkerMiddle >= totalRectHeight) {
             y = bottomAvailableArea[3] + triangleHeight;
-            y += (y - low < attribute.markerPointLineDefaultLength ? Math.min(attribute.markerPointLineDefaultLength, bottomMarkerBottom - totalRectHeight) : 0);
+            y += (y - low < attribute.markerPointLineDefaultLength ?
+                    Math.min(attribute.markerPointLineDefaultLength,
+                            bottomMarkerBottom - totalRectHeight) : 0);
             markerRect.top = y;
             markerRect.bottom = y + pointRectHeight;
         } else if (bottomMarkerBottom >= totalRectHeight) {
             y = bottomAvailableArea[5] + triangleHeight;
-            y += (y - low < attribute.markerPointLineDefaultLength ? Math.min(attribute.markerPointLineDefaultLength, bottomMarkerBottom - totalRectHeight) : 0);
+            y += (y - low < attribute.markerPointLineDefaultLength ?
+                    Math.min(attribute.markerPointLineDefaultLength,
+                            bottomMarkerBottom - totalRectHeight) : 0);
             markerRect.top = y;
             markerRect.bottom = y + pointRectHeight;
         } else if (bottomMarkerBottom >= topMarkerTop) {
@@ -284,7 +295,7 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
                 }
                 CandleEntry left = render.getAdapter().getItem(leftIndex);
                 RectF markerPointRect = catchMarkerPointRect.get(left.getId());
-                float[] buffer = absChartModule.getPointRect(render, left, leftIndex);
+                float[] buffer = chartModule.getPointRect(render, left, leftIndex);
                 float diff = (markerRect.width() - (buffer[2] - buffer[0])) / 2f;
                 float right = diff > 0 ? buffer[2] + diff : buffer[2];
                 if (markerRect.left >= right) {
@@ -368,7 +379,7 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
                     break rightCheck;
                 }
                 CandleEntry right = render.getAdapter().getItem(rightIndex);
-                float[] buffer = absChartModule.getPointRect(render, right, rightIndex);
+                float[] buffer = chartModule.getPointRect(render, right, rightIndex);
                 if (markerRect.right <= buffer[0]) {
                     doRight = false;
                     break rightCheck;

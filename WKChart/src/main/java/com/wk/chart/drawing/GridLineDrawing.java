@@ -14,8 +14,7 @@ import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
 
 /**
- * Grid轴刻度线绘制组件
- * <p>GridLineDrawing</p>
+ * <p>grid轴组件</p>
  */
 
 public class GridLineDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>> {
@@ -64,7 +63,7 @@ public class GridLineDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry
         //每隔特定个 entry，记录一个 X 轴label的位置信息和值
         if (current == 0 || current == lastPosition || current % interval != 0) return;
         gridBuffer[0] = current + 0.5f;
-        render.mapPoints(absChartModule.getMatrix(), gridBuffer);
+        render.mapPoints(chartModule.getMatrix(), gridBuffer);
         if (attribute.gridLineStyle == LineStyle.DOTTED || attribute.gridLineStyle == LineStyle.SOLID) {
             path.moveTo(gridBuffer[0], viewRect.top);
             path.lineTo(gridBuffer[0], viewRect.bottom);

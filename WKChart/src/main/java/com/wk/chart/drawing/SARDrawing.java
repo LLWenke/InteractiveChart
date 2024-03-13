@@ -17,8 +17,7 @@ import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
 
 /**
- * <p>SARDrawing</p>
- * SAR指标组件
+ * <p>SAR指标组件</p>
  */
 
 public class SARDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
@@ -84,7 +83,7 @@ public class SARDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
         rectBuffer[1] = value.value;
         rectBuffer[2] = current + 0.5f;
         rectBuffer[3] = value.value;
-        render.mapPoints(absChartModule.getMatrix(), rectBuffer);
+        render.mapPoints(chartModule.getMatrix(), rectBuffer);
         rectBuffer[0] -= pointSizeOffset;
         rectBuffer[1] -= pointSizeOffset;
         rectBuffer[2] += pointSizeOffset;

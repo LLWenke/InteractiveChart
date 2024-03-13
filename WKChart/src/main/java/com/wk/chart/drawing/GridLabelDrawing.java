@@ -68,7 +68,7 @@ public class GridLabelDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntr
     @Override
     public void onLayoutComplete() {
         super.onLayoutComplete();
-        float[] drawingNonOverlapMargin = absChartModule.getDrawingNonOverlapMargin();//非重叠边距
+        float[] drawingNonOverlapMargin = chartModule.getDrawingNonOverlapMargin();//非重叠边距
         gridLabelY = viewRect.bottom
                 + drawingNonOverlapMargin[3]
                 + attribute.gridLabelMarginVertical

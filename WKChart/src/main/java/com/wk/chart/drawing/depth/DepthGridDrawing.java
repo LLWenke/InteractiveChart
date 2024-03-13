@@ -18,8 +18,7 @@ import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.DepthRender;
 
 /**
- * >Grid轴绘制组件
- * <p>DepthGridDrawing</p>
+ * <p>深度图grid轴组件</p>
  */
 
 public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry>> {
@@ -98,17 +97,17 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
         } else {
             String value;
             //绘制最小值
-            value = absChartModule.getMinX().text;
+            value = chartModule.getMinX().text;
             pointCache[0] = viewRect.left + gridLabelPaint.measureText(value) / 2f;
             canvas.drawText(value, pointCache[0], gridLabelY, gridLabelPaint);
             //绘制最大值
-            value = absChartModule.getMaxX().text;
+            value = chartModule.getMaxX().text;
             pointCache[0] = viewRect.right - gridLabelPaint.measureText(value) / 2f;
             canvas.drawText(value, pointCache[0], gridLabelY, gridLabelPaint);
             for (int i = 1; i < attribute.gridCount; i++) {
                 float x = viewRect.left + i * regionWidth;
-                pointCache[0] = x - (i > (attribute.gridCount / 2) ? absChartModule.getXOffset() :
-                        -absChartModule.getXOffset());
+                pointCache[0] = x - (i > (attribute.gridCount / 2) ? chartModule.getXOffset() :
+                        -chartModule.getXOffset());
                 render.invertMapPoints(render.getMainModule().getMatrix(), pointCache);
                 value = render.getAdapter().rateConversion(pointCache[0], render.getAdapter().getScale().getQuoteScale(), false, false);
                 pointCache[0] = x;
@@ -121,7 +120,7 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
     public void onLayoutComplete() {
         super.onLayoutComplete();
         //非重叠边距
-        float[] drawingNonOverlapMargin = absChartModule.getDrawingNonOverlapMargin();
+        float[] drawingNonOverlapMargin = chartModule.getDrawingNonOverlapMargin();
         regionWidth = viewRect.width() / (float) (attribute.gridCount - 1);
         gridLabelY = viewRect.bottom + rect.height() + drawingNonOverlapMargin[3] + attribute.axisLabelMarginVertical;
     }

@@ -8,7 +8,6 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextPaint;
-import android.util.Log;
 
 import com.wk.chart.compat.FontStyle;
 import com.wk.chart.compat.Utils;
@@ -16,7 +15,6 @@ import com.wk.chart.compat.attribute.CandleAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.CandleEntry;
-import com.wk.chart.entry.RateEntry;
 import com.wk.chart.interfaces.IDrawingClickListener;
 import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
@@ -91,7 +89,7 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
         CandleEntry last = render.getAdapter().getItem(render.getAdapter().getLastPosition());
         cursorPoint[0] = render.getAdapter().getLastPosition() + 1;
         cursorPoint[1] = last.getClose().value;
-        render.mapPoints(absChartModule.getMatrix(), cursorPoint);
+        render.mapPoints(chartModule.getMatrix(), cursorPoint);
         String value = render.getAdapter().rateConversion(last.getClose(), false, false);
         //防止文字抖动现象
         float textWidth = foldedCursorTextPaint.measureText(value);

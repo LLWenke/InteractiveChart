@@ -17,7 +17,7 @@ import com.wk.chart.module.DepthModule;
 import com.wk.chart.render.DepthRender;
 
 /**
- * <p>DepthDrawing</p>
+ * <p>深度图组件</p>
  */
 
 public class DepthDrawing extends AbsDrawing<DepthRender, DepthModule> {
@@ -71,10 +71,10 @@ public class DepthDrawing extends AbsDrawing<DepthRender, DepthModule> {
             previousType = entry.getType();
             path = previousType == DepthAdapter.BID ? bidPath : askPath;
             offset = -offset;
-            render.mapPoints(absChartModule.getMatrix(), pathPts, offset, 0);
+            render.mapPoints(chartModule.getMatrix(), pathPts, offset, 0);
             path.moveTo(pathPts[0], viewRect.bottom);
         } else {
-            render.mapPoints(absChartModule.getMatrix(), pathPts, offset, 0);
+            render.mapPoints(chartModule.getMatrix(), pathPts, offset, 0);
         }
         path.lineTo(pathPts[0], pathPts[1]);
         //高亮点查找范围
@@ -86,7 +86,7 @@ public class DepthDrawing extends AbsDrawing<DepthRender, DepthModule> {
             if (previousType == fillEntry.getType()) {
                 pathPts[0] = fillEntry.getPrice().value;
                 pathPts[1] = entry.getTotalAmount().value;
-                render.mapPoints(absChartModule.getMatrix(), pathPts, offset, 0);
+                render.mapPoints(chartModule.getMatrix(), pathPts, offset, 0);
                 path.lineTo(pathPts[0], pathPts[1]);
                 x1 = pathPts[0];
             } else {
@@ -122,13 +122,9 @@ public class DepthDrawing extends AbsDrawing<DepthRender, DepthModule> {
     }
 
     @Override
-    public void drawOver(Canvas canvas) {
-    }
-
-    @Override
     public void onLayoutComplete() {
         super.onLayoutComplete();
-        offset = absChartModule.getXOffset();
+        offset = chartModule.getXOffset();
         left = viewRect.left - attribute.polylineWidth;
         right = viewRect.right + attribute.polylineWidth;
 

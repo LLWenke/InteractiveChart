@@ -685,7 +685,7 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         long ep = 0;
         long af = 0;
         long sar = 0;
-        public long prevLow = 0;
-        public long prevHigh = 0;
+        long prevLow = 0;
+        long prevHigh = 0;
     }
 }

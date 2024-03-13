@@ -111,7 +111,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private final GestureDetector gestureDetector = new GestureDetector(getContext(),
             new GestureDetector.SimpleOnGestureListener() {
                 @Override
-                public void onLongPress(MotionEvent e) {
+                public void onLongPress(@NonNull MotionEvent e) {
                     if (onTouch) {
                         onLongPress = true;
                         highlight(e.getX(), e.getY());
@@ -119,7 +119,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 }
 
                 @Override
-                public boolean onSingleTapConfirmed(MotionEvent e) {
+                public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
                     boolean consumed = false;
                     int clickId = getRender().onClick(e.getX(), e.getY());
                     if (null != interactiveHandler && clickId != ClickDrawingID.ID_NONE) {
@@ -138,7 +138,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 }
 
                 @Override
-                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                public boolean onScroll(@NonNull MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
                     if (!onLongPress && !onDoubleFingerPress) {
                         cancelHighlight();
                         if (render.canScroll(distanceX)) {
@@ -153,7 +153,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 }
 
                 @Override
-                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                public boolean onFling(@NonNull MotionEvent e1, @NonNull MotionEvent e2, float velocityX, float velocityY) {
                     lastFlingX = 0;
                     int flingX = (int) (-velocityX / 1.5f);
                     if (!onLongPress && !onDoubleFingerPress && render.canScroll(flingX)) {
@@ -173,7 +173,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private final ScaleGestureDetector scaleDetector = new ScaleGestureDetector(getContext(),
             new ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 @Override
-                public boolean onScale(ScaleGestureDetector detector) {
+                public boolean onScale(@NonNull ScaleGestureDetector detector) {
                     float scale = attribute.currentScale * detector.getScaleFactor();
                     if (scale < attribute.minScale) {
                         scale = attribute.minScale;
@@ -683,7 +683,8 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      * @param moduleGroupType 模块组
      * @param classes         组件
      */
-    public int removeDrawing(@ModuleType int moduleType, @ModuleGroupType int moduleGroupType, Class<? extends AbsDrawing<?, ?>>... classes) {
+    @SafeVarargs
+    public final int removeDrawing(@ModuleType int moduleType, @ModuleGroupType int moduleGroupType, Class<? extends AbsDrawing<?, ?>>... classes) {
         int removeCount = 0;
         AbsModule<?> module = getRender().getModule(moduleType, moduleGroupType);
         if (null == module) {

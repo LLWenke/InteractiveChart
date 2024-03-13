@@ -20,7 +20,7 @@ import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.DepthRender;
 
 /**
- * <p>DepthHighlightDrawing</p>
+ * <p>深度图高亮组件</p>
  */
 
 public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry>> {
@@ -141,7 +141,7 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<Abs
             }
         }
         //grid标签位置区域计算
-        drawingNonOverlapMargin = absChartModule.getDrawingNonOverlapMargin();
+        drawingNonOverlapMargin = chartModule.getDrawingNonOverlapMargin();
         rect = viewRect;
         if (null == gridTextMarker) {
             top = rect.top;

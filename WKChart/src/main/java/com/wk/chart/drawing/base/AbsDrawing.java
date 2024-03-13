@@ -21,7 +21,7 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
     private boolean initState = false;//是否初始化
     protected RectF viewRect; // 绘制区域
     protected T render;//渲染工厂
-    protected A absChartModule;//模块
+    protected A chartModule;//模块
 
     protected AbsDrawing() {
         this(ClickDrawingID.ID_NONE);
@@ -42,7 +42,7 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
     public void onInit(T render, A chartModule) {
         this.initState = true;
         this.render = render;
-        this.absChartModule = chartModule;
+        this.chartModule = chartModule;
         this.viewRect.set(chartModule.getRect());
         Arrays.fill(margin, 0);
     }
@@ -96,8 +96,8 @@ public abstract class AbsDrawing<T extends AbsRender<?, ?>, A extends AbsModule<
      * 视图布局完成，更新绘制区域
      */
     public void onLayoutComplete() {
-        if (null == absChartModule) return;
-        viewRect.set(absChartModule.getRect());
+        if (null == chartModule) return;
+        viewRect.set(chartModule.getRect());
     }
 
     /**

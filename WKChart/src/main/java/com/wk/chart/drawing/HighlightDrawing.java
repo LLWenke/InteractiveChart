@@ -141,7 +141,7 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntr
             }
         }
         //grid标签位置区域计算
-        drawingNonOverlapMargin = absChartModule.getDrawingNonOverlapMargin();
+        drawingNonOverlapMargin = chartModule.getDrawingNonOverlapMargin();
         rect = viewRect;
         if (null == gridTextMarker) {
             top = rect.top;

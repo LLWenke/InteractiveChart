@@ -16,7 +16,7 @@ import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.DepthRender;
 
 /**
- * <p>DepthSelectorDrawing</p>
+ * <p>深度图选择器组件</p>
  */
 
 public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry>> {
@@ -171,6 +171,6 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
     @Override
     public void onLayoutComplete() {
         super.onLayoutComplete();
-        drawingNonOverlapMargin = absChartModule.getDrawingNonOverlapMargin();
+        drawingNonOverlapMargin = chartModule.getDrawingNonOverlapMargin();
     }
 }
