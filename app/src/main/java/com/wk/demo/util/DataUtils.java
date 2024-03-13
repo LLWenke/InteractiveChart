@@ -15,6 +15,7 @@ import com.wk.demo.model.DepthWrapper;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -60,11 +61,10 @@ public class DataUtils {
             int length = in.available();
             byte[] buffer = new byte[length];
             in.read(buffer);
-            kLineData = new String(buffer, "UTF-8");
-            final String[] candleDatas = kLineData.split(",");
-
-            for (String candleData : candleDatas) {
-                String[] v = candleData.split("[|]");
+            kLineData = new String(buffer, StandardCharsets.UTF_8);
+            final String[] candleData = kLineData.split(",");
+            for (String item : candleData) {
+                String[] v = item.split("[|]");
                 int type = (new Random()).nextInt(10);
                 CandleEntry entry = new CandleEntry(v[0], v[1], v[2], v[3], v[4], new Date(Date.parse(v[5])));
                 entry.setMarkerPointType(type > 3 ? MarkerPointType.NORMAL : type);
@@ -85,7 +85,7 @@ public class DataUtils {
             int length = in.available();
             byte[] buffer = new byte[length];
             in.read(buffer);
-            String json = new String(buffer, 0, buffer.length, "UTF-8");
+            String json = new String(buffer, StandardCharsets.UTF_8);
             Gson gson = new Gson();
             DepthWrapper data = gson.fromJson(json, DepthWrapper.class);
 

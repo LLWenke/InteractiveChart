@@ -95,19 +95,18 @@ public class PushService extends IntentService {
         } else {
             openValue = highValue = lowValue = closeValue = close;
             volumeValue = 0.0;
-            timeValue = addDateMinut(time, 1);
+            timeValue = addDateMinute(time, 1);
         }
 
         return new CandleEntry(String.valueOf(openValue), String.valueOf(highValue), String.valueOf(lowValue),
                 String.valueOf(closeValue), String.valueOf(volumeValue), timeValue);
     }
 
-    private Date addDateMinut(Date date, int day) {
+    private Date addDateMinute(Date date, int day) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DAY_OF_MONTH, day);
         date = cal.getTime();
-        cal = null;
         return date;
     }
 

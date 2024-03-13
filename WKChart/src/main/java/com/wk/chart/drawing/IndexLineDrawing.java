@@ -16,8 +16,7 @@ import com.wk.chart.module.base.AbsModule;
 import com.wk.chart.render.CandleRender;
 
 /**
- * <p>IndexLineDrawing</p>
- * 指标线组件
+ * <p>指标线组件</p>
  */
 
 public class IndexLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
@@ -78,7 +77,7 @@ public class IndexLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
             }
             pathPts[0] = current + 0.5f;
             pathPts[1] = entry.value;
-            render.mapPoints(absChartModule.getMatrix(), pathPts);
+            render.mapPoints(chartModule.getMatrix(), pathPts);
             Path path = paths[i];
             if (path.isEmpty()) {
                 path.moveTo(pathPts[0], pathPts[1]);
@@ -103,7 +102,7 @@ public class IndexLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
             case IndexType.KDJ:
                 gridBuffer[0] = 0;
                 gridBuffer[1] = (extremum[3] + extremum[1]) / 2;
-                render.mapPoints(absChartModule.getMatrix(), gridBuffer);
+                render.mapPoints(chartModule.getMatrix(), gridBuffer);
                 canvas.drawLine(viewRect.left, gridBuffer[1], viewRect.right, gridBuffer[1], centerLinePaint);
                 break;
             case IndexType.BOLL:

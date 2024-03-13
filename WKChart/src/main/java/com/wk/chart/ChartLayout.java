@@ -36,6 +36,7 @@ import com.wk.chart.drawing.depth.DepthDrawing;
 import com.wk.chart.drawing.depth.DepthGridDrawing;
 import com.wk.chart.drawing.depth.DepthHighlightDrawing;
 import com.wk.chart.drawing.depth.DepthSelectorDrawing;
+import com.wk.chart.drawing.depth.DepthPositionDrawing;
 import com.wk.chart.drawing.timeLine.TimeLineDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.ChartCache;
@@ -129,7 +130,7 @@ public class ChartLayout extends ConstraintLayout {
         volumeModule.addDrawing(new VolumeDrawing());//交易量组件
         volumeModule.addDrawing(new IndexLineDrawing(IndexType.VOLUME_MA));//MA组件
         volumeModule.addDrawing(new IndexLabelDrawing(IndexType.VOLUME_MA));//MA指标文字标签组件
-        volumeModule.addDrawing(new ExtremumLabelDrawing(ExtremumVisible.MAX_VISIBLE, true, false));//x轴标签组件
+        volumeModule.addDrawing(new ExtremumLabelDrawing(ExtremumVisible.MAX_VISIBLE, true, false));//Axis轴标签组件
         volumeModule.addDrawing(new BorderDrawing(PositionType.BOTTOM));//边框组件
         volumeModule.setAttachIndexType(IndexType.VOLUME_MA);
         volumeModule.setEnable(true);
@@ -162,10 +163,11 @@ public class ChartLayout extends ConstraintLayout {
     protected void initDepthChartModules(AbsRender<?, ?> render) {
         DepthModule depthModule = new DepthModule();
         depthModule.addDrawing(new AxisDrawing(5, true));//axis轴组件
-        depthModule.addDrawing(new DepthGridDrawing());//grid轴组件
+        depthModule.addDrawing(new DepthGridDrawing());//深度图grid轴组件
         depthModule.addDrawing(new DepthDrawing());//深度图组件
-        depthModule.addDrawing(new DepthHighlightDrawing(new AxisTextMarker(), new GridTextMarker()));//高亮组件
-        depthModule.addDrawing(new DepthSelectorDrawing());//选择器组件
+        depthModule.addDrawing(new DepthPositionDrawing());//深度图盘口组件
+        depthModule.addDrawing(new DepthHighlightDrawing(new AxisTextMarker(), new GridTextMarker()));//深度图高亮组件
+        depthModule.addDrawing(new DepthSelectorDrawing());//深度图选择器组件
         depthModule.addDrawing(new BorderDrawing(PositionType.BOTTOM));//边框组件
         depthModule.setEnable(true);
         render.addModule(depthModule);
@@ -257,8 +259,7 @@ public class ChartLayout extends ConstraintLayout {
         return false;
     }
 
-    public @IndexType
-    int getNowIndexType(@ModuleGroupType int moduleGroupType) {
+    public @IndexType int getNowIndexType(@ModuleGroupType int moduleGroupType) {
         List<AbsModule<AbsEntry>> modules = candleRender.getModules().get(moduleGroupType);
         if (null == modules || modules.isEmpty()) {
             return IndexType.NONE;
@@ -276,8 +277,7 @@ public class ChartLayout extends ConstraintLayout {
      *
      * @return 缓存信息
      */
-    public @Nullable
-    ChartCache chartCache() {
+    public @Nullable ChartCache chartCache() {
         if (null == candleRender || null == candleChartView) {
             return null;
         }
@@ -292,8 +292,7 @@ public class ChartLayout extends ConstraintLayout {
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : candleRender.getModules().entrySet()) {
             for (AbsModule<AbsEntry> module : item.getValue()) {
                 if (module.isEnable()) {
-                    chartCache.getTypes().put(module.getModuleGroup(), new ChartCache.TypeEntry(
-                            module.getModuleType(), module.getAttachIndexType()));
+                    chartCache.getTypes().put(module.getModuleGroup(), new ChartCache.TypeEntry(module.getModuleType(), module.getAttachIndexType()));
                     break;
                 }
             }
@@ -368,10 +367,8 @@ public class ChartLayout extends ConstraintLayout {
      */
     public void loadBegin(LoadingType loadingType, ProgressBar bar, ChartView chart) {
         this.constraintSet.setVisibility(bar.getId(), VISIBLE);
-        this.constraintSet.connect(bar.getId(), ConstraintSet.START, chart.getId(),
-                ConstraintSet.START, Utils.dp2px(getContext(), 30));
-        this.constraintSet.connect(bar.getId(), ConstraintSet.END, chart.getId(),
-                ConstraintSet.END, Utils.dp2px(getContext(), 30));
+        this.constraintSet.connect(bar.getId(), ConstraintSet.START, chart.getId(), ConstraintSet.START, Utils.dp2px(getContext(), 30));
+        this.constraintSet.connect(bar.getId(), ConstraintSet.END, chart.getId(), ConstraintSet.END, Utils.dp2px(getContext(), 30));
         switch (loadingType) {
             case LEFT_LOADING:
                 this.constraintSet.clear(bar.getId(), ConstraintSet.END);

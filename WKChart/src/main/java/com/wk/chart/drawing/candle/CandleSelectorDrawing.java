@@ -210,6 +210,6 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, AbsModule<Ab
     @Override
     public void onLayoutComplete() {
         super.onLayoutComplete();
-        drawingNonOverlapMargin = absChartModule.getDrawingNonOverlapMargin();
+        drawingNonOverlapMargin = chartModule.getDrawingNonOverlapMargin();
     }
 }

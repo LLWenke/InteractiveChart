@@ -24,8 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 /**
- * Axis轴绘制组件
- * <p>AxisDrawing</p>
+ * <p>Axis轴组件</p>
  */
 
 public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
@@ -115,15 +114,15 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
             float labelOffset, lineOffset, axisY;
             axisY = viewRect.top + i * regionHeight;
             pointCache[1] = axisY;
-            render.invertMapPoints(absChartModule.getMatrix(), pointCache);
+            render.invertMapPoints(chartModule.getMatrix(), pointCache);
             if (i == 0) {
                 labelOffset = textHeight;
                 lineOffset = textCenter;
-                text = getScaleLabel(extremum[3], absChartModule.getMaxY());
+                text = getScaleLabel(extremum[3], chartModule.getMaxY());
             } else if (i == axisCount - 1) {
                 labelOffset = 0;
                 lineOffset = -textCenter;
-                text = getScaleLabel(extremum[1], absChartModule.getMinY());
+                text = getScaleLabel(extremum[1], chartModule.getMinY());
             } else {
                 labelOffset = textCenter;
                 lineOffset = 0;
@@ -186,7 +185,7 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
      * 格式化刻度标签
      */
     private String getScaleLabel(float value, @Nullable ValueEntry entry) {
-        if (null != entry && absChartModule.getModuleType() == ModuleType.VOLUME) {
+        if (null != entry && chartModule.getModuleType() == ModuleType.VOLUME) {
             return render.getAdapter().quantizationConversion(entry, true);
         } else if (isQuantization) {
             return render.getAdapter().rateConversion(value, render.getAdapter().getScale().getQuoteScale(), true, false);
