@@ -9,19 +9,20 @@ import android.text.TextPaint;
 import com.wk.chart.compat.FontStyle;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.DepthAttribute;
-import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.DepthEntry;
 import com.wk.chart.entry.ValueEntry;
 import com.wk.chart.enumeration.DepthGridStyle;
-import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.DepthRender;
 
 /**
  * <p>深度图grid轴组件</p>
  */
 
-public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry>> {
+public class DepthGridDrawing extends IndexDrawing<DepthRender, AbsModule<AbsEntry>> {
     private static final String TAG = "DepthGridDrawing";
     //配置文件
     private DepthAttribute attribute;
@@ -39,6 +40,10 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
     private int previousType = -1;
     //区域宽度,gridLabel的 Grid 轴坐标
     private float regionWidth, gridLabelY;
+
+    public DepthGridDrawing() {
+        super(IndexType.DEPTH);
+    }
 
     @Override
     public void onInit(DepthRender render, AbsModule<AbsEntry> chartModule) {
@@ -109,7 +114,11 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
                 pointCache[0] = x - (i > (attribute.gridCount / 2) ? chartModule.getXOffset() :
                         -chartModule.getXOffset());
                 render.invertMapPoints(render.getMainModule().getMatrix(), pointCache);
-                value = render.getAdapter().rateConversion(pointCache[0], render.getAdapter().getScale().getQuoteScale(), false, false);
+                value = render.getAdapter().rateConversion(pointCache[0],
+                        render.getAdapter().getScale().getQuoteScale(),
+                        false,
+                        false
+                );
                 pointCache[0] = x;
                 canvas.drawText(value, pointCache[0], gridLabelY, gridLabelPaint);
             }
@@ -122,7 +131,8 @@ public class DepthGridDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry
         //非重叠边距
         float[] drawingNonOverlapMargin = chartModule.getDrawingNonOverlapMargin();
         regionWidth = viewRect.width() / (float) (attribute.gridCount - 1);
-        gridLabelY = viewRect.bottom + rect.height() + drawingNonOverlapMargin[3] + attribute.axisLabelMarginVertical;
+        gridLabelY =
+                viewRect.bottom + rect.height() + drawingNonOverlapMargin[3] + attribute.axisLabelMarginVertical;
     }
 
 }

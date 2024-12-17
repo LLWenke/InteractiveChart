@@ -1,4 +1,3 @@
-
 package com.wk.chart.compat.attribute;
 
 import android.content.Context;
@@ -10,6 +9,7 @@ import androidx.annotation.NonNull;
 import com.wk.chart.enumeration.ExtremumVisible;
 import com.wk.chart.enumeration.HighLightStyle;
 import com.wk.chart.enumeration.LineStyle;
+import com.wk.chart.enumeration.ModuleLayoutType;
 import com.wk.chart.enumeration.PositionType;
 
 /**
@@ -27,11 +27,12 @@ public class BaseAttribute {
      * 各个视图模块的配置信息有关属性
      */
     public float mainViewHeight = 400;//主图模块高度
-    public float auxiliaryViewHeight = 180;//副图模块高度
-    public float indexViewHeight = 200;//指标模块高度
+    public float indexViewHeight = 180;//指标模块高度
     public float viewInterval = 0; // 各个视图模块间的间隔
     public float leftScrollOffset = 0;//X 轴方向的最小滚动值固定偏移量（左边）
     public float rightScrollOffset = 0;//X 轴方向的最大滚动值固定偏移量（右边）
+    public int mainModuleLayoutType = ModuleLayoutType.OVERLAP;// 主图模块布局类型
+    public int indexModuleLayoutType = ModuleLayoutType.SEPARATE;// 指标模块布局类型
 
     /**
      * 共用的有关属性

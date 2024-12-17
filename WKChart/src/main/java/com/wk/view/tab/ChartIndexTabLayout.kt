@@ -7,13 +7,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.wk.chart.R
 import com.wk.chart.databinding.ViewIndexLayoutBinding
 import com.wk.chart.enumeration.IndexType
-import com.wk.chart.enumeration.ModuleGroupType
+import com.wk.chart.enumeration.ModuleGroup
 import com.wk.view.ext.binding
 
 class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
     private val mBinding by binding<ViewIndexLayoutBinding>(true)
-    private var mMainIndexSelectedView: View? = null
-    private var mTrendIndexSelectedView: View? = null
     private var mChartTabListener: ChartTabListener? = null
 
     constructor(context: Context) : this(context, null, 0)
@@ -32,6 +30,7 @@ class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
             tvMa.setOnClickListener(this@ChartIndexTabLayout)
             tvBoll.setOnClickListener(this@ChartIndexTabLayout)
             tvSar.setOnClickListener(this@ChartIndexTabLayout)
+            tvVolume.setOnClickListener(this@ChartIndexTabLayout)
             tvMacd.setOnClickListener(this@ChartIndexTabLayout)
             tvKdj.setOnClickListener(this@ChartIndexTabLayout)
             tvRsi.setOnClickListener(this@ChartIndexTabLayout)
@@ -47,31 +46,35 @@ class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
     override fun onClick(v: View) {
         when (v.id) {
             R.id.tv_ma -> {
-                mainIndexViewToggle(v, IndexType.CANDLE_MA)
+                mainIndexViewToggle(IndexType.CANDLE_MA)
             }
 
             R.id.tv_boll -> {
-                mainIndexViewToggle(v, IndexType.BOLL)
+                mainIndexViewToggle(IndexType.BOLL)
             }
 
             R.id.tv_sar -> {
-                mainIndexViewToggle(v, IndexType.SAR)
+                mainIndexViewToggle(IndexType.SAR)
+            }
+
+            R.id.tv_volume -> {
+                trendIndexViewToggle(IndexType.VOLUME, v)
             }
 
             R.id.tv_macd -> {
-                trendIndexViewToggle(v, IndexType.MACD)
+                trendIndexViewToggle(IndexType.MACD, v)
             }
 
             R.id.tv_kdj -> {
-                trendIndexViewToggle(v, IndexType.KDJ)
+                trendIndexViewToggle(IndexType.KDJ, v)
             }
 
             R.id.tv_rsi -> {
-                trendIndexViewToggle(v, IndexType.RSI)
+                trendIndexViewToggle(IndexType.RSI, v)
             }
 
             R.id.tv_wr -> {
-                trendIndexViewToggle(v, IndexType.WR)
+                trendIndexViewToggle(IndexType.WR, v)
             }
 
             R.id.iv_setting -> {
@@ -80,98 +83,103 @@ class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
         }
     }
 
-    fun selectedDefaultIndexType(@IndexType indexType: Int, @ModuleGroupType moduleGroupType: Int) {
-        if (moduleGroupType == ModuleGroupType.MAIN) {
-            mainIndexViewSelected(getSelectedView(indexType))
-        } else if (moduleGroupType == ModuleGroupType.INDEX) {
-            trendIndexViewSelected(getSelectedView(indexType))
-        }
-    }
-
-    /**
-     * 获取选中指标对应的View
-     */
-    private fun getSelectedView(@IndexType indexType: Int): View? {
-        return when (indexType) {
-            IndexType.CANDLE_MA -> {
-                mBinding.tvMa
-            }
-
-            IndexType.BOLL -> {
-                mBinding.tvBoll
-            }
-
-            IndexType.SAR -> {
-                mBinding.tvSar
-            }
-
-            IndexType.MACD -> {
-                mBinding.tvMacd
-            }
-
-            IndexType.KDJ -> {
-                mBinding.tvKdj
-            }
-
-            IndexType.RSI -> {
-                mBinding.tvRsi
-            }
-
-            IndexType.WR -> {
-                mBinding.tvWr
-            }
-
-            else -> {
-                null
-            }
+    fun selectedDefaultIndexType(
+        @ModuleGroup moduleGroupType: Int,
+        indexTypeSet: HashSet<Int>?,
+    ) {
+        if (moduleGroupType == ModuleGroup.MAIN) {
+            mainIndexViewSelected(indexTypeSet)
+        } else if (moduleGroupType == ModuleGroup.INDEX) {
+            trendIndexViewSelected(indexTypeSet)
         }
     }
 
     /**
      * 主图指标View状态选中
      */
-    private fun mainIndexViewSelected(view: View?) {
-        mMainIndexSelectedView?.isSelected = false
-        view?.isSelected = true
-        mMainIndexSelectedView = view
-    }
+    private fun mainIndexViewSelected(indexTypeSet: HashSet<Int>?) {
+        mBinding.tvMa.isSelected = false
+        mBinding.tvBoll.isSelected = false
+        mBinding.tvSar.isSelected = false
+        indexTypeSet?.forEach { indexType ->
+            when (indexType) {
+                IndexType.CANDLE_MA -> {
+                    mBinding.tvMa.isSelected = true
+                }
 
-    /**
-     * 主图指标View状态切换
-     */
-    private fun mainIndexViewToggle(view: View, @IndexType indexType: Int) {
-        mMainIndexSelectedView?.isSelected = mMainIndexSelectedView == view
-        view.isSelected = !view.isSelected
-        if (view.isSelected) {
-            mMainIndexSelectedView = view
-            mChartTabListener?.onIndexTypeChange(indexType, ModuleGroupType.MAIN)
-        } else {
-            mMainIndexSelectedView = null
-            mChartTabListener?.onIndexTypeChange(IndexType.NONE, ModuleGroupType.MAIN)
-        }
-    }
+                IndexType.BOLL -> {
+                    mBinding.tvBoll.isSelected = true
+                }
 
-    /**
-     * 趋势指标View状态切换
-     */
-    private fun trendIndexViewToggle(view: View, @IndexType indexType: Int) {
-        mTrendIndexSelectedView?.isSelected = mTrendIndexSelectedView == view
-        view.isSelected = !view.isSelected
-        if (view.isSelected) {
-            mTrendIndexSelectedView = view
-            mChartTabListener?.onIndexTypeChange(indexType, ModuleGroupType.INDEX)
-        } else {
-            mTrendIndexSelectedView = null
-            mChartTabListener?.onIndexTypeChange(IndexType.NONE, ModuleGroupType.INDEX)
+                IndexType.SAR -> {
+                    mBinding.tvSar.isSelected = true
+                }
+
+            }
         }
     }
 
     /**
      * 趋势指标View状态选中
      */
-    private fun trendIndexViewSelected(view: View?) {
-        mTrendIndexSelectedView?.isSelected = false
-        view?.isSelected = true
-        mTrendIndexSelectedView = view
+    private fun trendIndexViewSelected(indexTypeSet: HashSet<Int>?) {
+        mBinding.tvVolume.isSelected = false
+        mBinding.tvMacd.isSelected = false
+        mBinding.tvKdj.isSelected = false
+        mBinding.tvRsi.isSelected = false
+        mBinding.tvWr.isSelected = false
+        indexTypeSet?.forEach { indexType ->
+            when (indexType) {
+                IndexType.VOLUME -> {
+                    mBinding.tvVolume.isSelected = true
+                }
+
+                IndexType.MACD -> {
+                    mBinding.tvMacd.isSelected = true
+                }
+
+                IndexType.KDJ -> {
+                    mBinding.tvKdj.isSelected = true
+                }
+
+                IndexType.RSI -> {
+                    mBinding.tvRsi.isSelected = true
+                }
+
+                IndexType.WR -> {
+                    mBinding.tvWr.isSelected = true
+                }
+
+            }
+        }
+    }
+
+    /**
+     * 主图指标View状态切换
+     */
+    private fun mainIndexViewToggle(@IndexType indexType: Int) {
+        mChartTabListener?.onAttachIndexTypeChange(
+            ModuleGroup.MAIN,
+            indexType,
+        )?.let {
+            mainIndexViewSelected(
+                it
+            )
+        }
+    }
+
+    /**
+     * 趋势指标View状态切换
+     */
+    private fun trendIndexViewToggle(@IndexType indexType: Int, v: View) {
+        mChartTabListener?.onModuleIndexTypeChange(
+            ModuleGroup.INDEX,
+            indexType,
+            !v.isSelected
+        )?.let {
+            trendIndexViewSelected(
+                it
+            )
+        }
     }
 }

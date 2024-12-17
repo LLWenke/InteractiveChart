@@ -16,10 +16,9 @@ import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.enumeration.ClickDrawingID;
-import com.wk.chart.enumeration.ModuleGroupType;
-import com.wk.chart.enumeration.ModuleType;
-import com.wk.chart.module.base.AbsModule;
-import com.wk.chart.module.base.MainModule;
+import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.enumeration.ModuleGroup;
+import com.wk.chart.module.AbsModule;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -47,7 +46,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     protected final RectF viewRect; // 整个的视图区域
     protected final A attribute; // 配置信息
     protected T adapter; // 数据适配器
-    protected MainModule<AbsEntry> mainModule;//主图模块
+    protected AbsModule<AbsEntry> mainModule;//主图模块
     protected AbsModule<AbsEntry> focusModule;//焦点图表模型
     private boolean highlight = false;//长按事件状态
     private boolean firstLoad = true;//首次加载
@@ -182,8 +181,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      */
     public boolean canScroll(float dx) {
         final float offset = touchValues[Matrix.MTRANS_X] - dx;
-        return (offset >= -maxScrollOffset || touchValues[Matrix.MTRANS_X] > -maxScrollOffset)
-                && (offset <= minScrollOffset || touchValues[Matrix.MTRANS_X] < minScrollOffset);
+        return (offset >= -maxScrollOffset || touchValues[Matrix.MTRANS_X] > -maxScrollOffset) && (offset <= minScrollOffset || touchValues[Matrix.MTRANS_X] < minScrollOffset);
     }
 
     /**
@@ -271,7 +269,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     public void initModuleDrawing(float viewWidth, float viewHeight) {
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
             for (AbsModule<AbsEntry> module : item.getValue()) {
-                if (!module.isAttach()) {
+                if (!module.isEnable()) {
                     continue;
                 }
                 module.initDrawing(this);
@@ -285,8 +283,8 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      */
     private void initBasicsAttr() {
         this.pointsSpace = (attribute.pointSpace / attribute.pointWidth) / 2f;
-        this.pointsMinWidth = attribute.pointBorderWidth +
-                attribute.pointBorderWidth * (attribute.pointSpace / attribute.pointWidth * 2f);
+        this.pointsMinWidth =
+                attribute.pointBorderWidth + attribute.pointBorderWidth * (attribute.pointSpace / attribute.pointWidth * 2f);
     }
 
     /**
@@ -295,21 +293,21 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     protected void layoutModule() {
         float left = viewRect.left, top = viewRect.top, maxMarginLeft = 0f;
         //浮动模块布局
-        List<AbsModule<AbsEntry>> viewModules = chartModules.get(ModuleGroupType.FLOAT);
+        List<AbsModule<AbsEntry>> viewModules = chartModules.get(ModuleGroup.FLOAT);
         if (null != viewModules) {
             float[] maxMargin = measureUtils.getModuleMaxMargin(viewModules);
             left += maxMargin[0];
             top += maxMargin[1];
             for (AbsModule<AbsEntry> module : viewModules) {
-                if (!module.isAttach()) continue;
+                if (!module.isEnable()) continue;
                 module.setRect(left, top, left + module.getWidth(), top + module.getHeight());
             }
         }
         //指标模块Left位置计算
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
-            if (item.getKey() == ModuleGroupType.FLOAT) continue;
+            if (item.getKey() == ModuleGroup.FLOAT) continue;
             for (AbsModule<AbsEntry> module : item.getValue()) {
-                if (!module.isAttach()) continue;
+                if (!module.isEnable()) continue;
                 float[] margin = module.getDrawingMargin();
                 maxMarginLeft = Math.max(maxMarginLeft, margin[0]);
             }
@@ -317,12 +315,12 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         left += maxMarginLeft;
         //指标模块布局
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
-            if (item.getKey() == ModuleGroupType.FLOAT) continue;
+            if (item.getKey() == ModuleGroup.FLOAT) continue;
             for (AbsModule<AbsEntry> module : item.getValue()) {
-                if (!module.isAttach()) continue;
+                if (!module.isEnable()) continue;
                 //更新主图模块
-                if (module.getModuleGroup() == ModuleGroupType.MAIN) {
-                    this.mainModule = (MainModule<AbsEntry>) module;
+                if (module.getModuleGroup() == ModuleGroup.MAIN) {
+                    this.mainModule = module;
                 }
                 //分配图表大小和位置
                 float[] margin = module.getDrawingMargin();
@@ -390,7 +388,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     private void layoutComplete() {
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
             for (AbsModule<AbsEntry> module : item.getValue()) {
-                if (module.isAttach()) {
+                if (module.isEnable()) {
                     module.onLayoutComplete();
                 }
             }
@@ -430,9 +428,11 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         final int dataSize = adapter.getCount();
         if (dataSize <= visibleCount) return touchValues[Matrix.MTRANS_X];
         float leftOffset = getPointX(matrix, 0) - rect.left;
-        float result = (maxScrollOffset - attribute.rightScrollOffset)
-                * entryIndex / (dataSize - visibleCount)
-                - Math.max(leftOffset, 0f);
+        float result =
+                (maxScrollOffset - attribute.rightScrollOffset) * entryIndex / (dataSize - visibleCount) - Math.max(
+                        leftOffset,
+                        0f
+                );
         result = Math.min(maxScrollOffset, result);
         result = Math.max(-minScrollOffset, result);
         return -result + overScrollOffset;
@@ -474,8 +474,11 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         overScrollOffset = 0;
         matrixTouch.getValues(touchValues);
         touchValues[Matrix.MTRANS_X] -= dx;
-        touchValues[Matrix.MTRANS_X] = touchValues[Matrix.MTRANS_X] > minScrollOffset ?
-                minScrollOffset : Math.max(touchValues[Matrix.MTRANS_X], -maxScrollOffset);
+        touchValues[Matrix.MTRANS_X] =
+                touchValues[Matrix.MTRANS_X] > minScrollOffset ? minScrollOffset : Math.max(
+                        touchValues[Matrix.MTRANS_X],
+                        -maxScrollOffset
+                );
         matrixTouch.setValues(touchValues);
     }
 
@@ -488,7 +491,9 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      * @param x            在点(x, y)上缩放
      * @param y            在点(x, y)上缩放。由于 K 线图只会进行水平滚动，因此 y 值被忽略
      */
-    protected void zoom(@NotNull Matrix matrix, RectF contentRect, float visibleCount, float x, float y) {
+    protected void zoom(
+            @NotNull Matrix matrix, RectF contentRect, float visibleCount, float x, float y
+    ) {
         if (x < contentRect.left) {
             x = contentRect.left;
         } else if (x > contentRect.right) {
@@ -506,7 +511,8 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         }
         touchValues[Matrix.MSCALE_X] = adapter.getCount() / visibleCount;
         computeScrollRange(contentRect, touchValues[Matrix.MSCALE_X]);
-        touchValues[Matrix.MTRANS_X] = getTransX(matrix, contentRect, visibleCount, minVisibleIndex);
+        touchValues[Matrix.MTRANS_X] =
+                getTransX(matrix, contentRect, visibleCount, minVisibleIndex);
         matrixTouch.setValues(touchValues);
     }
 
@@ -591,8 +597,8 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         if (Float.isInfinite(deltaY) || Float.isInfinite(deltaX)) {
             return;
         }
-        final float scaleX = (rect.width() - chartModule.getXCorrectedValue())
-                / (deltaX == 0 ? adapter.getCount() : deltaX);
+        final float scaleX =
+                (rect.width() - chartModule.getXCorrectedValue()) / (deltaX == 0 ? adapter.getCount() : deltaX);
         final float scaleY = (rect.height() - chartModule.getYCorrectedValue()) / deltaY;
         final float translateX = extremum[0] * scaleX;
         final float translateY = rect.top + extremum[3] / deltaY * rect.height();
@@ -629,7 +635,8 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
                 translate = -maxScrollOffset;
             }
         } else if (touchValues[Matrix.MTRANS_X] > 0) { // 左滑加载完成之后定位到之前滚动的位置
-            translate = touchValues[Matrix.MTRANS_X] - (maxScrollOffset - lastMaxScrollOffset) - attribute.leftScrollOffset;
+            translate =
+                    touchValues[Matrix.MTRANS_X] - (maxScrollOffset - lastMaxScrollOffset) - attribute.leftScrollOffset;
         } else if (touchValues[Matrix.MTRANS_X] < 0) {// 右滑加载完成之后定位到之前滚动的位置
             if ((int) overScrollOffset == 0) {
                 // 转动屏幕方向导致矩形变化，定位到之前相同比例的滚动位置
@@ -708,7 +715,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
             return false;
         }
         if (drawing instanceof IndexDrawing) {
-            return ((IndexDrawing<?, ?>) drawing).getIndexType() == module.getAttachIndexType();
+            return module.canRender(((IndexDrawing<?, ?>) drawing).getIndexType());
         }
         return true;
     }
@@ -770,25 +777,27 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     }
 
     /**
-     * 指标集合
+     * 获取所有模型
      */
     public LinkedHashMap<Integer, List<AbsModule<AbsEntry>>> getModules() {
         return chartModules;
     }
 
     /**
-     * 根据图表ModuleType获取对应模块
+     * 获取指定模型
      */
-    public AbsModule<AbsEntry> getModule(@ModuleType int moduleType, @ModuleGroupType int moduleGroupType) {
+    public AbsModule<?> getModule(
+            @IndexType int indexType,
+            @ModuleGroup int moduleGroupType
+    ) {
         List<AbsModule<AbsEntry>> modules = chartModules.get(moduleGroupType);
-        if (null != modules) {
-            for (AbsModule<AbsEntry> item : modules) {
-                if (item.getModuleType() == moduleType) {
-                    return item;
-                }
+        if (null == modules) return null;
+        for (AbsModule<AbsEntry> module : modules) {
+            if (module.getModuleIndexType() == indexType) {
+                return module;
             }
         }
-        return mainModule;
+        return null;
     }
 
     /**
@@ -822,9 +831,9 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     public void resetFocusModule(float x, float y) {
         if (null != focusModule && focusModule.getRect().contains(x, y)) return;
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
-            if (item.getKey() == ModuleGroupType.FLOAT) continue;
+            if (item.getKey() == ModuleGroup.FLOAT) continue;
             for (AbsModule<AbsEntry> module : item.getValue()) {
-                if (!module.isAttach()) continue;
+                if (!module.isEnable()) continue;
                 if (module.getRect().contains(x, y)) {
                     focusModule = module;
                     return;
@@ -845,7 +854,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         computeMinMax();
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
             for (AbsModule<AbsEntry> module : item.getValue()) {
-                if (!module.isAttach()) {
+                if (!module.isEnable()) {
                     continue;
                 }
                 postMatrixValue(module);
@@ -860,7 +869,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     protected void computeMinMax() {
         for (Map.Entry<Integer, List<AbsModule<AbsEntry>>> item : chartModules.entrySet()) {
             for (AbsModule<AbsEntry> module : item.getValue()) {
-                if (module.isAttach()) {
+                if (module.isEnable()) {
                     module.resetMinMax();
                     for (int i = begin; i < end; i++) {
                         module.computeMinMax(adapter.getItem(i));

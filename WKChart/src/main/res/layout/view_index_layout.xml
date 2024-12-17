@@ -78,10 +78,26 @@
         android:textColor="@color/colorTextImportant"
         android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/tv_macd"
+        app:layout_constraintBottom_toTopOf="@id/tv_volume"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_sar" />
+
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_volume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:padding="@dimen/five"
+        android:text="@string/wk_vol"
+        android:textColor="@color/color_tab_text_accent"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/tv_macd"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_auxiliary_index_label" />
 
     <com.wk.view.FontTextView
         android:id="@+id/tv_macd"
@@ -97,7 +113,7 @@
         app:layout_constraintBottom_toTopOf="@id/tv_kdj"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_auxiliary_index_label" />
+        app:layout_constraintTop_toBottomOf="@id/tv_volume" />
 
     <com.wk.view.FontTextView
         android:id="@+id/tv_kdj"

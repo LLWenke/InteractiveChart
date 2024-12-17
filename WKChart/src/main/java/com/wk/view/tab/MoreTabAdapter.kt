@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.wk.chart.databinding.ItemMoreTabBinding
-import com.wk.chart.enumeration.ModuleType
+import com.wk.chart.enumeration.IndexType
 import com.wk.chart.enumeration.TimeType
 import com.wk.view.ext.binding
 
@@ -75,10 +75,10 @@ class MoreTabAdapter(private val chartTabListener: ChartTabListener?) :
         return getItem(mRecoveryPosition)
     }
 
-    fun selectedItem(type: TimeType, @ModuleType moduleType: Int): TabTimeBean? {
+    fun selectedItem(type: TimeType, @IndexType indexType: Int): TabTimeBean? {
         for (i in mData.indices) {
             val item = mData[i]
-            if (item.moduleType == moduleType && item.tabValue == type) {
+            if (item.indexType == indexType && item.tabValue == type) {
                 itemRecovery()
                 itemSelected(i)?.let {
                     return it
@@ -93,7 +93,7 @@ class MoreTabAdapter(private val chartTabListener: ChartTabListener?) :
         v?.tag?.let {
             itemRecovery()
             itemSelected(it as Int)?.let { bean ->
-                chartTabListener?.onTimeTypeChange(bean.tabValue, bean.moduleType)
+                chartTabListener?.onTimeTypeChange(bean.tabValue, bean.indexType)
             }
         }
     }

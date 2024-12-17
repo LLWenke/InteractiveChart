@@ -9,7 +9,8 @@ import com.wk.chart.enumeration.TouchMoveType;
  * <p>横向移动、垂直移动 识别，解决滑动冲突用的</p>
  */
 
-public class GestureMoveActionCompat {
+public class GestureMoveAction {
+    private static final String TAG = "GestureMoveActionCompat";
     /**
      * 本次 ACTION_DOWN 事件的坐标 x
      */
@@ -33,7 +34,7 @@ public class GestureMoveActionCompat {
      * @return 触摸移动方向
      */
     public int getTouchMoveType(MotionEvent e, float x, float y) {
-        int touchSlop = 30;//避免程序识别错误的一个阀值。只有触摸移动的距离大于这个阀值时，才认为是一个有效的移动。
+        int touchSlop = 10;//避免程序识别错误的一个阀值。只有触摸移动的距离大于这个阀值时，才认为是一个有效的移动。
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 lastMotionY = y;

@@ -15,7 +15,7 @@ import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.ValueEntry;
 import com.wk.chart.enumeration.ExtremumVisible;
 import com.wk.chart.enumeration.PositionType;
-import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.AbsRender;
 
 /**

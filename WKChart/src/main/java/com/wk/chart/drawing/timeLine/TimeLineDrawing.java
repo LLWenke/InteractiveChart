@@ -10,16 +10,17 @@ import android.graphics.Shader;
 
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
-import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.CandleEntry;
-import com.wk.chart.module.TimeLineModule;
+import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.CandleRender;
 
 /**
  * <p>分时图组件</p>
  */
 
-public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
+public class TimeLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
     private static final String TAG = "TimeLineDrawing";
     private CandleAttribute attribute;//配置文件
     // 分时折线画笔(绘制path 尽量不开抗锯齿)
@@ -39,8 +40,12 @@ public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
     // 蜡烛图绘制的实际收首尾X轴坐标点（从首尾两根蜡烛图的中心点算起）
     private float beginX, endX = 0;
 
+    public TimeLineDrawing() {
+        super(IndexType.TIME_LINE);
+    }
+
     @Override
-    public void onInit(CandleRender render, TimeLineModule chartModule) {
+    public void onInit(CandleRender render, AbsModule<?> chartModule) {
         super.onInit(render, chartModule);
         attribute = render.getAttribute();
 
@@ -117,8 +122,15 @@ public class TimeLineDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
         super.onLayoutComplete();
         timeShaderPaint.setShader(
                 new LinearGradient(0, viewRect.top, 0, viewRect.bottom,
-                        new int[]{Utils.getColorWithAlpha(attribute.timeLineColor, attribute.shaderBeginColorAlpha)
-                                , Utils.getColorWithAlpha(attribute.timeLineColor, attribute.shaderEndColorAlpha)},
-                        null, Shader.TileMode.REPEAT));
+                        new int[]{Utils.getColorWithAlpha(
+                                attribute.timeLineColor,
+                                attribute.shaderBeginColorAlpha
+                        )
+                                , Utils.getColorWithAlpha(
+                                attribute.timeLineColor,
+                                attribute.shaderEndColorAlpha
+                        )},
+                        null, Shader.TileMode.REPEAT
+                ));
     }
 }

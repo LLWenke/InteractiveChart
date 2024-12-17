@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -15,7 +16,7 @@ import android.widget.OverScroller;
 import androidx.annotation.NonNull;
 
 import com.wk.chart.adapter.AbsAdapter;
-import com.wk.chart.compat.GestureMoveActionCompat;
+import com.wk.chart.compat.GestureMoveAction;
 import com.wk.chart.compat.attribute.AttributeRead;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.compat.attribute.CandleAttribute;
@@ -26,14 +27,14 @@ import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.ViewSizeEntry;
 import com.wk.chart.enumeration.ClickDrawingID;
 import com.wk.chart.enumeration.DelayedTaskID;
-import com.wk.chart.enumeration.ModuleGroupType;
-import com.wk.chart.enumeration.ModuleType;
+import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.enumeration.ModuleGroup;
 import com.wk.chart.enumeration.ObserverArg;
 import com.wk.chart.enumeration.RenderModel;
 import com.wk.chart.enumeration.TouchMoveType;
 import com.wk.chart.handler.DelayedHandler;
 import com.wk.chart.handler.InteractiveHandler;
-import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.AbsRender;
 import com.wk.chart.render.CandleRender;
 import com.wk.chart.render.DepthRender;
@@ -54,7 +55,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private BaseAttribute attribute = null;
     private final RectF viewRect = new RectF();
     private final ViewSizeEntry viewSizeEntry = new ViewSizeEntry();
-    private final GestureMoveActionCompat gestureCompat = new GestureMoveActionCompat();
+    private final GestureMoveAction gestureCompat = new GestureMoveAction();
     // 渲染相关的属性
     private AbsRender<? extends AbsAdapter<?, ?>, ? extends BaseAttribute> render;
     private InteractiveHandler interactiveHandler;
@@ -108,7 +109,8 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     /**
      * 手势检测器
      */
-    private final GestureDetector gestureDetector = new GestureDetector(getContext(),
+    private final GestureDetector gestureDetector = new GestureDetector(
+            getContext(),
             new GestureDetector.SimpleOnGestureListener() {
                 @Override
                 public void onLongPress(@NonNull MotionEvent e) {
@@ -138,7 +140,12 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 }
 
                 @Override
-                public boolean onScroll(@NonNull MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
+                public boolean onScroll(
+                        @NonNull MotionEvent e1,
+                        @NonNull MotionEvent e2,
+                        float distanceX,
+                        float distanceY
+                ) {
                     if (!onLongPress && !onDoubleFingerPress) {
                         cancelHighlight();
                         if (render.canScroll(distanceX)) {
@@ -153,27 +160,36 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 }
 
                 @Override
-                public boolean onFling(@NonNull MotionEvent e1, @NonNull MotionEvent e2, float velocityX, float velocityY) {
+                public boolean onFling(
+                        @NonNull MotionEvent e1,
+                        @NonNull MotionEvent e2,
+                        float velocityX,
+                        float velocityY
+                ) {
                     lastFlingX = 0;
                     int flingX = (int) (-velocityX / 1.5f);
                     if (!onLongPress && !onDoubleFingerPress && render.canScroll(flingX)) {
                         lastFlingTime = System.currentTimeMillis();
                         scroller.fling(0, 0, flingX, 0, Integer.MIN_VALUE,
-                                Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                                Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE
+                        );
                         return true;
                     } else {
                         return false;
                     }
                 }
-            });
+            }
+    );
 
     /**
      * 缩放手势处理逻辑
      */
-    private final ScaleGestureDetector scaleDetector = new ScaleGestureDetector(getContext(),
+    private final ScaleGestureDetector scaleDetector = new ScaleGestureDetector(
+            getContext(),
             new ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 @Override
                 public boolean onScale(@NonNull ScaleGestureDetector detector) {
+                    Log.e(TAG, "onScale：" + detector.getScaleFactor());
                     float scale = attribute.currentScale * detector.getScaleFactor();
                     if (scale < attribute.minScale) {
                         scale = attribute.minScale;
@@ -189,7 +205,8 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                         return false;
                     }
                 }
-            });
+            }
+    );
 
 
     public ChartView(Context context) {
@@ -205,7 +222,8 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         final TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs, R.styleable.ChartView, defStyleAttr, defStyleAttr);
         try {
-            int type = a.getInteger(R.styleable.ChartView_renderModel, RenderModel.CANDLE.ordinal());
+            int type =
+                    a.getInteger(R.styleable.ChartView_renderModel, RenderModel.CANDLE.ordinal());
             init(a, RenderModel.values()[type]);
         } catch (Exception e) {
             e.printStackTrace();
@@ -281,7 +299,12 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
             float[] highlightPoint = render.getHighlightPoint();
             if (entry != null) {
                 if (interactiveHandler != null) {
-                    interactiveHandler.onHighlight(entry, highlightIndex, highlightPoint[0], highlightPoint[1]);
+                    interactiveHandler.onHighlight(
+                            entry,
+                            highlightIndex,
+                            highlightPoint[0],
+                            highlightPoint[1]
+                    );
                 }
                 lastHighlightIndex = highlightIndex;
             }
@@ -540,12 +563,12 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (checkReadyState()) {
+            boolean doublePointer = event.getPointerCount() > 1;
             int touchMoveType = gestureCompat.getTouchMoveType(event, event.getX(), event.getY());
-            if (onLongPress || onDoubleFingerPress || touchMoveType == TouchMoveType.HORIZONTAL) {
+            if (onLongPress || onDoubleFingerPress || doublePointer || touchMoveType == TouchMoveType.HORIZONTAL) {
                 getParent().requestDisallowInterceptTouchEvent(true);
                 return super.dispatchTouchEvent(event);
             }
-            getParent().requestDisallowInterceptTouchEvent(false);
             return super.dispatchTouchEvent(event);
         }
         return false;
@@ -557,7 +580,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        boolean state = gestureDetector.onTouchEvent(e) | scaleDetector.onTouchEvent(e);
+        boolean state = scaleDetector.onTouchEvent(e) | gestureDetector.onTouchEvent(e);
         switch (e.getAction()) {
             case MotionEvent.ACTION_POINTER_DOWN:
                 onDoubleFingerPress = true;
@@ -679,14 +702,18 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     /**
      * 删除绘制组件
      *
-     * @param moduleType      模块类型
+     * @param indexType       模块指标类型
      * @param moduleGroupType 模块组
      * @param classes         组件
      */
     @SafeVarargs
-    public final int removeDrawing(@ModuleType int moduleType, @ModuleGroupType int moduleGroupType, Class<? extends AbsDrawing<?, ?>>... classes) {
+    public final int removeDrawing(
+            @IndexType int indexType,
+            @ModuleGroup int moduleGroupType,
+            Class<? extends AbsDrawing<?, ?>>... classes
+    ) {
         int removeCount = 0;
-        AbsModule<?> module = getRender().getModule(moduleType, moduleGroupType);
+        AbsModule<?> module = getRender().getModule(indexType, moduleGroupType);
         if (null == module) {
             return removeCount;
         }
@@ -723,7 +750,6 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      * @param what 延时任务唯一标识
      */
     @Override
-
     public void onDelayedWork(int what) {
         if (what == DelayedTaskID.ID_CANCEL_HIGHLIGHT) {//延时取消高亮标识
             cancelHighlight();

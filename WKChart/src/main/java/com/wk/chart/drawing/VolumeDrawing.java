@@ -6,8 +6,9 @@ import android.graphics.Path;
 
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
-import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.CandleEntry;
+import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.module.VolumeModule;
 import com.wk.chart.render.CandleRender;
 
@@ -15,7 +16,7 @@ import com.wk.chart.render.CandleRender;
  * <p>交易量组件</p>
  */
 
-public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeModule> {
+public class VolumeDrawing extends IndexDrawing<CandleRender, VolumeModule> {
     private static final String TAG = "VolumeDrawing";
     private CandleAttribute attribute;//配置文件
     // 上涨画笔
@@ -30,6 +31,10 @@ public class VolumeDrawing extends AbsDrawing<CandleRender, VolumeModule> {
     private final float[] rectBuffer = new float[4];
     //数据点矩形边框线偏移量
     private float pointBorderOffset;
+
+    public VolumeDrawing() {
+        super(IndexType.VOLUME);
+    }
 
     @Override
     public void onInit(CandleRender render, VolumeModule chartModule) {

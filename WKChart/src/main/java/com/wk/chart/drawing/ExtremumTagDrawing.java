@@ -10,9 +10,10 @@ import android.text.TextPaint;
 import com.wk.chart.compat.FontStyle;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
-import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.enumeration.ExtremumVisible;
+import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.interfaces.IDrawingClickListener;
 import com.wk.chart.module.CandleModule;
 import com.wk.chart.render.CandleRender;
@@ -21,7 +22,8 @@ import com.wk.chart.render.CandleRender;
  * <p>极值标签组件</p>
  */
 
-public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> implements IDrawingClickListener {
+public class ExtremumTagDrawing extends IndexDrawing<CandleRender, CandleModule> implements
+        IDrawingClickListener {
     private static final String TAG = "ExtremumTagDrawing";
     private CandleAttribute attribute;//配置文件
     // 当前可见区域内的极值画笔
@@ -35,7 +37,7 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> i
     private Bitmap bitmap;//极值标签drawable转换成的Bitmap
 
     public ExtremumTagDrawing(int id) {
-        super(id);
+        super(IndexType.CANDLE, id);
     }
 
     @Override
@@ -69,7 +71,8 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> i
         //文字align调整
         float left = extremumBuffer[0];
         float top = extremumBuffer[1] + extremumRect.height() / 2f;
-        float drawableLeft = left + extremumRect.width() + attribute.extremumTagDrawableMarginHorizontal;
+        float drawableLeft =
+                left + extremumRect.width() + attribute.extremumTagDrawableMarginHorizontal;
         float currentExpandWidth = 0;
         if ((attribute.extremumTagDrawableVisible & ExtremumVisible.MAX_VISIBLE) != 0) {
             currentExpandWidth = expandWidth;
@@ -83,14 +86,22 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> i
         canvas.drawText(text, left, top, extremumPaint);
         //绘制极值标签drawable
         if (null != bitmap && currentExpandWidth > 0) {
-            float drawableTop = top - drawableHeight + (drawableHeight - extremumRect.height()) / 2f;
-            maxDrawableRect.set((int) drawableLeft, (int) drawableTop, (int) (drawableLeft + drawableWidth), (int) (drawableTop + drawableHeight));
+            float drawableTop =
+                    top - drawableHeight + (drawableHeight - extremumRect.height()) / 2f;
+            maxDrawableRect.set(
+                    (int) drawableLeft,
+                    (int) drawableTop,
+                    (int) (drawableLeft + drawableWidth),
+                    (int) (drawableTop + drawableHeight)
+            );
             canvas.drawBitmap(bitmap, null, maxDrawableRect, drawablePaint);
             //增大maxDrawableRect的点击区域
-            maxDrawableRect.set((int) (maxDrawableRect.left - attribute.candleExtremumLabelSize),
+            maxDrawableRect.set(
+                    (int) (maxDrawableRect.left - attribute.candleExtremumLabelSize),
                     (int) (maxDrawableRect.top - attribute.candleExtremumLabelSize),
                     (int) (maxDrawableRect.right + attribute.candleExtremumLabelSize),
-                    (int) (maxDrawableRect.bottom + attribute.candleExtremumLabelSize));
+                    (int) (maxDrawableRect.bottom + attribute.candleExtremumLabelSize)
+            );
         }
 
         // 绘制当前显示区域的最小文字（min）
@@ -114,14 +125,22 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> i
         canvas.drawText(text, left, top, extremumPaint);
         //绘制极值标签drawable
         if (null != bitmap && currentExpandWidth > 0) {
-            float drawableTop = top - drawableHeight + (drawableHeight - extremumRect.height()) / 2f;
-            minDrawableRect.set((int) drawableLeft, (int) drawableTop, (int) (drawableLeft + drawableWidth), (int) (drawableTop + drawableHeight));
+            float drawableTop =
+                    top - drawableHeight + (drawableHeight - extremumRect.height()) / 2f;
+            minDrawableRect.set(
+                    (int) drawableLeft,
+                    (int) drawableTop,
+                    (int) (drawableLeft + drawableWidth),
+                    (int) (drawableTop + drawableHeight)
+            );
             canvas.drawBitmap(bitmap, null, minDrawableRect, drawablePaint);
             //增大minDrawableRect的点击区域
-            minDrawableRect.set((int) (minDrawableRect.left - attribute.candleExtremumLabelSize),
+            minDrawableRect.set(
+                    (int) (minDrawableRect.left - attribute.candleExtremumLabelSize),
                     (int) (minDrawableRect.top - attribute.candleExtremumLabelSize),
                     (int) (minDrawableRect.right + attribute.candleExtremumLabelSize),
-                    (int) (minDrawableRect.bottom + attribute.candleExtremumLabelSize));
+                    (int) (minDrawableRect.bottom + attribute.candleExtremumLabelSize)
+            );
         }
         canvas.restore();
     }
@@ -130,13 +149,18 @@ public class ExtremumTagDrawing extends AbsDrawing<CandleRender, CandleModule> i
     public void onLayoutComplete() {
         super.onLayoutComplete();
         if (null == bitmap) return;
-        drawableWidth = attribute.extremumTagDrawableWidth == 0 ? bitmap.getWidth() : attribute.extremumTagDrawableWidth;
-        drawableHeight = attribute.extremumTagDrawableHeight == 0 ? bitmap.getHeight() : attribute.extremumTagDrawableHeight;
+        drawableWidth =
+                attribute.extremumTagDrawableWidth == 0 ? bitmap.getWidth() : attribute.extremumTagDrawableWidth;
+        drawableHeight =
+                attribute.extremumTagDrawableHeight == 0 ? bitmap.getHeight() : attribute.extremumTagDrawableHeight;
         expandWidth = drawableWidth + attribute.extremumTagDrawableMarginHorizontal * 2f;
     }
 
     @Override
     public boolean onDrawingClick(float x, float y) {
-        return maxDrawableRect.contains((int) x, (int) y) || minDrawableRect.contains((int) x, (int) y);
+        return maxDrawableRect.contains((int) x, (int) y) || minDrawableRect.contains(
+                (int) x,
+                (int) y
+        );
     }
 }

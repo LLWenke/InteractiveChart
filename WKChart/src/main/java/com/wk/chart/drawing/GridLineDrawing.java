@@ -10,7 +10,7 @@ import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.enumeration.LineStyle;
-import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.CandleRender;
 
 /**

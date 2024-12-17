@@ -16,7 +16,6 @@ import android.os.Looper;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -29,8 +28,8 @@ import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.ChartCache;
 import com.wk.chart.enumeration.DataType;
-import com.wk.chart.enumeration.ModuleGroupType;
-import com.wk.chart.enumeration.ModuleType;
+import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.enumeration.ModuleGroup;
 import com.wk.chart.enumeration.ObserverArg;
 import com.wk.chart.enumeration.TimeType;
 import com.wk.chart.handler.InteractiveHandler;
@@ -51,6 +50,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -76,7 +76,7 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
 
     private int loadStartPos = 0;
     private int loadEndPos = 0;
-    private int loadCount = 300;
+    private final int loadCount = 300;
     private CandleAdapter candleAdapter;
     private DepthAdapter depthAdapter;
 
@@ -199,11 +199,10 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
         }
         this.depthChart.setAdapter(depthAdapter);
         if (null == candleAdapter) {
-            this.candleAdapter = new CandleAdapter(new IndexBuildConfig(IndexManager.INSTANCE.getIndexConfigs(this)));
+            this.candleAdapter =
+                    new CandleAdapter(new IndexBuildConfig(IndexManager.INSTANCE.getIndexConfigs(
+                            this)));
             this.candleAdapter.setScale(4, 4);
-        }
-        if (dataShowType == DataType.REAL_TIME.ordinal()) {
-            this.chartLayout.setDataDisplayType(DataType.REAL_TIME);
         }
         this.candleAdapter.addDataChangeSupport(propertyChangeListener);
         this.candleChart.setAdapter(candleAdapter);
@@ -216,7 +215,7 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
                 candleChart.postDelayed(() -> {
                     List<CandleEntry> entries = getHeader();
                     candleAdapter.addHeaderData(entries);
-                    if (entries.size() == 0) {
+                    if (entries.isEmpty()) {
                         Toast.makeText(ChartActivity.this, "已经到达最左边了", LENGTH_SHORT).show();
                     }
                     chartLayout.loadComplete(candleProgressBar);
@@ -230,13 +229,16 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
                 candleChart.postDelayed(() -> {
                     List<CandleEntry> entries = getFooter();
                     candleAdapter.addFooterData(entries);
-                    if (entries.size() == 0) {
+                    if (entries.isEmpty()) {
                         Toast.makeText(ChartActivity.this, "已经到达最右边了", LENGTH_SHORT).show();
                     }
                     chartLayout.loadComplete(candleProgressBar);
                 }, 2000);
             }
         });
+        if (dataShowType == DataType.REAL_TIME.ordinal()) {
+            this.chartLayout.setDataDisplayType(DataType.REAL_TIME);
+        }
     }
 
     @Override
@@ -254,13 +256,25 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
     private void recoveryChartState() {
         if (null == mChartCache) {
             TimeType timeType = TimeType.DAY;
-            chartTabLayout.selectedDefaultTimeType(timeType, ModuleType.CANDLE);
-            chartTabLayout.selectedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.MAIN), ModuleGroupType.MAIN);
-            chartTabLayout.selectedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.INDEX), ModuleGroupType.INDEX);
+            chartTabLayout.selectedDefaultTimeType(timeType, IndexType.CANDLE);
+            chartTabLayout.selectedDefaultIndexType(
+                    ModuleGroup.MAIN,
+                    buildIndexTypeSet(IndexType.CANDLE_MA)
+            );
+            chartTabLayout.selectedDefaultIndexType(
+                    ModuleGroup.INDEX,
+                    buildIndexTypeSet(IndexType.VOLUME)
+            );
             if (null != chartIndexTabLayout) {
-                chartIndexTabLayout.selectedDefaultIndexType(chartLayout.getNowIndexType(ModuleGroupType.INDEX), ModuleGroupType.INDEX);
+                chartIndexTabLayout.selectedDefaultIndexType(
+                        ModuleGroup.INDEX,
+                        buildIndexTypeSet(IndexType.VOLUME)
+                );
             }
-            switchTimeType(timeType, ModuleType.CANDLE);
+            switchTimeType(timeType, IndexType.CANDLE);
+            if (chartLayout.moduleEnable(ModuleGroup.INDEX, IndexType.VOLUME)) {
+                candleChart.onViewInit();
+            }
         } else {
             chartLayout.loadChartCache(mChartCache);
         }
@@ -278,14 +292,14 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
      *
      * @param timeType 类型
      */
-    private void switchTimeType(TimeType timeType, @ModuleType int moduleType) {
+    private void switchTimeType(TimeType timeType, int indexType) {
         chartLayout.loadBegin(REFRESH_LOADING, candleProgressBar, candleChart);
         candleAdapter.setData(timeType, dataShowType == DataType.REAL_TIME.ordinal() ?
                 getNewestData(loadCount) : getInit());
         if (depthAdapter.getCount() == 0) {
             depthAdapter.resetData(depthEntries);
         }
-        if (chartLayout.switchModuleType(moduleType, ModuleGroupType.MAIN)) {
+        if (chartLayout.moduleEnable(ModuleGroup.MAIN, indexType)) {
             candleChart.onViewInit();
         }
     }
@@ -349,21 +363,30 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
     }
 
     @Override
-    public void onLoadCacheTypes(@Nullable TimeType timeType, boolean isNeedLoadData, @NonNull Map<Integer, ChartCache.TypeEntry> typeMap) {
-        int mainModuleType = ModuleType.CANDLE;
-        for (Map.Entry<Integer, ChartCache.TypeEntry> types : typeMap.entrySet()) {
-            if (types.getKey() == ModuleGroupType.MAIN) {
-                mainModuleType = types.getValue().getModuleType();
+    public void onLoadCacheTypes(
+            @Nullable TimeType timeType,
+            boolean isNeedLoadData,
+            @NotNull Map<Integer, List<ChartCache.TypeEntry>> typeMap
+    ) {
+        int mainModuleIndexType = IndexType.CANDLE;
+        for (Map.Entry<Integer, List<ChartCache.TypeEntry>> types : typeMap.entrySet()) {
+            HashSet<Integer> indexTypeSet = new HashSet<>();
+            for (ChartCache.TypeEntry entry : types.getValue()) {
+                indexTypeSet.add(entry.getModuleIndexType());
+                indexTypeSet.addAll(entry.getAttachTypeSet());
+                if (types.getKey() == ModuleGroup.MAIN) {
+                    mainModuleIndexType = entry.getModuleIndexType();
+                }
             }
-            chartTabLayout.selectedDefaultIndexType(types.getValue().getIndexType(), types.getKey());
+            chartTabLayout.selectedDefaultIndexType(types.getKey(), indexTypeSet);
             if (null != chartIndexTabLayout) {
-                chartIndexTabLayout.selectedDefaultIndexType(types.getValue().getIndexType(), types.getKey());
+                chartIndexTabLayout.selectedDefaultIndexType(types.getKey(), indexTypeSet);
             }
         }
         timeType = null == timeType ? TimeType.FIFTEEN_MINUTE : timeType;
-        chartTabLayout.selectedDefaultTimeType(timeType, mainModuleType);
+        chartTabLayout.selectedDefaultTimeType(timeType, mainModuleIndexType);
         if (isNeedLoadData) {
-            onTimeTypeChange(timeType, mainModuleType);
+            onTimeTypeChange(timeType, mainModuleIndexType);
         }
     }
 
@@ -373,14 +396,34 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
     }
 
     @Override
-    public void onTimeTypeChange(@NotNull TimeType type, int moduleType) {
-        switchTimeType(type, moduleType);
+    public void onTimeTypeChange(@NotNull TimeType type, int indexType) {
+        switchTimeType(type, indexType);
     }
 
+    @Nullable
     @Override
-    public void onIndexTypeChange(int indexType, int moduleGroupType) {
-        chartLayout.switchIndexType(indexType, moduleGroupType);
-        candleChart.onViewInit();
+    public HashSet<Integer> onAttachIndexTypeChange(int moduleGroupType, int indexType) {
+        if (chartLayout.moduleAttachIndexReset(
+                moduleGroupType,
+                IndexType.CANDLE,
+                buildIndexTypeSet(indexType)
+        )) {
+            candleChart.onViewInit();
+        }
+        return chartLayout.getEnableModuleAttachIndexTypeSet(moduleGroupType);
+    }
+
+    @Nullable
+    @Override
+    public HashSet<Integer> onModuleIndexTypeChange(
+            int moduleGroupType,
+            int indexType,
+            boolean state
+    ) {
+        if (chartLayout.moduleEnable(moduleGroupType, indexType, state)) {
+            candleChart.onViewInit();
+        }
+        return chartLayout.getEnableModuleIndexTypeSet(moduleGroupType);
     }
 
     @Override
@@ -394,7 +437,14 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
 
     @Override
     public void onSetting() {
-        IndexManager.INSTANCE.setIndexBuildConfig(candleAdapter.getBuildConfig().getDefaultIndexConfig());
+        IndexManager.INSTANCE.setIndexBuildConfig(candleAdapter.getBuildConfig()
+                .getDefaultIndexConfig());
         startActivityForResult(new Intent(this, IndexSettingActivity.class), 999);
+    }
+
+    private HashSet<Integer> buildIndexTypeSet(@IndexType int indexType) {
+        HashSet<Integer> set = new HashSet<>(1);
+        set.add(indexType);
+        return set;
     }
 }

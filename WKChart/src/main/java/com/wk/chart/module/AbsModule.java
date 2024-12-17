@@ -1,5 +1,4 @@
-
-package com.wk.chart.module.base;
+package com.wk.chart.module;
 
 import android.graphics.Matrix;
 import android.graphics.RectF;
@@ -9,13 +8,13 @@ import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.ValueEntry;
 import com.wk.chart.enumeration.ClickDrawingID;
 import com.wk.chart.enumeration.IndexType;
-import com.wk.chart.enumeration.ModuleGroupType;
-import com.wk.chart.enumeration.ModuleType;
+import com.wk.chart.enumeration.ModuleGroup;
 import com.wk.chart.interfaces.IDrawingClickListener;
 import com.wk.chart.render.AbsRender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * <p>组件base类</p>
@@ -24,7 +23,8 @@ import java.util.Arrays;
 public abstract class AbsModule<T extends AbsEntry> {
     private final Matrix matrix = new Matrix(); // 把值映射到屏幕像素的矩阵
 
-    private final ArrayList<AbsDrawing<AbsRender<?, ?>, AbsModule<?>>> drawingList = new ArrayList<>();
+    private final ArrayList<AbsDrawing<AbsRender<?, ?>, AbsModule<?>>> drawingList =
+            new ArrayList<>();
 
     protected final ValueEntry maxEntry; //最大值
 
@@ -40,16 +40,13 @@ public abstract class AbsModule<T extends AbsEntry> {
 
     protected float[] rectBuffer;//数据点的矩形坐标点
 
-    private boolean enable = false;
+    private boolean enable = false;//模块状态
 
-    @ModuleType
-    private final int moduleType;//模块类型
-
+    private HashSet<Integer> attachIndexSet;//附加指标集
     @IndexType
-    private int attachIndexType;//附加指标类型
-
-    @ModuleGroupType
-    private int moduleGroup;//指标类型分组
+    private final int moduleIndexType;//模型指标类型F
+    @ModuleGroup
+    private int moduleGroup;//模型分组
 
     private ValueEntry maxY;// Y 轴上指标的最大值
 
@@ -67,10 +64,10 @@ public abstract class AbsModule<T extends AbsEntry> {
     private float xOffset, yOffset;// X,Y 轴实际偏移数值（用于修正折线偏移后被影响的数值）
     private float width = 0f, height = 0f;// 宽，高
 
-    protected AbsModule(@ModuleType int moduleType, @ModuleGroupType int moduleGroupType) {
-        this.moduleType = moduleType;
+    protected AbsModule(@ModuleGroup int moduleGroupType, @IndexType int moduleIndexType) {
         this.moduleGroup = moduleGroupType;
-        this.attachIndexType = IndexType.NONE;
+        this.moduleIndexType = moduleIndexType;
+        this.attachIndexSet = new HashSet<>();
         this.maxEntry = new ValueEntry();
         this.minEntry = new ValueEntry();
         this.zeroEntry = new ValueEntry();
@@ -196,31 +193,34 @@ public abstract class AbsModule<T extends AbsEntry> {
         return enable;
     }
 
-    public boolean isAttach() {
-        return enable && (moduleType != ModuleType.MUTATION || attachIndexType != IndexType.NONE);
+    public void setAttachIndexSet(HashSet<Integer> attachIndexSet) {
+        this.attachIndexSet = null == attachIndexSet ? new HashSet<>() : attachIndexSet;
+    }
+
+    public HashSet<Integer> getAttachIndexSet() {
+        return attachIndexSet;
+    }
+
+    public void addAttachIndex(@IndexType int attachIndexType) {
+        this.attachIndexSet.add(attachIndexType);
+    }
+
+    public void removeAttachIndex(@IndexType int attachIndexType) {
+        this.attachIndexSet.remove(attachIndexType);
+    }
+
+    public boolean canRender(@IndexType int indexType) {
+        return moduleIndexType == indexType || attachIndexSet.contains(indexType);
     }
 
     @IndexType
-    public int getAttachIndexType() {
-        return attachIndexType;
+    public int getModuleIndexType() {
+        return moduleIndexType;
     }
 
-    public void setAttachIndexType(@IndexType int attachIndexType) {
-        this.attachIndexType = attachIndexType;
-    }
-
-    @ModuleType
-    public int getModuleType() {
-        return moduleType;
-    }
-
-    @ModuleGroupType
+    @ModuleGroup
     public int getModuleGroup() {
         return moduleGroup;
-    }
-
-    public void setModuleGroup(@ModuleGroupType int moduleGroup) {
-        this.moduleGroup = moduleGroup;
     }
 
     public void setEnable(boolean enable) {
@@ -346,15 +346,18 @@ public abstract class AbsModule<T extends AbsEntry> {
      * @return (返回响应事件的元素ID)
      */
     public int onClick(float x, float y) {
-        if (!isAttach() || !getRect().contains(x, y)) {
+        if (!isEnable() || !getRect().contains(x, y)) {
             return ClickDrawingID.ID_NONE;
         }
         for (AbsDrawing<AbsRender<?, ?>, AbsModule<?>> drawing : getDrawingList()) {
-            if (drawing instanceof IDrawingClickListener
-                    && ((IDrawingClickListener) drawing).onDrawingClick(x, y)) {
+            if (drawing instanceof IDrawingClickListener && ((IDrawingClickListener) drawing).onDrawingClick(
+                    x,
+                    y
+            )) {
                 return drawing.getId();
             }
         }
         return ClickDrawingID.ID_NONE;
     }
+
 }

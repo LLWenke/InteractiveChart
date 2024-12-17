@@ -11,8 +11,9 @@ import android.graphics.Shader;
 import com.wk.chart.adapter.DepthAdapter;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.DepthAttribute;
-import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.DepthEntry;
+import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.module.DepthModule;
 import com.wk.chart.render.DepthRender;
 
@@ -20,7 +21,7 @@ import com.wk.chart.render.DepthRender;
  * <p>深度图组件</p>
  */
 
-public class DepthDrawing extends AbsDrawing<DepthRender, DepthModule> {
+public class DepthDrawing extends IndexDrawing<DepthRender, DepthModule> {
     private static final String TAG = "DepthDrawing";
     private DepthAttribute attribute;//配置文件
     // 买单折线画笔(绘制path 尽量不开抗锯齿)
@@ -45,6 +46,10 @@ public class DepthDrawing extends AbsDrawing<DepthRender, DepthModule> {
     private float left, right;
     //用于修正折线偏移量
     private float offset;
+
+    public DepthDrawing() {
+        super(IndexType.DEPTH);
+    }
 
     @Override
     public void onInit(DepthRender render, DepthModule chartModule) {

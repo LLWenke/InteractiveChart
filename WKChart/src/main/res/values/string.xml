@@ -14,6 +14,7 @@
 
     <string name="app_name">WKChart</string>
     <string name="wk_indicators">指标</string>
+    <string name="wk_vol">Volume</string>
     <string name="wk_macd">MACD</string>
     <string name="wk_rsi">RSI</string>
     <string name="wk_kdj">KDJ</string>

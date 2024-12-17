@@ -134,9 +134,27 @@
         tools:ignore="ContentDescription" />
 
     <com.wk.view.FontTextView
+        android:id="@+id/tv_volume"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_tab_selector"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="@string/wk_vol"
+        android:textColor="@color/color_tab_text"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/tv_macd"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="@id/tv_main_index_label"
+        app:layout_constraintTop_toBottomOf="@id/tv_auxiliary_index_label" />
+
+    <com.wk.view.FontTextView
         android:id="@+id/tv_macd"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/bg_tab_selector"
         android:gravity="center"
@@ -147,7 +165,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@id/tv_kdj"
         app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="@id/tv_main_index_label"
+        app:layout_constraintStart_toEndOf="@id/tv_volume"
         app:layout_constraintTop_toBottomOf="@id/tv_auxiliary_index_label" />
 
     <com.wk.view.FontTextView

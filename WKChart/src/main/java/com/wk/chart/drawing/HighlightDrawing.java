@@ -1,4 +1,3 @@
-
 package com.wk.chart.drawing;
 
 
@@ -16,8 +15,8 @@ import com.wk.chart.drawing.child.GridTextMarker;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.enumeration.HighLightStyle;
-import com.wk.chart.enumeration.ModuleType;
-import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.CandleRender;
 
 /**
@@ -93,32 +92,35 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntr
         float highlightY = render.getHighlightPoint()[1];
         CandleEntry entry = render.getAdapter().getItem(render.getAdapter().getHighlightIndex());
         //获取当前焦点区域内的图表模型
-        AbsModule<AbsEntry> focusModule = attribute.axisHighlightLabelAutoSelect ? render.getFocusModule() : render.getMainModule();
+        AbsModule<AbsEntry> focusModule =
+                attribute.axisHighlightLabelAutoSelect ? render.getFocusModule() : render.getMainModule();
         //获取高亮点的值
-        switch (focusModule.getModuleType()) {
-            case ModuleType.CANDLE://k线图 指标
-            case ModuleType.TIME://分时图 指标
+        switch (focusModule.getModuleIndexType()) {
+            case IndexType.CANDLE://k线图 指标
+            case IndexType.TIME_LINE://分时图 指标
                 highlightPoint[1] = entry.getClose().value;
                 render.mapPoints(focusModule.getMatrix(), highlightPoint);
                 axisMarkerText = render.getAdapter().rateConversion(entry.getClose(), false, false);
                 isReverseMarker = false;
                 break;
-            case ModuleType.VOLUME://交易量 指标
+            case IndexType.VOLUME://交易量 指标
                 highlightPoint[1] = entry.getVolume().value;
                 render.mapPoints(focusModule.getMatrix(), highlightPoint);
-                axisMarkerText = render.getAdapter().quantizationConversion(entry.getVolume(), true);
-                isReverseMarker = true;
-                break;
-            case ModuleType.MUTATION:  // 指标
-                highlightPoint[1] = highlightY;
-                render.invertMapPoints(focusModule.getMatrix(), highlightPoint);
-                axisMarkerText = render.getAdapter().rateConversion(highlightPoint[1],
-                        render.getAdapter().getScale().getQuoteScale(), false, false);
-                highlightPoint[1] = highlightY;
+                axisMarkerText =
+                        render.getAdapter().quantizationConversion(entry.getVolume(), true);
                 isReverseMarker = true;
                 break;
             default:
-                return;
+                highlightPoint[1] = highlightY;
+                render.invertMapPoints(focusModule.getMatrix(), highlightPoint);
+                axisMarkerText = render.getAdapter().rateConversion(highlightPoint[1],
+                        render.getAdapter().getScale().getQuoteScale(),
+                        false,
+                        false
+                );
+                highlightPoint[1] = highlightY;
+                isReverseMarker = true;
+                break;
         }
 
         gridMarkerText = entry.getTimeText();
@@ -130,8 +132,13 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntr
             left = rect.left;
             right = rect.right;
         } else {
-            axisMarkerBuffer = axisTextMarker.onMeasureChildView(rect, drawingNonOverlapMargin,
-                    highlightPoint[0], highlightPoint[1], axisMarkerText, isReverseMarker);
+            axisMarkerBuffer = axisTextMarker.onMeasureChildView(rect,
+                    drawingNonOverlapMargin,
+                    highlightPoint[0],
+                    highlightPoint[1],
+                    axisMarkerText,
+                    isReverseMarker
+            );
             if (axisMarkerBuffer[0] < (rect.left + rect.width() / 2f)) {
                 left = axisMarkerBuffer[2];
                 right = rect.right;
@@ -147,8 +154,13 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntr
             top = rect.top;
             bottom = rect.bottom;
         } else {
-            gridMarkerBuffer = gridTextMarker.onMeasureChildView(rect, drawingNonOverlapMargin,
-                    highlightPoint[0], highlightPoint[1], gridMarkerText, true);
+            gridMarkerBuffer = gridTextMarker.onMeasureChildView(rect,
+                    drawingNonOverlapMargin,
+                    highlightPoint[0],
+                    highlightPoint[1],
+                    gridMarkerText,
+                    true
+            );
             if (gridMarkerBuffer[1] < (rect.top + rect.height() / 2f)) {
                 top = gridMarkerBuffer[3];
                 bottom = rect.bottom;

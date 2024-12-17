@@ -4,25 +4,21 @@ import androidx.annotation.NonNull;
 
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.ValueEntry;
+import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.MarkerPointType;
-import com.wk.chart.enumeration.ModuleType;
+import com.wk.chart.enumeration.ModuleGroup;
 import com.wk.chart.interfaces.IMarkerPoint;
-import com.wk.chart.module.base.MainModule;
 import com.wk.chart.render.AbsRender;
 
 /**
  * <p>蜡烛图模块</p>
  */
 
-public class CandleModule extends MainModule<CandleEntry> implements IMarkerPoint {
+public class CandleModule extends AbsModule<CandleEntry> implements IMarkerPoint {
     private int markerPointCount;//标签数量
 
     public CandleModule() {
-        super(ModuleType.CANDLE);
-    }
-
-    public CandleModule(@ModuleType int moduleType) {
-        super(moduleType);
+        super(ModuleGroup.MAIN, IndexType.CANDLE);
     }
 
     @Override
@@ -31,8 +27,11 @@ public class CandleModule extends MainModule<CandleEntry> implements IMarkerPoin
         setMinY(entry.getLow());
         //计算最大值
         setMaxY(entry.getHigh());
-        computeIndexMinMax(entry.getIndex(getAttachIndexType()));
-        computeIndexMinMax(entry.getLineIndex(getAttachIndexType()));
+        //计算指标最大最小值
+        for (Integer index : getAttachIndexSet()) {
+            computeIndexMinMax(entry.getIndex(index));
+            computeIndexMinMax(entry.getLineIndex(index));
+        }
         //计算标签数量
         if (entry.getMarkerPointType() != MarkerPointType.NORMAL) {
             this.markerPointCount++;
@@ -42,9 +41,7 @@ public class CandleModule extends MainModule<CandleEntry> implements IMarkerPoin
     private void computeIndexMinMax(ValueEntry[] values) {
         if (null == values) return;
         for (ValueEntry item : values) {
-            if (null == item) {
-                continue;
-            }
+            if (null == item) continue;
             //计算最小值
             setMinY(item);
             //计算最大值
