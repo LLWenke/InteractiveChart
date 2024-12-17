@@ -2,17 +2,17 @@ package com.wk.chart.module;
 
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.ValueEntry;
-import com.wk.chart.enumeration.ModuleType;
-import com.wk.chart.module.base.AuxiliaryModule;
+import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.enumeration.ModuleGroup;
 
 /**
  * <p>交易量模块</p>
  */
 
-public class VolumeModule extends AuxiliaryModule<CandleEntry> {
+public class VolumeModule extends AbsModule<CandleEntry> {
 
     public VolumeModule() {
-        super(ModuleType.VOLUME);
+        super(ModuleGroup.INDEX, IndexType.VOLUME);
     }
 
     @Override
@@ -21,8 +21,11 @@ public class VolumeModule extends AuxiliaryModule<CandleEntry> {
         setMinY(entry.getVolume());
         //计算最大值
         setMaxY(entry.getVolume());
-        computeIndexMinMax(entry.getIndex(getAttachIndexType()));
-        computeIndexMinMax(entry.getLineIndex(getAttachIndexType()));
+        //计算指标最大最小值
+        for (Integer index : getAttachIndexSet()) {
+            computeIndexMinMax(entry.getIndex(index));
+            computeIndexMinMax(entry.getLineIndex(index));
+        }
     }
 
     private void computeIndexMinMax(ValueEntry[] values) {

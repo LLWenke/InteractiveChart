@@ -1,4 +1,4 @@
-package com.wk.chart.drawing;
+package com.wk.chart.drawing.timeLine;
 
 
 import android.graphics.Canvas;
@@ -9,15 +9,16 @@ import android.graphics.Shader;
 import com.wk.chart.adapter.CandleAdapter;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.CandleAttribute;
-import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.CandleEntry;
-import com.wk.chart.module.TimeLineModule;
+import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.CandleRender;
 
 /**
  * <p>呼吸灯组件</p>
  */
-public class BreathingLampDrawing extends AbsDrawing<CandleRender, TimeLineModule> {
+public class BreathingLampDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
     private CandleAttribute attribute;//配置文件
     private final Paint lampPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final int[] lampShaderColor = new int[4];
@@ -26,8 +27,12 @@ public class BreathingLampDrawing extends AbsDrawing<CandleRender, TimeLineModul
     private float shaderSize, breathingLampSize;
     private long time = 0;
 
+    public BreathingLampDrawing() {
+        super(IndexType.TIME_LINE);
+    }
+
     @Override
-    public void onInit(CandleRender render, TimeLineModule chartModule) {
+    public void onInit(CandleRender render, AbsModule<?> chartModule) {
         super.onInit(render, chartModule);
         this.attribute = render.getAttribute();
         lampPaint.setStyle(Paint.Style.FILL);

@@ -11,6 +11,10 @@ import java.lang.annotation.RetentionPolicy;
  */
 @IntDef({
         IndexType.NONE,
+        IndexType.CANDLE,
+        IndexType.TIME_LINE,
+        IndexType.VOLUME,
+        IndexType.DEPTH,
         IndexType.MACD,
         IndexType.KDJ,
         IndexType.RSI,
@@ -25,6 +29,14 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.SOURCE)
 public @interface IndexType {
     int NONE = -1;//无指标
+
+    int CANDLE = 1;//蜡烛图 指标
+
+    int TIME_LINE = 2;//分时图 指标
+
+    int VOLUME = 3;//交易量 指标
+
+    int DEPTH = 4;//深度图 指标
 
     int MACD = 5;//MACD 指标
 

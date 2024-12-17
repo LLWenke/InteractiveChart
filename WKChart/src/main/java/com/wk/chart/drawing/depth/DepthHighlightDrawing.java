@@ -10,20 +10,21 @@ import android.graphics.RectF;
 import com.wk.chart.adapter.DepthAdapter;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.DepthAttribute;
-import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.drawing.child.AxisTextMarker;
 import com.wk.chart.drawing.child.GridTextMarker;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.DepthEntry;
 import com.wk.chart.enumeration.HighLightStyle;
-import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.DepthRender;
 
 /**
  * <p>深度图高亮组件</p>
  */
 
-public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry>> {
+public class DepthHighlightDrawing extends IndexDrawing<DepthRender, AbsModule<AbsEntry>> {
     private static final String TAG = "DepthHighlightDrawing";
     private DepthAttribute attribute;//配置文件
     private final AxisTextMarker axisTextMarker;//axis标签
@@ -36,6 +37,7 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<Abs
     private final float[] highlightPoint = new float[2];//高亮线条x，y
 
     public DepthHighlightDrawing(AxisTextMarker axisTextMarker, GridTextMarker gridTextMarker) {
+        super(IndexType.DEPTH);
         this.axisTextMarker = axisTextMarker;
         this.gridTextMarker = gridTextMarker;
     }
@@ -109,7 +111,8 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<Abs
         float highlightX = render.getHighlightPoint()[0];
         DepthEntry entry = render.getAdapter().getItem(render.getAdapter().getHighlightIndex());
         //获取当前焦点区域内的图表模型
-        AbsModule<AbsEntry> focusModule = attribute.axisHighlightLabelAutoSelect ? render.getFocusModule() : render.getMainModule();
+        AbsModule<AbsEntry> focusModule =
+                attribute.axisHighlightLabelAutoSelect ? render.getFocusModule() : render.getMainModule();
         //区分区域
         if (entry.getType() == DepthAdapter.BID) {
             circlePant = bidCirclePaint;
@@ -131,7 +134,8 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<Abs
             right = rect.right;
         } else {
             axisMarkerBuffer = axisTextMarker.onMeasureChildView(rect, drawingNonOverlapMargin,
-                    highlightPoint[0], highlightPoint[1], axisMarkerText, true);
+                    highlightPoint[0], highlightPoint[1], axisMarkerText, true
+            );
             if (axisMarkerBuffer[0] < (rect.left + rect.width() / 2f)) {
                 left = axisMarkerBuffer[2];
                 right = rect.right;
@@ -148,7 +152,8 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<Abs
             bottom = rect.bottom;
         } else {
             gridMarkerBuffer = gridTextMarker.onMeasureChildView(rect, drawingNonOverlapMargin,
-                    highlightPoint[0], highlightPoint[1], gridMarkerText, true);
+                    highlightPoint[0], highlightPoint[1], gridMarkerText, true
+            );
             if (gridMarkerBuffer[1] < (rect.top + rect.height() / 2f)) {
                 top = gridMarkerBuffer[3];
                 bottom = rect.bottom;
@@ -175,7 +180,8 @@ public class DepthHighlightDrawing extends AbsDrawing<DepthRender, AbsModule<Abs
         }
         //绘制圆点
         canvas.drawCircle(render.getHighlightPoint()[0], render.getHighlightPoint()[1],
-                attribute.circleSize / 2f, circlePant);
+                attribute.circleSize / 2f, circlePant
+        );
         //绘制标签
         if (null != axisTextMarker) {
             axisTextMarker.onChildViewDraw(canvas, axisMarkerText);

@@ -7,13 +7,15 @@ import com.wk.chart.compat.config.IndexBuildConfig
 import com.wk.chart.entry.IndexConfigEntry
 import com.wk.chart.enumeration.IndexType
 import com.wk.view.unit.Preferences
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.lang.ref.SoftReference
 
 
 object IndexManager {
-    private const val KEY_MAIN_INDEX = "main_index"
-    private const val KEY_TREND_INDEX = "trend_index"
     private const val KEY_CHART_INDEX_CONFIG = "chart_index_config"
     private var mDefaultIndexConfigs: LinkedHashMap<Int, IndexConfigEntry>? = null
     private var mIndexConfigs: LinkedHashMap<Int, IndexConfigEntry>? = null
@@ -128,34 +130,6 @@ object IndexManager {
                 break
             }
         }
-    }
-
-    /**
-     * 缓存主图指标
-     */
-    fun cacheMainIndex(context: Context, @IndexType indexType: Int) {
-        Preferences.saveInt(context, KEY_MAIN_INDEX, indexType)
-    }
-
-    /**
-     * 缓存趋势指标
-     */
-    fun cacheTrendIndex(context: Context, @IndexType indexType: Int) {
-        Preferences.saveInt(context, KEY_TREND_INDEX, indexType)
-    }
-
-    /**
-     * 获取缓存的主图指标
-     */
-    fun getCacheMainIndex(context: Context): Int {
-        return Preferences.getInt(context, KEY_MAIN_INDEX, IndexType.NONE)
-    }
-
-    /**
-     * 获取缓存趋势指标
-     */
-    fun getCacheTrendIndex(context: Context): Int {
-        return Preferences.getInt(context, KEY_TREND_INDEX, IndexType.NONE)
     }
 
     interface IndexConfigChangeListener {

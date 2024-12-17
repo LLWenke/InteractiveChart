@@ -9,8 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.wk.chart.R
 import com.wk.chart.databinding.ViewTabLayoutBinding
 import com.wk.chart.enumeration.IndexType
-import com.wk.chart.enumeration.ModuleGroupType
-import com.wk.chart.enumeration.ModuleType
+import com.wk.chart.enumeration.ModuleGroup
 import com.wk.chart.enumeration.TimeType
 import com.wk.view.ext.binding
 
@@ -124,7 +123,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_time_line),
                         TimeType.ONE_MINUTE,
-                        ModuleType.TIME,
+                        IndexType.TIME_LINE,
                         false
                     )
                 )
@@ -132,7 +131,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_15m),
                         TimeType.FIFTEEN_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -140,7 +139,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_4h),
                         TimeType.FOUR_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -148,7 +147,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_day),
                         TimeType.DAY,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -158,7 +157,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_1m),
                         TimeType.ONE_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -166,7 +165,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_5m),
                         TimeType.FIVE_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -174,7 +173,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_30m),
                         TimeType.THIRTY_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -182,7 +181,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_1h),
                         TimeType.ONE_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -190,7 +189,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_2h),
                         TimeType.TWO_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -198,7 +197,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_8h),
                         TimeType.EIGHT_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -206,7 +205,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_week),
                         TimeType.WEEK,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -214,7 +213,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_month),
                         TimeType.MONTH,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -227,7 +226,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_time_line),
                         TimeType.ONE_MINUTE,
-                        ModuleType.TIME,
+                        IndexType.TIME_LINE,
                         false
                     )
                 )
@@ -235,7 +234,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_15m),
                         TimeType.FIFTEEN_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -243,7 +242,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_4h),
                         TimeType.FOUR_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -251,7 +250,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_day),
                         TimeType.DAY,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -261,7 +260,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_1m),
                         TimeType.ONE_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -269,7 +268,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_5m),
                         TimeType.FIVE_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -277,7 +276,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_30m),
                         TimeType.THIRTY_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -285,7 +284,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_1h),
                         TimeType.ONE_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -293,7 +292,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_2h),
                         TimeType.TWO_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -301,7 +300,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_8h),
                         TimeType.EIGHT_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -309,7 +308,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_week),
                         TimeType.WEEK,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -317,7 +316,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_month),
                         TimeType.MONTH,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -332,7 +331,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_time_line),
                         TimeType.ONE_MINUTE,
-                        ModuleType.TIME,
+                        IndexType.TIME_LINE,
                         false
                     )
                 )
@@ -340,7 +339,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_15m),
                         TimeType.FIFTEEN_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -348,7 +347,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_4h),
                         TimeType.FOUR_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -356,7 +355,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_day),
                         TimeType.DAY,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -366,7 +365,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_1m),
                         TimeType.ONE_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -374,7 +373,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_5m),
                         TimeType.FIVE_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -382,7 +381,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_30m),
                         TimeType.THIRTY_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -390,7 +389,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_1h),
                         TimeType.ONE_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -398,7 +397,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_2h),
                         TimeType.TWO_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -406,7 +405,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_6h),
                         TimeType.SIX_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -414,7 +413,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_12h),
                         TimeType.TWELVE_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -422,7 +421,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_week),
                         TimeType.WEEK,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -435,7 +434,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_time_line),
                         TimeType.ONE_MINUTE,
-                        ModuleType.TIME,
+                        IndexType.TIME_LINE,
                         false
                     )
                 )
@@ -443,7 +442,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_15m),
                         TimeType.FIFTEEN_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -451,7 +450,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_4h),
                         TimeType.FOUR_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -459,7 +458,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_day),
                         TimeType.DAY,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -469,7 +468,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_1m),
                         TimeType.ONE_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -477,7 +476,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_5m),
                         TimeType.FIVE_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -485,7 +484,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_30m),
                         TimeType.THIRTY_MINUTE,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -493,7 +492,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_1h),
                         TimeType.ONE_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -501,7 +500,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_2h),
                         TimeType.TWO_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -509,7 +508,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_8h),
                         TimeType.EIGHT_HOUR,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -517,7 +516,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_week),
                         TimeType.WEEK,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -525,7 +524,7 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
                     TabTimeBean(
                         context.getString(R.string.wk_month),
                         TimeType.MONTH,
-                        ModuleType.CANDLE,
+                        IndexType.CANDLE,
                         false
                     )
                 )
@@ -540,12 +539,13 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
             R.id.tv_1,
             R.id.tv_2,
             R.id.tv_3,
-            R.id.tv_4 -> {
+            R.id.tv_4,
+                -> {
                 v.tag?.toString()?.toIntOrNull()?.let {
                     tabRecovery()
                     tabMoreRecovery()
                     tabSelected(it)?.let { bean ->
-                        onTimeTypeChange(bean.tabValue, bean.moduleType)
+                        onTimeTypeChange(bean.tabValue, bean.indexType)
                     }
                 }
             }
@@ -664,18 +664,26 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
         mChartTabListener = chartTabListener
     }
 
-    override fun onTimeTypeChange(type: TimeType, @ModuleType moduleType: Int) {
+    override fun onTimeTypeChange(type: TimeType, @IndexType indexType: Int) {
         mMorePopupWindow?.getSelectedItem()?.let {
             tabMoreSelected(it)
         }
-        mChartTabListener?.onTimeTypeChange(type, moduleType)
+        mChartTabListener?.onTimeTypeChange(type, indexType)
     }
 
-    override fun onIndexTypeChange(
-        @IndexType indexType: Int,
-        @ModuleGroupType moduleGroupType: Int
-    ) {
-        mChartTabListener?.onIndexTypeChange(indexType, moduleGroupType)
+    override fun onAttachIndexTypeChange(
+        moduleGroupType: Int,
+        indexType: Int,
+    ): HashSet<Int>? {
+        return mChartTabListener?.onAttachIndexTypeChange(moduleGroupType, indexType)
+    }
+
+    override fun onModuleIndexTypeChange(
+        moduleGroupType: Int,
+        indexType: Int,
+        state: Boolean,
+    ): HashSet<Int>? {
+        return mChartTabListener?.onModuleIndexTypeChange(moduleGroupType, indexType, state)
     }
 
     override fun onOrientationChange() {
@@ -687,27 +695,27 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
         mChartTabListener?.onSetting()
     }
 
-    fun selectedDefaultTimeType(type: TimeType, @ModuleType moduleType: Int): TabTimeBean? {
-        getSelectedPosition(type, moduleType)?.let {
+    fun selectedDefaultTimeType(type: TimeType, @IndexType indexType: Int): TabTimeBean? {
+        getSelectedPosition(type, indexType)?.let {
             tabRecovery()
             tabMoreRecovery()
             return tabSelected(it)
         }
-        mMorePopupWindow?.selectedDefaultTimeType(type, moduleType)?.let {
+        mMorePopupWindow?.selectedDefaultTimeType(type, indexType)?.let {
             tabMoreSelected(it)
             return it
         }
         return null
     }
 
-    fun selectedDefaultIndexType(@IndexType indexType: Int, @ModuleGroupType moduleGroupType: Int) {
-        mIndexPopupWindow?.selectedDefaultIndexType(indexType, moduleGroupType)
+    fun selectedDefaultIndexType(@ModuleGroup moduleGroupType: Int, indexTypeSet: HashSet<Int>?) {
+        mIndexPopupWindow?.selectedDefaultIndexType(moduleGroupType, indexTypeSet)
     }
 
-    private fun getSelectedPosition(type: TimeType, @ModuleType moduleType: Int): Int? {
+    private fun getSelectedPosition(type: TimeType, @IndexType indexType: Int): Int? {
         for (i in mBaseData.indices) {
             val item = mBaseData[i]
-            if (item.moduleType == moduleType && item.tabValue == type) {
+            if (item.indexType == indexType && item.tabValue == type) {
                 return i
             }
         }
@@ -716,8 +724,19 @@ class ChartTabLayout : ConstraintLayout, View.OnClickListener, ChartTabListener 
 }
 
 interface ChartTabListener {
-    fun onTimeTypeChange(type: TimeType, @ModuleType moduleType: Int)
-    fun onIndexTypeChange(@IndexType indexType: Int, @ModuleGroupType moduleGroupType: Int)
+    fun onTimeTypeChange(type: TimeType, @IndexType indexType: Int)
+
+    fun onAttachIndexTypeChange(
+        @ModuleGroup moduleGroupType: Int,
+        @IndexType indexType: Int,
+    ): HashSet<Int>?
+
+    fun onModuleIndexTypeChange(
+        @ModuleGroup moduleGroupType: Int,
+        @IndexType indexType: Int,
+        state: Boolean,
+    ): HashSet<Int>?
+
     fun onOrientationChange()
     fun onSetting()
 }

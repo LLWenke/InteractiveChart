@@ -1,6 +1,5 @@
 package com.wk.board.module;
 
-import com.wk.chart.enumeration.ModuleType;
 import com.wk.chart.module.CandleModule;
 
 /**
@@ -9,6 +8,6 @@ import com.wk.chart.module.CandleModule;
 
 public class DrawingBoardModule extends CandleModule {
     public DrawingBoardModule() {
-        super(ModuleType.BOARD);
+        super();
     }
 }

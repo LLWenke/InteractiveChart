@@ -1,17 +1,17 @@
 package com.wk.chart.module;
 
 import com.wk.chart.entry.DepthEntry;
-import com.wk.chart.enumeration.ModuleType;
-import com.wk.chart.module.base.MainModule;
+import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.enumeration.ModuleGroup;
 
 /**
  * <p>深度图模块</p>
  */
 
-public class DepthModule extends MainModule<DepthEntry> {
+public class DepthModule extends AbsModule<DepthEntry> {
 
     public DepthModule() {
-        super(ModuleType.DEPTH);
+        super(ModuleGroup.MAIN, IndexType.DEPTH);
     }
 
     @Override

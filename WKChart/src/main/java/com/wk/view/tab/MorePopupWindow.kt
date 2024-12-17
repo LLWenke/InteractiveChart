@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import com.wk.chart.databinding.MoreTabLayoutBinding
-import com.wk.chart.enumeration.ModuleType
+import com.wk.chart.enumeration.IndexType
 import com.wk.chart.enumeration.TimeType
 import com.wk.view.ext.binding
 
@@ -26,8 +26,8 @@ class MorePopupWindow(
         return mBinding.root
     }
 
-    fun selectedDefaultTimeType(type: TimeType, @ModuleType moduleType: Int): TabTimeBean? {
-        return mAdapter?.selectedItem(type, moduleType)
+    fun selectedDefaultTimeType(type: TimeType, @IndexType indexType: Int): TabTimeBean? {
+        return mAdapter?.selectedItem(type, indexType)
     }
 
     fun getSelectedItem(): TabTimeBean? {

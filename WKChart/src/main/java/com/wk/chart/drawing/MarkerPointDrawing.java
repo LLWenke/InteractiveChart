@@ -19,7 +19,7 @@ import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.enumeration.MarkerPointType;
 import com.wk.chart.interfaces.IMarkerPoint;
-import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.CandleRender;
 
 import java.util.HashMap;

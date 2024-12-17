@@ -6,8 +6,9 @@ import android.graphics.Paint;
 import android.graphics.Path;
 
 import com.wk.chart.compat.attribute.CandleAttribute;
-import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.CandleEntry;
+import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.module.CandleModule;
 import com.wk.chart.render.CandleRender;
 
@@ -15,7 +16,7 @@ import com.wk.chart.render.CandleRender;
 /**
  * <p>蜡烛图组件</p>
  */
-public class CandleDrawing extends AbsDrawing<CandleRender, CandleModule> {
+public class CandleDrawing extends IndexDrawing<CandleRender, CandleModule> {
     private static final String TAG = "CandleDrawing";
     private CandleAttribute attribute;//配置文件
     // 上涨画笔
@@ -30,6 +31,10 @@ public class CandleDrawing extends AbsDrawing<CandleRender, CandleModule> {
     private boolean highlightState = true;//高亮状态
     // 蜡烛图绘制的实际收首尾X轴坐标点（从首尾两根蜡烛图的中心点算起）
     private float beginX, endX = 0;
+
+    public CandleDrawing() {
+        super(IndexType.CANDLE);
+    }
 
     @Override
     public void onInit(CandleRender render, CandleModule chartModule) {

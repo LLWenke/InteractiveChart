@@ -4,8 +4,6 @@
         <!-- 各个视图模块的配置信息有关属性 -->
         <!-- 主图模块高度 -->
         <attr name="mainViewHeight" format="dimension" />
-        <!-- 副图模块高度 -->
-        <attr name="auxiliaryViewHeight" format="dimension" />
         <!-- 指标模块高度 -->
         <attr name="indexViewHeight" format="dimension" />
         <!-- 各个视图模块间的间隔 -->
@@ -14,9 +12,25 @@
         <attr name="leftScrollOffset" format="dimension" />
         <!-- X 轴方向的最大滚动值固定偏移量（右边） -->
         <attr name="rightScrollOffset" format="dimension" />
+        <!-- 主图模块布局类型 -->
+        <attr name="mainModuleLayoutType">
+            <!-- 重叠 -->
+            <enum name="overlap" value="0" />
+            <!-- 分离 -->
+            <enum name="separate" value="1" />
+        </attr>
+        <!-- 指标模块布局类型 -->
+        <attr name="indexModuleLayoutType">
+            <!-- 重叠 -->
+            <enum name="overlap" value="0" />
+            <!-- 分离 -->
+            <enum name="separate" value="1" />
+        </attr>
         <!-- 渲染model类别 -->
         <attr name="renderModel">
+            <!-- 蜡烛图 -->
             <enum name="candle" value="0" />
+            <!-- 深度图 -->
             <enum name="depth" value="1" />
         </attr>
 

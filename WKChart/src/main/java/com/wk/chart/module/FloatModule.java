@@ -1,9 +1,8 @@
 package com.wk.chart.module;
 
 import com.wk.chart.entry.AbsEntry;
-import com.wk.chart.enumeration.ModuleGroupType;
-import com.wk.chart.enumeration.ModuleType;
-import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.enumeration.ModuleGroup;
 
 /**
  * <p>浮动模块</p>
@@ -12,8 +11,7 @@ import com.wk.chart.module.base.AbsModule;
 public class FloatModule extends AbsModule<AbsEntry> {
 
     public FloatModule() {
-        super(ModuleType.FLOAT, ModuleGroupType.FLOAT);
-        setEnable(true);
+        super(ModuleGroup.FLOAT, IndexType.NONE);
     }
 
     @Override

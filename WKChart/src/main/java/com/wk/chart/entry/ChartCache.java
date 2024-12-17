@@ -3,14 +3,13 @@ package com.wk.chart.entry;
 import androidx.annotation.Nullable;
 
 import com.wk.chart.enumeration.IndexType;
-import com.wk.chart.enumeration.ModuleGroupType;
-import com.wk.chart.enumeration.ModuleType;
+import com.wk.chart.enumeration.ModuleGroup;
 import com.wk.chart.enumeration.TimeType;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 public class ChartCache implements Serializable {
@@ -19,53 +18,47 @@ public class ChartCache implements Serializable {
     public float cacheMaxScrollOffset = 0f;
     public float cacheCurrentTransX = 0f;
     public float scale = 1;
-    private final Map<Integer, TypeEntry> types;
+    private final Map<Integer, List<TypeEntry>> typeEntryCache;
 
     public ChartCache() {
-        this.types = new HashMap<>();
+        this.typeEntryCache = new HashMap<>();
     }
 
-    public @NotNull
-    Map<Integer, TypeEntry> getTypes() {
-        return types;
+    public Map<Integer, List<TypeEntry>> getTypeEntryCache() {
+        return typeEntryCache;
     }
 
-    public @Nullable
-    TypeEntry getTypeEntry(@ModuleGroupType int moduleGroupType) {
-        return types.get(moduleGroupType);
-    }
-
-    public void updateTypeEntry(@ModuleGroupType int moduleGroupType, @NotNull TypeEntry typeEntry) {
-        types.put(moduleGroupType, typeEntry);
+    public void putTypeEntry(
+            @ModuleGroup int moduleGroup,
+            List<TypeEntry> list
+    ) {
+        typeEntryCache.put(moduleGroup, list);
     }
 
     public static class TypeEntry implements Serializable {
-        private @ModuleType
-        int moduleType;
-        private @IndexType
-        int indexType;
+        private @IndexType int moduleIndexType;
+        private HashSet<Integer> attachTypeSet;
 
-        public TypeEntry(@ModuleType int moduleType, @IndexType int indexType) {
-            this.moduleType = moduleType;
-            this.indexType = indexType;
+        public TypeEntry(@IndexType int moduleIndexType, HashSet<Integer> attachTypeSet) {
+            this.moduleIndexType = moduleIndexType;
+            this.attachTypeSet = attachTypeSet;
         }
 
-        public @ModuleType
-        int getModuleType() {
-            return moduleType;
+        @IndexType
+        public int getModuleIndexType() {
+            return moduleIndexType;
         }
 
-        public void setModuleType(@ModuleType int moduleType) {
-            this.moduleType = moduleType;
+        public void setModuleIndexType(@IndexType int moduleIndexType) {
+            this.moduleIndexType = moduleIndexType;
         }
 
-        public @IndexType
-        int getIndexType() {
-            return indexType;
+        public HashSet<Integer> getAttachTypeSet() {
+            return attachTypeSet;
         }
 
-        public void setIndexType(@IndexType int indexType) {
-            this.indexType = indexType;
+        public void setAttachTypeSet(HashSet<Integer> attachTypeSet) {
+            this.attachTypeSet = attachTypeSet;
         }
     }
 }

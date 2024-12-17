@@ -1,28 +1,33 @@
 package com.wk.view.tab;
 
-import com.wk.chart.enumeration.ModuleType;
+import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.TimeType;
 
 public class TabTimeBean {
     private String tabName;
     private TimeType tabValue;
-    private int moduleType;
+    @IndexType
+    private int indexType;
     private boolean selected;
 
-    public TabTimeBean(String tabName, TimeType tabValue, @ModuleType int moduleType, boolean selected) {
+    public TabTimeBean(
+            String tabName,
+            TimeType tabValue,
+            @IndexType int indexType,
+            boolean selected
+    ) {
         this.tabName = tabName;
         this.tabValue = tabValue;
-        this.moduleType = moduleType;
+        this.indexType = indexType;
         this.selected = selected;
     }
 
-    public @ModuleType
-    int getModuleType() {
-        return moduleType;
+    public @IndexType int getIndexType() {
+        return indexType;
     }
 
-    public void setModuleType(int moduleType) {
-        this.moduleType = moduleType;
+    public void setIndexType(@IndexType int indexType) {
+        this.indexType = indexType;
     }
 
     public String getTabName() {

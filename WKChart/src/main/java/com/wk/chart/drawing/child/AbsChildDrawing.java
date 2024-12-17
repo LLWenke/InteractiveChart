@@ -6,7 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.RectF;
 
 import com.wk.chart.compat.attribute.BaseAttribute;
-import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.AbsRender;
 
 import java.util.Arrays;

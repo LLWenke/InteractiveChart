@@ -12,7 +12,7 @@ import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.IndexConfigEntry;
 import com.wk.chart.entry.ValueEntry;
 import com.wk.chart.enumeration.IndexType;
-import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.CandleRender;
 
 /**

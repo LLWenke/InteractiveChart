@@ -9,7 +9,7 @@ import android.text.TextPaint;
 
 import com.wk.chart.compat.Utils;
 import com.wk.chart.enumeration.PositionType;
-import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.AbsRender;
 
 /**

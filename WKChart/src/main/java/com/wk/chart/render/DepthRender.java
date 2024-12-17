@@ -6,7 +6,7 @@ import android.graphics.RectF;
 import com.wk.chart.adapter.DepthAdapter;
 import com.wk.chart.compat.attribute.DepthAttribute;
 import com.wk.chart.entry.AbsEntry;
-import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.module.AbsModule;
 
 /**
  * <p>DepthRender 深度图渲染器</p>

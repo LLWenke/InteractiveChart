@@ -24,9 +24,6 @@ public class AttributeRead {
         attribute.mainViewHeight = a.getDimension(R.styleable.ChartView_mainViewHeight,
                 attribute.mainViewHeight);// 主图模块高度
 
-        attribute.auxiliaryViewHeight = a.getDimension(R.styleable.ChartView_auxiliaryViewHeight,
-                attribute.auxiliaryViewHeight);// 副图模块高度
-
         attribute.indexViewHeight = a.getDimension(R.styleable.ChartView_indexViewHeight,
                 attribute.indexViewHeight);// 指标模块高度
 
@@ -38,6 +35,12 @@ public class AttributeRead {
 
         attribute.rightScrollOffset = a.getDimension(R.styleable.ChartView_rightScrollOffset,
                 attribute.rightScrollOffset);//X 轴方向的最大滚动值固定偏移量（右边）
+
+        attribute.mainModuleLayoutType = a.getInt(R.styleable.ChartView_mainModuleLayoutType,
+                attribute.mainModuleLayoutType);//主图模块布局类型
+
+        attribute.indexModuleLayoutType = a.getInt(R.styleable.ChartView_indexModuleLayoutType,
+                attribute.indexModuleLayoutType);//指标模块布局类型
 
         /*
          * 共用的有关属性

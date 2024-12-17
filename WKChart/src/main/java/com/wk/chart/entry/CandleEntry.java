@@ -1,21 +1,18 @@
 package com.wk.chart.entry;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.wk.chart.compat.DateUtil;
 import com.wk.chart.compat.ValueUtils;
-import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.MarkerPointType;
 import com.wk.chart.enumeration.TimeType;
 
 import java.util.Date;
-import java.util.HashMap;
 
 /**
  * <p>CandleEntry</p>
  */
-public class CandleEntry extends AbsEntry {
+public class CandleEntry extends IndexEntry {
     private final ValueEntry open; // 开盘价
     private final ValueEntry high; // 最高价
     private final ValueEntry low; // 最低价
@@ -23,9 +20,6 @@ public class CandleEntry extends AbsEntry {
     private final ValueEntry volume; // 量
     private final ValueEntry changeAmount; // 涨跌额
     private final ValueEntry changeProportion; // 涨跌幅
-    //通用属性
-    private final HashMap<Integer, ValueEntry[]> index; // 指标
-    private final HashMap<Integer, ValueEntry[]> lineIndex; // 折线指标
     private @MarkerPointType
     int markerPointType = MarkerPointType.NORMAL; // 标记点类型
     private TimeType timeType = null;//时间类型
@@ -51,8 +45,6 @@ public class CandleEntry extends AbsEntry {
         this.volume = new ValueEntry(volume);
         this.changeAmount = new ValueEntry();
         this.changeProportion = new ValueEntry();
-        this.index = new HashMap<>();
-        this.lineIndex = new HashMap<>();
         addAnimatorEntry(this.close, this.high, this.low, this.volume);
     }
 
@@ -126,24 +118,6 @@ public class CandleEntry extends AbsEntry {
      */
     public ValueEntry buildBaseScaleValue(@NonNull ScaleEntry scale, long value) {
         return ValueUtils.buildScaleValue(value, scale.getBaseScale());
-    }
-
-    public void putLineIndex(@IndexType int indexType, ValueEntry... values) {
-        this.lineIndex.put(indexType, values);
-    }
-
-    public @Nullable
-    ValueEntry[] getLineIndex(@IndexType int indexType) {
-        return lineIndex.get(indexType);
-    }
-
-    public void putIndex(@IndexType int indexType, ValueEntry... values) {
-        this.index.put(indexType, values);
-    }
-
-    public @Nullable
-    ValueEntry[] getIndex(@IndexType int indexType) {
-        return index.get(indexType);
     }
 
     public @MarkerPointType

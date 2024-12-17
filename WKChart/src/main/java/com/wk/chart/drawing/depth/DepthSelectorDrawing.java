@@ -8,18 +8,19 @@ import android.text.TextPaint;
 import com.wk.chart.R;
 import com.wk.chart.compat.FontStyle;
 import com.wk.chart.compat.attribute.DepthAttribute;
-import com.wk.chart.drawing.base.AbsDrawing;
+import com.wk.chart.drawing.base.IndexDrawing;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.DepthEntry;
 import com.wk.chart.entry.SelectorItemEntry;
-import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.DepthRender;
 
 /**
  * <p>深度图选择器组件</p>
  */
 
-public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsEntry>> {
+public class DepthSelectorDrawing extends IndexDrawing<DepthRender, AbsModule<AbsEntry>> {
     private static final String TAG = "DepthSelectorDrawing";
     private DepthAttribute attribute;//配置文件
 
@@ -38,6 +39,10 @@ public class DepthSelectorDrawing extends AbsDrawing<DepthRender, AbsModule<AbsE
     private SelectorItemEntry[] selectorInfo;//选择器信息集合
     private float selectorBorderOffset;//选择器边框偏移量
     private final int itemCount = 3;//选择器中的条目数
+
+    public DepthSelectorDrawing() {
+        super(IndexType.DEPTH);
+    }
 
     @Override
     public void onInit(DepthRender render, AbsModule<AbsEntry> chartModule) {

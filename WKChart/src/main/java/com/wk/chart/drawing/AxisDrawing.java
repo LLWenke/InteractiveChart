@@ -13,10 +13,10 @@ import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.ValueEntry;
+import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.LineStyle;
-import com.wk.chart.enumeration.ModuleType;
 import com.wk.chart.enumeration.PositionType;
-import com.wk.chart.module.base.AbsModule;
+import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.AbsRender;
 
 import org.jetbrains.annotations.Nullable;
@@ -185,7 +185,7 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
      * 格式化刻度标签
      */
     private String getScaleLabel(float value, @Nullable ValueEntry entry) {
-        if (null != entry && chartModule.getModuleType() == ModuleType.VOLUME) {
+        if (null != entry && chartModule.getModuleIndexType() == IndexType.VOLUME) {
             return render.getAdapter().quantizationConversion(entry, true);
         } else if (isQuantization) {
             return render.getAdapter().rateConversion(value, render.getAdapter().getScale().getQuoteScale(), true, false);
