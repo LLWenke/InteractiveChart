@@ -19,6 +19,13 @@
             <!-- 分离 -->
             <enum name="separate" value="1" />
         </attr>
+        <!-- 指标模块数据显示类型 -->
+        <attr name="dataDisplayType">
+            <!-- 分页 -->
+            <enum name="paging" value="0" />
+            <!-- 实时 -->
+            <enum name="real_time" value="1" />
+        </attr>
         <!-- 指标模块布局类型 -->
         <attr name="indexModuleLayoutType">
             <!-- 重叠 -->
