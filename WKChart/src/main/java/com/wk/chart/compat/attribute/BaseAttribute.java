@@ -226,11 +226,11 @@ public class BaseAttribute {
     /**
      * 与loading和error有关的属性
      */
-    public float loadingTextSize = 26;
-    public int loadingTextColor = 0xffffffff;
-    public String loadingText = "Loading...";
+    public float loadingTextSize = 26;//loading文字大小
+    public int loadingTextColor = 0xffffffff;//loading文字颜色
+    public String loadingText = "Loading...";//loading文字
 
-    public float errorTextSize = 26;
-    public int errorTextColor = 0xffffffff;
-    public String errorText = "Empty";
+    public float errorTextSize = 26;//error文字大小
+    public int errorTextColor = 0xffffffff;//error文字颜色
+    public String errorText = "Empty";//error文字
 }
