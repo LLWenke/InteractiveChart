@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.wk.chart.enumeration.DataType;
+import com.wk.chart.enumeration.DataDisplayType;
 import com.wk.demo.R;
 import com.wk.demo.util.DataUtils;
 import com.wk.demo.util.LoadingListener;
@@ -47,10 +47,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = new Intent(this, ChartActivity.class);
         switch (v.getId()) {
             case R.id.btn_real_time_data:
-                intent.putExtra(ChartActivity.DATA_SHOW_KEY, DataType.REAL_TIME.ordinal());
+                intent.putExtra(ChartActivity.DATA_SHOW_KEY, DataDisplayType.REAL_TIME.ordinal());
                 break;
             case R.id.btn_historical_data:
-                intent.putExtra(ChartActivity.DATA_SHOW_KEY, DataType.PAGING.ordinal());
+                intent.putExtra(ChartActivity.DATA_SHOW_KEY, DataDisplayType.PAGING.ordinal());
                 break;
         }
         startActivity(intent);

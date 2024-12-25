@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
 
+import com.wk.chart.enumeration.DataDisplayType;
 import com.wk.chart.enumeration.ExtremumVisible;
 import com.wk.chart.enumeration.HighLightStyle;
 import com.wk.chart.enumeration.LineStyle;
@@ -33,6 +34,7 @@ public class BaseAttribute {
     public float rightScrollOffset = 0;//X 轴方向的最大滚动值固定偏移量（右边）
     public int mainModuleLayoutType = ModuleLayoutType.OVERLAP;// 主图模块布局类型
     public int indexModuleLayoutType = ModuleLayoutType.SEPARATE;// 指标模块布局类型
+    public DataDisplayType dataDisplayType = DataDisplayType.REAL_TIME;//指标模块数据显示类型
 
     /**
      * 共用的有关属性
@@ -43,6 +45,8 @@ public class BaseAttribute {
     public float labelSize = 26; // 标签字符大小
     public int labelColor = 0xff8c99a6; //标签字符颜色
     public boolean onSingleClickSelected = false;//是否可以单击选中
+    public boolean enableLeftLoadMore = true;//启用左滑加载更多
+    public boolean enableRightLoadMore = true;//启用右滑加载更多
 
     /**
      * 边框线有关属性
@@ -91,7 +95,8 @@ public class BaseAttribute {
     public int markerTextColor = 0xffffffff; // MarkerView 字符颜色
     public Paint.Style markerStyle = Paint.Style.FILL_AND_STROKE; //  MarkerView 的style（边框/边框和填充）
     public int axisMarkerPosition = PositionType.AUTO; // axis 轴 MarkerView 位置
-    public int gridMarkerPosition = PositionType.BOTTOM | PositionType.OUTSIDE_VERTICAL; // grid 轴 MarkerView 位置
+    public int gridMarkerPosition = PositionType.BOTTOM | PositionType.OUTSIDE_VERTICAL;
+    // grid 轴 MarkerView 位置
 
     /**
      * 与选择器有关的属性
@@ -118,7 +123,8 @@ public class BaseAttribute {
     public float indexTextMarginVertical = 8f;//指标文字垂直margin
     public float indexTextInterval = 16f;//指标文字的间隔
     public boolean indexDefaultShowLastItemInfo = true;//指标默认显示最后一条的数据
-    public int indexLabelPosition = PositionType.START | PositionType.TOP | PositionType.OUTSIDE_VERTICAL;//指标文字的位置
+    public int indexLabelPosition =
+            PositionType.START | PositionType.TOP | PositionType.OUTSIDE_VERTICAL;//指标文字的位置
 
     /**
      * 与游标指示器有关的属性
@@ -164,7 +170,8 @@ public class BaseAttribute {
      */
     public float extremumLabelMarginHorizontal = 16f;//极值Label的水平边距
     public float extremumLabelMarginVertical = 8f;//极值Label的垂直边距
-    public int extremumLabelPosition = PositionType.END | PositionType.OUTSIDE_VERTICAL; // 极值Label的位置
+    public int extremumLabelPosition = PositionType.END | PositionType.OUTSIDE_VERTICAL;
+    // 极值Label的位置
 
     /**
      * 极值Tag有关属性

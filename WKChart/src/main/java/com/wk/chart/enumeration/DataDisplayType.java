@@ -5,12 +5,12 @@ package com.wk.chart.enumeration;
  * 数据展示类型
  */
 
-public enum DataType {
+public enum DataDisplayType {
   PAGING(0),//分页
 
   REAL_TIME(1);//实时
 
-  DataType(int nativeInt) {
+  DataDisplayType(int nativeInt) {
     this.nativeInt = nativeInt;
   }
 

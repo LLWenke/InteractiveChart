@@ -27,10 +27,11 @@ import com.wk.chart.compat.config.IndexBuildConfig;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.ChartCache;
-import com.wk.chart.enumeration.DataType;
+import com.wk.chart.enumeration.DataDisplayType;
 import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.ModuleGroup;
 import com.wk.chart.enumeration.ObserverArg;
+import com.wk.chart.enumeration.RenderModel;
 import com.wk.chart.enumeration.TimeType;
 import com.wk.chart.handler.InteractiveHandler;
 import com.wk.chart.interfaces.ICacheLoadListener;
@@ -61,7 +62,6 @@ import java.util.Map;
 public class ChartActivity extends AppCompatActivity implements ChartTabListener,
         ICacheLoadListener, IndexManager.IndexConfigChangeListener {
     public static final String DATA_SHOW_KEY = "DATA_SHOW_KEY";//数据展示类型KEY
-
     private ChartIndexTabLayout chartIndexTabLayout;
     private ChartTabLayout chartTabLayout;
     private ChartLayout chartLayout;
@@ -88,7 +88,7 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
             case INIT:
             case ATTR_UPDATE:
             case RESET:
-                if (dataShowType == DataType.REAL_TIME.ordinal()) {
+                if (dataShowType == DataDisplayType.REAL_TIME.ordinal()) {
                     PushService.stopPush();
                     new Handler(Looper.getMainLooper())
                             .postDelayed(ChartActivity.this::startPush, 1000);
@@ -107,7 +107,8 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.dataShowType = getIntent().getIntExtra(DATA_SHOW_KEY, DataType.PAGING.ordinal());
+        this.dataShowType =
+                getIntent().getIntExtra(DATA_SHOW_KEY, DataDisplayType.PAGING.ordinal());
         initUI();
         initChart();
         chartLayout.loadBegin(REFRESH_LOADING, candleProgressBar, candleChart);
@@ -206,7 +207,11 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
         }
         this.candleAdapter.addDataChangeSupport(propertyChangeListener);
         this.candleChart.setAdapter(candleAdapter);
-
+        if (dataShowType == DataDisplayType.REAL_TIME.ordinal()) {
+            this.candleChart.getRender().getAttribute().dataDisplayType = DataDisplayType.REAL_TIME;
+        } else {
+            this.candleChart.getRender().getAttribute().dataDisplayType = DataDisplayType.PAGING;
+        }
         this.candleChart.setInteractiveHandler(new InteractiveHandler() {
             @Override
             public void onLeftLoad(AbsEntry firstData) {
@@ -236,9 +241,7 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
                 }, 2000);
             }
         });
-        if (dataShowType == DataType.REAL_TIME.ordinal()) {
-            this.chartLayout.setDataDisplayType(DataType.REAL_TIME);
-        }
+        this.chartLayout.initChart();
     }
 
     @Override
@@ -272,11 +275,11 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
                 );
             }
             switchTimeType(timeType, IndexType.CANDLE);
-            if (chartLayout.moduleEnable(ModuleGroup.INDEX, IndexType.VOLUME)) {
+            if (chartLayout.moduleEnable(RenderModel.CANDLE, ModuleGroup.INDEX, IndexType.VOLUME)) {
                 candleChart.onViewInit();
             }
         } else {
-            chartLayout.loadChartCache(mChartCache);
+            chartLayout.loadChartCache(RenderModel.CANDLE, mChartCache);
         }
     }
 
@@ -284,7 +287,7 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
      * 保存图表状态
      */
     private void saveChartState() {
-        mChartCache = chartLayout.chartCache();
+        mChartCache = chartLayout.chartCache(RenderModel.CANDLE);
     }
 
     /**
@@ -294,12 +297,12 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
      */
     private void switchTimeType(TimeType timeType, int indexType) {
         chartLayout.loadBegin(REFRESH_LOADING, candleProgressBar, candleChart);
-        candleAdapter.setData(timeType, dataShowType == DataType.REAL_TIME.ordinal() ?
+        candleAdapter.setData(timeType, dataShowType == DataDisplayType.REAL_TIME.ordinal() ?
                 getNewestData(loadCount) : getInit());
         if (depthAdapter.getCount() == 0) {
             depthAdapter.resetData(depthEntries);
         }
-        if (chartLayout.moduleEnable(ModuleGroup.MAIN, indexType)) {
+        if (chartLayout.moduleEnable(RenderModel.CANDLE, ModuleGroup.MAIN, indexType)) {
             candleChart.onViewInit();
         }
     }
@@ -404,13 +407,14 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
     @Override
     public HashSet<Integer> onAttachIndexTypeChange(int moduleGroupType, int indexType) {
         if (chartLayout.moduleAttachIndexReset(
+                RenderModel.CANDLE,
                 moduleGroupType,
                 IndexType.CANDLE,
                 buildIndexTypeSet(indexType)
         )) {
             candleChart.onViewInit();
         }
-        return chartLayout.getEnableModuleAttachIndexTypeSet(moduleGroupType);
+        return chartLayout.getEnableModuleAttachIndexTypeSet(RenderModel.CANDLE, moduleGroupType);
     }
 
     @Nullable
@@ -420,10 +424,10 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
             int indexType,
             boolean state
     ) {
-        if (chartLayout.moduleEnable(moduleGroupType, indexType, state)) {
+        if (chartLayout.moduleEnable(RenderModel.CANDLE, moduleGroupType, indexType, state)) {
             candleChart.onViewInit();
         }
-        return chartLayout.getEnableModuleIndexTypeSet(moduleGroupType);
+        return chartLayout.getEnableModuleIndexTypeSet(RenderModel.CANDLE, moduleGroupType);
     }
 
     @Override

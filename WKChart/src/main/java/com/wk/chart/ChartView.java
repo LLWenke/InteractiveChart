@@ -68,8 +68,6 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private boolean onDoubleFingerPress = false;
     private boolean hasLeftLoad = false;
     private boolean hasRightLoad = false;
-    private boolean enableLeftLoad = true;
-    private boolean enableRightLoad = true;
     private boolean scrollIdle = true;
     private int loadState = 0;//加载状态
     private float lastFlingX = 0;
@@ -249,6 +247,8 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
             case DEPTH://深度图
                 DepthAttribute depthAttribute = new DepthAttribute(getContext());
                 attributeRead.initAttribute(array, depthAttribute);
+                depthAttribute.enableLeftLoadMore = false;
+                depthAttribute.enableRightLoadMore = false;
                 render = new DepthRender(depthAttribute, viewRect);
                 break;
         }
@@ -523,31 +523,17 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     }
 
     /**
-     * 设置是否启用左滑加载
-     */
-    public void setEnableLeftLoad(boolean enableLeftLoad) {
-        this.enableLeftLoad = enableLeftLoad;
-    }
-
-    /**
-     * 设置是否启用右滑加载
-     */
-    public void setEnableRightLoad(boolean enableRightLoad) {
-        this.enableRightLoad = enableRightLoad;
-    }
-
-    /**
      * 是否可以左滑加载
      */
     public boolean canLeftLoad() {
-        return enableLeftLoad && hasLeftLoad;
+        return null != attribute && attribute.enableLeftLoadMore && hasLeftLoad;
     }
 
     /**
      * 是否可以右滑加载
      */
     public boolean rightCanLoad() {
-        return enableRightLoad && hasRightLoad;
+        return null != attribute && attribute.enableRightLoadMore && hasRightLoad;
     }
 
     /**
