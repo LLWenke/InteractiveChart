@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 7.3.1" type="baseline" client="gradle" dependencies="false" name="AGP (7.3.1)" variant="fatal" version="7.3.1">
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;app_name&quot; is translated here but not found in default locale"
+        errorLine1="  &lt;string name=&quot;app_name&quot;>WKChart&lt;/string>"
+        errorLine2="          ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rCN/strings.xml"
+            line="2"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;wk_indicators&quot; is translated here but not found in default locale"
+        errorLine1="  &lt;string name=&quot;wk_indicators&quot;>指标&lt;/string>"
+        errorLine2="          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rCN/strings.xml"
+            line="3"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;wk_macd&quot; is translated here but not found in default locale"
+        errorLine1="  &lt;string name=&quot;wk_macd&quot;>MACD&lt;/string>"
+        errorLine2="          ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rCN/strings.xml"
+            line="4"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;wk_rsi&quot; is translated here but not found in default locale"
+        errorLine1="  &lt;string name=&quot;wk_rsi&quot;>RSI&lt;/string>"
+        errorLine2="          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rCN/strings.xml"
+            line="5"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;wk_kdj&quot; is translated here but not found in default locale"
+        errorLine1="  &lt;string name=&quot;wk_kdj&quot;>KDJ&lt;/string>"
+        errorLine2="          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rCN/strings.xml"
+            line="6"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;wk_bull&quot; is translated here but not found in default locale"
+        errorLine1="  &lt;string name=&quot;wk_bull&quot;>BULL&lt;/string>"
+        errorLine2="          ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rCN/strings.xml"
+            line="7"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;wk_wr&quot; is translated here but not found in default locale"
+        errorLine1="  &lt;string name=&quot;wk_wr&quot;>WR&lt;/string>"
+        errorLine2="          ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rCN/strings.xml"
+            line="8"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;wk_time_line&quot; is translated here but not found in default locale"
+        errorLine1="  &lt;string name=&quot;wk_time_line&quot;>分时&lt;/string>"
+        errorLine2="          ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rCN/strings.xml"
+            line="10"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;wk_1m&quot; is translated here but not found in default locale"
+        errorLine1="  &lt;string name=&quot;wk_1m&quot;>1m&lt;/string>"
+        errorLine2="          ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rCN/strings.xml"
+            line="11"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;wk_5m&quot; is translated here but not found in default locale"
+        errorLine1="  &lt;string name=&quot;wk_5m&quot;>5m&lt;/string>"
+        errorLine2="          ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rCN/strings.xml"
+            line="12"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;wk_15m&quot; is translated here but not found in default locale"
+        errorLine1="  &lt;string name=&quot;wk_15m&quot;>15m&lt;/string>"
+        errorLine2="          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rCN/strings.xml"
+            line="13"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;wk_1h&quot; is translated here but not found in default locale"
+        errorLine1="  &lt;string name=&quot;wk_1h&quot;>1h&lt;/string>"
+        errorLine2="          ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rCN/strings.xml"
+            line="14"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;wk_6h&quot; is translated here but not found in default locale"
+        errorLine1="  &lt;string name=&quot;wk_6h&quot;>6h&lt;/string>"
+        errorLine2="          ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rCN/strings.xml"
+            line="15"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;wk_1d&quot; is translated here but not found in default locale"
+        errorLine1="  &lt;string name=&quot;wk_1d&quot;>1d&lt;/string>"
+        errorLine2="          ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rCN/strings.xml"
+            line="16"
+            column="11"/>
+    </issue>
+
+</issues>
