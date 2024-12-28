@@ -217,6 +217,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
 
     public ChartView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         final TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs, R.styleable.ChartView, defStyleAttr, defStyleAttr);
         try {

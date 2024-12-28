@@ -76,7 +76,10 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, AbsModule<Ab
         selectorBorderOffset = attribute.selectorBorderWidth / 2;
         selectorInfo = new SelectorItemEntry[itemCount];
         for (int i = 0; i < itemCount; i++) {
-            selectorInfo[i] = new SelectorItemEntry();
+            selectorInfo[i] = new SelectorItemEntry()
+                    .setLabelPaint(labelPaint)
+                    .setValuePaint(valuePaint)
+                    .setLabel(getLabel(i));
         }
     }
 
@@ -100,15 +103,17 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, AbsModule<Ab
                 + attribute.selectorPadding * 2
                 + attribute.selectorIntervalHorizontal;
         this.selectedWidth = Math.max(selectedWidth, width);
-        this.selectedHeight = selectedHeight > 0 ? selectedHeight : attribute.selectorIntervalVertical *
-                (selectorInfo.length + 1) + textHeight * selectorInfo.length;
+        this.selectedHeight =
+                selectedHeight > 0 ? selectedHeight : attribute.selectorIntervalVertical *
+                        (selectorInfo.length + 1) + textHeight * selectorInfo.length;
 
         //负责选择器左右漂浮
         float x = render.getHighlightPoint()[0];
         if (x > viewRect.width() / 2) {
             left = viewRect.left + attribute.selectorMarginHorizontal + drawingNonOverlapMargin[0];
         } else {
-            left = viewRect.right - selectedWidth - attribute.selectorMarginHorizontal - drawingNonOverlapMargin[2];
+            left = viewRect.right - selectedWidth - attribute.selectorMarginHorizontal
+                    - drawingNonOverlapMargin[2];
         }
 
         //计算选择器坐标位置
@@ -120,24 +125,34 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, AbsModule<Ab
         //绘制选择器外边框
         canvas.drawRoundRect(viewRectBuffer[0], viewRectBuffer[1], viewRectBuffer[2],
                 viewRectBuffer[3], attribute.selectorRadius, attribute.selectorRadius,
-                selectorBorderPaint);
+                selectorBorderPaint
+        );
 
         //绘制选择器填充背景
-        canvas.drawRoundRect(viewRectBuffer[0] + selectorBorderOffset, viewRectBuffer[1] + selectorBorderOffset,
-                viewRectBuffer[2] - selectorBorderOffset, viewRectBuffer[3] - selectorBorderOffset,
-                attribute.selectorRadius, attribute.selectorRadius, selectorBackgroundPaint);
+        canvas.drawRoundRect(
+                viewRectBuffer[0] + selectorBorderOffset,
+                viewRectBuffer[1] + selectorBorderOffset,
+                viewRectBuffer[2] - selectorBorderOffset,
+                viewRectBuffer[3] - selectorBorderOffset,
+                attribute.selectorRadius,
+                attribute.selectorRadius,
+                selectorBackgroundPaint
+        );
 
         //绘制选择器内容信息
-        float y = top + attribute.selectorIntervalVertical + (textHeight - metrics.bottom - metrics.top) / 2;
+        float y =
+                top + attribute.selectorIntervalVertical + (textHeight - metrics.bottom - metrics.top) / 2;
         for (SelectorItemEntry item : selectorInfo) {
             //绘制label
             canvas.drawText(item.getLabel(), viewRectBuffer[0] + attribute.selectorPadding, y,
-                    item.getLabelPaint());
+                    item.getLabelPaint()
+            );
             //绘制value
             canvas.drawText(item.getValue(),
                     viewRectBuffer[2]
                             - item.getValuePaint().measureText(item.getValue())
-                            - attribute.selectorPadding, y, item.getValuePaint());
+                            - attribute.selectorPadding, y, item.getValuePaint()
+            );
             //计算Y轴位置
             y += textHeight + attribute.selectorIntervalVertical;
         }
@@ -149,36 +164,16 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, AbsModule<Ab
     private void loadSelectorInfo() {
         CandleEntry entry = render.getAdapter().getItem(render.getAdapter().getHighlightIndex());
         //时间
-        selectorInfo[0]
-                .setLabel(attribute.context.getString(R.string.wk_time_value))
-                .setLabelPaint(labelPaint)
-                .setValue(entry.getTimeText())
-                .setValuePaint(valuePaint);
+        selectorInfo[0].setValue(entry.getTimeText());
         //开
-        selectorInfo[1]
-                .setLabel(attribute.context.getString(R.string.wk_open))
-                .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(entry.getOpen(), false, false))
-                .setValuePaint(valuePaint);
+        selectorInfo[1].setValue(render.getAdapter().rateConversion(entry.getOpen(), false, false));
         //高
-        selectorInfo[2]
-                .setLabel(attribute.context.getString(R.string.wk_high))
-                .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(entry.getHigh(), false, false))
-                .setValuePaint(valuePaint);
+        selectorInfo[2].setValue(render.getAdapter().rateConversion(entry.getHigh(), false, false));
         //低
-        selectorInfo[3]
-                .setLabel(attribute.context.getString(R.string.wk_low))
-                .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(entry.getLow(), false, false))
-                .setValuePaint(valuePaint);
+        selectorInfo[3].setValue(render.getAdapter().rateConversion(entry.getLow(), false, false));
         //收
-        selectorInfo[4]
-                .setLabel(attribute.context.getString(R.string.wk_close))
-                .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(entry.getClose(), false, false))
-                .setValuePaint(valuePaint);
-        //涨跌幅
+        selectorInfo[4].setValue(render.getAdapter()
+                .rateConversion(entry.getClose(), false, false));
         String symbol;
         TextPaint paint;
         if (entry.getClose().value < entry.getOpen().value) {
@@ -188,23 +183,41 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, AbsModule<Ab
             paint = increasingValuePaint;//上涨或者不涨不跌
             symbol = "+";
         }
-        selectorInfo[5]
-                .setLabel(attribute.context.getString(R.string.wk_change_proportion))
-                .setLabelPaint(labelPaint)
-                .setValue(symbol.concat(entry.getChangeProportion().text).concat("%"))
+        //涨跌幅
+        selectorInfo[5].setValue(symbol.concat(entry.getChangeProportion().text).concat("%"))
                 .setValuePaint(paint);
         //涨跌额
-        selectorInfo[6]
-                .setLabel(attribute.context.getString(R.string.wk_change_amount))
-                .setLabelPaint(labelPaint)
-                .setValue(symbol.concat(render.getAdapter().rateConversion(entry.getChangeAmount(), false, true)))
+        selectorInfo[6].setValue(symbol.concat(render.getAdapter()
+                        .rateConversion(entry.getChangeAmount(), false, true)))
                 .setValuePaint(paint);
         //成交量
-        selectorInfo[7]
-                .setLabel(attribute.context.getString(R.string.wk_volume))
-                .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().quantizationConversion(entry.getVolume(), true))
-                .setValuePaint(valuePaint);
+        selectorInfo[7].setValue(render.getAdapter()
+                .quantizationConversion(entry.getVolume(), true));
+    }
+
+    /**
+     * 获取选择器的Label
+     */
+    private String getLabel(int position) {
+        switch (position) {
+            case 0:
+                return attribute.context.getString(R.string.wk_time_value);
+            case 1:
+                return attribute.context.getString(R.string.wk_open);
+            case 2:
+                return attribute.context.getString(R.string.wk_high);
+            case 3:
+                return attribute.context.getString(R.string.wk_low);
+            case 4:
+                return attribute.context.getString(R.string.wk_close);
+            case 5:
+                return attribute.context.getString(R.string.wk_change_proportion);
+            case 6:
+                return attribute.context.getString(R.string.wk_change_amount);
+            case 7:
+                return attribute.context.getString(R.string.wk_volume);
+        }
+        return "";
     }
 
     @Override

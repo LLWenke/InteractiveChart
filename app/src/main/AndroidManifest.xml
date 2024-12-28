@@ -23,6 +23,7 @@
         </activity>
         <activity
             android:name=".activity.ChartActivity"
+            android:hardwareAccelerated="true"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="unspecified" />
 

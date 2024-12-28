@@ -65,7 +65,7 @@ public class DataUtils {
             final String[] candleData = kLineData.split(",");
             for (String item : candleData) {
                 String[] v = item.split("[|]");
-                int type = (new Random()).nextInt(10);
+                int type = (new Random()).nextInt(20);
                 CandleEntry entry = new CandleEntry(v[0], v[1], v[2], v[3], v[4], new Date(Date.parse(v[5])));
                 entry.setMarkerPointType(type > 3 ? MarkerPointType.NORMAL : type);
                 dataList.add(entry);
