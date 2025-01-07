@@ -536,6 +536,12 @@ public class AttributeRead {
                 1f - a.getFloat(R.styleable.ChartView_minScale, attribute.minScale) / 10f;// 最多缩小倍数
         attribute.minScale = minScale > 0 ? minScale : 0.1f;
 
+        float scalePow = a.getFloat(
+                R.styleable.ChartView_scalePow,
+                attribute.scalePow
+        );// 当前缩放速率的幂（设置此参数可控制缩放速度，取值>=0）
+        attribute.scalePow = scalePow < 0 ? 0 : scalePow;
+
         attribute.currentScale =
                 a.getFloat(R.styleable.ChartView_currentScale, attribute.currentScale);// 当前缩放倍数
 

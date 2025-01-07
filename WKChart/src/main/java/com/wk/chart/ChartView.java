@@ -6,7 +6,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -187,8 +186,9 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
             new ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 @Override
                 public boolean onScale(@NonNull ScaleGestureDetector detector) {
-                    Log.e(TAG, "onScale：" + detector.getScaleFactor());
-                    float scale = attribute.currentScale * detector.getScaleFactor();
+//                    Log.e(TAG, "onScale：" + detector.getScaleFactor());
+                    double scalePow = Math.pow(detector.getScaleFactor(), attribute.scalePow);
+                    float scale = (float) (attribute.currentScale * scalePow);
                     if (scale < attribute.minScale) {
                         scale = attribute.minScale;
                     } else if (scale > attribute.maxScale) {

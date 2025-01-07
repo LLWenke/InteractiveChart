@@ -96,7 +96,7 @@ public class BaseAttribute {
     public Paint.Style markerStyle = Paint.Style.FILL_AND_STROKE; //  MarkerView 的style（边框/边框和填充）
     public int axisMarkerPosition = PositionType.AUTO; // axis 轴 MarkerView 位置
     public int gridMarkerPosition = PositionType.BOTTOM | PositionType.OUTSIDE_VERTICAL;
-    // grid 轴 MarkerView 位置
+// grid 轴 MarkerView 位置
 
     /**
      * 与选择器有关的属性
@@ -162,7 +162,8 @@ public class BaseAttribute {
     public float pointWidth = 28f;//数据点初始宽度（缩放都将以此宽度为基准）
     public float visibleCount = 20; // 竖屏状态下的默认缩放倍数下显示多少个蜡烛图。注：横屏时会自动根据视图宽高变化比例计算，不需要手工设置
     public float maxScale = 10;// 最多放大倍数
-    public float minScale = 6;// 最多缩小倍数(缩小后的宽度不会小于 蜡烛图矩形边框线宽度（candleBorderWidth）)
+    public float minScale = 5;// 最多缩小倍数(缩小后的宽度不会小于 蜡烛图矩形边框线宽度（candleBorderWidth）)
+    public float scalePow = 2;// 当前缩放速率的幂（设置此参数可控制缩放速度，取值>=0）
     public float currentScale = 1;// 当前缩放倍数
 
     /**
