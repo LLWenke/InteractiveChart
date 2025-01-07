@@ -194,9 +194,9 @@ public class ValueUtils {
         }
         //校准结果精度值
         if (scale > valueScale) {
-            result /= pow10(scale - valueScale);
+            result /= (long) pow10(scale - valueScale);
         } else if (scale < valueScale) {
-            result *= pow10(valueScale - scale);
+            result *= (long) pow10(valueScale - scale);
         }
         //生成格式化后的字符串
         return sign.concat(buildText(result, valueScale, stripTrailingZeros)).concat(unit);
@@ -209,7 +209,6 @@ public class ValueUtils {
         try {
             return new BigDecimal(value);
         } catch (Exception e) {
-            e.printStackTrace();
             return BigDecimal.ZERO;
         }
     }

@@ -1,9 +1,9 @@
 package com.wk.chart.compat;
 
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * 时间工具类
@@ -13,18 +13,23 @@ public class DateUtil {
     private DateUtil() {
     }
 
+    private static final ZoneId zoneId = ZoneId.systemDefault();
     /**
      * 常用变量
      */
-    public static final String DATE_FORMAT_YMD = "yyyy-MM-dd";
-    public static final String DATE_FORMAT_YMD_HM = "yyyy-MM-dd HH:mm";
+    public static DateTimeFormatter DATE_FORMAT_HM = DateTimeFormatter.ofPattern("HH:mm");
+    public static DateTimeFormatter DATE_FORMAT_MD_HM = DateTimeFormatter.ofPattern("MM-dd HH:mm");
+    public static DateTimeFormatter DATE_FORMAT_MD = DateTimeFormatter.ofPattern("MM-dd");
+    public static DateTimeFormatter DATE_FORMAT_YMD = DateTimeFormatter.ofPattern("yy-MM-dd");
+    public static DateTimeFormatter DATE_FORMAT_YMD_HM =
+            DateTimeFormatter.ofPattern("yy-MM-dd HH:mm");
 
     /**
      * 日期转换为制定格式字符串
      */
-    public static String formatDateToString(Date time, String pattern) {
+    public static String formatDateToString(Date time, DateTimeFormatter pattern) {
         try {
-            return (new SimpleDateFormat(pattern, Locale.getDefault())).format(time);
+            return time.toInstant().atZone(zoneId).format(pattern);
         } catch (Exception e) {
             return "";
         }

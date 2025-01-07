@@ -1,8 +1,15 @@
 package com.wk.chart.enumeration;
 
+import static com.wk.chart.compat.DateUtil.DATE_FORMAT_HM;
+import static com.wk.chart.compat.DateUtil.DATE_FORMAT_MD;
+import static com.wk.chart.compat.DateUtil.DATE_FORMAT_MD_HM;
+import static com.wk.chart.compat.DateUtil.DATE_FORMAT_YMD;
+import static com.wk.chart.compat.DateUtil.DATE_FORMAT_YMD_HM;
+
 import androidx.annotation.Nullable;
 
 import java.io.Serializable;
+import java.time.format.DateTimeFormatter;
 
 /**
  * <p>TimeType</p>
@@ -10,7 +17,7 @@ import java.io.Serializable;
  */
 
 public enum TimeType implements Serializable {
-    ONE_MINUTE(0, "HH:mm", 1, 60000, "1min"),//一分钟
+    ONE_MINUTE(0, DATE_FORMAT_HM, 1, 60000, "1min"),//一分钟
 
     FIVE_MINUTE(1, ONE_MINUTE.pattern, 5, ONE_MINUTE.msec, "5min"),//五分钟
 
@@ -20,7 +27,7 @@ public enum TimeType implements Serializable {
 
     ONE_HOUR(4, ONE_MINUTE.pattern, 1, ONE_MINUTE.msec * 60, "60min"),//一小时
 
-    TWO_HOUR(5, "MM-dd HH:mm", 2, ONE_HOUR.msec, "2hour"),//二小时
+    TWO_HOUR(5, DATE_FORMAT_MD_HM, 2, ONE_HOUR.msec, "2hour"),//二小时
 
     THREE_HOUR(6, TWO_HOUR.pattern, 3, ONE_HOUR.msec, "3hour"),//三小时
 
@@ -32,13 +39,13 @@ public enum TimeType implements Serializable {
 
     TWELVE_HOUR(10, TWO_HOUR.pattern, 12, ONE_HOUR.msec, "12hour"),//十二小时
 
-    DAY(11, "MM-dd", 1, ONE_HOUR.msec * 24, "1day"),//天
+    DAY(11, DATE_FORMAT_MD, 1, ONE_HOUR.msec * 24, "1day"),//天
 
-    WEEK(12, "yy-MM-dd", 7, DAY.msec, "1week"),//周
+    WEEK(12, DATE_FORMAT_YMD, 7, DAY.msec, "1week"),//周
 
-    MONTH(13, "yy-MM-dd", 1, 0, "1month");//月
+    MONTH(13, DATE_FORMAT_YMD_HM, 1, 0, "1month");//月
 
-    TimeType(int nativeInt, String pattern, int value, long msec, String param) {
+    TimeType(int nativeInt, DateTimeFormatter pattern, int value, long msec, String param) {
         this.pattern = pattern;
         this.value = value;
         this.msec = msec;
@@ -46,14 +53,14 @@ public enum TimeType implements Serializable {
         this.param = param;
     }
 
-    private final String pattern;
+    private final DateTimeFormatter pattern;
     private final int value;
     private final long msec;
     private final int nativeInt;
     private final String param;
     private static final int HASHCODE = TimeType.class.hashCode();
 
-    public final String pattern() {
+    public final DateTimeFormatter pattern() {
         return pattern;
     }
 

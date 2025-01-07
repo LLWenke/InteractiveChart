@@ -36,7 +36,14 @@ public class CandleEntry extends IndexEntry {
      * @param volume 量
      * @param time   时间
      */
-    public CandleEntry(String open, String high, String low, String close, String volume,@NonNull Date time) {
+    public CandleEntry(
+            String open,
+            String high,
+            String low,
+            String close,
+            String volume,
+            @NonNull Date time
+    ) {
         super(time);
         this.open = new ValueEntry(open);
         this.high = new ValueEntry(high);
@@ -82,7 +89,11 @@ public class CandleEntry extends IndexEntry {
         Integer changeProportionScale = 2;
         long changeProportionValue = ValueUtils.scaleDivide(changeAmount.result, open.result, 4);
         if (!changeProportionScale.equals(changeProportion.scale) || changeProportionValue != changeProportion.result) {
-            ValueUtils.buildScaleValue(changeProportion, changeProportionValue, changeProportionScale);
+            ValueUtils.buildScaleValue(
+                    changeProportion,
+                    changeProportionValue,
+                    changeProportionScale
+            );
         }
     }
 
@@ -95,8 +106,7 @@ public class CandleEntry extends IndexEntry {
         if (this.timeType == timeType) return;
         this.timeType = timeType;
         shortTimeText = DateUtil.formatDateToString(getTime(), timeType.pattern());
-        timeText = DateUtil.formatDateToString(getTime(), timeType == TimeType.DAY
-                ? DateUtil.DATE_FORMAT_YMD : DateUtil.DATE_FORMAT_YMD_HM);
+        timeText = DateUtil.formatDateToString(getTime(), DateUtil.DATE_FORMAT_YMD_HM);
     }
 
 
