@@ -111,7 +111,7 @@ public class DepthGridDrawing extends IndexDrawing<DepthRender, AbsModule<AbsEnt
             canvas.drawText(value, pointCache[0], gridLabelY, gridLabelPaint);
             for (int i = 1; i < attribute.gridCount; i++) {
                 float x = viewRect.left + i * regionWidth;
-                pointCache[0] = x - (i > (attribute.gridCount / 2) ? chartModule.getXOffset() :
+                pointCache[0] = x - (i > (attribute.gridCount >> 1) ? chartModule.getXOffset() :
                         -chartModule.getXOffset());
                 render.invertMapPoints(render.getMainModule().getMatrix(), pointCache);
                 value = render.getAdapter().rateConversion(pointCache[0],
