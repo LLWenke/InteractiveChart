@@ -123,7 +123,7 @@ public class DepthAdapter extends AbsAdapter<DepthEntry, NormalBuildConfig> {
         } else if (end - start == 1) {
             return end;
         }
-        int mid = start + (end - start) / 2;
+        int mid = start + ((end - start) >> 1);
         long midValue = data.get(mid).getPrice().result;
         switch (type) {
             case 1://反向查找

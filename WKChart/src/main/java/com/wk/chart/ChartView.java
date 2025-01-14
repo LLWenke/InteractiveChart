@@ -372,7 +372,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private void dragging(float dx) {
         //添加阻尼效果
         float overScrollOffset = Math.abs(render.getOverScrollOffset());
-        float restriction = viewRect.width() / 2f;
+        float restriction = viewRect.width() / 2;
         float rate = overScrollOffset < restriction ? 1f - overScrollOffset / restriction : 0f;
         float draggingDX = dx * rate;
         render.updateCurrentTransX(draggingDX);

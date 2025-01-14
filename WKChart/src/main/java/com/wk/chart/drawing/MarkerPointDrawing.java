@@ -94,9 +94,9 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
         markerPointsTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
         Utils.measureTextArea(markerPointsTextPaint, textRect, "S");
-        pointRectHalfWidth = (int) ((textRect.width() + attribute.markerPointTextMarginHorizontal * 2) / 2);
+        pointRectHalfWidth = (int) (textRect.width() + attribute.markerPointTextMarginHorizontal * 2) >> 1;
         pointRectHeight = (textRect.height() + attribute.markerPointTextMarginVertical * 2);
-        jointSize = (int) (attribute.markerPointJointRadius * 2);
+        jointSize = (int) attribute.markerPointJointRadius << 1;
         textY = (pointRectHeight - textRect.height()) / 2;
         triangleHeight = jointSize - jointSize / 3;
         totalRectHeight = pointRectHeight + triangleHeight;
@@ -107,7 +107,7 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
         position = 0;
         if (null == texts || iMarkerPoint.getMarkerPointCount() > texts.length) {
             texts = new String[iMarkerPoint.getMarkerPointCount()];
-            textPointBuffer = new float[texts.length * 2];
+            textPointBuffer = new float[texts.length << 1];
         }
     }
 
@@ -156,7 +156,7 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
         canvas.drawPath(markerPointsLinePathT, markerPointsLinePaint);
 
         for (int i = 0; i < iMarkerPoint.getMarkerPointCount() && i < texts.length; i++) {
-            int index = i * 2;
+            int index = i << 1;
             canvas.drawText(texts[i], textPointBuffer[index], textPointBuffer[index + 1], markerPointsTextPaint);
         }
 
@@ -464,7 +464,7 @@ public class MarkerPointDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEn
         }
         if (position < texts.length) {
             texts[position] = markerText;
-            int index = position * 2;
+            int index = position << 1;
             textPointBuffer[index] = x;
             textPointBuffer[index + 1] = y;
             position++;

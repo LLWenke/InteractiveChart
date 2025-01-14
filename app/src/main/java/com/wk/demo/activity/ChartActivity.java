@@ -308,7 +308,7 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
     }
 
     private List<CandleEntry> getInit() {
-        this.loadStartPos = candleEntries.size() / 2;
+        this.loadStartPos = candleEntries.size() >> 1;
         this.loadEndPos = loadStartPos + loadCount;
         this.loadEndPos = Math.min(loadEndPos, candleEntries.size());
         List<CandleEntry> set = new ArrayList<>();
