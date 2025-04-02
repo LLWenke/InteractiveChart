@@ -75,7 +75,7 @@ class IndexSettingActivity : AppCompatActivity(), IndexManager.IndexConfigChange
                 if (TextUtils.isEmpty(index.term)) {
                     continue
                 }
-                if (item.key == IndexType.CANDLE_MA || item.key == IndexType.RSI || item.key == IndexType.WR) {
+                if (item.key == IndexType.CANDLE_MA || item.key == IndexType.EMA || item.key == IndexType.RSI || item.key == IndexType.WR) {
                     nodes.add(
                         IndexChildNode(
                             item.key,
@@ -110,6 +110,11 @@ class IndexSettingActivity : AppCompatActivity(), IndexManager.IndexConfigChange
                     footerTips = getString(R.string.wk_ma_tips)
                     baseTitle = getString(R.string.wk_main_index)
                     baseName = getString(R.string.wk_ma)
+                }
+
+                IndexType.EMA -> {
+                    footerTips = getString(R.string.wk_ema_tips)
+                    baseName = getString(R.string.wk_ema)
                 }
 
                 IndexType.BOLL -> {

@@ -20,6 +20,7 @@ class IndexPopupWindow(
     override fun initContentView(): View {
         mBinding.runCatching {
             tvMa.setOnClickListener(this@IndexPopupWindow)
+            tvEma.setOnClickListener(this@IndexPopupWindow)
             tvBoll.setOnClickListener(this@IndexPopupWindow)
             tvSar.setOnClickListener(this@IndexPopupWindow)
             tvVolume.setOnClickListener(this@IndexPopupWindow)
@@ -39,6 +40,10 @@ class IndexPopupWindow(
         when (v.id) {
             R.id.tv_ma -> {
                 mainIndexViewToggle(IndexType.CANDLE_MA)
+            }
+
+            R.id.tv_ema -> {
+                mainIndexViewToggle(IndexType.EMA)
             }
 
             R.id.tv_boll -> {
@@ -101,6 +106,7 @@ class IndexPopupWindow(
      */
     private fun mainIndexViewSelected(indexTypeSet: HashSet<Int>?) {
         mBinding.tvMa.isSelected = false
+        mBinding.tvEma.isSelected = false
         mBinding.tvBoll.isSelected = false
         mBinding.tvSar.isSelected = false
         mBinding.ivMainIndexSwitch.isSelected = false
@@ -108,6 +114,10 @@ class IndexPopupWindow(
             when (indexType) {
                 IndexType.CANDLE_MA -> {
                     mBinding.tvMa.isSelected = true
+                }
+
+                IndexType.EMA -> {
+                    mBinding.tvEma.isSelected = true
                 }
 
                 IndexType.BOLL -> {

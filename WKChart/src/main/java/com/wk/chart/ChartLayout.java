@@ -160,6 +160,8 @@ public class ChartLayout extends ConstraintLayout {
         candleModule.addDrawing(new CandleDrawing());//蜡烛图组件
         candleModule.addDrawing(new IndexLineDrawing(IndexType.CANDLE_MA));//MA组件
         candleModule.addDrawing(new IndexLabelDrawing(IndexType.CANDLE_MA));//MA指标文字标签组件
+        candleModule.addDrawing(new IndexLineDrawing(IndexType.EMA));//EMA组件
+        candleModule.addDrawing(new IndexLabelDrawing(IndexType.EMA));//EMA指标文字标签组件
         candleModule.addDrawing(new IndexLineDrawing(IndexType.BOLL));//BOLL指标组件
         candleModule.addDrawing(new IndexLabelDrawing(IndexType.BOLL));//BOLL指标文字标签组件
         candleModule.addDrawing(new SARDrawing());//SAR指标组件
