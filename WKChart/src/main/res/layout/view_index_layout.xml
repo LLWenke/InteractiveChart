@@ -33,10 +33,26 @@
         android:textColor="@color/color_tab_text_accent"
         android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/tv_boll"
+        app:layout_constraintBottom_toTopOf="@id/tv_ema"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_main_index_label" />
+
+    <com.wk.view.FontTextView
+        android:id="@+id/tv_ema"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:padding="@dimen/five"
+        android:text="@string/wk_ema"
+        android:textColor="@color/color_tab_text_accent"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/tv_boll"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_ma" />
 
     <com.wk.view.FontTextView
         android:id="@+id/tv_boll"
@@ -52,7 +68,7 @@
         app:layout_constraintBottom_toTopOf="@id/tv_sar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_ma" />
+        app:layout_constraintTop_toBottomOf="@id/tv_ema" />
 
     <com.wk.view.FontTextView
         android:id="@+id/tv_sar"

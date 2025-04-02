@@ -65,6 +65,14 @@ public class IndexBuildConfig extends AbsBuildConfig {
                 new int[]{7, 15},
                 new boolean[]{true, true},
                 defaultIndexColors));
+        //配置EMA
+        this.defaultIndexFlagConfig.put(IndexType.EMA, buildIndexTagEntry(
+                null,
+                new String[]{"EMA#:", "EMA#:", "EMA#:", "EMA#:", "EMA#:", "EMA#:"},
+                new String[]{"EMA", "EMA", "EMA", "EMA", "EMA", "EMA"},
+                new int[]{6, 12, 20, 0, 0, 0},
+                new boolean[]{true, true, true, false, false, false},
+                defaultIndexColors));
         //配置BOLL
         this.defaultIndexFlagConfig.put(IndexType.BOLL, buildIndexTagEntry(
                 "BOLL(#)",

@@ -28,6 +28,7 @@ class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
         mBinding.runCatching {
             setPadding(0, 20, 0, 16)
             tvMa.setOnClickListener(this@ChartIndexTabLayout)
+            tvEma.setOnClickListener(this@ChartIndexTabLayout)
             tvBoll.setOnClickListener(this@ChartIndexTabLayout)
             tvSar.setOnClickListener(this@ChartIndexTabLayout)
             tvVolume.setOnClickListener(this@ChartIndexTabLayout)
@@ -47,6 +48,10 @@ class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
         when (v.id) {
             R.id.tv_ma -> {
                 mainIndexViewToggle(IndexType.CANDLE_MA)
+            }
+
+            R.id.tv_ema -> {
+                mainIndexViewToggle(IndexType.EMA)
             }
 
             R.id.tv_boll -> {
@@ -99,12 +104,17 @@ class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
      */
     private fun mainIndexViewSelected(indexTypeSet: HashSet<Int>?) {
         mBinding.tvMa.isSelected = false
+        mBinding.tvEma.isSelected = false
         mBinding.tvBoll.isSelected = false
         mBinding.tvSar.isSelected = false
         indexTypeSet?.forEach { indexType ->
             when (indexType) {
                 IndexType.CANDLE_MA -> {
                     mBinding.tvMa.isSelected = true
+                }
+
+                IndexType.EMA -> {
+                    mBinding.tvEma.isSelected = true
                 }
 
                 IndexType.BOLL -> {

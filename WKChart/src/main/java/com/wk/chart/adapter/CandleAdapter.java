@@ -201,8 +201,9 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         //构建数据属性值
         buildScaleValue(data, startPosition);
         buildTimeText(data, startPosition);
-        //计算 MA MACD BOLL SAR RSI KDJ WR 指标
+        //计算 MA EMA MACD BOLL SAR RSI KDJ WR 指标
         computeMA(data, buildConfig, startPosition);
+        computeEMA(data, buildConfig, startPosition);
         computeMACD(data, buildConfig, startPosition);
         computeBOLL(data, buildConfig, startPosition);
         computeSAR(data, buildConfig, startPosition);
@@ -283,6 +284,44 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
                 this.calculationCache.candleMA = candleMA.clone();
                 this.calculationCache.volumeMA = volumeMA.clone();
             }
+        }
+    }
+
+    /**
+     * 计算 EMA
+     * 计算公式为：EMA(今日) = (今日收盘价 - 昨日EMA) × (2/(N+1)) + 昨日EMA‌，其中N为计算周期，平滑系数通过2/(N+1)确定
+     */
+    private void computeEMA(@NonNull List<CandleEntry> data, @NonNull IndexBuildConfig indicatorConfig, int startPosition) {
+        IndexConfigEntry indicatorTag = indicatorConfig.getIndexTags(IndexType.EMA);
+        int indicatorCount = null == indicatorTag ? 0 : indicatorTag.getFlagEntries().length;
+        long[] ema;
+        if (startPosition == 0) {
+            ema = new long[indicatorCount];
+        } else {
+            ema = null == calculationCache.ema ? new long[indicatorCount] : calculationCache.ema.clone();
+        }
+        //计算蜡烛图EMA值
+        for (int i = startPosition, z = data.size(); i < z; i++) {
+            CandleEntry entry = data.get(i);
+            ValueEntry[] values = new ValueEntry[indicatorCount];
+            for (int j = 0; j < indicatorCount; j++) {
+                int flag = indicatorTag.getFlagEntries()[j].getFlag();
+                int startIndex = flag - 1;
+                if (i > startIndex) {
+                    ema[j] = (long) ((entry.getClose().result - ema[j]) * (2.0f / (flag + 1)) + ema[j]);
+                    values[j] = entry.buildQuoteScaleValue(getScale(), ema[j]);
+                } else if (i == startIndex) {
+                    ema[j] = entry.getClose().result;
+                    values[j] = entry.buildQuoteScaleValue(getScale(), ema[j]);
+                }
+            }
+            //存储此次计算结果
+            entry.putLineIndex(IndexType.EMA, values);
+            //将倒数第二次的计算结果缓存
+            if (i == z - 2) {
+                this.calculationCache.ema = ema.clone();
+            }
+
         }
     }
 
@@ -666,9 +705,11 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
      * 计算结果缓存类
      */
     static class CalculationCache {
-        //平均线
+        //MA
         long[] candleMA;
         long[] volumeMA;
+        //EMA
+        long[] ema;
         //macd
         long emaS = 0;
         long emaL = 0;

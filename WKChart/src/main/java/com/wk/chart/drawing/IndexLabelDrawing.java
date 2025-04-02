@@ -204,6 +204,7 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
         String label;
         switch (indexType) {
             case IndexType.CANDLE_MA:
+            case IndexType.EMA:
             case IndexType.BOLL:
             case IndexType.SAR:
                 label = name.concat(render.getAdapter().rateConversion(value, false, false));
