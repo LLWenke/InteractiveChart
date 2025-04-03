@@ -49,9 +49,7 @@ public class WaterMarkingDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?
 
     @Override
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
-        if (bitmap == null || bitmap.isRecycled()) {
-            return;
-        }
+        if (bitmap == null || bitmap.isRecycled()) return;
         canvas.drawBitmap(bitmap, matrix, paint);
     }
 
