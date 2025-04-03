@@ -370,6 +370,10 @@
             <flag name="end" value="8" />
             <!-- 下 -->
             <flag name="bottom" value="16" />
+            <!-- 垂直居中 -->
+            <flag name="center_vertical" value="512" />
+            <!-- 水平居中 -->
+            <flag name="center_horizontal" value="1024" />
         </attr>
 
         <!--与呼吸灯有关的属性-->
