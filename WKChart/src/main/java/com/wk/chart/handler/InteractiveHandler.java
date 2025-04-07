@@ -13,9 +13,6 @@ public abstract class InteractiveHandler {
     public void onLeftLoad(AbsEntry firstData) {
     }
 
-    public void onRightLoad(AbsEntry lastData) {
-    }
-
     public boolean onSingleClick(int clickId, float x, float y) {
         return false;
     }
