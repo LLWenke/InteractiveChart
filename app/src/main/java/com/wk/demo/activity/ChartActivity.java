@@ -76,7 +76,7 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
 
     private int loadStartPos = 0;
     private int loadEndPos = 0;
-    private final int loadCount = 300;
+    private final int loadCount = 1000;
     private CandleAdapter candleAdapter;
     private DepthAdapter depthAdapter;
 
