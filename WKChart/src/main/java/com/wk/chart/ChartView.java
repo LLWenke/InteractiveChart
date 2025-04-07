@@ -46,10 +46,7 @@ import java.beans.PropertyChangeListener;
 
 public class ChartView extends View implements DelayedHandler.DelayedWorkListener {
     private static final String TAG = "ChartView";
-    // 与滚动控制、滑动加载数据相关的属性
-    private final int OVER_SCROLL_DURATION = 500; // dragging 松手之后回中的时间，单位：毫秒
     private final int LEFT_LOADING = -1; // 加载中（左）
-    private final int RIGHT_LOADING = 1; // 加载中（右）
     // 视图区域
     private BaseAttribute attribute = null;
     private final RectF viewRect = new RectF();
@@ -66,7 +63,6 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     private boolean onLongPress = false;
     private boolean onDoubleFingerPress = false;
     private boolean hasLeftLoad = false;
-    private boolean hasRightLoad = false;
     private boolean scrollIdle = true;
     private int loadState = 0;//加载状态
     private float lastFlingX = 0;
@@ -485,15 +481,10 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                         loadState = LEFT_LOADING;
                         interactiveHandler.onLeftLoad(adapter.getItem(0));
                     }
-                } else if (rightCanLoad() && overScrollOffset < 0) {
-                    overScrollOffset += eventThreshold;
-                    if (loadState != RIGHT_LOADING) {
-                        loadState = RIGHT_LOADING;
-                        interactiveHandler.onRightLoad(adapter.getItem(adapter.getLastPosition()));
-                    }
                 }
             }
-            scroller.startScroll(0, 0, (int) overScrollOffset, 0, OVER_SCROLL_DURATION);
+            // 与滚动控制、滑动加载数据相关的属性
+            scroller.startScroll(0, 0, (int) overScrollOffset, 0, 500);
             postInvalidateOnAnimation();
         } else {
             scrollIdle = true;
@@ -504,19 +495,13 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      * 加载完成
      */
     public void loadingComplete(boolean hasMore) {
-        int overScrollOffset = (int) render.getOverScrollOffset();
         int state = loadState;
         this.loadState = 0;
         this.lastFlingX = 0;
         this.scrollIdle = false;
+        this.render.setOverScrollOffset(0);
         if (state == LEFT_LOADING) {
             hasLeftLoad = hasMore;
-        } else if (state == RIGHT_LOADING) {
-            hasRightLoad = hasMore;
-        }
-        if (overScrollOffset != 0) {
-            scroller.startScroll(0, 0, overScrollOffset, 0, OVER_SCROLL_DURATION);
-            postInvalidateOnAnimation();
         }
     }
 
@@ -524,7 +509,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      * 是否加载中
      */
     public boolean isLoading() {
-        return loadState == LEFT_LOADING || loadState == RIGHT_LOADING;
+        return loadState == LEFT_LOADING;
     }
 
     /**
@@ -532,13 +517,6 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
      */
     public boolean canLeftLoad() {
         return null != attribute && attribute.enableLeftLoadMore && hasLeftLoad;
-    }
-
-    /**
-     * 是否可以右滑加载
-     */
-    public boolean rightCanLoad() {
-        return null != attribute && attribute.enableRightLoadMore && hasRightLoad;
     }
 
     /**
@@ -668,7 +646,6 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         this.lastFlingX = 0;
         this.scrollIdle = true;
         this.hasLeftLoad = true;
-        this.hasRightLoad = true;
         this.render.resetChart();
         this.scroller.forceFinished(true);
     }

@@ -3,7 +3,6 @@ package com.wk.demo.activity;
 import static android.widget.Toast.LENGTH_SHORT;
 import static com.wk.chart.enumeration.LoadingType.LEFT_LOADING;
 import static com.wk.chart.enumeration.LoadingType.REFRESH_LOADING;
-import static com.wk.chart.enumeration.LoadingType.RIGHT_LOADING;
 import static com.wk.demo.util.DataUtils.candleEntries;
 import static com.wk.demo.util.DataUtils.depthEntries;
 
@@ -76,7 +75,7 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
 
     private int loadStartPos = 0;
     private int loadEndPos = 0;
-    private final int loadCount = 1000;
+    private final int loadCount = 300;
     private CandleAdapter candleAdapter;
     private DepthAdapter depthAdapter;
 
@@ -226,20 +225,6 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
                     chartLayout.loadComplete(candleProgressBar);
                 }, 2000);
             }
-
-            @Override
-            public void onRightLoad(AbsEntry lastData) {
-                chartLayout.loadBegin(RIGHT_LOADING, candleProgressBar, candleChart);
-                // 模拟耗时
-                candleChart.postDelayed(() -> {
-                    List<CandleEntry> entries = getFooter();
-                    candleAdapter.addFooterData(entries);
-                    if (entries.isEmpty()) {
-                        Toast.makeText(ChartActivity.this, "已经到达最右边了", LENGTH_SHORT).show();
-                    }
-                    chartLayout.loadComplete(candleProgressBar);
-                }, 2000);
-            }
         });
         this.chartLayout.initChart();
     }
@@ -324,17 +309,6 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
         this.loadStartPos = Math.max(loadStartPos, 0);
         List<CandleEntry> entries = new ArrayList<>();
         for (int i = loadStartPos; i < end; i++) {
-            entries.add(candleEntries.get(i));
-        }
-        return entries;
-    }
-
-    private List<CandleEntry> getFooter() {
-        int start = loadEndPos;
-        this.loadEndPos = loadEndPos + loadCount;
-        this.loadEndPos = Math.min(loadEndPos, candleEntries.size());
-        List<CandleEntry> entries = new ArrayList<>();
-        for (int i = start; i < loadEndPos; i++) {
             entries.add(candleEntries.get(i));
         }
         return entries;
