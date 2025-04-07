@@ -474,11 +474,11 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         overScrollOffset = 0;
         matrixTouch.getValues(touchValues);
         touchValues[Matrix.MTRANS_X] -= dx;
-        touchValues[Matrix.MTRANS_X] =
-                touchValues[Matrix.MTRANS_X] > minScrollOffset ? minScrollOffset : Math.max(
-                        touchValues[Matrix.MTRANS_X],
-                        -maxScrollOffset
-                );
+        touchValues[Matrix.MTRANS_X] = touchValues[Matrix.MTRANS_X] > minScrollOffset ?
+                minScrollOffset : Math.max(
+                touchValues[Matrix.MTRANS_X],
+                -maxScrollOffset
+        );
         matrixTouch.setValues(touchValues);
     }
 
@@ -509,6 +509,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         } else {
             minVisibleIndex = Math.abs(touchPts[0] - toMinVisibleIndex);
         }
+        matrixTouch.getValues(touchValues);
         touchValues[Matrix.MSCALE_X] = adapter.getCount() / visibleCount;
         computeScrollRange(contentRect, touchValues[Matrix.MSCALE_X]);
         touchValues[Matrix.MTRANS_X] =

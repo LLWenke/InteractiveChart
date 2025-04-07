@@ -31,9 +31,7 @@ public class CandleRender extends AbsRender<CandleAdapter, CandleAttribute> {
      */
     @Override
     public void onZoom(float x, float y) {
-        if (adapter.getCount() == 0 || !canScroll()) {
-            return;
-        }
+        if (adapter.getCount() == 0 || !canScroll()) return;
         resetPointsWidth();
         zoom(mainModule.getMatrix(), mainModule.getRect(), attribute.visibleCount, x, y);
     }

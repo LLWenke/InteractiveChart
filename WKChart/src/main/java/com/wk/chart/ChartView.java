@@ -110,8 +110,13 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
             getContext(),
             new GestureDetector.SimpleOnGestureListener() {
                 @Override
+                public boolean onDown(@NonNull MotionEvent e) {
+                    return true;
+                }
+
+                @Override
                 public void onLongPress(@NonNull MotionEvent e) {
-                    if (onTouch) {
+                    if (onTouch && !onDoubleFingerPress) {
                         onLongPress = true;
                         highlight(e.getX(), e.getY());
                     }
@@ -143,6 +148,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                         float distanceX,
                         float distanceY
                 ) {
+//                    Log.e(TAG, "onScroll：" + distanceX);
                     if (!onLongPress && !onDoubleFingerPress) {
                         cancelHighlight();
                         if (render.canScroll(distanceX)) {
@@ -255,9 +261,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
         }
         this.renderModel = renderModel;
         this.attribute = render.getAttribute();
-        this.gestureDetector.setIsLongpressEnabled(true);
         this.scroller = new OverScroller(getContext());
-        this.scaleDetector.setQuickScaleEnabled(false);
         DelayedHandler.getInstance().setListener(this);
     }
 
@@ -567,8 +571,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        boolean state = scaleDetector.onTouchEvent(e) | gestureDetector.onTouchEvent(e);
-        switch (e.getAction()) {
+        switch (e.getActionMasked()) {
             case MotionEvent.ACTION_POINTER_DOWN:
                 onDoubleFingerPress = true;
                 break;
@@ -584,10 +587,12 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                     onDragging = true;
                 }
                 break;
+            case MotionEvent.ACTION_POINTER_UP:
+                onDoubleFingerPress = false;
+                break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 onTouch = false;
-                onDoubleFingerPress = false;
                 if (onLongPress) {
                     onLongPress = false;
                     postOnlyDelayedWork(DelayedTaskID.ID_CANCEL_HIGHLIGHT, 10000);
@@ -596,10 +601,8 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                     computeScroll();
                 }
                 break;
-            default:
-                break;
         }
-        return state;
+        return onDoubleFingerPress ? scaleDetector.onTouchEvent(e) : gestureDetector.onTouchEvent(e);
     }
 
     /**

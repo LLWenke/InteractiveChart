@@ -44,7 +44,7 @@ public class BaseAttribute {
     public int lineColor = 0x1Affffff; // 线条颜色
     public float labelSize = 26; // 标签字符大小
     public int labelColor = 0xff8c99a6; //标签字符颜色
-    public boolean onSingleClickSelected = false;//是否可以单击选中
+    public boolean onSingleClickSelected = true;//是否可以单击选中
     public boolean enableLeftLoadMore = true;//启用左滑加载更多
     public boolean enableRightLoadMore = true;//启用右滑加载更多
 
@@ -162,7 +162,7 @@ public class BaseAttribute {
     public float pointWidth = 28f;//数据点初始宽度（缩放都将以此宽度为基准）
     public float visibleCount = 20; // 竖屏状态下的默认缩放倍数下显示多少个蜡烛图。注：横屏时会自动根据视图宽高变化比例计算，不需要手工设置
     public float maxScale = 10;// 最多放大倍数
-    public float minScale = 5;// 最多缩小倍数(缩小后的宽度不会小于 蜡烛图矩形边框线宽度（candleBorderWidth）)
+    public float minScale = 4;// 最多缩小倍数(缩小后的宽度不会小于 蜡烛图矩形边框线宽度（candleBorderWidth）)
     public float scalePow = 2;// 当前缩放速率的幂（设置此参数可控制缩放速度，取值>=0）
     public float currentScale = 1;// 当前缩放倍数
 
