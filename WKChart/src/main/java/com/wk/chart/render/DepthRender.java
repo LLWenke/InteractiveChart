@@ -53,7 +53,7 @@ public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
     }
 
     @Override
-    public boolean canScroll(float dx) {
+    public boolean canScroll() {
         return false;
     }
 

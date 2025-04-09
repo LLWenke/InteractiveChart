@@ -93,13 +93,6 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     }
 
     /**
-     * 是否可滚动
-     */
-    public boolean canScroll() {
-        return attribute.canScroll;
-    }
-
-    /**
      * 获取配置信息
      */
     public A getAttribute() {
@@ -179,9 +172,9 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     /**
      * 是否可以滚动
      */
-    public boolean canScroll(float dx) {
-        final float offset = touchValues[Matrix.MTRANS_X] - dx;
-        return (offset >= -maxScrollOffset || touchValues[Matrix.MTRANS_X] > -maxScrollOffset) && (offset <= minScrollOffset || touchValues[Matrix.MTRANS_X] < minScrollOffset);
+    public boolean canScroll() {
+        matrixTouch.getValues(touchValues);
+        return touchValues[Matrix.MTRANS_X] > -maxScrollOffset && touchValues[Matrix.MTRANS_X] < minScrollOffset;
     }
 
     /**
@@ -330,14 +323,13 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         cacheCurrentTransX = 0;
         cacheMaxScrollOffset = 0;
         setOverScrollOffset(0);
-        setCurrentTransX(0);
     }
 
     /**
      * 刷新缩放后的数据点宽度和显示数量
      */
     protected void resetPointsWidth() {
-        if (canScroll()) {
+        if (attribute.canScroll) {
             pointsWidth = attribute.pointWidth * attribute.currentScale;
             if (pointsWidth < pointsMinWidth) {
                 pointsWidth = pointsMinWidth;
@@ -363,14 +355,15 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      * 刷新Matrix
      */
     void resetMatrix() {
-        final float lastMaxScrollOffset = maxScrollOffset;
-        final float visibleScale = adapter.getCount() / attribute.visibleCount;
-        final float widthScale = mainModule.getRect().width() / adapter.getCount();
+        float lastMaxScrollOffset = maxScrollOffset;
+        float visibleScale = adapter.getCount() / attribute.visibleCount;
+        float widthScale = mainModule.getRect().width() / adapter.getCount();
         computeScrollRange(mainModule.getRect(), visibleScale);
         postMatrixScale(matrixTouch, visibleScale, 1f);
         postMatrixScale(mainModule.getMatrix(), widthScale, 1f);
         postMatrixOffset(matrixOffset, mainModule.getRect().left, viewRect.top);
         postMatrixTranslate(matrixTouch, lastMaxScrollOffset);
+        matrixTouch.getValues(touchValues);
     }
 
     /**
@@ -398,16 +391,6 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     }
 
     /**
-     * 无边界检测地直接设置当前滚动量
-     *
-     * @param transX 当前滚动位置。此值为正时将被程序视为负，因为这里的滚动量用负数表示。
-     */
-    public void setCurrentTransX(float transX) {
-        touchValues[Matrix.MTRANS_X] = transX > 0 ? -transX : transX;
-        matrixTouch.setValues(touchValues);
-    }
-
-    /**
      * 获取当前滚动量
      *
      * @return 当前滚动量
@@ -415,24 +398,6 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     public float getCurrentTransX() {
         matrixTouch.getValues(touchValues);
         return touchValues[Matrix.MTRANS_X];
-    }
-
-    /**
-     * 获取给定的 entryIndex 对应的滚动偏移量。在调用 {@link #computeScrollRange} 之后才能调用此方法
-     *
-     * @param matrix       矩阵
-     * @param rect         显示区域矩形
-     * @param visibleCount 当前显示区域的 X 轴方向上需要显示多少个 entry 值
-     * @param entryIndex   entry 索引
-     */
-    protected float getTransX(Matrix matrix, RectF rect, float visibleCount, float entryIndex) {
-        final int dataSize = adapter.getCount();
-        if (dataSize <= visibleCount) return touchValues[Matrix.MTRANS_X];
-        float leftOffset = getPointX(matrix, 0) - rect.left;
-        float result = (maxScrollOffset - attribute.rightScrollOffset) * entryIndex / (dataSize - visibleCount) - Math.max(leftOffset, 0f);
-        result = Math.min(maxScrollOffset, result);
-        result = Math.max(-minScrollOffset, result);
-        return -result + overScrollOffset;
     }
 
     /**
@@ -470,9 +435,9 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
     public void scroll(float dx) {
         overScrollOffset = 0;
         matrixTouch.getValues(touchValues);
-        touchValues[Matrix.MTRANS_X] -= dx;
-        touchValues[Matrix.MTRANS_X] = touchValues[Matrix.MTRANS_X] > minScrollOffset
-                ? minScrollOffset : Math.max(touchValues[Matrix.MTRANS_X], -maxScrollOffset);
+        float translate = touchValues[Matrix.MTRANS_X] - dx;
+        touchValues[Matrix.MTRANS_X] = translate > minScrollOffset
+                ? minScrollOffset : Math.max(translate, -maxScrollOffset);
         matrixTouch.setValues(touchValues);
     }
 
@@ -486,24 +451,22 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      * @param y            在点(x, y)上缩放。由于 K 线图只会进行水平滚动，因此 y 值被忽略
      */
     protected void zoom(@NotNull Matrix matrix, RectF contentRect, float visibleCount, float x, float y) {
-        if (x < contentRect.left) {
-            x = contentRect.left;
-        } else if (x > contentRect.right) {
-            x = contentRect.right;
-        }
-        final float scaleX;
-        final float minVisibleIndex;
-        final float toMinVisibleIndex = visibleCount * (x - contentRect.left) / contentRect.width();
+        int dataSize = adapter.getCount();
+        float scaleX = dataSize / visibleCount;
+        x = x < contentRect.left ? contentRect.left : Math.min(x, contentRect.right);
         touchPts[0] = x;
         touchPts[1] = 0;
         invertMapPoints(matrix, touchPts);
-        minVisibleIndex = touchPts[0] <= toMinVisibleIndex ? 0 : Math.abs(touchPts[0] - toMinVisibleIndex);
-        scaleX = adapter.getCount() / visibleCount;
         computeScrollRange(contentRect, scaleX);
+        float leftOffset = Math.max(0, getPointX(matrix, 0) - contentRect.left);
+        float toMinVisibleIndex = visibleCount * (x - contentRect.left) / contentRect.width();
+        float minVisibleIndex = touchPts[0] <= toMinVisibleIndex ? 0 : Math.abs(touchPts[0] - toMinVisibleIndex);
+        float result = (maxScrollOffset - attribute.rightScrollOffset) * minVisibleIndex / (dataSize - visibleCount) - leftOffset;
+        result = Math.min(maxScrollOffset, result);
+        result = Math.max(-minScrollOffset, result);
         matrixTouch.getValues(touchValues);
         touchValues[Matrix.MSCALE_X] = scaleX;
-        computeScrollRange(contentRect, scaleX);
-        touchValues[Matrix.MTRANS_X] = getTransX(matrix, contentRect, visibleCount, minVisibleIndex);
+        touchValues[Matrix.MTRANS_X] = -result + overScrollOffset;
         matrixTouch.setValues(touchValues);
     }
 
@@ -619,19 +582,14 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
         float translate;
         if (firstLoad) {
             firstLoad = false;
-            if (cacheMaxScrollOffset > 0) { // 通常首次加载时定位到最末尾
-                translate = cacheCurrentTransX + (cacheMaxScrollOffset - maxScrollOffset);
-            } else { //如果有需要第一次加载滚动到的下标位置，则滚动到该下标对应位置
-                translate = -maxScrollOffset;
-            }
-        } else if (touchValues[Matrix.MTRANS_X] <= -lastMaxScrollOffset) {
-            translate = -maxScrollOffset;
+            translate = cacheMaxScrollOffset > 0 ? cacheCurrentTransX + (cacheMaxScrollOffset - maxScrollOffset) :
+                    -maxScrollOffset;
         } else {
-            translate = touchValues[Matrix.MTRANS_X] - (maxScrollOffset - lastMaxScrollOffset) - attribute.leftScrollOffset;
+            translate = touchValues[Matrix.MTRANS_X] <= -lastMaxScrollOffset ? -maxScrollOffset :
+                    touchValues[Matrix.MTRANS_X] - (maxScrollOffset - lastMaxScrollOffset) - attribute.leftScrollOffset;
         }
         translate = Math.max(-maxScrollOffset, translate);
         translate = Math.min(minScrollOffset, translate);
-        touchValues[Matrix.MTRANS_X] = translate;
         matrix.postTranslate(translate, 0f);
     }
 
