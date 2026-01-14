@@ -5,19 +5,16 @@ import android.os.Looper;
 import android.os.Message;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.wk.chart.animator.ChartAnimator;
 import com.wk.chart.compat.Utils;
-import com.wk.chart.compat.ValueUtils;
 import com.wk.chart.compat.config.AbsBuildConfig;
 import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.BuildData;
-import com.wk.chart.entry.QuantizationEntry;
-import com.wk.chart.entry.RateEntry;
 import com.wk.chart.entry.ScaleEntry;
-import com.wk.chart.entry.ValueEntry;
 import com.wk.chart.enumeration.ObserverArg;
+import com.wk.chart.formatter.DateFormatter;
+import com.wk.chart.formatter.ValueFormatter;
 import com.wk.chart.thread.WorkThread;
 
 import java.beans.PropertyChangeListener;
@@ -25,20 +22,16 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
-        implements Handler.Callback, WorkThread.WorkCallBack<BuildData<T, F>>,
-        ChartAnimator.AnimationListener<T> {
+public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig> implements Handler.Callback, WorkThread.WorkCallBack<BuildData<T, F>>, ChartAnimator.AnimationListener<T> {
     private final PropertyChangeSupport dataChangeSupport;//数据状态监听器
-    private final ScaleEntry scale;// 精度
-    private final Handler uiHandler; //主线程Handler
+    private final DateFormatter dateFormatter;//日期格式化工具
+    private final ValueFormatter valueFormatter;//数值格式化工具
     private final ChartAnimator<T> animator;//数据更新动画
+    private final Handler uiHandler; //主线程Handler
+    private final ScaleEntry scale;// 精度
     private F buildConfig; // 构建配置信息
     private WorkThread<BuildData<T, F>> workThread;//异步任务处理线程
-    private RateEntry rate;// 比率
-    private QuantizationEntry quantizationEntry;//量化
     private List<T> renderData;//数据列表（渲染）
-    protected float high;//Y 轴上entry的最高值
-    protected float low;//Y 轴上entry的最低值
     protected int maxYIndex;// Y 轴上entry的最高值索引
     protected int minYIndex;//Y 轴上entry的最低值索引
     private int highlightIndex;//高亮的 entry 索引
@@ -49,28 +42,22 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         this.buildConfig = buildConfig;
         this.renderData = new ArrayList<>();
         this.dataChangeSupport = new PropertyChangeSupport(this);
-        this.uiHandler = new Handler(Looper.getMainLooper(), this);
+        this.dateFormatter = new DateFormatter();
+        this.valueFormatter = new ValueFormatter();
         this.animator = new ChartAnimator<>(this, 400);
+        this.uiHandler = new Handler(Looper.getMainLooper(), this);
         this.scale = new ScaleEntry(0, 0, "", "");
-        this.rate = new RateEntry(1.0, scale.getQuoteUnit(), scale.getQuoteScale());
-        this.quantizationEntry = new QuantizationEntry();
     }
 
     AbsAdapter(@NonNull AbsAdapter<T, F> absAdapter) {
         this(absAdapter.getBuildConfig());
         this.renderData.addAll(absAdapter.renderData);
-        this.high = absAdapter.high;
-        this.low = absAdapter.low;
         this.maxYIndex = absAdapter.maxYIndex;
         this.minYIndex = absAdapter.minYIndex;
         this.highlightIndex = absAdapter.highlightIndex;
-        this.rate = absAdapter.rate;
-        this.quantizationEntry = absAdapter.quantizationEntry;
         this.dataSize = renderData.size();
-        this.setScale(absAdapter.getScale().getBaseScale()
-                , absAdapter.getScale().getQuoteScale()
-                , absAdapter.getScale().getBaseUnit()
-                , absAdapter.getScale().getQuoteUnit());
+        this.setScale(absAdapter.getScale().getBaseScale(), absAdapter.getScale().getQuoteScale(),
+                absAdapter.getScale().getBaseUnit(), absAdapter.getScale().getQuoteUnit());
     }
 
     /**
@@ -156,62 +143,6 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     }
 
     /**
-     * 设置量化配置
-     *
-     * @param minFormatNum 最小量化数（即小于此数，不量化）
-     * @param scale        量化后小数的精度
-     */
-    public void setQuantization(long minFormatNum, int scale) {
-        this.quantizationEntry.reset(minFormatNum, scale);
-    }
-
-    /**
-     * 获取比率实例
-     *
-     * @return 比率值
-     */
-    public @NonNull
-    RateEntry getRate() {
-        return rate;
-    }
-
-    /**
-     * 获取量化实例
-     *
-     * @return 取量值
-     */
-    public QuantizationEntry getQuantizationEntry() {
-        return quantizationEntry;
-    }
-
-    /**
-     * 设置比率
-     *
-     * @param rateValue 比率值
-     * @param unit      单位
-     * @param scale     精度
-     */
-    public void setRate(Double rateValue, String unit, int scale) {
-        this.rate.setRate(rateValue);
-        this.rate.setSign(unit);
-        this.rate.setScale(scale);
-    }
-
-    /**
-     * 重置比率
-     */
-    public void resetRate() {
-        this.rate = new RateEntry(1.0, scale.getQuoteUnit(), scale.getQuoteScale());
-    }
-
-    /**
-     * 获取汇率设置状态
-     */
-    public boolean getRateState() {
-        return getRate().isSet();
-    }
-
-    /**
      * 获取指标配置信息
      *
      * @return 配置信息类（复制品）
@@ -228,7 +159,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         stopAsyTask();
         this.buildConfig = buildConfig;
         if (getCount() == 0) return;
-        onAsyTask(buildConfig, cloneDataList(), ObserverArg.INIT, 0, null);
+        onAsyTask(buildConfig, cloneDataList(), ObserverArg.INIT, 0);
     }
 
     /**
@@ -239,7 +170,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     /**
      * 在给定的范围内，计算最大值和最小值
      */
-    public abstract void computeMinAndMax(int start, int end);
+    public abstract void calculateMinAndMax(int start, int end);
 
     /**
      * 获取数据数量
@@ -271,8 +202,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     private ArrayList<T> cloneDataList() {
         try {
             return (ArrayList<T>) ((ArrayList<T>) renderData).clone();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
             return new ArrayList<>();
         }
     }
@@ -287,7 +217,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         if (isCalculateData) {
             stopAnimator();
             stopAsyTask();
-            onAsyTask(buildConfig, cloneDataList(), ObserverArg.FORMAT_UPDATE, 0, null);
+            onAsyTask(buildConfig, cloneDataList(), ObserverArg.FORMAT_UPDATE, 0);
         } else {
             notifyDataSetChanged(ObserverArg.FORMAT_UPDATE);
         }
@@ -320,7 +250,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             stopAnimator();
             stopAsyTask();
-            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.RESET : ObserverArg.INIT, 0, null);
+            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.RESET : ObserverArg.INIT, 0);
         }
     }
 
@@ -333,7 +263,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             stopAnimator();
             stopAsyTask();
-            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.UPDATE : ObserverArg.INIT, 0, null);
+            onAsyTask(buildConfig, data, buildConfig.isInit() ? ObserverArg.UPDATE : ObserverArg.INIT, 0);
         }
     }
 
@@ -346,7 +276,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             stopAnimator();
             data.addAll(renderData);
-            onAsyTask(buildConfig, data, ObserverArg.ADD, 0, null);
+            onAsyTask(buildConfig, data, ObserverArg.ADD, 0);
         }
     }
 
@@ -359,7 +289,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         } else {
             stopAnimator();
             data.addAll(0, renderData);
-            onAsyTask(buildConfig, data, ObserverArg.ADD, getLastPosition(), null);
+            onAsyTask(buildConfig, data, ObserverArg.ADD, getLastPosition());
         }
     }
 
@@ -371,7 +301,7 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
             stopAnimator();
             ArrayList<T> copyList = cloneDataList();
             copyList.add(data);
-            onAsyTask(buildConfig, copyList, ObserverArg.UPDATE, getLastPosition(), null);
+            onAsyTask(buildConfig, copyList, ObserverArg.UPDATE, getLastPosition());
         }
     }
 
@@ -384,32 +314,28 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
         if (null != data && position >= 0 && position < getCount()) {
             ArrayList<T> copyList = cloneDataList();
             copyList.set(position, data);
-            onAsyTask(buildConfig, copyList, ObserverArg.REFRESH, position, position);
+            this.animator.startAnimator(renderData, copyList, position);
         }
     }
+
 
     /**
      * 动画执行中
      *
-     * @param position   动画位置
-     * @param updateData 更行数据
+     * @param position 动画位置
+     * @param newList  新数据列表
+     *
      */
     @Override
-    public void onAnimation(int position, T updateData) {
-        if (getItem(position).getTime().getTime() == updateData.getTime().getTime()) {
-            this.renderData.set(position, updateData);
-            notifyDataSetChanged(ObserverArg.REFRESH);
-        }
+    public void onAnimation(int position, List<T> newList) {
+        onAsyTask(buildConfig, newList, ObserverArg.REFRESH, position);
     }
 
     /**
      * 动画刷新
      */
     public void animationRefresh() {
-        if (getCount() == 0) {
-            return;
-        }
-        notifyDataSetChanged(ObserverArg.REFRESH);
+        if (getCount() > 0) notifyDataSetChanged(ObserverArg.REFRESH);
     }
 
     /**
@@ -444,17 +370,10 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     public boolean handleMessage(Message msg) {
         if (msg.obj instanceof BuildData) {
             BuildData<T, F> buildData = (BuildData<T, F>) msg.obj;
-            Integer animPosition = buildData.getAnimPosition();
-            if (null == animPosition) {
-                this.buildConfig = buildData.getBuildConfig();
-                this.renderData = buildData.getData();
-                this.dataSize = renderData.size();
-                notifyDataSetChanged(buildData.getObserverArg());
-            } else if (animPosition < getCount() && animPosition < buildData.getDataSize()) {
-                T oldItem = getItem(animPosition);
-                T newItem = buildData.getData().get(animPosition);
-                this.animator.startAnimator(oldItem, newItem, animPosition);
-            }
+            this.buildConfig = buildData.getBuildConfig();
+            this.renderData = buildData.getData();
+            this.dataSize = renderData.size();
+            notifyDataSetChanged(buildData.getObserverArg());
         }
         return true;
     }
@@ -462,15 +381,11 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     /**
      * 开启异步任务
      */
-    private void onAsyTask(@NonNull final F buildConfig,
-                           @NonNull final List<T> data,
-                           @NonNull final ObserverArg arg,
-                           @NonNull Integer startPosition,
-                           @Nullable Integer animPosition) {
+    private void onAsyTask(@NonNull final F buildConfig, @NonNull final List<T> data, @NonNull final ObserverArg arg, @NonNull Integer startPosition) {
         if (null == workThread) {
             this.workThread = new WorkThread<>();
         }
-        this.workThread.post(new BuildData<>(buildConfig, data, arg, startPosition, animPosition), this);
+        this.workThread.post(new BuildData<>(buildConfig, data, arg, startPosition), this);
     }
 
     /**
@@ -502,54 +417,21 @@ public abstract class AbsAdapter<T extends AbsEntry, F extends AbsBuildConfig>
     }
 
     /**
-     * 汇率转换（此处已做精度控制）
+     * 获取日期格式化工具
      *
-     * @param entry              传入的entry
-     * @param isQuantization     是否量化转换
-     * @param stripTrailingZeros 去除无用的0（如：2.4560->2.456）
+     * @return 日期格式化工具
      */
-    public String rateConversion(ValueEntry entry, boolean isQuantization, boolean stripTrailingZeros) {
-        return rateConversion(entry.result, null == entry.scale ? 0 : entry.scale,
-                isQuantization, stripTrailingZeros);
+    public DateFormatter getDateFormatter() {
+        return dateFormatter;
     }
 
     /**
-     * 汇率转换（此处已做精度控制）
+     * 获取数值格式化工具
      *
-     * @param value              传入的value值
-     * @param scale              精度
-     * @param isQuantization     是否量化转换
-     * @param stripTrailingZeros 去除无用的0（如：2.4560->2.456）
+     * @return 数值格式化工具
      */
-    public String rateConversion(double value, int scale, boolean isQuantization, boolean stripTrailingZeros) {
-        return rateConversion(ValueUtils.buildResult(value, scale), scale, isQuantization, stripTrailingZeros);
-    }
-
-    /**
-     * 汇率转换（此处已做精度控制）
-     *
-     * @param result             传入的result值
-     * @param scale              精度
-     * @param isQuantization     是否量化转换
-     * @param stripTrailingZeros 去除无用的0（如：2.4560->2.456）
-     */
-    public String rateConversion(long result, int scale, boolean isQuantization, boolean stripTrailingZeros) {
-        if (isQuantization) {
-            return ValueUtils.rateFormat(result, scale, getRate(), getQuantizationEntry(), stripTrailingZeros);
-        } else {
-            return ValueUtils.rateFormat(result, scale, getRate(), null, stripTrailingZeros);
-        }
-    }
-
-    /**
-     * 量化转换（此处已做精度控制）
-     *
-     * @param entry              传入的entry
-     * @param stripTrailingZeros 去除无用的0（如：2.4560->2.456）
-     */
-    public String quantizationConversion(ValueEntry entry, boolean stripTrailingZeros) {
-        return ValueUtils.rateFormat(entry.result, null == entry.scale ? 0 : entry.scale,
-                null, getQuantizationEntry(), stripTrailingZeros);
+    public ValueFormatter getValueFormatter() {
+        return valueFormatter;
     }
 
     /**

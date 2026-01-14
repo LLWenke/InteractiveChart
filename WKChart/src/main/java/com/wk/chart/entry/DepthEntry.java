@@ -2,20 +2,24 @@ package com.wk.chart.entry;
 
 import androidx.annotation.NonNull;
 
-import com.wk.chart.compat.ValueUtils;
+import com.wk.chart.formatter.ValueFormatter;
+import com.wk.utils.NumberUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>DepthEntry</p>
  */
 
 public class DepthEntry extends AbsEntry {
-    // 初始需全部赋值的属性
-    private final ValueEntry price;
-    private final ValueEntry amount;
-    private final ValueEntry totalAmount;
-    private final ValueEntry totalPrice;
+    private final ValueEntry price;// 价格
+    private final ValueEntry amount;// 交易量
+    private final ValueEntry totalAmount;// 总交易量
+    private final ValueEntry totalPrice;// 总交易额
     private final int type;
 
     /**
@@ -25,55 +29,52 @@ public class DepthEntry extends AbsEntry {
      * @param type        类型
      * @param time        时间
      */
-    public DepthEntry(String price, String amount, String totalAmount, int type,@NonNull Date time) {
+    public DepthEntry(String price, String amount, String totalAmount, int type, @NonNull Date time) {
+        super(time);
+        this.price = new ValueEntry(NumberUtils.parseDouble(price));
+        this.amount = new ValueEntry(NumberUtils.parseDouble(amount));
+        this.totalAmount = new ValueEntry(NumberUtils.parseDouble(totalAmount));
+        this.totalPrice = new ValueEntry(0d);
+        this.type = type;
+    }
+
+    /**
+     * @param price       价格
+     * @param amount      交易量
+     * @param totalAmount 总交易量
+     * @param type        类型
+     * @param time        时间
+     */
+    public DepthEntry(double price, double amount, double totalAmount, int type, @NonNull Date time) {
         super(time);
         this.price = new ValueEntry(price);
         this.amount = new ValueEntry(amount);
         this.totalAmount = new ValueEntry(totalAmount);
-        this.totalPrice = new ValueEntry();
+        this.totalPrice = new ValueEntry(0d);
         this.type = type;
     }
 
     /**
-     * @param priceResult       价格
-     * @param amountResult      交易量
-     * @param totalAmountResult 总交易量
-     * @param type              类型
-     * @param time              时间
-     */
-    public DepthEntry(@NonNull ScaleEntry scale, Long priceResult, Long amountResult,
-                      Long totalAmountResult, int type,@NonNull Date time) {
-        super(time);
-        this.price = new ValueEntry();
-        this.amount = new ValueEntry();
-        this.totalAmount = new ValueEntry();
-        this.totalPrice = new ValueEntry();
-        this.type = type;
-        ValueUtils.buildScaleValue(price, priceResult, scale.getQuoteScale());
-        ValueUtils.buildScaleValue(amount, amountResult, scale.getBaseScale());
-        ValueUtils.buildScaleValue(totalAmount, totalAmountResult, scale.getBaseScale());
-        buildTotalPriceScaleValue(scale);
-    }
-
-    /**
-     * 构建精度值
+     * 构建值精度(耗时操作，建议放在子线程)
      *
-     * @param scale 精度
+     * @param scale     精度
+     * @param formatter 数值格式化工具
      */
-    public void buildScaleValue(@NonNull ScaleEntry scale) {
-        Integer priceScale = scale.getQuoteScale();
-        if (!priceScale.equals(price.scale)) {
-            ValueUtils.buildScaleValue(price, priceScale);
-        }
-        Integer amountScale = scale.getBaseScale();
-        if (!amountScale.equals(amount.scale)) {
-            ValueUtils.buildScaleValue(amount, amountScale);
-        }
-        Integer totalAmountScale = scale.getBaseScale();
-        if (!totalAmountScale.equals(totalAmount.scale)) {
-            ValueUtils.buildScaleValue(totalAmount, totalAmountScale);
-        }
-        buildTotalPriceScaleValue(scale);
+    public void buildValueScale(@NonNull ScaleEntry scale, @NonNull ValueFormatter formatter) {
+        int baseScale = scale.getBaseScale();
+        int quoteScale = scale.getQuoteScale();
+        BigDecimal priceValue = NumberUtils.parseBigDecimal(price.value, quoteScale);
+        BigDecimal amountValue = NumberUtils.parseBigDecimal(amount.value, quoteScale);
+        BigDecimal totalAmountValue = NumberUtils.parseBigDecimal(totalAmount.value, baseScale);
+        BigDecimal totalPriceValue = priceValue.multiply(amountValue).setScale(quoteScale, RoundingMode.DOWN);
+        this.price.value = priceValue.doubleValue();
+        this.price.valueFormat = formatter.formatFixed(priceValue, quoteScale,false);
+        this.amount.value = amountValue.doubleValue();
+        this.amount.valueFormat = formatter.formatFixed(amountValue, baseScale,false);
+        this.totalAmount.value = totalAmountValue.doubleValue();
+        this.totalAmount.valueFormat = formatter.formatFixed(totalAmountValue, baseScale,false);
+        this.totalPrice.value = totalPriceValue.doubleValue();
+        this.totalPrice.valueFormat = formatter.formatFixed(totalPriceValue, quoteScale,false);
     }
 
     public ValueEntry getPrice() {
@@ -96,11 +97,8 @@ public class DepthEntry extends AbsEntry {
         return type;
     }
 
-    private void buildTotalPriceScaleValue(@NonNull ScaleEntry scale) {
-        Integer totalPriceScale = scale.getQuoteScale();
-        long totalPriceValue = ValueUtils.scaleMultiply(price.result, totalAmount.result, totalAmount.scale);
-        if (!totalPriceScale.equals(totalPrice.scale) || totalPriceValue != totalPrice.result) {
-            ValueUtils.buildScaleValue(totalPrice, totalPriceValue, totalPriceScale);
-        }
+    @Override
+    public List<ValueEntry> getAnimatorEntry() {
+        return Collections.emptyList();
     }
 }

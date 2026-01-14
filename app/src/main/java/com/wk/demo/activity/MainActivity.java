@@ -45,13 +45,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         Intent intent = new Intent(this, ChartActivity.class);
-        switch (v.getId()) {
-            case R.id.btn_real_time_data:
-                intent.putExtra(ChartActivity.DATA_SHOW_KEY, DataDisplayType.REAL_TIME.ordinal());
-                break;
-            case R.id.btn_historical_data:
-                intent.putExtra(ChartActivity.DATA_SHOW_KEY, DataDisplayType.PAGING.ordinal());
-                break;
+        if (v.getId() == R.id.btn_real_time_data) {
+            intent.putExtra(ChartActivity.DATA_SHOW_KEY, DataDisplayType.REAL_TIME.ordinal());
+        } else if (v.getId() == R.id.btn_historical_data) {
+            intent.putExtra(ChartActivity.DATA_SHOW_KEY, DataDisplayType.PAGING.ordinal());
         }
         startActivity(intent);
     }

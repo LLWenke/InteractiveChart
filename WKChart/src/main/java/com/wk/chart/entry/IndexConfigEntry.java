@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.wk.chart.compat.Utils;
+import com.wk.chart.formatter.ValueFormatter;
+import com.wk.utils.NumberUtils;
 
 
 /**
@@ -12,14 +14,20 @@ import com.wk.chart.compat.Utils;
  * 指标标志位实例
  */
 public class IndexConfigEntry {
+    private final int scale;
     private final String tag;
     private final String tagText;
     private final FlagEntry[] flagEntries;
 
-    public IndexConfigEntry(@Nullable String tag, FlagEntry[] flagEntries) {
+    public IndexConfigEntry(@Nullable String tag, FlagEntry[] flagEntries, int scale, ValueFormatter formatter) {
+        this.scale = scale;
         this.tag = null == tag ? "" : tag;
         this.flagEntries = null == flagEntries ? new FlagEntry[0] : flagEntries;
-        this.tagText = Utils.replacePlaceholder(this.tag, this.flagEntries);
+        this.tagText = Utils.replacePlaceholder(this.tag, formatter, scale, this.flagEntries);
+    }
+
+    public int getScale() {
+        return scale;
     }
 
     public String getTag() {
@@ -39,17 +47,19 @@ public class IndexConfigEntry {
         private final String name;
         private String nameText;
         private final String term;
-        private int flag;
+        private double flag;
         private final int color;
         private boolean enable;
+        private final int scale;
 
-        public FlagEntry(String name, String term, int flag, int color, boolean enable) {
+        public FlagEntry(String name, String term, double flag, int scale, int color, boolean enable, ValueFormatter formatter) {
             this.name = name;
             this.term = term;
-            this.flag = flag;
             this.color = color;
             this.enable = enable;
-            this.nameText = Utils.replacePlaceholder(name, this);
+            this.scale = scale;
+            this.flag = NumberUtils.parseBigDecimal(flag, scale).doubleValue();
+            this.nameText = Utils.replacePlaceholder(name, formatter, scale, this);
         }
 
         public String getName() {
@@ -64,13 +74,13 @@ public class IndexConfigEntry {
             return term;
         }
 
-        public int getFlag() {
+        public double getFlag() {
             return flag;
         }
 
-        public void setFlag(int flag) {
-            this.flag = flag;
-            this.nameText = Utils.replacePlaceholder(name, this);
+        public void setFlag(double flag, ValueFormatter formatter) {
+            this.flag = NumberUtils.parseBigDecimal(flag, scale).doubleValue();
+            this.nameText = Utils.replacePlaceholder(name, formatter, scale, this);
         }
 
         public int getColor() {
@@ -83,6 +93,10 @@ public class IndexConfigEntry {
 
         public void setEnable(boolean enable) {
             this.enable = enable;
+        }
+
+        public int getScale() {
+            return scale;
         }
     }
 }

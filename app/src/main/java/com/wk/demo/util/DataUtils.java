@@ -5,8 +5,10 @@ import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.wk.chart.adapter.DepthAdapter;
 import com.wk.chart.compat.Utils;
+import com.wk.chart.entry.AbsEntry;
 import com.wk.chart.entry.CandleEntry;
 import com.wk.chart.entry.DepthEntry;
 import com.wk.chart.enumeration.MarkerPointType;
@@ -18,6 +20,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -62,11 +65,17 @@ public class DataUtils {
             byte[] buffer = new byte[length];
             in.read(buffer);
             kLineData = new String(buffer, StandardCharsets.UTF_8);
-            final String[] candleData = kLineData.split(",");
-            for (String item : candleData) {
-                String[] v = item.split("[|]");
+            List<List<String>> lists = (new Gson()).fromJson(kLineData, new TypeToken<List<List<String>>>() {
+            }.getType());
+            for (List<String> list : lists) {
+                String close = list.get(0);
+                String high = list.get(1);
+                String low = list.get(2);
+                String open = list.get(3);
+                long date = Long.parseLong(list.get(4));
+                String volume = list.get(5);
                 int type = (new Random()).nextInt(20);
-                CandleEntry entry = new CandleEntry(v[0], v[1], v[2], v[3], v[4], new Date(Date.parse(v[5])));
+                CandleEntry entry = new CandleEntry(open, high, low, close, volume, new Date(date));
                 entry.setMarkerPointType(type > 3 ? MarkerPointType.NORMAL : type);
                 dataList.add(entry);
             }
@@ -74,7 +83,7 @@ public class DataUtils {
             e.printStackTrace();
         }
 
-        Collections.sort(dataList, (arg0, arg1) -> arg0.getTime().compareTo(arg1.getTime()));
+        dataList.sort(Comparator.comparing(AbsEntry::getTime));
 
         return dataList;
     }
@@ -89,11 +98,10 @@ public class DataUtils {
             Gson gson = new Gson();
             DepthWrapper data = gson.fromJson(json, DepthWrapper.class);
 
-            Collections.sort(data.getBids(), (arg1, arg0) -> arg0.getPrice()
+            data.getBids().sort((arg1, arg0) -> arg0.getPrice()
                     .compareTo(arg1.getPrice()));
 
-            Collections.sort(data.getAsks(), (arg0, arg1) -> arg0.getPrice()
-                    .compareTo(arg1.getPrice()));
+            data.getAsks().sort(Comparator.comparing(DepthWrapper.Depth::getPrice));
 
             List<DepthEntry> depthData = new ArrayList<>();
             BigDecimal totalAmount = BigDecimal.ZERO;

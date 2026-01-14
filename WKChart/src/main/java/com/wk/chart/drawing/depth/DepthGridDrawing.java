@@ -85,9 +85,9 @@ public class DepthGridDrawing extends IndexDrawing<DepthRender, AbsModule<AbsEnt
         //绘制盘口价格或者刻度值（取决于depthGridStyle）
         if (attribute.depthGridStyle == DepthGridStyle.GAP_STYLE) {
             for (int i = 0; i < depthGap.length; i++) {
-                pointCache[0] = depthGap[i].value;
+                pointCache[0] = (float) depthGap[i].value;
                 render.mapPoints(render.getMainModule().getMatrix(), pointCache);
-                float textCentre = gridLabelPaint.measureText(depthGap[i].text) / 2f;
+                float textCentre = gridLabelPaint.measureText(depthGap[i].valueFormat) / 2f;
                 float left = viewRect.left + textCentre;
                 float right = viewRect.right - textCentre;
                 pointCache[0] += ((i & 1) == 0 ? -textCentre - render.getMainModule().getXOffset()
@@ -97,16 +97,16 @@ public class DepthGridDrawing extends IndexDrawing<DepthRender, AbsModule<AbsEnt
                 } else if (pointCache[0] > right) {
                     pointCache[0] = right;
                 }
-                canvas.drawText(depthGap[i].text, pointCache[0], gridLabelY, gridLabelPaint);
+                canvas.drawText(depthGap[i].valueFormat, pointCache[0], gridLabelY, gridLabelPaint);
             }
         } else {
             String value;
             //绘制最小值
-            value = chartModule.getMinX().text;
+            value = chartModule.getMinX().valueFormat;
             pointCache[0] = viewRect.left + gridLabelPaint.measureText(value) / 2f;
             canvas.drawText(value, pointCache[0], gridLabelY, gridLabelPaint);
             //绘制最大值
-            value = chartModule.getMaxX().text;
+            value = chartModule.getMaxX().valueFormat;
             pointCache[0] = viewRect.right - gridLabelPaint.measureText(value) / 2f;
             canvas.drawText(value, pointCache[0], gridLabelY, gridLabelPaint);
             for (int i = 1; i < attribute.gridCount; i++) {
@@ -114,10 +114,8 @@ public class DepthGridDrawing extends IndexDrawing<DepthRender, AbsModule<AbsEnt
                 pointCache[0] = x - (i > (attribute.gridCount >> 1) ? chartModule.getXOffset() :
                         -chartModule.getXOffset());
                 render.invertMapPoints(render.getMainModule().getMatrix(), pointCache);
-                value = render.getAdapter().rateConversion(pointCache[0],
-                        render.getAdapter().getScale().getQuoteScale(),
-                        false,
-                        false
+                value = render.getAdapter().getValueFormatter().formatFixed(pointCache[0],
+                        render.getAdapter().getScale().getQuoteScale()
                 );
                 pointCache[0] = x;
                 canvas.drawText(value, pointCache[0], gridLabelY, gridLabelPaint);

@@ -23,14 +23,11 @@ import java.util.HashSet;
 public abstract class AbsModule<T extends AbsEntry> {
     private final Matrix matrix = new Matrix(); // 把值映射到屏幕像素的矩阵
 
-    private final ArrayList<AbsDrawing<AbsRender<?, ?>, AbsModule<?>>> drawingList =
-            new ArrayList<>();
+    private final ArrayList<AbsDrawing<AbsRender<?, ?>, AbsModule<?>>> drawingList = new ArrayList<>();
 
-    protected final ValueEntry maxEntry; //最大值
+    protected final ValueEntry maxEntry = new ValueEntry(-Double.MIN_VALUE); //最大值
 
-    protected final ValueEntry minEntry; //最小值
-
-    protected final ValueEntry zeroEntry; //0
+    protected final ValueEntry minEntry = new ValueEntry(Double.MAX_VALUE); //最小值
 
     private final RectF rect = new RectF();
 
@@ -44,7 +41,7 @@ public abstract class AbsModule<T extends AbsEntry> {
 
     private HashSet<Integer> attachIndexSet;//附加指标集
     @IndexType
-    private final int moduleIndexType;//模型指标类型F
+    private final int moduleIndexType;//模型指标类型
     @ModuleGroup
     private int moduleGroup;//模型分组
 
@@ -68,14 +65,13 @@ public abstract class AbsModule<T extends AbsEntry> {
         this.moduleGroup = moduleGroupType;
         this.moduleIndexType = moduleIndexType;
         this.attachIndexSet = new HashSet<>();
-        this.maxEntry = new ValueEntry();
-        this.minEntry = new ValueEntry();
-        this.zeroEntry = new ValueEntry();
-        this.maxEntry.result = -Long.MAX_VALUE;
-        this.minEntry.result = Long.MAX_VALUE;
         this.rectBuffer = new float[8];
         this.drawingMargin = new float[4];
         this.drawingNonOverlapMargin = new float[4];
+        this.maxY = maxEntry;
+        this.maxX = maxEntry;
+        this.minX = minEntry;
+        this.minY = minEntry;
     }
 
     public abstract void computeMinMax(T entry);
@@ -86,10 +82,10 @@ public abstract class AbsModule<T extends AbsEntry> {
     }
 
     public void resetMinMax() {
+        this.maxY = maxEntry;
+        this.maxX = maxEntry;
         this.minX = minEntry;
         this.minY = minEntry;
-        this.maxX = maxEntry;
-        this.maxY = maxEntry;
     }
 
     public Matrix getMatrix() {
@@ -228,41 +224,41 @@ public abstract class AbsModule<T extends AbsEntry> {
     }
 
     public ValueEntry getMaxY() {
-        return maxY == maxEntry ? zeroEntry : maxY;
+        return maxY;
     }
 
     protected void setMaxY(ValueEntry maxY) {
-        if (maxY.result > this.maxY.result) {
+        if (maxY.value > this.maxY.value) {
             this.maxY = maxY;
         }
     }
 
     public ValueEntry getMinY() {
-        return minY == minEntry ? zeroEntry : minY;
+        return minY;
     }
 
     protected void setMinY(ValueEntry minY) {
-        if (minY.result < this.minY.result) {
+        if (minY.value < this.minY.value) {
             this.minY = minY;
         }
     }
 
     public ValueEntry getMaxX() {
-        return maxX == maxEntry ? zeroEntry : maxX;
+        return maxX;
     }
 
     protected void setMaxX(ValueEntry maxX) {
-        if (maxX.result > this.maxX.result) {
+        if (maxX.value > this.maxX.value) {
             this.maxX = maxX;
         }
     }
 
     public ValueEntry getMinX() {
-        return minX == minEntry ? zeroEntry : minX;
+        return minX;
     }
 
     protected void setMinX(ValueEntry minX) {
-        if (minX.result < this.minX.result) {
+        if (minX.value < this.minX.value) {
             this.minX = minX;
         }
     }
@@ -276,11 +272,11 @@ public abstract class AbsModule<T extends AbsEntry> {
     }
 
     public float getDeltaX() {
-        return maxX.value - minX.value;
+        return (float) (maxX.value - minX.value);
     }
 
     public float getDeltaY() {
-        return maxY.value - minY.value;
+        return (float) (maxY.value - minY.value);
     }
 
     public float getXCorrectedValue() {
@@ -350,10 +346,7 @@ public abstract class AbsModule<T extends AbsEntry> {
             return ClickDrawingID.ID_NONE;
         }
         for (AbsDrawing<AbsRender<?, ?>, AbsModule<?>> drawing : getDrawingList()) {
-            if (drawing instanceof IDrawingClickListener && ((IDrawingClickListener) drawing).onDrawingClick(
-                    x,
-                    y
-            )) {
+            if (drawing instanceof IDrawingClickListener && ((IDrawingClickListener) drawing).onDrawingClick(x, y)) {
                 return drawing.getId();
             }
         }

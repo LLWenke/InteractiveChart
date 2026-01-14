@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.wk.chart.entry.IndexConfigEntry;
 import com.wk.chart.enumeration.IndexType;
+import com.wk.chart.formatter.ValueFormatter;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -45,7 +46,7 @@ public class IndexBuildConfig extends AbsBuildConfig {
     /**
      * 获取默认指标配置信息
      */
-    public LinkedHashMap<Integer, IndexConfigEntry> getDefaultIndexConfig() {
+    public LinkedHashMap<Integer, IndexConfigEntry> getDefaultIndexConfig(ValueFormatter valueFormatter) {
         if (!defaultIndexFlagConfig.isEmpty()) {
             return defaultIndexFlagConfig;
         }
@@ -54,73 +55,91 @@ public class IndexBuildConfig extends AbsBuildConfig {
                 null,
                 new String[]{"MA#:", "MA#:", "MA#:", "MA#:", "MA#:", "MA#:"},
                 new String[]{"MA", "MA", "MA", "MA", "MA", "MA"},
-                new int[]{7, 30, 90, 0, 0, 0},
+                new double[]{7, 30, 90, 0, 0, 0},
+                0,
                 new boolean[]{true, true, true, false, false, false},
-                defaultIndexColors));
+                defaultIndexColors,
+                valueFormatter));
         //配置交易量MA
         this.defaultIndexFlagConfig.put(IndexType.VOLUME_MA, buildIndexTagEntry(
                 "Vol(#,#):",
                 new String[]{"MA#:", "MA#:"},
                 new String[]{"MA", "MA"},
-                new int[]{7, 15},
+                new double[]{7, 15},
+                0,
                 new boolean[]{true, true},
-                defaultIndexColors));
+                defaultIndexColors,
+                valueFormatter));
         //配置EMA
         this.defaultIndexFlagConfig.put(IndexType.EMA, buildIndexTagEntry(
                 null,
                 new String[]{"EMA#:", "EMA#:", "EMA#:", "EMA#:", "EMA#:", "EMA#:"},
                 new String[]{"EMA", "EMA", "EMA", "EMA", "EMA", "EMA"},
-                new int[]{6, 12, 20, 0, 0, 0},
+                new double[]{6, 12, 20, 0, 0, 0},
+                0,
                 new boolean[]{true, true, true, false, false, false},
-                defaultIndexColors));
+                defaultIndexColors,
+                valueFormatter));
         //配置BOLL
         this.defaultIndexFlagConfig.put(IndexType.BOLL, buildIndexTagEntry(
                 "BOLL(#)",
                 new String[]{"UP:", "MB:", "DN:"},
                 new String[]{"N", "P"},
-                new int[]{20, 2},
+                new double[]{20, 2},
+                0,
                 new boolean[]{true, true, true},
-                defaultIndexColors));
+                defaultIndexColors,
+                valueFormatter));
         //配置BOLL
         this.defaultIndexFlagConfig.put(IndexType.SAR, buildIndexTagEntry(
                 "SAR(#,#,#)",
                 new String[]{"SAR:", "SAR:", "SAR:"},
                 new String[]{"N:", "S:", "M:"},
-                new int[]{4, 2, 20},
+                new double[]{0.02, 0.02, 0.2},
+                2,
                 new boolean[]{true, true, true},
-                defaultIndexColors));
+                defaultIndexColors,
+                valueFormatter));
         //配置MACD
         this.defaultIndexFlagConfig.put(IndexType.MACD, buildIndexTagEntry(
                 "MACD(#,#,#)",
                 new String[]{"DIF:", "DEA:", "MACD:"},
                 new String[]{"S", "L", "M"},
-                new int[]{12, 26, 9},
+                new double[]{12, 26, 9},
+                0,
                 new boolean[]{true, true, true},
-                defaultIndexColors));
+                defaultIndexColors,
+                valueFormatter));
         //配置KDJ
         this.defaultIndexFlagConfig.put(IndexType.KDJ, buildIndexTagEntry(
                 "KDJ(#,#,#)",
                 new String[]{"K:", "D:", "J:"},
                 new String[]{"N", "M1-", "M2-"},
-                new int[]{14, 1, 3},
+                new double[]{14, 1, 3},
+                0,
                 new boolean[]{true, true, true},
-                defaultIndexColors));
+                defaultIndexColors,
+                valueFormatter));
         //配置RSI
         this.defaultIndexFlagConfig.put(IndexType.RSI, buildIndexTagEntry(
                 "RSI(#,#,#)",
                 new String[]{"RSI#:", "RSI#:", "RSI#:"},
                 new String[]{"RSI1-", "RSI2-", "RSI3-"},
-                new int[]{14, 0, 0},
+                new double[]{14, 0, 0},
+                0,
                 new boolean[]{true, false, false},
-                defaultIndexColors));
+                defaultIndexColors,
+                valueFormatter));
         //配置WR
         this.defaultIndexFlagConfig.put(IndexType.WR, buildIndexTagEntry(
                 null,
                 new String[]{"WR(#):", "WR(#):", "WR(#):"},
                 new String[]{"WR1-", "WR2-", "WR3-"},
-                new int[]{14, 0, 0},
+                new double[]{14, 0, 0},
+                0,
                 new boolean[]{true, false, false},
-                defaultIndexColors));
+                defaultIndexColors,
+                valueFormatter));
 
         return defaultIndexFlagConfig;
     }
@@ -132,7 +151,7 @@ public class IndexBuildConfig extends AbsBuildConfig {
      * @param flags  指标标识（数组）
      * @param colors 指标颜色（数组）
      */
-    private IndexConfigEntry buildIndexTagEntry(String tag, String[] names, String[] terms, int[] flags, boolean[] enables, @ColorInt int[] colors) {
+    private IndexConfigEntry buildIndexTagEntry(String tag, String[] names, String[] terms, double[] flags, int scale, boolean[] enables, @ColorInt int[] colors, ValueFormatter formatter) {
         if (null == names || null == flags || null == colors) {
             return null;
         }
@@ -143,7 +162,7 @@ public class IndexBuildConfig extends AbsBuildConfig {
             if (i < terms.length) {
                 term = terms[i];
             }
-            int flag = 0;
+            double flag = 0d;
             if (i < flags.length) {
                 flag = flags[i];
             }
@@ -155,20 +174,20 @@ public class IndexBuildConfig extends AbsBuildConfig {
             if (i < colors.length) {
                 color = colors[i];
             }
-            entries[i] = new IndexConfigEntry.FlagEntry(names[i], term, flag, color, enable);
+            entries[i] = new IndexConfigEntry.FlagEntry(names[i], term, flag, scale, color, enable, formatter);
         }
-        return new IndexConfigEntry(tag, entries);
+        return new IndexConfigEntry(tag, entries, scale, formatter);
     }
 
     /**
      * 构建指标配置（剔除未启用的指标配置）
      */
-    public void buildIndexFlags() {
+    public void buildIndexFlags(ValueFormatter formatter) {
         if (!indexFlags.isEmpty()) {
             return;
         }
         if (defaultIndexFlagConfig.isEmpty()) {
-            getDefaultIndexConfig();
+            getDefaultIndexConfig(formatter);
         }
         for (Map.Entry<Integer, IndexConfigEntry> item : defaultIndexFlagConfig.entrySet()) {
             int count = 0;
@@ -181,7 +200,8 @@ public class IndexBuildConfig extends AbsBuildConfig {
             }
             IndexConfigEntry.FlagEntry[] copy = new IndexConfigEntry.FlagEntry[count];
             System.arraycopy(entries, 0, copy, 0, copy.length);
-            this.indexFlags.put(item.getKey(), new IndexConfigEntry(item.getValue().getTag(), copy));
+            this.indexFlags.put(item.getKey(), new IndexConfigEntry(item.getValue().getTag(), copy,
+                    item.getValue().getScale(), formatter));
         }
     }
 

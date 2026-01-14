@@ -155,7 +155,7 @@ public class ChartLayout extends ConstraintLayout {
     private CandleModule buildCandleModule() {
         CandleModule candleModule = new CandleModule();
         candleModule.addDrawing(new WaterMarkingDrawing());//水印组件
-        candleModule.addDrawing(new AxisDrawing(5, false));//axis轴组件
+        candleModule.addDrawing(new AxisDrawing(5));//axis轴组件
         candleModule.addDrawing(new GridLineDrawing());//grid轴组件
         candleModule.addDrawing(new CandleDrawing());//蜡烛图组件
         candleModule.addDrawing(new IndexLineDrawing(IndexType.CANDLE_MA));//MA组件
@@ -181,7 +181,7 @@ public class ChartLayout extends ConstraintLayout {
     private TimeLineModule buildTimeLineModule() {
         TimeLineModule timeLineModule = new TimeLineModule();
         timeLineModule.addDrawing(new WaterMarkingDrawing());//水印组件
-        timeLineModule.addDrawing(new AxisDrawing(5, false));//axis轴组件
+        timeLineModule.addDrawing(new AxisDrawing(5));//axis轴组件
         timeLineModule.addDrawing(new GridLineDrawing());//grid轴组件
         timeLineModule.addDrawing(new TimeLineDrawing());//分时图组件
         timeLineModule.addDrawing(new BreathingLampDrawing());//呼吸灯组件
@@ -201,11 +201,7 @@ public class ChartLayout extends ConstraintLayout {
         volumeModule.addDrawing(new VolumeDrawing());//交易量组件
         volumeModule.addDrawing(new IndexLineDrawing(IndexType.VOLUME_MA));//MA组件
         volumeModule.addDrawing(new IndexLabelDrawing(IndexType.VOLUME_MA));//MA指标文字标签组件
-        volumeModule.addDrawing(new ExtremumLabelDrawing(
-                ExtremumVisible.MAX_VISIBLE,
-                true,
-                false
-        ));//Axis轴标签组件
+        volumeModule.addDrawing(new ExtremumLabelDrawing(ExtremumVisible.MAX_VISIBLE));//Axis轴标签组件
         volumeModule.addDrawing(new BorderDrawing(PositionType.BOTTOM));//边框组件
         volumeModule.addAttachIndex(IndexType.VOLUME_MA);
         return volumeModule;
@@ -271,7 +267,7 @@ public class ChartLayout extends ConstraintLayout {
      */
     protected DepthModule buildDepthModule() {
         DepthModule depthModule = new DepthModule();
-        depthModule.addDrawing(new AxisDrawing(5, true));//axis轴组件
+        depthModule.addDrawing(new AxisDrawing(5));//axis轴组件
         depthModule.addDrawing(new DepthGridDrawing());//深度图grid轴组件
         depthModule.addDrawing(new DepthDrawing());//深度图组件
         depthModule.addDrawing(new DepthPositionDrawing());//深度图盘口组件

@@ -57,12 +57,12 @@ public class TimeLineModule extends AbsModule<CandleEntry> implements IMarkerPoi
 
     @Override
     public float getHighPoint(@NonNull CandleEntry entry) {
-        return entry.getClose().value;
+        return (float) entry.getClose().value;
     }
 
     @Override
     public float getLowPoint(@NonNull CandleEntry entry) {
-        return entry.getClose().value;
+        return (float) entry.getClose().value;
     }
 
     @Override
@@ -86,7 +86,7 @@ public class TimeLineModule extends AbsModule<CandleEntry> implements IMarkerPoi
         rectBuffer[0] = current + render.pointsSpace;
         rectBuffer[2] = current + 1 - render.pointsSpace;
         //y轴坐标
-        rectBuffer[1] = rectBuffer[3] = entry.getClose().value;
+        rectBuffer[1] = rectBuffer[3] = (float) entry.getClose().value;
         render.mapPoints(getMatrix(), rectBuffer);
         return rectBuffer;
     }

@@ -1,16 +1,41 @@
 package com.wk.chart.entry;
 
-public class ValueEntry {
-    public String source = "0";//数据源
-    public String text = "0";//显示文本
-    public long result = 0;//用于计算的值
-    public float value = 0;//用于绘制的值
-    public Integer scale = null;//精度
+import com.wk.chart.formatter.ValueFormatter;
 
-    public ValueEntry(String source) {
-        this.source = source;
+public class ValueEntry {
+    public double value;//数字值
+    public String valueFormat = "0";//格式化值
+
+    /**
+     * 构造方法
+     *
+     * @param value 数字值
+     */
+    public ValueEntry(double value) {
+        this.value = value;
     }
 
-    public ValueEntry() {
+    /**
+     * 格式化(精度)
+     *
+     * @param formatter 格式化器
+     * @param scale     精度
+     * @return ValueEntry
+     */
+    public ValueEntry formatFixed(ValueFormatter formatter, int scale) {
+        this.valueFormat = formatter.formatFixed(value, scale);
+        return this;
+    }
+
+    /**
+     * 带单位格式化(精度)
+     *
+     * @param formatter 格式化器
+     * @param scale     精度
+     * @return ValueEntry
+     */
+    public ValueEntry formatUnit(ValueFormatter formatter, int scale) {
+        this.valueFormat = formatter.formatUnit(value, scale);
+        return this;
     }
 }

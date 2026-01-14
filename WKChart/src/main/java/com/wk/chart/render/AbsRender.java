@@ -610,11 +610,11 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
      */
     protected void computeExtremumValue(float[] extremum, AbsModule<AbsEntry> chartModule) {
         //X轴
-        extremum[0] = chartModule.getMinX().value;
-        extremum[2] = chartModule.getMaxX().value;
+        extremum[0] = (float) chartModule.getMinX().value;
+        extremum[2] = (float) chartModule.getMaxX().value;
         //Y轴
-        extremum[1] = chartModule.getMinY().value;
-        extremum[3] = chartModule.getMaxY().value;
+        extremum[1] = (float) chartModule.getMinY().value;
+        extremum[3] = (float) chartModule.getMaxY().value;
     }
 
     /**
@@ -810,7 +810,7 @@ public abstract class AbsRender<T extends AbsAdapter<? extends AbsEntry, ? exten
                 }
             }
         }
-        adapter.computeMinAndMax(begin, end);
+        adapter.calculateMinAndMax(begin, end);
     }
 
     /**

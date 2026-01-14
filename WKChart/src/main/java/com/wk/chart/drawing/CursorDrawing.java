@@ -88,9 +88,9 @@ public class CursorDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntry>>
     public void drawOver(Canvas canvas) {
         CandleEntry last = render.getAdapter().getItem(render.getAdapter().getLastPosition());
         cursorPoint[0] = render.getAdapter().getLastPosition() + 1;
-        cursorPoint[1] = last.getClose().value;
+        cursorPoint[1] = (float) last.getClose().value;
         render.mapPoints(chartModule.getMatrix(), cursorPoint);
-        String value = render.getAdapter().rateConversion(last.getClose(), false, false);
+        String value = last.getClose().valueFormat;
         //防止文字抖动现象
         float textWidth = foldedCursorTextPaint.measureText(value);
         float cursorRight = viewRect.right - attribute.axisLabelMarginHorizontal;

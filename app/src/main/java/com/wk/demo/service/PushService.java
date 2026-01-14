@@ -36,11 +36,11 @@ public class PushService extends IntentService {
         if (null == intent) {
             return;
         }
-        double open = intent.getFloatExtra("open", 0);
-        double high = intent.getFloatExtra("high", 0);
-        double low = intent.getFloatExtra("low", 0);
-        double close = intent.getFloatExtra("close", 0);
-        double volume = intent.getFloatExtra("volume", 0);
+        double open = intent.getDoubleExtra("open", 0d);
+        double high = intent.getDoubleExtra("high", 0d);
+        double low = intent.getDoubleExtra("low", 0d);
+        double close = intent.getDoubleExtra("close", 0d);
+        double volume = intent.getDoubleExtra("volume", 0d);
         Date time = new Date(intent.getLongExtra("time", System.currentTimeMillis()));
         while (isPush) {
             try {
@@ -53,11 +53,11 @@ public class PushService extends IntentService {
                     pushType = ADD;
                 }
                 CandleEntry pushData = candlePushDataOperation(open, high, low, close, volume, time, pushType);
-                open = Double.parseDouble(pushData.getOpen().source);
-                high = Double.parseDouble(pushData.getHigh().source);
-                low = Double.parseDouble(pushData.getLow().source);
-                close = Double.parseDouble(pushData.getClose().source);
-                volume = Double.parseDouble(pushData.getVolume().source);
+                open = pushData.getOpen().value;
+                high = pushData.getHigh().value;
+                low = pushData.getLow().value;
+                close = pushData.getClose().value;
+                volume = pushData.getVolume().value;
                 time = pushData.getTime();
                 ServiceMessage message = new ServiceMessage();
                 message.setWhat(CANDLE);
@@ -75,7 +75,7 @@ public class PushService extends IntentService {
      */
     private CandleEntry candlePushDataOperation(double open, double high, double low,
                                                 double close, double volume, Date time, int pushType) {
-        double closeUpdate = (Math.random() - 0.5) * 10;
+        double closeUpdate = (Math.random() - 0.5) * 100;
         double closeValue;
         double openValue;
         double highValue;
@@ -90,7 +90,7 @@ public class PushService extends IntentService {
 
             highValue = Math.max(closeValue, highValue);
             lowValue = Math.min(closeValue, lowValue);
-            volumeValue = volume + Math.random() * (volume > 1_000_000_000 ? 100_000 : 500_000);
+            volumeValue = volume + Math.random() * (volume > 1_000_000_000 ? 100_00 : 500_00);
             timeValue = time;
         } else {
             openValue = highValue = lowValue = closeValue = close;

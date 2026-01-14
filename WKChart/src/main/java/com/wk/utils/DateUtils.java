@@ -1,40 +1,9 @@
-package com.wk.chart.compat;
+package com.wk.utils;
 
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- * 时间工具类
- */
-public class DateUtil {
-
-    private DateUtil() {
-    }
-
-    private static final ZoneId zoneId = ZoneId.systemDefault();
-    /**
-     * 常用变量
-     */
-    public static DateTimeFormatter DATE_FORMAT_HM = DateTimeFormatter.ofPattern("HH:mm");
-    public static DateTimeFormatter DATE_FORMAT_MD_HM = DateTimeFormatter.ofPattern("MM-dd HH:mm");
-    public static DateTimeFormatter DATE_FORMAT_MD = DateTimeFormatter.ofPattern("MM-dd");
-    public static DateTimeFormatter DATE_FORMAT_YMD = DateTimeFormatter.ofPattern("yy-MM-dd");
-    public static DateTimeFormatter DATE_FORMAT_YMD_HM =
-            DateTimeFormatter.ofPattern("yy-MM-dd HH:mm");
-
-    /**
-     * 日期转换为制定格式字符串
-     */
-    public static String formatDateToString(Date time, DateTimeFormatter pattern) {
-        try {
-            return time.toInstant().atZone(zoneId).format(pattern);
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
+public class DateUtils {
     /**
      * 计算两个日期相差的时间（天以内，包含天）
      */
@@ -74,4 +43,3 @@ public class DateUtil {
         return yearInterval * 12 + monthInterval;
     }
 }
-

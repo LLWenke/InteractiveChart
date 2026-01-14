@@ -416,7 +416,7 @@ public class ChartActivity extends AppCompatActivity implements ChartTabListener
     @Override
     public void onSetting() {
         IndexManager.INSTANCE.setIndexBuildConfig(candleAdapter.getBuildConfig()
-                .getDefaultIndexConfig());
+                .getDefaultIndexConfig(candleAdapter.getValueFormatter()));
         startActivityForResult(new Intent(this, IndexSettingActivity.class), 999);
     }
 

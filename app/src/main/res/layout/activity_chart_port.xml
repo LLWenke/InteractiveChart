@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:fillViewport="true">
 
     <LinearLayout
@@ -59,7 +60,7 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:lineWidth="1dp"
-                app:mainViewHeight="200dp"
+                app:mainViewHeight="300dp"
                 app:markerPaddingHorizontal="5dp"
                 app:markerPaddingVertical="4dp"
                 app:markerPointJointMargin="1dp"
@@ -100,7 +101,7 @@
             <com.wk.chart.ChartView
                 android:id="@+id/depth_chart"
                 android:layout_width="0dp"
-                android:layout_height="300dp"
+                android:layout_height="220dp"
                 android:layout_marginTop="10dp"
                 app:axisLabelMarginHorizontal="2dp"
                 app:axisLabelMarginVertical="0dp"

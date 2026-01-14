@@ -102,9 +102,9 @@ public class DepthPositionDrawing extends IndexDrawing<DepthRender, DepthModule>
         DepthEntry entry = render.getAdapter().getItem(current);
         ValueEntry price = entry.getPrice();
         int type = entry.getType();
-        if (type == DepthAdapter.BID && (null == bidHigh || price.result >= bidHigh.result)) {
+        if (type == DepthAdapter.BID && (null == bidHigh || price.value >= bidHigh.value)) {
             bidHigh = price;
-        } else if (type == DepthAdapter.ASK && (null == askLow || price.result <= askLow.result)) {
+        } else if (type == DepthAdapter.ASK && (null == askLow || price.value <= askLow.value)) {
             askLow = price;
         }
     }
@@ -112,10 +112,9 @@ public class DepthPositionDrawing extends IndexDrawing<DepthRender, DepthModule>
     @Override
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
         if (null == askLow || null == bidHigh) return;
-        int scale = null == bidHigh.scale ? 0 : bidHigh.scale;
-        String diffLabel = render.getAdapter()
-                .rateConversion(askLow.result - bidHigh.result, scale, false, true);
-        float bidPriceWidth = labelPaint.measureText(bidHigh.text, 0, bidHigh.text.length());
+        String diffLabel = render.getAdapter().getValueFormatter().formatFixed(
+                askLow.value - bidHigh.value, render.getAdapter().getScale().getQuoteScale());
+        float bidPriceWidth = labelPaint.measureText(bidHigh.valueFormat, 0, bidHigh.valueFormat.length());
         float diffLabelWidth = labelPaint.measureText(diffLabel, 0, diffLabel.length());
         float lineWidth = Math.max(diffLabelWidth + labelMargin * 2f, 50f);
         float left = center - lineWidth / 2f;
@@ -133,13 +132,13 @@ public class DepthPositionDrawing extends IndexDrawing<DepthRender, DepthModule>
         canvas.drawPath(scalePath, scalePaint);
         canvas.drawText(diffLabel, left + offset, top + scaleLineOffset + labelHeight, labelPaint);
         canvas.drawText(
-                bidHigh.text,
+                bidHigh.valueFormat,
                 left - bidPriceWidth - labelMargin,
                 top - scaleLineOffset + labelHeightHalf,
                 labelPaint
         );
         canvas.drawText(
-                askLow.text,
+                askLow.valueFormat,
                 right + labelMargin,
                 top - scaleLineOffset + labelHeightHalf,
                 labelPaint

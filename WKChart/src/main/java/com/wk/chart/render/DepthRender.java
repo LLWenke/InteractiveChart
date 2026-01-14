@@ -69,17 +69,16 @@ public class DepthRender extends AbsRender<DepthAdapter, DepthAttribute> {
     protected void computeExtremumValue(float[] extremumY, AbsModule<AbsEntry> chartModule) {
         final float deltaYScale = chartModule.getDeltaY() * chartModule.getYScale();
         //X轴
-        extremumY[0] = chartModule.getMinX().value;
-        extremumY[2] = chartModule.getMaxX().value;
+        extremumY[0] = (float) chartModule.getMinX().value;
+        extremumY[2] = (float) chartModule.getMaxX().value;
         //Y轴
-        extremumY[1] = chartModule.getMinY().value;
+        extremumY[1] = (float) chartModule.getMinY().value;
         if (deltaYScale > 0) {
-            extremumY[3] = chartModule.getMaxY().value + deltaYScale;
+            extremumY[3] = (float) (chartModule.getMaxY().value + deltaYScale);
         } else {
-            extremumY[3] = chartModule.getMaxY().value + chartModule.getMaxY().value
-                    * chartModule.getYScale();
+            extremumY[3] = (float) (chartModule.getMaxY().value + chartModule.getMaxY().value
+                    * chartModule.getYScale());
         }
-
         if (extremumY[1] == 0 && extremumY[3] == 0) {
             extremumY[3] = 1;
         }

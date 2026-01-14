@@ -71,7 +71,7 @@ public class SARDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
         ValueEntry value = values[0];
         CandleEntry entry = render.getAdapter().getItem(current);
         // 设置涨跌路径
-        if (entry.getClose().result < value.result) {
+        if (entry.getClose().value < value.value) {
             path = decreasingPath;//下跌路径
             isStroke = attribute.decreasingStyle == Paint.Style.STROKE;
         } else {
@@ -80,9 +80,9 @@ public class SARDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
         }
         //计算SAR指标点的矩形坐标
         rectBuffer[0] = current + 0.5f;
-        rectBuffer[1] = value.value;
+        rectBuffer[1] = (float) value.value;
         rectBuffer[2] = current + 0.5f;
-        rectBuffer[3] = value.value;
+        rectBuffer[3] = rectBuffer[1];
         render.mapPoints(chartModule.getMatrix(), rectBuffer);
         rectBuffer[0] -= pointSizeOffset;
         rectBuffer[1] -= pointSizeOffset;

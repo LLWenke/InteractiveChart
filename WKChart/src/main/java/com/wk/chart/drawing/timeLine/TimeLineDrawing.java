@@ -65,7 +65,7 @@ public class TimeLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
     public void onComputation(int begin, int end, int current, float[] extremum) {
         CandleEntry entry = render.getAdapter().getItem(current);
         pathPts[0] = current + 0.5f;
-        pathPts[1] = entry.getClose().value;
+        pathPts[1] = (float) entry.getClose().value;
         render.mapPoints(chartModule.getMatrix(), pathPts);
         if (current == begin) {//开始点
             float left = begin == 0 ? pathPts[0] : viewRect.left;

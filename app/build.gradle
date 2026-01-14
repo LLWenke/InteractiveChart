@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -5,13 +7,13 @@ plugins {
 
 android {
     namespace 'com.wk.demo'
-    compileSdk 33
+    compileSdkVersion 36
     defaultConfig {
         applicationId "com.wk.demo"
         minSdkVersion 26
-        targetSdkVersion 33
-        versionCode 6
-        versionName "1.6.0"
+        targetSdkVersion 36
+        versionCode 10
+        versionName "2.0.0"
         multiDexEnabled true
     }
     sourceSets {
@@ -22,10 +24,19 @@ android {
     buildFeatures {
         viewBinding true
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -33,12 +44,12 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
-    implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'org.greenrobot:eventbus:3.1.1'
-    implementation 'io.github.didi.dokit:dokitx:3.7.1'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'com.google.android.material:material:1.13.0'
+    implementation 'com.google.code.gson:gson:2.13.2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'androidx.core:core-ktx:1.17.0'
+    implementation 'org.greenrobot:eventbus:3.3.1'
+    implementation 'io.github.didi.dokit:dokitx:3.7.11'
     implementation project(':WKChart')
 }
