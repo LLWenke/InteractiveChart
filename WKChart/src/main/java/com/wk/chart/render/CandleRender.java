@@ -31,7 +31,7 @@ public class CandleRender extends AbsRender<CandleAdapter, CandleAttribute> {
      */
     @Override
     public void onZoom(float x, float y) {
-        if (adapter.getCount() == 0 || !canScroll()) return;
+        if (adapter.getCount() == 0 || !attribute.canScroll) return;
         resetPointsWidth();
         zoom(mainModule.getMatrix(), mainModule.getRect(), attribute.visibleCount, x, y);
     }
@@ -45,22 +45,22 @@ public class CandleRender extends AbsRender<CandleAdapter, CandleAttribute> {
         final float deltaYScale = chartModule.getDeltaY() * chartModule.getYScale();
         //默认Y轴最大值和最小值全部进行比例缩放
         if (chartModule.getModuleIndexType() == IndexType.VOLUME) {//交易量需要底部对齐，所以不做Y轴最小值的缩放,只缩放Y轴最大值
-            extremum[1] = chartModule.getMinY().value;
+            extremum[1] = (float) chartModule.getMinY().value;
             if (deltaYScale > 0) {
-                extremum[3] = chartModule.getMaxY().value + deltaYScale;
+                extremum[3] = (float) chartModule.getMaxY().value + deltaYScale;
             } else {
-                extremum[3] = chartModule.getMaxY().value + chartModule.getMaxY().value
-                        * chartModule.getYScale();
+                extremum[3] = (float) (chartModule.getMaxY().value + chartModule.getMaxY().value
+                        * chartModule.getYScale());
             }
         } else {
             if (deltaYScale > 0) {
-                extremum[1] = chartModule.getMinY().value - deltaYScale;
-                extremum[3] = chartModule.getMaxY().value + deltaYScale;
+                extremum[1] = (float) chartModule.getMinY().value - deltaYScale;
+                extremum[3] = (float) chartModule.getMaxY().value + deltaYScale;
             } else {
-                extremum[1] = chartModule.getMinY().value - chartModule.getMinY().value
-                        * chartModule.getYScale();
-                extremum[3] = chartModule.getMaxY().value + chartModule.getMaxY().value
-                        * chartModule.getYScale();
+                extremum[1] = (float) (chartModule.getMinY().value - chartModule.getMinY().value
+                        * chartModule.getYScale());
+                extremum[3] = (float) (chartModule.getMaxY().value + chartModule.getMaxY().value
+                        * chartModule.getYScale());
             }
         }
         if (extremum[1] == 0 && extremum[3] == 0) {

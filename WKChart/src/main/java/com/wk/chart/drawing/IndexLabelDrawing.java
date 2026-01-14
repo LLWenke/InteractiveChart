@@ -94,7 +94,7 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
             if (null == value) {
                 continue;
             }
-            String label = getLabel(tagEntry.getFlagEntries()[i].getNameText(), value);
+            String label = tagEntry.getFlagEntries()[i].getNameText().concat(value.valueFormat);
             int position;
             if (align == Paint.Align.RIGHT) {
                 position = labelPaints.length - 1 - i;
@@ -150,7 +150,7 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
             if (null == value) {
                 continue;
             }
-            String label = getLabel(tagEntry.getFlagEntries()[i].getNameText(), value);
+            String label = tagEntry.getFlagEntries()[i].getNameText().concat(value.valueFormat);
             canvas.drawText(label, currentX, currentY, labelPaints[i]);
             if ((attribute.indexLabelPosition & PositionType.END) != 0) {
                 int z = labelPaints.length - 1 - i;
@@ -193,30 +193,10 @@ public class IndexLabelDrawing extends IndexDrawing<CandleRender, AbsModule<?>> 
 
     private String getTag(String tag, CandleEntry entry) {
         if (indexType == IndexType.VOLUME_MA) {
-            return tag.concat(render.getAdapter().quantizationConversion(entry.getVolume(), true));
+            return tag.concat(entry.getVolume().valueFormat);
         } else {
             return tag;
         }
-    }
-
-    @SuppressLint("SwitchIntDef")
-    private String getLabel(String name, ValueEntry value) {
-        String label;
-        switch (indexType) {
-            case IndexType.CANDLE_MA:
-            case IndexType.EMA:
-            case IndexType.BOLL:
-            case IndexType.SAR:
-                label = name.concat(render.getAdapter().rateConversion(value, false, false));
-                break;
-            case IndexType.VOLUME_MA:
-                label = name.concat(render.getAdapter().quantizationConversion(value, true));
-                break;
-            default:
-                label = name.concat(value.text);
-                break;
-        }
-        return label;
     }
 
     private ValueEntry[] getIndexValue(CandleEntry entry) {

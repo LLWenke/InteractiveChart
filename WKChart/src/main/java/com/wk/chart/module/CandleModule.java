@@ -57,12 +57,12 @@ public class CandleModule extends AbsModule<CandleEntry> implements IMarkerPoint
 
     @Override
     public float getHighPoint(@NonNull CandleEntry entry) {
-        return entry.getHigh().value;
+        return (float) entry.getHigh().value;
     }
 
     @Override
     public float getLowPoint(@NonNull CandleEntry entry) {
-        return entry.getLow().value;
+        return (float) entry.getLow().value;
     }
 
     @Override
@@ -88,14 +88,14 @@ public class CandleModule extends AbsModule<CandleEntry> implements IMarkerPoint
         rectBuffer[4] = current;
         rectBuffer[6] = current + 1;
         //y轴坐标
-        rectBuffer[1] = entry.getHigh().value;
-        rectBuffer[3] = entry.getLow().value;
+        rectBuffer[1] = (float) entry.getHigh().value;
+        rectBuffer[3] = (float) entry.getLow().value;
         if (entry.getOpen().value > entry.getClose().value) {
-            rectBuffer[5] = entry.getOpen().value;
-            rectBuffer[7] = entry.getClose().value;
+            rectBuffer[5] = (float) entry.getOpen().value;
+            rectBuffer[7] = (float) entry.getClose().value;
         } else {
-            rectBuffer[5] = entry.getClose().value;
-            rectBuffer[7] = entry.getOpen().value;
+            rectBuffer[5] = (float) entry.getClose().value;
+            rectBuffer[7] = (float) entry.getOpen().value;
         }
         render.mapPoints(getMatrix(), rectBuffer);
         return rectBuffer;

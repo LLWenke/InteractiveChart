@@ -21,7 +21,6 @@ import com.wk.chart.render.CandleRender;
 /**
  * <p>极值标签组件</p>
  */
-
 public class ExtremumTagDrawing extends IndexDrawing<CandleRender, CandleModule> implements
         IDrawingClickListener {
     private static final String TAG = "ExtremumTagDrawing";
@@ -61,12 +60,11 @@ public class ExtremumTagDrawing extends IndexDrawing<CandleRender, CandleModule>
         CandleEntry min = render.getAdapter().getItem(render.getAdapter().getMinYIndex());
         extremumBuffer[0] = render.getAdapter().getMaxYIndex() + 0.5f;
         extremumBuffer[2] = render.getAdapter().getMinYIndex() + 0.5f;
-        extremumBuffer[1] = max.getHigh().value;
-        extremumBuffer[3] = min.getLow().value;
+        extremumBuffer[1] = (float) max.getHigh().value;
+        extremumBuffer[3] = (float) min.getLow().value;
         render.mapPoints(chartModule.getMatrix(), extremumBuffer);
         // 绘制当前显示区域的最大文字（max）
-        String maxValue = render.getAdapter().rateConversion(max.getHigh(), false, false);
-        String text = "← ".concat(maxValue);
+        String text = "← ".concat(max.getHigh().valueFormat);
         Utils.measureTextArea(extremumPaint, extremumRect, text);
         //文字align调整
         float left = extremumBuffer[0];
@@ -78,7 +76,7 @@ public class ExtremumTagDrawing extends IndexDrawing<CandleRender, CandleModule>
             currentExpandWidth = expandWidth;
         }
         if (extremumBuffer[0] + extremumRect.width() + currentExpandWidth > viewRect.right) {
-            text = maxValue.concat(" →");
+            text = max.getHigh().valueFormat.concat(" →");
             left = extremumBuffer[0] - extremumRect.width();
             drawableLeft = left - drawableWidth - attribute.extremumTagDrawableMarginHorizontal;
         }
@@ -105,8 +103,7 @@ public class ExtremumTagDrawing extends IndexDrawing<CandleRender, CandleModule>
         }
 
         // 绘制当前显示区域的最小文字（min）
-        String minValue = render.getAdapter().rateConversion(min.getLow(), false, false);
-        text = "← ".concat(minValue);
+        text = "← ".concat(min.getLow().valueFormat);
         Utils.measureTextArea(extremumPaint, extremumRect, text);
         //文字align调整
         left = extremumBuffer[2];
@@ -117,7 +114,7 @@ public class ExtremumTagDrawing extends IndexDrawing<CandleRender, CandleModule>
             currentExpandWidth = expandWidth;
         }
         if (extremumBuffer[2] + extremumRect.width() + currentExpandWidth > viewRect.right) {
-            text = minValue.concat(" →");
+            text = min.getLow().valueFormat.concat(" →");
             left = extremumBuffer[2] - extremumRect.width();
             drawableLeft = left - drawableWidth - attribute.extremumTagDrawableMarginHorizontal;
         }

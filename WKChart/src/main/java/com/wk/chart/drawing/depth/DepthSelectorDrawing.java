@@ -150,16 +150,16 @@ public class DepthSelectorDrawing extends IndexDrawing<DepthRender, AbsModule<Ab
         selectorInfo[0]
                 .setLabel(attribute.context.getString(R.string.wk_price))
                 .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(entry.getPrice(), false, false))
+                .setValue(entry.getPrice().valueFormat)
                 .setValuePaint(valuePaint)
-                .setUnit(" ".concat(render.getAdapter().getRate().getSign()))
+                .setUnit(" ".concat(render.getAdapter().getScale().getQuoteUnit()))
                 .setUnitPaint(unitPaint);
 
         //总量
         selectorInfo[1]
                 .setLabel(attribute.context.getString(R.string.wk_total_amount))
                 .setLabelPaint(labelPaint)
-                .setValue(entry.getTotalAmount().text)
+                .setValue(entry.getTotalAmount().valueFormat)
                 .setValuePaint(valuePaint)
                 .setUnit(" ".concat(render.getAdapter().getScale().getBaseUnit()))
                 .setUnitPaint(unitPaint);
@@ -167,9 +167,9 @@ public class DepthSelectorDrawing extends IndexDrawing<DepthRender, AbsModule<Ab
         selectorInfo[2]
                 .setLabel(attribute.context.getString(R.string.wk_total_cost))
                 .setLabelPaint(labelPaint)
-                .setValue(render.getAdapter().rateConversion(entry.getTotalPrice(), true, true))
+                .setValue(entry.getTotalPrice().valueFormat)
                 .setValuePaint(valuePaint)
-                .setUnit(" ".concat(render.getAdapter().getRate().getSign()))
+                .setUnit(" ".concat(render.getAdapter().getScale().getQuoteUnit()))
                 .setUnitPaint(unitPaint);
     }
 

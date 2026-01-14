@@ -52,7 +52,7 @@ public class BreathingLampDrawing extends IndexDrawing<CandleRender, AbsModule<?
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
         CandleEntry entry = render.getAdapter().getItem(render.getAdapter().getLastPosition());
         points[0] = render.getAdapter().getLastPosition() + 0.5f;
-        points[1] = entry.getClose().value;
+        points[1] = (float) entry.getClose().value;
         render.mapPoints(chartModule.getMatrix(), points);
         if (points[0] > viewRect.width()) return;
         float size = attribute.breathingLampRadius;

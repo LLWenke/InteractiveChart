@@ -147,7 +147,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
 //                    Log.e(TAG, "onScroll：" + distanceX);
                     if (!onLongPress && !onDoubleFingerPress) {
                         cancelHighlight();
-                        if (render.canScroll(distanceX)) {
+                        if (render.canScroll()) {
                             scroll(distanceX);
                         } else if (render.canDragging(distanceX)) {
                             dragging(distanceX);
@@ -167,7 +167,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
                 ) {
                     lastFlingX = 0;
                     int flingX = (int) (-velocityX / 1.5f);
-                    if (!onLongPress && !onDoubleFingerPress && render.canScroll(flingX)) {
+                    if (!onLongPress && !onDoubleFingerPress && render.canScroll()) {
                         lastFlingTime = System.currentTimeMillis();
                         scroller.fling(0, 0, flingX, 0, Integer.MIN_VALUE,
                                 Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE
@@ -453,7 +453,7 @@ public class ChartView extends View implements DelayedHandler.DelayedWorkListene
             } else if (!scrollIdle) {
                 releaseBack(dx);
                 return;
-            } else if (render.canScroll(dx)) {
+            } else if (render.canScroll()) {
                 scroll(dx);
                 return;
             } else {

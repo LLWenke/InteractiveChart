@@ -69,8 +69,8 @@ public class DepthDrawing extends IndexDrawing<DepthRender, DepthModule> {
     public void onComputation(int begin, int end, int current, float[] extremum) {
         float x0, x1;
         DepthEntry entry = render.getAdapter().getItem(current);
-        pathPts[0] = entry.getPrice().value;
-        pathPts[1] = entry.getTotalAmount().value;
+        pathPts[0] = (float) entry.getPrice().value;
+        pathPts[1] = (float) entry.getTotalAmount().value;
         //计算数据点
         if (previousType != entry.getType()) {
             previousType = entry.getType();
@@ -89,8 +89,8 @@ public class DepthDrawing extends IndexDrawing<DepthRender, DepthModule> {
             //获取补位点信息
             DepthEntry fillEntry = render.getAdapter().getItem(current + 1);
             if (previousType == fillEntry.getType()) {
-                pathPts[0] = fillEntry.getPrice().value;
-                pathPts[1] = entry.getTotalAmount().value;
+                pathPts[0] = (float) fillEntry.getPrice().value;
+                pathPts[1] = (float) entry.getTotalAmount().value;
                 render.mapPoints(chartModule.getMatrix(), pathPts, offset, 0);
                 path.lineTo(pathPts[0], pathPts[1]);
                 x1 = pathPts[0];

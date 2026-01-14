@@ -12,14 +12,11 @@ import com.wk.chart.compat.FontStyle;
 import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
-import com.wk.chart.entry.ValueEntry;
 import com.wk.chart.enumeration.IndexType;
 import com.wk.chart.enumeration.LineStyle;
 import com.wk.chart.enumeration.PositionType;
 import com.wk.chart.module.AbsModule;
 import com.wk.chart.render.AbsRender;
-
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -39,7 +36,6 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
     private final float[] pointCache = new float[2];//[x,y]
     private final float[] labelBuffer = new float[4];//[x1,y1,x2,y2]
     private final float[] lineBuffer = new float[8];//[x1,y1,x2,y2,x3,y4,x4,y4]
-    private final boolean isQuantization;
     private final int axisCount;
     private int axisStart = 0, axisEnd = 0;
     private float textHeight, textCenter, regionHeight, sortLineOffset, lineHeightOffset;
@@ -47,11 +43,9 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
     /**
      * 构造
      *
-     * @param axisCount      行数
-     * @param isQuantization 是否量化数字
+     * @param axisCount 行数
      */
-    public AxisDrawing(int axisCount, boolean isQuantization) {
-        this.isQuantization = isQuantization;
+    public AxisDrawing(int axisCount) {
         this.axisCount = axisCount;
     }
 
@@ -118,15 +112,18 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
             if (i == 0) {
                 labelOffset = textHeight;
                 lineOffset = textCenter;
-                text = getScaleLabel(extremum[3], chartModule.getMaxY());
+                text = isDynamicTag() ? render.getAdapter().getValueFormatter().formatFixed(extremum[3],
+                        render.getAdapter().getScale().getQuoteScale()) : chartModule.getMaxY().valueFormat;
             } else if (i == axisCount - 1) {
                 labelOffset = 0;
                 lineOffset = -textCenter;
-                text = getScaleLabel(extremum[1], chartModule.getMinY());
+                text = isDynamicTag() ? render.getAdapter().getValueFormatter().formatFixed(extremum[1],
+                        render.getAdapter().getScale().getQuoteScale()) : chartModule.getMinY().valueFormat;
             } else {
                 labelOffset = textCenter;
                 lineOffset = 0;
-                text = getScaleLabel(pointCache[1], null);
+                text = render.getAdapter().getValueFormatter().formatFixed(pointCache[1],
+                        render.getAdapter().getScale().getQuoteScale());
             }
             //绘制刻度值
             if ((attribute.axisLabelPosition & PositionType.BOTTOM) != 0) {
@@ -182,15 +179,15 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
     }
 
     /**
-     * 格式化刻度标签
+     * 是否为动态标签
      */
-    private String getScaleLabel(float value, @Nullable ValueEntry entry) {
-        if (null != entry && chartModule.getModuleIndexType() == IndexType.VOLUME) {
-            return render.getAdapter().quantizationConversion(entry, true);
-        } else if (isQuantization) {
-            return render.getAdapter().rateConversion(value, render.getAdapter().getScale().getQuoteScale(), true, false);
-        } else {
-            return render.getAdapter().rateConversion(value, render.getAdapter().getScale().getQuoteScale(), false, false);
-        }
+    private boolean isDynamicTag() {
+        return chartModule.getModuleIndexType() == IndexType.CANDLE
+                || chartModule.getModuleIndexType() == IndexType.TIME_LINE
+                || chartModule.getModuleIndexType() == IndexType.DEPTH
+                || chartModule.getModuleIndexType() == IndexType.BOLL
+                || chartModule.getModuleIndexType() == IndexType.CANDLE_MA
+                || chartModule.getModuleIndexType() == IndexType.EMA
+                || chartModule.getModuleIndexType() == IndexType.SAR;
     }
 }

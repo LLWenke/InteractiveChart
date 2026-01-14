@@ -9,7 +9,7 @@ class IndexBaseNode(
         @get:IndexType
         @param:IndexType
         val indexType: Int,
-        private val nodes: MutableList<BaseNode>,
+        private val nodes: MutableList<BaseNode>?,
         val name: String?,
         val title: String?,
         val isShowInterval: Boolean,
@@ -19,7 +19,7 @@ class IndexBaseNode(
         isExpanded = false
     }
 
-    override val childNode: MutableList<BaseNode>
+    override val childNode: MutableList<BaseNode>?
         get() = nodes
 
     override val footerNode: BaseNode?

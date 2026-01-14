@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken
 import com.wk.chart.compat.config.IndexBuildConfig
 import com.wk.chart.entry.IndexConfigEntry
 import com.wk.chart.enumeration.IndexType
+import com.wk.chart.formatter.ValueFormatter
 import com.wk.view.unit.Preferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -20,6 +21,7 @@ object IndexManager {
     private var mDefaultIndexConfigs: LinkedHashMap<Int, IndexConfigEntry>? = null
     private var mIndexConfigs: LinkedHashMap<Int, IndexConfigEntry>? = null
     private var mListener: ArrayList<SoftReference<IndexConfigChangeListener>> = ArrayList()
+    private val mFormatter: ValueFormatter = ValueFormatter()
     private val mGson: Gson = Gson()
 
     fun setIndexBuildConfig(indexConfigs: LinkedHashMap<Int, IndexConfigEntry>) {
@@ -49,7 +51,7 @@ object IndexManager {
         mDefaultIndexConfigs?.let {
             return it[indexType]
         }
-        mDefaultIndexConfigs = IndexBuildConfig().defaultIndexConfig
+        mDefaultIndexConfigs = IndexBuildConfig().getDefaultIndexConfig(mFormatter)
         return getIndexConfigs(indexType)
     }
 
@@ -63,8 +65,8 @@ object IndexManager {
                                 val node = nodes[i]
                                 if (node is IndexChildNode && i < index.flagEntries.size) {
                                     val flagEntry = index.flagEntries[i]
-                                    flagEntry.flag = node.flag
                                     flagEntry.isEnable = node.isEnable()
+                                    flagEntry.setFlag(node.flag, mFormatter)
                                 } else {
                                     break
                                 }

@@ -98,25 +98,23 @@ public class HighlightDrawing extends AbsDrawing<CandleRender, AbsModule<AbsEntr
         switch (focusModule.getModuleIndexType()) {
             case IndexType.CANDLE://k线图 指标
             case IndexType.TIME_LINE://分时图 指标
-                highlightPoint[1] = entry.getClose().value;
+                highlightPoint[1] = (float) entry.getClose().value;
                 render.mapPoints(focusModule.getMatrix(), highlightPoint);
-                axisMarkerText = render.getAdapter().rateConversion(entry.getClose(), false, false);
+                axisMarkerText = entry.getClose().valueFormat;
                 isReverseMarker = false;
                 break;
             case IndexType.VOLUME://交易量 指标
-                highlightPoint[1] = entry.getVolume().value;
+                highlightPoint[1] = (float) entry.getVolume().value;
                 render.mapPoints(focusModule.getMatrix(), highlightPoint);
-                axisMarkerText =
-                        render.getAdapter().quantizationConversion(entry.getVolume(), true);
+                axisMarkerText = entry.getVolume().valueFormat;
                 isReverseMarker = true;
                 break;
             default:
                 highlightPoint[1] = highlightY;
                 render.invertMapPoints(focusModule.getMatrix(), highlightPoint);
-                axisMarkerText = render.getAdapter().rateConversion(highlightPoint[1],
-                        render.getAdapter().getScale().getQuoteScale(),
-                        false,
-                        false
+                axisMarkerText = render.getAdapter().getValueFormatter().formatFixed(
+                        highlightPoint[1],
+                        render.getAdapter().getScale().getQuoteScale()
                 );
                 highlightPoint[1] = highlightY;
                 isReverseMarker = true;

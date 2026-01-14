@@ -102,10 +102,10 @@ public class MACDDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
         boolean isComputationDeaPath = null != values[1];
         pathPts[0] = pathPts[2] = current + 0.5f;
         if (isComputationDiffPath) {
-            pathPts[3] = values[0].value;
+            pathPts[3] = (float) values[0].value;
         }
         if (isComputationDeaPath) {
-            pathPts[1] = values[1].value;
+            pathPts[1] = (float) values[1].value;
         }
         render.mapPoints(chartModule.getMatrix(), pathPts);
         if (isComputationDiffPath) {
@@ -124,13 +124,13 @@ public class MACDDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
         if (macd.value >= 0f) {
             path = increasingPath;//上涨或者不涨不跌路径
             isStroke = attribute.increasingStyle == Paint.Style.STROKE;
-            rectBuffer[1] = macd.value;
+            rectBuffer[1] = (float) macd.value;
             rectBuffer[3] = 0;
         } else {
             path = decreasingPath;//下跌路径
             isStroke = attribute.decreasingStyle == Paint.Style.STROKE;
             rectBuffer[1] = 0;
-            rectBuffer[3] = macd.value;
+            rectBuffer[3] = (float) macd.value;
         }
         rectBuffer[0] = current + render.pointsSpace;
         rectBuffer[2] = current + 1 - render.pointsSpace;

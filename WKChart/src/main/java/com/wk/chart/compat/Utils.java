@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
 import com.wk.chart.entry.IndexConfigEntry;
+import com.wk.chart.formatter.ValueFormatter;
 
 import java.util.Collection;
 
@@ -109,9 +110,11 @@ public class Utils {
      * 替换占位符
      *
      * @param str         源字符串
+     * @param formatter   值格式化器
+     * @param scale       精度
      * @param flagEntries flag数组，用于将其中flag替换到对应的占位符上
      */
-    public static String replacePlaceholder(@NonNull String str, IndexConfigEntry.FlagEntry... flagEntries) {
+    public static String replacePlaceholder(@NonNull String str, ValueFormatter formatter, int scale, IndexConfigEntry.FlagEntry... flagEntries) {
         if (null == flagEntries) {
             return str;
         }
@@ -121,7 +124,8 @@ public class Utils {
             return str;
         }
         for (IndexConfigEntry.FlagEntry value : flagEntries) {
-            str = str.replaceFirst(placeholder, String.valueOf(value.getFlag()));
+            str = str.replaceFirst(placeholder, null == formatter ? String.valueOf(value.getFlag())
+                    : formatter.formatFixedStripTrailingZeros(value.getFlag(), scale));
         }
         return str;
     }

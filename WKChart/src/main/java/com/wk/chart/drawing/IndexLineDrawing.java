@@ -76,7 +76,7 @@ public class IndexLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
                 continue;
             }
             pathPts[0] = current + 0.5f;
-            pathPts[1] = entry.value;
+            pathPts[1] = (float) entry.value;
             render.mapPoints(chartModule.getMatrix(), pathPts);
             Path path = paths[i];
             if (path.isEmpty()) {

@@ -5,9 +5,12 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.chad.library.adapter.base.BaseNodeAdapter
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.wk.chart.enumeration.IndexType
+import com.wk.chart.formatter.ValueFormatter
 import com.wk.view.indexSetting.IndexManager.getIndexConfigs
 
 class IndexAdapter : BaseNodeAdapter() {
+    val mFormatter: ValueFormatter = ValueFormatter()
+
     init {
         addFullSpanNodeProvider(IndexBaseProvider())
         addNodeProvider(IndexChildProvider())
@@ -19,12 +22,15 @@ class IndexAdapter : BaseNodeAdapter() {
             is IndexBaseNode -> {
                 TYPE_BASE
             }
+
             is IndexChildNode -> {
                 TYPE_CHILD
             }
+
             is IndexFooterNode -> {
                 TYPE_FOOTER
             }
+
             else -> -1
         }
     }
@@ -62,9 +68,9 @@ class IndexAdapter : BaseNodeAdapter() {
             val childCount = node.childNode?.size ?: 0
             var i = 0
             while (i < childCount && i < defaultIndex.flagEntries.size) {
-                val child = node.childNode!![i] as IndexChildNode
+                val child = node.childNode?.get(i) as? IndexChildNode
                 val entry = defaultIndex.flagEntries[i]
-                child.flag = entry.flag
+                child?.flag = entry.flag
                 i++
             }
             if (childCount == 0) {

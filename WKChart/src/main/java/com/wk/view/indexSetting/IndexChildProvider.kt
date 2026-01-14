@@ -7,6 +7,7 @@ import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.wk.chart.R
+import com.wk.utils.NumberUtils
 import com.wk.view.FontEditTextView
 
 class IndexChildProvider : BaseNodeProvider() {
@@ -30,21 +31,28 @@ class IndexChildProvider : BaseNodeProvider() {
         val input = helper.getView<FontEditTextView>(R.id.et_index_value)
         input.setListener(null)
         helper.setText(R.id.tv_index_label, entity.name)
-        input.setText(if (0 == entity.flag) null else entity.flag.toString())
+        input.setText(
+            if (0.0 == entity.flag) null else NumberUtils.parseBigDecimal(
+                entity.flag,
+                entity.scale
+            ).stripTrailingZeros().toPlainString()
+        )
         if (entity.color == 0) {
-            helper.getView<View>(R.id.v_index_background).backgroundTintList = ContextCompat.getColorStateList(context, R.color.colorTextAuxiliary)
+            helper.getView<View>(R.id.v_index_background).backgroundTintList =
+                ContextCompat.getColorStateList(context, R.color.colorTextAuxiliary)
             input.setTextColor(ContextCompat.getColor(context, R.color.colorTextImportant))
         } else {
-            helper.getView<View>(R.id.v_index_background).backgroundTintList = ColorStateList.valueOf(entity.color)
+            helper.getView<View>(R.id.v_index_background).backgroundTintList =
+                ColorStateList.valueOf(entity.color)
             input.setTextColor(entity.color)
         }
         setCheckBoxImageRes(helper, entity.imageRes)
         input.setListener { text: CharSequence ->
             if (text.isEmpty() || "0" == text.trim()) {
-                entity.flag = 0
+                entity.flag = 0.0
                 entity.setEnable(false)
             } else {
-                entity.flag = text.toString().toInt()
+                entity.flag = text.toString().toDouble()
                 entity.setEnable(true)
             }
             setCheckBoxImageRes(helper, entity.imageRes)

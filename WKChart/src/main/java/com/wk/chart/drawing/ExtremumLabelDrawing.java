@@ -12,7 +12,6 @@ import com.wk.chart.compat.Utils;
 import com.wk.chart.compat.attribute.BaseAttribute;
 import com.wk.chart.drawing.base.AbsDrawing;
 import com.wk.chart.entry.AbsEntry;
-import com.wk.chart.entry.ValueEntry;
 import com.wk.chart.enumeration.ExtremumVisible;
 import com.wk.chart.enumeration.PositionType;
 import com.wk.chart.module.AbsModule;
@@ -25,8 +24,6 @@ import com.wk.chart.render.AbsRender;
 public class ExtremumLabelDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<AbsEntry>> {
     private BaseAttribute attribute;//配置文件
     private final int extremumLabelVisible;//极值标签显示状态式
-    private final boolean isQuantization;//是否进行量化
-    private final boolean isRate;//是否进行汇率转换
     private final TextPaint labelPaintLeft = new TextPaint(Paint.ANTI_ALIAS_FLAG);// 标签画笔
     private final TextPaint labelPaintRight = new TextPaint(Paint.ANTI_ALIAS_FLAG);// 标签画笔
     private final Paint axisLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG); // Axis 轴线条的画笔
@@ -35,10 +32,8 @@ public class ExtremumLabelDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<
     private float textHeight;//文字
     private boolean showMaxLabel, showMinLabel;//显示最大标签，显示最小标签
 
-    public ExtremumLabelDrawing(int extremumLabelVisible, boolean isQuantization, boolean isRate) {
+    public ExtremumLabelDrawing(int extremumLabelVisible) {
         this.extremumLabelVisible = extremumLabelVisible;
-        this.isQuantization = isQuantization;
-        this.isRate = isRate;
     }
 
     @Override
@@ -85,10 +80,10 @@ public class ExtremumLabelDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<
     public void onDraw(Canvas canvas, int begin, int end, float[] extremum) {
         String topLabel = "", bottomLabel = "";
         if (showMaxLabel) {//最大值标签可见
-            topLabel = getLabelText(chartModule.getMaxY());
+            topLabel = chartModule.getMaxY().valueFormat;
         }
         if (showMinLabel) {//最小值标签可见
-            bottomLabel = getLabelText(chartModule.getMinY());
+            bottomLabel = chartModule.getMinY().valueFormat;
         }
         if ((attribute.extremumLabelPosition & PositionType.START_AND_END) != 0) {
             if (showMaxLabel) {
@@ -135,23 +130,6 @@ public class ExtremumLabelDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<
         } else {
             labelBuffer[1] = labelBuffer[5] = viewRect.top + textHeight + attribute.extremumLabelMarginVertical;
             labelBuffer[3] = labelBuffer[7] = viewRect.bottom - attribute.extremumLabelMarginVertical;
-        }
-    }
-
-    /**
-     * 格式话标签文字
-     */
-    private String getLabelText(ValueEntry entry) {
-        if (isRate) {
-            if (isQuantization) {
-                return render.getAdapter().rateConversion(entry, true, false);
-            } else {
-                return render.getAdapter().rateConversion(entry, false, false);
-            }
-        } else if (isQuantization) {
-            return render.getAdapter().quantizationConversion(entry, true);
-        } else {
-            return entry.text;
         }
     }
 }

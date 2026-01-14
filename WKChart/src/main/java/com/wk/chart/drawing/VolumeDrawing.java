@@ -70,7 +70,7 @@ public class VolumeDrawing extends IndexDrawing<CandleRender, VolumeModule> {
         }
         // 计算 成交量的矩形坐标
         rectBuffer[0] = current + render.pointsSpace;
-        rectBuffer[1] = entry.getVolume().value;
+        rectBuffer[1] = (float) entry.getVolume().value;
         rectBuffer[2] = current + 1 - render.pointsSpace;
         rectBuffer[3] = extremum[1];
         render.mapPoints(chartModule.getMatrix(), rectBuffer);

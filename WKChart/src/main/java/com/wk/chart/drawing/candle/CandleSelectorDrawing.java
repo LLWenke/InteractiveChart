@@ -166,14 +166,13 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, AbsModule<Ab
         //时间
         selectorInfo[0].setValue(entry.getTimeText());
         //开
-        selectorInfo[1].setValue(render.getAdapter().rateConversion(entry.getOpen(), false, false));
+        selectorInfo[1].setValue(entry.getOpen().valueFormat);
         //高
-        selectorInfo[2].setValue(render.getAdapter().rateConversion(entry.getHigh(), false, false));
+        selectorInfo[2].setValue(entry.getHigh().valueFormat);
         //低
-        selectorInfo[3].setValue(render.getAdapter().rateConversion(entry.getLow(), false, false));
+        selectorInfo[3].setValue(entry.getLow().valueFormat);
         //收
-        selectorInfo[4].setValue(render.getAdapter()
-                .rateConversion(entry.getClose(), false, false));
+        selectorInfo[4].setValue(entry.getClose().valueFormat);
         String symbol;
         TextPaint paint;
         if (entry.getClose().value < entry.getOpen().value) {
@@ -184,15 +183,11 @@ public class CandleSelectorDrawing extends AbsDrawing<CandleRender, AbsModule<Ab
             symbol = "+";
         }
         //涨跌幅
-        selectorInfo[5].setValue(symbol.concat(entry.getChangeProportion().text).concat("%"))
-                .setValuePaint(paint);
+        selectorInfo[5].setValue(entry.getChangeRate().valueFormat).setValuePaint(paint);
         //涨跌额
-        selectorInfo[6].setValue(symbol.concat(render.getAdapter()
-                        .rateConversion(entry.getChangeAmount(), false, true)))
-                .setValuePaint(paint);
+        selectorInfo[6].setValue(entry.getChangeAmount().valueFormat).setValuePaint(paint);
         //成交量
-        selectorInfo[7].setValue(render.getAdapter()
-                .quantizationConversion(entry.getVolume(), true));
+        selectorInfo[7].setValue(entry.getVolume().valueFormat);
     }
 
     /**

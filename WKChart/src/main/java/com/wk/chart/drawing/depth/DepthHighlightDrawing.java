@@ -121,9 +121,9 @@ public class DepthHighlightDrawing extends IndexDrawing<DepthRender, AbsModule<A
             circlePant = askCirclePaint;
             highlightPaint = askHighlightPaint;
         }
-        axisMarkerText = entry.getTotalAmount().text;
-        gridMarkerText = render.getAdapter().rateConversion(entry.getPrice(), false, false);
-        highlightPoint[1] = entry.getTotalAmount().value;
+        axisMarkerText = entry.getTotalAmount().valueFormat;
+        gridMarkerText = entry.getPrice().valueFormat;
+        highlightPoint[1] = (float) entry.getTotalAmount().value;
         render.mapPoints(focusModule.getMatrix(), highlightPoint);
         highlightPoint[0] = highlightX;
         //axis标签位置区域计算

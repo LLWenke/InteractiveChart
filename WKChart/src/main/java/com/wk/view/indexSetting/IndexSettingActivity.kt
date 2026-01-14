@@ -75,12 +75,14 @@ class IndexSettingActivity : AppCompatActivity(), IndexManager.IndexConfigChange
                 if (TextUtils.isEmpty(index.term)) {
                     continue
                 }
+
                 if (item.key == IndexType.CANDLE_MA || item.key == IndexType.EMA || item.key == IndexType.RSI || item.key == IndexType.WR) {
                     nodes.add(
                         IndexChildNode(
                             item.key,
                             index.term,
                             index.flag,
+                            index.scale,
                             index.color,
                             getImageRes(i),
                             unCheckedImageRes,
@@ -93,6 +95,7 @@ class IndexSettingActivity : AppCompatActivity(), IndexManager.IndexConfigChange
                             item.key,
                             index.term,
                             index.flag,
+                            index.scale,
                             0,
                             null,
                             null,

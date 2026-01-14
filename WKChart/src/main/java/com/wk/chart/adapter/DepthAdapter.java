@@ -22,23 +22,24 @@ public class DepthAdapter extends AbsAdapter<DepthEntry, NormalBuildConfig> {
     @Override
     void buildData(@NonNull NormalBuildConfig buildConfig, @NonNull List<DepthEntry> data, int startPosition) {
         buildConfig.setInit(true);
-        buildScaleValue(data, startPosition);
         computeData(data, startPosition);
+        buildValueScale(data, startPosition);
     }
 
     /**
      * 在给定的范围内，计算最大值和最小值
      */
     @Override
-    public void computeMinAndMax(int start, int end) {
+    public void calculateMinAndMax(int start, int end) {
+
     }
 
     /**
      * 构建精度值
      */
-    private void buildScaleValue(@NonNull List<DepthEntry> data, int startPosition) {
+    private void buildValueScale(@NonNull List<DepthEntry> data, int startPosition) {
         for (int i = startPosition, z = data.size(); i < z; i++) {
-            data.get(i).buildScaleValue(getScale());
+            data.get(i).buildValueScale(getScale(), getValueFormatter());
         }
     }
 
@@ -67,43 +68,43 @@ public class DepthAdapter extends AbsAdapter<DepthEntry, NormalBuildConfig> {
             return;
         }
         if (Utils.listIsEmpty(bids)) {
-            DepthEntry bidBean = new DepthEntry(getScale(), asks.get(0).getPrice().result,
+            DepthEntry bidBean = new DepthEntry(asks.get(0).getPrice().value,
                     0L, 0L, BID, new Date());
             bids.add(bidBean);
         } else if (Utils.listIsEmpty(asks)) {
-            DepthEntry askBean = new DepthEntry(getScale(),
-                    bids.get(0).getPrice().result + (bids.get(0).getPrice().result - bids.get(bids.size() - 1)
-                            .getPrice().result), 0L, 0L, ASK, new Date());
+            DepthEntry askBean = new DepthEntry(
+                    bids.get(0).getPrice().value + (bids.get(0).getPrice().value - bids.get(bids.size() - 1)
+                            .getPrice().value), 0L, 0L, ASK, new Date());
             asks.add(askBean);
         }
         if (bids.size() == 1) {
-            DepthEntry bidBean = new DepthEntry(getScale(), 0L, 0L,
-                    bids.get(0).getTotalAmount().result, BID, new Date());
+            DepthEntry bidBean = new DepthEntry(0L, 0L,
+                    bids.get(0).getTotalAmount().value, BID, new Date());
             bids.add(bidBean);
         }
         if (asks.size() == 1) {
-            DepthEntry askBean = new DepthEntry(getScale(),
-                    asks.get(0).getPrice().result + (bids.get(0).getPrice().result - bids.get(bids.size() - 1)
-                            .getPrice().result), 0L, asks.get(0).getTotalAmount().result, ASK, new Date());
+            DepthEntry askBean = new DepthEntry(
+                    asks.get(0).getPrice().value + (bids.get(0).getPrice().value - bids.get(bids.size() - 1)
+                            .getPrice().value), 0L, asks.get(0).getTotalAmount().value, ASK, new Date());
             asks.add(askBean);
         }
         //保持买单/卖单数据的价格跨度值一致
-        long bidsDiff = bids.get(0).getPrice().result - bids.get(bids.size() - 1).getPrice().result;//买单数据的价格跨度值
-        long asksDiff = asks.get(asks.size() - 1).getPrice().result - asks.get(0).getPrice().result;//卖单数据的价格跨度值
+        double bidsDiff = bids.get(0).getPrice().value - bids.get(bids.size() - 1).getPrice().value;//买单数据的价格跨度值
+        double asksDiff = asks.get(asks.size() - 1).getPrice().value - asks.get(0).getPrice().value;//卖单数据的价格跨度值
 
         if (bidsDiff > asksDiff) {
             //补齐最低值
-            long minPrice = bids.get(0).getPrice().result - asksDiff;
+            double minPrice = bids.get(0).getPrice().value - asksDiff;
             bids = bids.subList(0, indexOfDiff(minPrice, 0, bids.size() - 1, bids, 1));//剔除不在跨度范围内的数据
-            DepthEntry minBean = new DepthEntry(getScale(), minPrice, 0L,
-                    bids.get(bids.size() - 1).getTotalAmount().result, BID, new Date());
+            DepthEntry minBean = new DepthEntry(minPrice, 0L,
+                    bids.get(bids.size() - 1).getTotalAmount().value, BID, new Date());
             bids.add(minBean);
         } else if (bidsDiff < asksDiff) {
             //补齐最高值
-            long maxPrice = asks.get(0).getPrice().result + bidsDiff;
+            double maxPrice = asks.get(0).getPrice().value + bidsDiff;
             asks = asks.subList(0, indexOfDiff(maxPrice, 0, asks.size() - 1, asks, 2));//剔除不在跨度范围内的数据
-            DepthEntry maxBean = new DepthEntry(getScale(), maxPrice, 0L,
-                    asks.get(asks.size() - 1).getTotalAmount().result, ASK, new Date());
+            DepthEntry maxBean = new DepthEntry(maxPrice, 0L,
+                    asks.get(asks.size() - 1).getTotalAmount().value, ASK, new Date());
             asks.add(maxBean);
         }
         data.addAll(bids);
@@ -113,7 +114,7 @@ public class DepthAdapter extends AbsAdapter<DepthEntry, NormalBuildConfig> {
     /**
      * 二分查找当前值的index
      */
-    private int indexOfDiff(long value, int start, int end, List<DepthEntry> data,
+    private int indexOfDiff(double value, int start, int end, List<DepthEntry> data,
                             int type) {
         int count = data.size();
         if (count == 0) {
@@ -124,7 +125,7 @@ public class DepthAdapter extends AbsAdapter<DepthEntry, NormalBuildConfig> {
             return end;
         }
         int mid = start + ((end - start) >> 1);
-        long midValue = data.get(mid).getPrice().result;
+        double midValue = data.get(mid).getPrice().value;
         switch (type) {
             case 1://反向查找
                 if (value < midValue) {

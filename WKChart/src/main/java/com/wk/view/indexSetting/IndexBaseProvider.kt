@@ -27,16 +27,17 @@ class IndexBaseProvider : BaseNodeProvider() {
 
     private fun getNext(position: Int): IndexBaseNode? {
         val node = getAdapter()?.getItemOrNull(position + 1) ?: return null
-        return if (node is IndexBaseNode) {
-            node
-        } else null
+        return node as? IndexBaseNode
     }
 
     override fun convert(helper: BaseViewHolder, item: BaseNode) {
         val entity = item as IndexBaseNode
         val next = getNext(helper.bindingAdapterPosition)
         helper.setGone(R.id.v_index_title_interval, !entity.isShowInterval)
-        helper.setGone(R.id.v_index_title_dividing_line, entity.isExpanded || next == null || next.isShowInterval)
+        helper.setGone(
+            R.id.v_index_title_dividing_line,
+            entity.isExpanded || next == null || next.isShowInterval
+        )
         if (TextUtils.isEmpty(entity.title)) {
             helper.setGone(R.id.tv_index_group_name, true)
         } else {
@@ -58,7 +59,12 @@ class IndexBaseProvider : BaseNodeProvider() {
                 if (!node.isEnable()) {
                     continue
                 }
-                builder.append(node.name).append(node.flag).append(interval)
+                builder.append(node.name).append(
+                    indexAdapter?.mFormatter?.formatFixedStripTrailingZeros(
+                        node.flag,
+                        node.scale
+                    ) ?: node.flag
+                ).append(interval)
             }
         }
         val start = builder.length - interval.length
