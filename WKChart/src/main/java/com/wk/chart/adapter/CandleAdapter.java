@@ -195,7 +195,8 @@ public class CandleAdapter extends AbsAdapter<CandleEntry, IndexBuildConfig> {
         calculate.calculateEMA(data, buildConfig, getValueFormatter(), getScale(), startPosition);
         calculate.calculateMACD(data, buildConfig, getValueFormatter(), getScale(), startPosition);
         calculate.calculateBOLL(data, buildConfig, getValueFormatter(), getScale(), startPosition);
-        calculate.calculateSAR2(data, buildConfig, getValueFormatter(), getScale(), startPosition);
+        calculate.calculateSAR(data, buildConfig, getValueFormatter(), getScale(), startPosition);
+        calculate.calculateAVL(data, buildConfig, getValueFormatter(), getScale(), startPosition);
         calculate.calculateRSI(data, buildConfig, getValueFormatter(), getScale(), startPosition);
         calculate.calculateKDJ(data, buildConfig, getValueFormatter(), getScale(), startPosition);
         calculate.calculateWR(data, buildConfig, getValueFormatter(), getScale(), startPosition);

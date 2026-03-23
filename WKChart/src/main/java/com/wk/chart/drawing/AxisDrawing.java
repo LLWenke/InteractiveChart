@@ -188,6 +188,7 @@ public class AxisDrawing extends AbsDrawing<AbsRender<?, ?>, AbsModule<?>> {
                 || chartModule.getModuleIndexType() == IndexType.BOLL
                 || chartModule.getModuleIndexType() == IndexType.CANDLE_MA
                 || chartModule.getModuleIndexType() == IndexType.EMA
-                || chartModule.getModuleIndexType() == IndexType.SAR;
+                || chartModule.getModuleIndexType() == IndexType.SAR
+                || chartModule.getModuleIndexType() == IndexType.AVL;
     }
 }

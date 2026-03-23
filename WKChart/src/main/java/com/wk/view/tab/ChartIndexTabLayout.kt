@@ -31,6 +31,7 @@ class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
             tvEma.setOnClickListener(this@ChartIndexTabLayout)
             tvBoll.setOnClickListener(this@ChartIndexTabLayout)
             tvSar.setOnClickListener(this@ChartIndexTabLayout)
+            tvAvl.setOnClickListener(this@ChartIndexTabLayout)
             tvVolume.setOnClickListener(this@ChartIndexTabLayout)
             tvMacd.setOnClickListener(this@ChartIndexTabLayout)
             tvKdj.setOnClickListener(this@ChartIndexTabLayout)
@@ -60,6 +61,10 @@ class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
 
             R.id.tv_sar -> {
                 mainIndexViewToggle(IndexType.SAR)
+            }
+
+            R.id.tv_avl -> {
+                mainIndexViewToggle(IndexType.AVL)
             }
 
             R.id.tv_volume -> {
@@ -107,6 +112,7 @@ class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
         mBinding.tvEma.isSelected = false
         mBinding.tvBoll.isSelected = false
         mBinding.tvSar.isSelected = false
+        mBinding.tvAvl.isSelected = false
         indexTypeSet?.forEach { indexType ->
             when (indexType) {
                 IndexType.CANDLE_MA -> {
@@ -123,6 +129,9 @@ class ChartIndexTabLayout : ConstraintLayout, View.OnClickListener {
 
                 IndexType.SAR -> {
                     mBinding.tvSar.isSelected = true
+                }
+                IndexType.AVL -> {
+                    mBinding.tvAvl.isSelected = true
                 }
 
             }

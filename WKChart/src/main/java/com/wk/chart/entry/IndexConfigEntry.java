@@ -17,10 +17,12 @@ public class IndexConfigEntry {
     private final int scale;
     private final String tag;
     private final String tagText;
+    private final boolean customizable;
     private final FlagEntry[] flagEntries;
 
-    public IndexConfigEntry(@Nullable String tag, FlagEntry[] flagEntries, int scale, ValueFormatter formatter) {
+    public IndexConfigEntry(@Nullable String tag, boolean customizable, FlagEntry[] flagEntries, int scale, ValueFormatter formatter) {
         this.scale = scale;
+        this.customizable = customizable;
         this.tag = null == tag ? "" : tag;
         this.flagEntries = null == flagEntries ? new FlagEntry[0] : flagEntries;
         this.tagText = Utils.replacePlaceholder(this.tag, formatter, scale, this.flagEntries);
@@ -28,6 +30,10 @@ public class IndexConfigEntry {
 
     public int getScale() {
         return scale;
+    }
+
+    public boolean isCustomizable() {
+        return customizable;
     }
 
     public String getTag() {

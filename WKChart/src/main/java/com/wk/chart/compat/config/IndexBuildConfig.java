@@ -53,6 +53,7 @@ public class IndexBuildConfig extends AbsBuildConfig {
         //配置蜡烛图MA
         this.defaultIndexFlagConfig.put(IndexType.CANDLE_MA, buildIndexTagEntry(
                 null,
+                true,
                 new String[]{"MA#:", "MA#:", "MA#:", "MA#:", "MA#:", "MA#:"},
                 new String[]{"MA", "MA", "MA", "MA", "MA", "MA"},
                 new double[]{7, 30, 90, 0, 0, 0},
@@ -63,6 +64,7 @@ public class IndexBuildConfig extends AbsBuildConfig {
         //配置交易量MA
         this.defaultIndexFlagConfig.put(IndexType.VOLUME_MA, buildIndexTagEntry(
                 "Vol(#,#):",
+                true,
                 new String[]{"MA#:", "MA#:"},
                 new String[]{"MA", "MA"},
                 new double[]{7, 15},
@@ -73,6 +75,7 @@ public class IndexBuildConfig extends AbsBuildConfig {
         //配置EMA
         this.defaultIndexFlagConfig.put(IndexType.EMA, buildIndexTagEntry(
                 null,
+                true,
                 new String[]{"EMA#:", "EMA#:", "EMA#:", "EMA#:", "EMA#:", "EMA#:"},
                 new String[]{"EMA", "EMA", "EMA", "EMA", "EMA", "EMA"},
                 new double[]{6, 12, 20, 0, 0, 0},
@@ -83,6 +86,7 @@ public class IndexBuildConfig extends AbsBuildConfig {
         //配置BOLL
         this.defaultIndexFlagConfig.put(IndexType.BOLL, buildIndexTagEntry(
                 "BOLL(#)",
+                true,
                 new String[]{"UP:", "MB:", "DN:"},
                 new String[]{"N", "P"},
                 new double[]{20, 2},
@@ -90,9 +94,10 @@ public class IndexBuildConfig extends AbsBuildConfig {
                 new boolean[]{true, true, true},
                 defaultIndexColors,
                 valueFormatter));
-        //配置BOLL
+        //配置SAR
         this.defaultIndexFlagConfig.put(IndexType.SAR, buildIndexTagEntry(
                 "SAR(#,#,#)",
+                true,
                 new String[]{"SAR:", "SAR:", "SAR:"},
                 new String[]{"N:", "S:", "M:"},
                 new double[]{0.02, 0.02, 0.2},
@@ -100,9 +105,21 @@ public class IndexBuildConfig extends AbsBuildConfig {
                 new boolean[]{true, true, true},
                 defaultIndexColors,
                 valueFormatter));
+        //配置AVL
+        this.defaultIndexFlagConfig.put(IndexType.AVL, buildIndexTagEntry(
+                "AVL:",
+                false,
+                new String[]{""},
+                new String[]{""},
+                new double[]{0d},
+                0,
+                new boolean[]{true},
+                defaultIndexColors,
+                valueFormatter));
         //配置MACD
         this.defaultIndexFlagConfig.put(IndexType.MACD, buildIndexTagEntry(
                 "MACD(#,#,#)",
+                true,
                 new String[]{"DIF:", "DEA:", "MACD:"},
                 new String[]{"S", "L", "M"},
                 new double[]{12, 26, 9},
@@ -113,6 +130,7 @@ public class IndexBuildConfig extends AbsBuildConfig {
         //配置KDJ
         this.defaultIndexFlagConfig.put(IndexType.KDJ, buildIndexTagEntry(
                 "KDJ(#,#,#)",
+                true,
                 new String[]{"K:", "D:", "J:"},
                 new String[]{"N", "M1-", "M2-"},
                 new double[]{14, 1, 3},
@@ -123,6 +141,7 @@ public class IndexBuildConfig extends AbsBuildConfig {
         //配置RSI
         this.defaultIndexFlagConfig.put(IndexType.RSI, buildIndexTagEntry(
                 "RSI(#,#,#)",
+                true,
                 new String[]{"RSI#:", "RSI#:", "RSI#:"},
                 new String[]{"RSI1-", "RSI2-", "RSI3-"},
                 new double[]{14, 0, 0},
@@ -133,6 +152,7 @@ public class IndexBuildConfig extends AbsBuildConfig {
         //配置WR
         this.defaultIndexFlagConfig.put(IndexType.WR, buildIndexTagEntry(
                 null,
+                true,
                 new String[]{"WR(#):", "WR(#):", "WR(#):"},
                 new String[]{"WR1-", "WR2-", "WR3-"},
                 new double[]{14, 0, 0},
@@ -151,7 +171,7 @@ public class IndexBuildConfig extends AbsBuildConfig {
      * @param flags  指标标识（数组）
      * @param colors 指标颜色（数组）
      */
-    private IndexConfigEntry buildIndexTagEntry(String tag, String[] names, String[] terms, double[] flags, int scale, boolean[] enables, @ColorInt int[] colors, ValueFormatter formatter) {
+    private IndexConfigEntry buildIndexTagEntry(String tag, boolean customizable, String[] names, String[] terms, double[] flags, int scale, boolean[] enables, @ColorInt int[] colors, ValueFormatter formatter) {
         if (null == names || null == flags || null == colors) {
             return null;
         }
@@ -176,7 +196,7 @@ public class IndexBuildConfig extends AbsBuildConfig {
             }
             entries[i] = new IndexConfigEntry.FlagEntry(names[i], term, flag, scale, color, enable, formatter);
         }
-        return new IndexConfigEntry(tag, entries, scale, formatter);
+        return new IndexConfigEntry(tag, customizable, entries, scale, formatter);
     }
 
     /**
@@ -200,8 +220,8 @@ public class IndexBuildConfig extends AbsBuildConfig {
             }
             IndexConfigEntry.FlagEntry[] copy = new IndexConfigEntry.FlagEntry[count];
             System.arraycopy(entries, 0, copy, 0, copy.length);
-            this.indexFlags.put(item.getKey(), new IndexConfigEntry(item.getValue().getTag(), copy,
-                    item.getValue().getScale(), formatter));
+            this.indexFlags.put(item.getKey(), new IndexConfigEntry(item.getValue().getTag(),
+                    item.getValue().isCustomizable(), copy, item.getValue().getScale(), formatter));
         }
     }
 

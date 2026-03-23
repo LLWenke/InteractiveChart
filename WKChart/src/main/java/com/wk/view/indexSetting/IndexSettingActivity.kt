@@ -86,7 +86,8 @@ class IndexSettingActivity : AppCompatActivity(), IndexManager.IndexConfigChange
                             index.color,
                             getImageRes(i),
                             unCheckedImageRes,
-                            index.isEnable
+                            index.isEnable,
+                            item.value.isCustomizable
                         )
                     )
                 } else {
@@ -99,7 +100,8 @@ class IndexSettingActivity : AppCompatActivity(), IndexManager.IndexConfigChange
                             0,
                             null,
                             null,
-                            index.isEnable
+                            index.isEnable,
+                            item.value.isCustomizable
                         )
                     )
                 }
@@ -128,6 +130,11 @@ class IndexSettingActivity : AppCompatActivity(), IndexManager.IndexConfigChange
                 IndexType.SAR -> {
                     footerTips = getString(R.string.wk_sar_tips)
                     baseName = getString(R.string.wk_sar)
+                }
+
+                IndexType.AVL -> {
+                    footerTips = getString(R.string.wk_avl_tips)
+                    baseName = getString(R.string.wk_avl)
                 }
 
                 IndexType.MACD -> {
@@ -159,7 +166,7 @@ class IndexSettingActivity : AppCompatActivity(), IndexManager.IndexConfigChange
                     baseName,
                     baseTitle,
                     isShowInterval,
-                    IndexFooterNode(item.key, footerTips)
+                    IndexFooterNode(item.key, footerTips, item.value.isCustomizable)
                 )
             )
         }

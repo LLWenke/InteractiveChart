@@ -106,6 +106,7 @@ public class IndexLineDrawing extends IndexDrawing<CandleRender, AbsModule<?>> {
                 canvas.drawLine(viewRect.left, gridBuffer[1], viewRect.right, gridBuffer[1], centerLinePaint);
                 break;
             case IndexType.BOLL:
+            case IndexType.AVL:
             case IndexType.CANDLE_MA:
             case IndexType.DMI:
             case IndexType.EMA:

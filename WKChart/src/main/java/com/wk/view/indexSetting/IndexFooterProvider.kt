@@ -25,6 +25,8 @@ class IndexFooterProvider : BaseNodeProvider() {
     override fun convert(helper: BaseViewHolder, item: BaseNode) {
         val entity = item as IndexFooterNode
         helper.setText(R.id.tv_index_tips_value, entity.tips)
-        helper.getView<View>(R.id.tv_reset).setOnClickListener { getAdapter()?.resetDefaultChildNode(entity.indexType) }
+        val resetView = helper.getView<View>(R.id.tv_reset)
+        resetView.visibility = if (entity.hasReset) View.VISIBLE else View.GONE
+        resetView.setOnClickListener { getAdapter()?.resetDefaultChildNode(entity.indexType) }
     }
 }
