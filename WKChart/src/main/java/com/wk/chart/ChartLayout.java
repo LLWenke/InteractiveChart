@@ -166,6 +166,8 @@ public class ChartLayout extends ConstraintLayout {
         candleModule.addDrawing(new IndexLabelDrawing(IndexType.BOLL));//BOLL指标文字标签组件
         candleModule.addDrawing(new SARDrawing());//SAR指标组件
         candleModule.addDrawing(new IndexLabelDrawing(IndexType.SAR));//SAR指标文字标签组件
+        candleModule.addDrawing(new IndexLineDrawing(IndexType.AVL));//AVL指标组件
+        candleModule.addDrawing(new IndexLabelDrawing(IndexType.AVL));//AVL指标文字标签组件
         candleModule.addDrawing(new MarkerPointDrawing());//标记点绘制组件
         candleModule.addDrawing(new ExtremumTagDrawing(ClickDrawingID.ID_EXTREMUM_TAG));//极值标签组件
         candleModule.addDrawing(new BorderDrawing(PositionType.BOTTOM));//边框组件

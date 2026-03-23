@@ -30,6 +30,7 @@ class IndexChildProvider : BaseNodeProvider() {
         val entity = item as IndexChildNode
         val input = helper.getView<FontEditTextView>(R.id.et_index_value)
         input.setListener(null)
+        input.isEnabled = entity.customizable
         helper.setText(R.id.tv_index_label, entity.name)
         input.setText(
             if (0.0 == entity.flag) null else NumberUtils.parseBigDecimal(
@@ -58,7 +59,9 @@ class IndexChildProvider : BaseNodeProvider() {
             setCheckBoxImageRes(helper, entity.imageRes)
             getAdapter()?.notifyBaseNode(entity.indexType)
         }
-        helper.getView<View>(R.id.iv_index_check_box).setOnClickListener {
+        val indexCheckBox = helper.getView<View>(R.id.iv_index_check_box)
+        indexCheckBox.isEnabled = entity.customizable
+        indexCheckBox.setOnClickListener {
             entity.setEnable(!entity.isEnable())
             setCheckBoxImageRes(helper, entity.imageRes)
             getAdapter()?.notifyBaseNode(entity.indexType)

@@ -162,7 +162,7 @@ public class CandleDataCalculate {
                     md += value * value;
                 }
                 md = md / n;
-                md = (double) Math.sqrt(md);
+                md = Math.sqrt(md);
                 double up = maValue + p * md;//上轨线
                 double dn = maValue - p * md;//下轨线
                 //精度恢复运算
@@ -188,7 +188,7 @@ public class CandleDataCalculate {
      *
      * @param data 数据集合
      */
-    public void calculateSAR2(
+    public void calculateSAR(
             @NonNull List<CandleEntry> data,
             @NonNull IndexBuildConfig indicatorConfig,
             @NonNull ValueFormatter formatter,
@@ -219,56 +219,115 @@ public class CandleDataCalculate {
             double high = entry.getHigh().value;
             double low = entry.getLow().value;
             if (i == 0) {
-                sar = low;
-                ep = high;
+                // 用第2根K线的收盘来确定第1根的初始趋势，
+                // 再据此初始化第1根的 SAR/EP（否则第二根很容易出现明显偏差）
+                if (z >= 2) {
+                    double close0 = entry.getClose().value;
+                    double close1 = data.get(1).getClose().value;
+                    upTrend = close1 >= close0;
+                    sar = upTrend ? low : high;
+                    ep = upTrend ? high : low;
+                } else {
+                    // 兜底：只有一根K线时无法判定趋势
+                    sar = low;
+                    ep = high;
+                }
+                af = start;
             } else {
                 CandleEntry prev = data.get(i - 1);
                 double prevHigh = prev.getHigh().value;
                 double prevLow = prev.getLow().value;
+                double prevSAR = sar;
                 if (i == 1) {
-                    // 确定初始趋势方向
-                    double close = entry.getClose().value;
-                    if (close > prevHigh) {
-                        upTrend = true;
-                        sar = prevLow;
-                        ep = high;
-                    } else if (close < prevLow) {
-                        upTrend = false;
-                        sar = prevHigh;
-                        ep = low;
-                    } else {
-                        upTrend = true;
-                        sar = prevLow;
-                        ep = Math.max(prevHigh, high);
-                    }
-                    af = start;
-                } else {
-                    // 标准 SAR 计算
-                    double prevSAR = sar;
-                    CandleEntry prev2 = data.get(i - 2);
+                    // 第2根K线：使用递推公式计算 SAR
                     if (upTrend) {
                         sar = prevSAR + af * (ep - prevSAR);
-                        sar = Math.min(sar, Math.min(prevLow, prev2.getLow().value));
+                        // 先检查是否反转（不考虑边界限制）
                         if (low < sar) {
                             upTrend = false;
-                            sar = Math.max(ep, prevHigh);
+                            sar = ep; // 反转时 SAR=前一趋势EP
+                            // i==1 只有一根历史可用于边界限制
+                            sar = Math.max(sar, prevHigh);
                             ep = low;
                             af = start;
-                        } else if (high > ep) {
-                            ep = high;
-                            af = Math.min(af + increment, max);
+                        } else {
+                            // 未反转：更新EP/AF
+                            if (high > ep) {
+                                ep = high;
+                                af = Math.min(af + increment, max);
+                            }
+                            // i==1：边界限制只能参考上一根
+                            sar = Math.min(sar, prevLow);
                         }
                     } else {
                         sar = prevSAR - af * (prevSAR - ep);
-                        sar = Math.max(sar, Math.max(prevHigh, prev2.getHigh().value));
+                        // 先检查是否反转（不考虑边界限制）
                         if (high > sar) {
                             upTrend = true;
-                            sar = Math.min(ep, prevLow);
+                            sar = ep; // 反转时 SAR=前一趋势EP
+                            // i==1 只有一根历史可用于边界限制
+                            sar = Math.min(sar, prevLow);
                             ep = high;
                             af = start;
-                        } else if (low < ep) {
+                        } else {
+                            // 未反转：更新EP/AF
+                            if (low < ep) {
+                                ep = low;
+                                af = Math.min(af + increment, max);
+                            }
+                            // i==1：边界限制只能参考上一根
+                            sar = Math.max(sar, prevHigh);
+                        }
+                    }
+                } else {
+                    // 标准 SAR 计算
+                    if (upTrend) {
+                        sar = prevSAR + af * (ep - prevSAR);
+                        // 先检查是否反转（使用计算出的 SAR，不考虑边界限制）
+                        if (low < sar) {
+                            // 趋势反转：上升转下降
+                            upTrend = false;
+                            // 反转时 SAR 设置为前一个 EP（上升趋势的最高点）
+                            sar = ep;
+                            // 应用下降趋势的边界限制：SAR 不能低于前两根 K 线的最高点
+                            double maxHigh = Math.max(prevHigh, data.get(i - 2).getHigh().value);
+                            sar = Math.max(sar, maxHigh);
+                            // 设置新的 EP 为当前 bar 的最低点
                             ep = low;
-                            af = Math.min(af + increment, max);
+                            af = start;
+                        } else {
+                            // 没有反转，先更新极端点 EP（如果当前 high 超过前一个 EP）
+                            if (high > ep) {
+                                ep = high;
+                                af = Math.min(af + increment, max);
+                            }
+                            // 然后应用上升趋势的边界限制：SAR 不能高于前两根 K 线的最低点
+                            double minLow = Math.min(prevLow, data.get(i - 2).getLow().value);
+                            sar = Math.min(sar, minLow);
+                        }
+                    } else {
+                        sar = prevSAR - af * (prevSAR - ep);
+                        // 先检查是否反转（使用计算出的 SAR，不考虑边界限制）
+                        if (high > sar) {
+                            // 趋势反转：下降转上升
+                            upTrend = true;
+                            // 反转时 SAR 设置为前一个 EP（下降趋势的最低点）
+                            sar = ep;
+                            // 应用上升趋势的边界限制：SAR 不能高于前两根 K 线的最低点
+                            double minLow = Math.min(prevLow, data.get(i - 2).getLow().value);
+                            sar = Math.min(sar, minLow);
+                            // 设置新的 EP 为当前 bar 的最高点
+                            ep = high;
+                            af = start;
+                        } else {
+                            // 没有反转，先更新极端点 EP（如果当前 low 低于前一个 EP）
+                            if (low < ep) {
+                                ep = low;
+                                af = Math.min(af + increment, max);
+                            }
+                            // 然后应用下降趋势的边界限制：SAR 不能低于前两根 K 线的最高点
+                            double maxHigh = Math.max(prevHigh, data.get(i - 2).getHigh().value);
+                            sar = Math.max(sar, maxHigh);
                         }
                     }
                 }
@@ -285,6 +344,31 @@ public class CandleDataCalculate {
                 calculationCache.sar = sar;
                 calculationCache.upTrend = upTrend;
             }
+        }
+    }
+
+    /**
+     * 计算 AVL（Average Line）
+     * AVL = (Open + High + Low + Close) / 4
+     *
+     * @param data 数据集合
+     */
+    public void calculateAVL(@NonNull List<CandleEntry> data,
+                             @NonNull IndexBuildConfig indicatorConfig,
+                             @NonNull ValueFormatter formatter,
+                             @NotNull ScaleEntry scale,
+                             int startPosition
+    ) {
+        IndexConfigEntry indicatorTag = indicatorConfig.getIndexTags(IndexType.AVL);
+        if (null == indicatorTag) return;
+        for (int i = startPosition, z = data.size(); i < z; i++) {
+            CandleEntry entry = data.get(i);
+            ValueEntry avlValue = new ValueEntry((entry.getOpen().value
+                    + entry.getHigh().value
+                    + entry.getLow().value
+                    + entry.getClose().value) / 4f)
+                    .formatFixed(formatter, scale.getQuoteScale());
+            entry.putLineIndex(IndexType.AVL, avlValue);
         }
     }
 
@@ -340,7 +424,6 @@ public class CandleDataCalculate {
                 dea = ((m - 1) * dea + 2 * dif) / (m + 1);
             }
             //计算macd
-//            double macd = 2 * (dif - dea);
             double macd = dif - dea;
             if (i >= startIndex) {
                 ValueEntry[] macdValues = new ValueEntry[3];
@@ -395,7 +478,7 @@ public class CandleDataCalculate {
                 rsiMaxEma[j] = (Rmax + (flag - 1) * rsiMaxEma[j]) / flag;
                 if (i >= flag - 1 && rsiABSEma[j] != 0) {
                     double value = 100d * rsiMaxEma[j] / rsiABSEma[j];
-                    values[j] = new ValueEntry(value);
+                    values[j] = new ValueEntry(value).formatFixed(formatter, scale.getQuoteScale());
                 }
             }
             entry.putLineIndex(IndexType.RSI, values);

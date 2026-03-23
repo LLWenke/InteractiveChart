@@ -16,7 +16,8 @@ class IndexChildNode(
     private val checkedImageRes: Int?,
     @param:DrawableRes
     private val unCheckedImageRes: Int?,
-    private var enable: Boolean
+    private var enable: Boolean,
+    val customizable: Boolean,
 ) : BaseNode() {
 
     @get:DrawableRes

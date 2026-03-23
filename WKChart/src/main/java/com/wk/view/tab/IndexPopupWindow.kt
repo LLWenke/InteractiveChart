@@ -23,6 +23,7 @@ class IndexPopupWindow(
             tvEma.setOnClickListener(this@IndexPopupWindow)
             tvBoll.setOnClickListener(this@IndexPopupWindow)
             tvSar.setOnClickListener(this@IndexPopupWindow)
+            tvAvl.setOnClickListener(this@IndexPopupWindow)
             tvVolume.setOnClickListener(this@IndexPopupWindow)
             tvMacd.setOnClickListener(this@IndexPopupWindow)
             tvKdj.setOnClickListener(this@IndexPopupWindow)
@@ -52,6 +53,10 @@ class IndexPopupWindow(
 
             R.id.tv_sar -> {
                 mainIndexViewToggle(IndexType.SAR)
+            }
+
+            R.id.tv_avl -> {
+                mainIndexViewToggle(IndexType.AVL)
             }
 
             R.id.iv_main_index_switch -> {
@@ -109,6 +114,7 @@ class IndexPopupWindow(
         mBinding.tvEma.isSelected = false
         mBinding.tvBoll.isSelected = false
         mBinding.tvSar.isSelected = false
+        mBinding.tvAvl.isSelected = false
         mBinding.ivMainIndexSwitch.isSelected = false
         indexTypeSet?.forEach { indexType ->
             when (indexType) {
@@ -126,6 +132,10 @@ class IndexPopupWindow(
 
                 IndexType.SAR -> {
                     mBinding.tvSar.isSelected = true
+                }
+
+                IndexType.AVL -> {
+                    mBinding.tvAvl.isSelected = true
                 }
 
                 IndexType.NONE -> {
